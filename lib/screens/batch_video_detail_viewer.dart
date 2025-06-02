@@ -47,6 +47,7 @@ class BatchVideoDetailViewer extends StatefulWidget {
 class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   List<VideoInfo> videoInfos = [];
   bool isLoading = false;
+  int _selectedIndex = 0; // 0: Dữ liệu, 1: Thống kê
 
   Future<void> pickVideos() async {
     try {
@@ -403,382 +404,445 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
           ? const Center(child: CircularProgressIndicator())
           : videoInfos.isEmpty
               ? _buildEmptyState(isMobile)
-              : DragTarget<List<File>>(
-                  onWillAccept: (files) => files != null && files.isNotEmpty,
-                  onAcceptWithDetails: (details) async {
-                    final files = details.data;
-                    if (files.isNotEmpty) {
-                      List<PlatformFile> platformFiles = files
-                          .map((file) => PlatformFile(
-                                path: file.path,
-                                name: file.path
-                                    .split(Platform.pathSeparator)
-                                    .last,
-                                size: file.lengthSync(),
-                              ))
-                          .toList();
-                      await _processFiles(platformFiles);
-                    }
-                  },
-                  builder: (context, candidates, rejects) => Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: candidates.isNotEmpty
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer
-                                  .withOpacity(0.2)
-                              : null,
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (candidates.isNotEmpty)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 16),
-                                      width: double.infinity,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                      child: const Text(
-                                        'Drop files to add them',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  const SizedBox(height: 8),
-                                  Card(
-                                    elevation: 2,
-                                    clipBehavior: Clip.antiAlias,
-                                    margin: EdgeInsets.zero,
-                                    child: DataTable(
-                                      headingRowHeight: 50,
-                                      dataRowMinHeight: 48,
-                                      dataRowMaxHeight: 64,
-                                      horizontalMargin: 24,
-                                      columnSpacing: 20,
-                                      headingRowColor:
-                                          MaterialStateProperty.all(
-                                        Theme.of(context)
-                                            .colorScheme
-                                            .surfaceVariant,
-                                      ),
-                                      border: TableBorder(
-                                        horizontalInside: BorderSide(
-                                          width: 1,
-                                          color: Theme.of(context)
-                                              .dividerColor
-                                              .withOpacity(0.3),
-                                        ),
-                                      ),
-                                      columns: [
-                                        DataColumn(
-                                            label: Text('Name',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Ext',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Created Date',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Size (MB)',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Duration',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Total Bitrate',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Width',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Height',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Framerate',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Audio Bitrate',
-                                                style: headingStyle)),
-                                        DataColumn(
-                                            label: Text('Audio Channels',
-                                                style: headingStyle)),
-                                      ],
-                                      rows: [
-                                        ...videoInfos.map((info) => DataRow(
-                                              cells: [
-                                                DataCell(
-                                                  SizedBox(
-                                                    width: 150,
-                                                    child: Text(
-                                                      _truncateText(
-                                                          info.name, 20),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ),
-                                                DataCell(Text(info.extension)),
-                                                DataCell(Text(dateFormat
-                                                    .format(info.createdDate))),
-                                                DataCell(Text(info.sizeMB
-                                                    .toStringAsFixed(2))),
-                                                DataCell(Text(_formatDuration(
-                                                    info.duration))),
-                                                DataCell(Text(
-                                                    '${(info.totalBitrate / 1000).toStringAsFixed(2)} kbps')),
-                                                DataCell(Text(info.frameWidth
-                                                    .toString())),
-                                                DataCell(Text(info.frameHeight
-                                                    .toString())),
-                                                DataCell(Text(info.framerate
-                                                    .toStringAsFixed(2))),
-                                                DataCell(Text(
-                                                    '${(info.audioBitrate / 1000).toStringAsFixed(2)} kbps')),
-                                                DataCell(Text(info.audioChannels
-                                                    .toString())),
-                                              ],
-                                            )),
-                                        if (stats.isNotEmpty) ...[
-                                          // MAX row with bold background
-                                          DataRow(
-                                            color: MaterialStateProperty.all(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .primaryContainer
-                                                  .withOpacity(0.3),
-                                            ),
-                                            cells: [
-                                              DataCell(Text('MAX',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              const DataCell(Text('')),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(
-                                                  stats['sizeMB']['max']
-                                                      .toStringAsFixed(2),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(
-                                                  '${(stats['totalBitrate']['max'] / 1000).toStringAsFixed(2)} kbps',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['frameWidth']['max']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['frameHeight']['max']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['framerate']['max']
-                                                      .toStringAsFixed(2),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  '${(stats['audioBitrate']['max'] / 1000).toStringAsFixed(2)} kbps',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['audioChannels']['max']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                            ],
-                                          ),
-                                          // MIN row with light background
-                                          DataRow(
-                                            color: MaterialStateProperty.all(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .surfaceVariant
-                                                  .withOpacity(0.2),
-                                            ),
-                                            cells: [
-                                              DataCell(Text('MIN',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              const DataCell(Text('')),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(stats['sizeMB']
-                                                      ['min']
-                                                  .toStringAsFixed(2))),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(
-                                                  '${(stats['totalBitrate']['min'] / 1000).toStringAsFixed(2)} kbps')),
-                                              DataCell(Text(stats['frameWidth']
-                                                      ['min']
-                                                  .toString())),
-                                              DataCell(Text(stats['frameHeight']
-                                                      ['min']
-                                                  .toString())),
-                                              DataCell(Text(stats['framerate']
-                                                      ['min']
-                                                  .toStringAsFixed(2))),
-                                              DataCell(Text(
-                                                  '${(stats['audioBitrate']['min'] / 1000).toStringAsFixed(2)} kbps')),
-                                              DataCell(Text(
-                                                  stats['audioChannels']['min']
-                                                      .toString())),
-                                            ],
-                                          ),
-                                          // AVG row with light background
-                                          DataRow(
-                                            color: MaterialStateProperty.all(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .surfaceVariant
-                                                  .withOpacity(0.2),
-                                            ),
-                                            cells: [
-                                              DataCell(Text('AVG',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              const DataCell(Text('')),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(stats['sizeMB']
-                                                      ['avg']
-                                                  .toStringAsFixed(2))),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(
-                                                  '${(stats['totalBitrate']['avg'] / 1000).toStringAsFixed(2)} kbps')),
-                                              DataCell(Text(stats['frameWidth']
-                                                      ['avg']
-                                                  .toStringAsFixed(2))),
-                                              DataCell(Text(stats['frameHeight']
-                                                      ['avg']
-                                                  .toStringAsFixed(2))),
-                                              DataCell(Text(stats['framerate']
-                                                      ['avg']
-                                                  .toStringAsFixed(2))),
-                                              DataCell(Text(
-                                                  '${(stats['audioBitrate']['avg'] / 1000).toStringAsFixed(2)} kbps')),
-                                              DataCell(Text(
-                                                  stats['audioChannels']['avg']
-                                                      .toStringAsFixed(2))),
-                                            ],
-                                          ),
-                                          // COMMON row with bold background
-                                          DataRow(
-                                            color: MaterialStateProperty.all(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .primaryContainer
-                                                  .withOpacity(0.3),
-                                            ),
-                                            cells: [
-                                              DataCell(Text('COMMON',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              const DataCell(Text('')),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(
-                                                  stats['sizeMB']['common']
-                                                      .toStringAsFixed(2),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              const DataCell(Text('')),
-                                              DataCell(Text(
-                                                  '${(stats['totalBitrate']['common'] / 1000).toStringAsFixed(2)} kbps',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['frameWidth']['common']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['frameHeight']['common']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['framerate']['common']
-                                                      .toStringAsFixed(2),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  '${(stats['audioBitrate']['common'] / 1000).toStringAsFixed(2)} kbps',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                              DataCell(Text(
-                                                  stats['audioChannels']
-                                                          ['common']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                            ],
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (candidates.isNotEmpty)
-                        Positioned.fill(
-                          child: Container(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.05),
-                            child: const Center(
-                              child: Text(
-                                'Drop videos here',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+              : _selectedIndex == 0
+                  ? _buildDataTab(stats, dateFormat, headingStyle, isMobile)
+                  : _buildStatsTab(stats, headingStyle),
+      bottomNavigationBar: videoInfos.isNotEmpty
+          ? BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.table_chart),
+                  label: 'Dữ liệu',
                 ),
-      floatingActionButton: isMobile
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bar_chart),
+                  label: 'Thống kê',
+                ),
+              ],
+            )
+          : null,
+      floatingActionButton: isMobile && !isLoading
           ? FloatingActionButton(
-              onPressed: isLoading ? null : pickVideos,
+              onPressed: pickVideos,
               tooltip: 'Add videos',
               child: const Icon(Icons.add),
             )
           : null,
+    );
+  }
+
+  Widget _buildDataTab(Map<String, dynamic> stats, DateFormat dateFormat,
+      TextStyle headingStyle, bool isMobile) {
+    return DragTarget<List<File>>(
+      onWillAccept: (files) => files != null && files.isNotEmpty,
+      onAcceptWithDetails: (details) async {
+        final files = details.data;
+        if (files.isNotEmpty) {
+          List<PlatformFile> platformFiles = files
+              .map((file) => PlatformFile(
+                    path: file.path,
+                    name: file.path.split(Platform.pathSeparator).last,
+                    size: file.lengthSync(),
+                  ))
+              .toList();
+          await _processFiles(platformFiles);
+        }
+      },
+      builder: (context, candidates, rejects) => Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: candidates.isNotEmpty
+                  ? Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withOpacity(0.2)
+                  : null,
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (candidates.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
+                          width: double.infinity,
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          child: const Text(
+                            'Drop files to add them',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      Card(
+                        elevation: 2,
+                        clipBehavior: Clip.antiAlias,
+                        margin: EdgeInsets.zero,
+                        child: DataTable(
+                          headingRowHeight: 50,
+                          dataRowMinHeight: 48,
+                          dataRowMaxHeight: 64,
+                          horizontalMargin: 24,
+                          columnSpacing: 20,
+                          headingRowColor: MaterialStateProperty.all(
+                            Theme.of(context).colorScheme.surfaceVariant,
+                          ),
+                          border: TableBorder(
+                            horizontalInside: BorderSide(
+                              width: 1,
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.3),
+                            ),
+                          ),
+                          columns: [
+                            DataColumn(
+                                label: Text('Name', style: headingStyle)),
+                            DataColumn(label: Text('Ext', style: headingStyle)),
+                            DataColumn(
+                                label:
+                                    Text('Created Date', style: headingStyle)),
+                            DataColumn(
+                                label: Text('Size (MB)', style: headingStyle)),
+                            DataColumn(
+                                label: Text('Duration', style: headingStyle)),
+                            DataColumn(
+                                label:
+                                    Text('Total Bitrate', style: headingStyle)),
+                            DataColumn(
+                                label: Text('Width', style: headingStyle)),
+                            DataColumn(
+                                label: Text('Height', style: headingStyle)),
+                            DataColumn(
+                                label: Text('Framerate', style: headingStyle)),
+                            DataColumn(
+                                label:
+                                    Text('Audio Bitrate', style: headingStyle)),
+                            DataColumn(
+                                label: Text('Audio Channels',
+                                    style: headingStyle)),
+                          ],
+                          rows: [
+                            ...videoInfos.map((info) => DataRow(
+                                  cells: [
+                                    DataCell(
+                                      SizedBox(
+                                        width: 150,
+                                        child: Text(
+                                          _truncateText(info.name, 20),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(Text(info.extension)),
+                                    DataCell(Text(
+                                        dateFormat.format(info.createdDate))),
+                                    DataCell(
+                                        Text(info.sizeMB.toStringAsFixed(2))),
+                                    DataCell(
+                                        Text(_formatDuration(info.duration))),
+                                    DataCell(Text(
+                                        '${(info.totalBitrate / 1000).toStringAsFixed(2)} kbps')),
+                                    DataCell(Text(info.frameWidth.toString())),
+                                    DataCell(Text(info.frameHeight.toString())),
+                                    DataCell(Text(
+                                        info.framerate.toStringAsFixed(2))),
+                                    DataCell(Text(
+                                        '${(info.audioBitrate / 1000).toStringAsFixed(2)} kbps')),
+                                    DataCell(
+                                        Text(info.audioChannels.toString())),
+                                  ],
+                                )),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (candidates.isNotEmpty)
+            Positioned.fill(
+              child: Container(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                child: const Center(
+                  child: Text(
+                    'Drop videos here',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsTab(Map<String, dynamic> stats, TextStyle headingStyle) {
+    if (stats.isEmpty) {
+      return const Center(child: Text('No statistics available'));
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Video Statistics Summary',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Resolution Analysis Card
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Resolution',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Common Resolution',
+                          '${stats['frameWidth']['common']}x${stats['frameHeight']['common']}',
+                          Icons.aspect_ratio,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Max Resolution',
+                          '${stats['frameWidth']['max']}x${stats['frameHeight']['max']}',
+                          Icons.photo_size_select_large,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Min Resolution',
+                          '${stats['frameWidth']['min']}x${stats['frameHeight']['min']}',
+                          Icons.photo_size_select_small,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Bitrate Analysis Card
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bitrate',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Average Video Bitrate',
+                          '${(stats['totalBitrate']['avg'] / 1000).toStringAsFixed(2)} kbps',
+                          Icons.high_quality,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Max Video Bitrate',
+                          '${(stats['totalBitrate']['max'] / 1000).toStringAsFixed(2)} kbps',
+                          Icons.trending_up,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Average Audio Bitrate',
+                          '${(stats['audioBitrate']['avg'] / 1000).toStringAsFixed(2)} kbps',
+                          Icons.audiotrack,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Common Audio Channels',
+                          '${stats['audioChannels']['common']}',
+                          Icons.surround_sound,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Filesize Analysis Card
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'File Size',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Average Size',
+                          '${stats['sizeMB']['avg'].toStringAsFixed(2)} MB',
+                          Icons.sd_storage,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Largest',
+                          '${stats['sizeMB']['max'].toStringAsFixed(2)} MB',
+                          Icons.arrow_upward,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Smallest',
+                          '${stats['sizeMB']['min'].toStringAsFixed(2)} MB',
+                          Icons.arrow_downward,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Framerate Analysis Card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Framerate',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Common Framerate',
+                          '${stats['framerate']['common'].toStringAsFixed(2)} FPS',
+                          Icons.timelapse,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Average Framerate',
+                          '${stats['framerate']['avg'].toStringAsFixed(2)} FPS',
+                          Icons.speed,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon) {
+    return Card(
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: Column(
+          children: [
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

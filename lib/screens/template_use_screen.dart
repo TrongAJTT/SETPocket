@@ -15,17 +15,26 @@ class TemplateUseScreen extends StatefulWidget {
   State<TemplateUseScreen> createState() => _TemplateUseScreenState();
 }
 
-class _TemplateUseScreenState extends State<TemplateUseScreen> {
+class _TemplateUseScreenState extends State<TemplateUseScreen>
+    with SingleTickerProviderStateMixin {
   late String _previewText;
+  late TabController _tabController;
   final Map<String, dynamic> _fieldValues = {};
   final List<TemplateElement> _elements = [];
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _extractElements();
     _previewText = widget.template.content;
     _updatePreview();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _extractElements() {
@@ -147,29 +156,69 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Tìm tất cả vòng lặp dữ liệu
     final loops =
         TemplateManager.findDataLoopsInContent(widget.template.content);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tạo văn bản: ${widget.template.title}'),
+        title: Text('Generate Document: ${widget.template.title}'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.edit), text: 'Fill Data'),
+            Tab(icon: Icon(Icons.visibility), text: 'Preview'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.description),
-            tooltip: 'Xem văn bản',
+            tooltip: 'Show Document',
             onPressed: _showFinalDocument,
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Preview card
-              Card(
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // Tab 1: Fill Data
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Fill Information',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  ..._buildFieldInputs(),
+                  if (loops.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Data Loops',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+                    ...loops
+                        .map((loop) => _buildDataLoopSection(loop))
+                        .toList(),
+                  ],
+                  const SizedBox(height: 32),
+                  FilledButton.icon(
+                    onPressed: _showFinalDocument,
+                    icon: const Icon(Icons.text_snippet),
+                    label: const Text('Generate Document'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Tab 2: Preview
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
                 elevation: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -180,7 +229,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Xem trước',
+                            'Preview',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -188,7 +237,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
                           ),
                           TextButton.icon(
                             icon: const Icon(Icons.copy),
-                            label: const Text('Sao chép'),
+                            label: const Text('Copy'),
                             onPressed: () => _copyPreviewText(),
                           ),
                         ],
@@ -202,42 +251,9 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // Field inputs section
-              const Text(
-                'Điền thông tin',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ..._buildFieldInputs(),
-
-              // Vòng lặp dữ liệu section
-              if (loops.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                const Text(
-                  'Vòng lặp dữ liệu',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ...loops.map((loop) => _buildDataLoopSection(loop)).toList(),
-              ],
-
-              const SizedBox(height: 32),
-              FilledButton.icon(
-                onPressed: _showFinalDocument,
-                icon: const Icon(Icons.text_snippet),
-                label: const Text('Tạo văn bản'),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -309,7 +325,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
                 FilledButton.icon(
                   onPressed: () => _addLoopInstance(loopId),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Thêm dòng mới'),
+                  label: const Text('Add New Row'),
                 ),
               ],
             ),
@@ -343,7 +359,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Dòng ${instanceIndex + 1}',
+                  'Row ${instanceIndex + 1}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 if (showDeleteButton)
@@ -353,7 +369,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
                       color: Theme.of(context).colorScheme.error,
                     ),
                     onPressed: () => _removeLoopInstance(loopId, instanceIndex),
-                    tooltip: 'Xóa dòng này',
+                    tooltip: 'Delete this row',
                   ),
               ],
             ),
@@ -390,7 +406,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
       case 'text':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Nhập ${element.title.toLowerCase()}',
+            hintText: 'Enter ${element.title.toLowerCase()}',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_fields),
           ),
@@ -403,7 +419,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
       case 'largetext':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Nhập ${element.title.toLowerCase()}',
+            hintText: 'Enter ${element.title.toLowerCase()}',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_snippet),
           ),
@@ -419,7 +435,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
       case 'number':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Nhập ${element.title.toLowerCase()}',
+            hintText: 'Enter ${element.title.toLowerCase()}',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.numbers),
           ),
@@ -432,7 +448,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
         );
 
       default:
-        return Text('Loại trường ${element.type} chưa hỗ trợ trong vòng lặp');
+        return Text('Field type ${element.type} not supported in loop');
     }
   }
 
@@ -477,7 +493,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
       case 'text':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Nhập ${element.title.toLowerCase()}',
+            hintText: 'Enter ${element.title.toLowerCase()}',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_fields),
           ),
@@ -490,7 +506,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
       case 'largetext':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Nhập ${element.title.toLowerCase()}',
+            hintText: 'Enter ${element.title.toLowerCase()}',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_snippet),
           ),
@@ -506,7 +522,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
       case 'number':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Nhập ${element.title.toLowerCase()}',
+            hintText: 'Enter ${element.title.toLowerCase()}',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.numbers),
           ),
@@ -563,7 +579,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
               _fieldValues[element.id] != null
                   ? DateFormat('dd/MM/yyyy')
                       .format(_fieldValues[element.id] as DateTime)
-                  : 'Chọn ngày',
+                  : 'Select date',
             ),
           ),
         );
@@ -609,7 +625,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
             child: Text(
               _fieldValues[element.id] != null
                   ? '${(_fieldValues[element.id] as TimeOfDay).hour.toString().padLeft(2, '0')}:${(_fieldValues[element.id] as TimeOfDay).minute.toString().padLeft(2, '0')}'
-                  : 'Chọn giờ',
+                  : 'Select time',
             ),
           ),
         );
@@ -634,13 +650,13 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
               _fieldValues[element.id] != null
                   ? DateFormat('dd/MM/yyyy HH:mm')
                       .format(_fieldValues[element.id] as DateTime)
-                  : 'Chọn ngày và giờ',
+                  : 'Select date and time',
             ),
           ),
         );
 
       default:
-        return const Text('Loại trường không hỗ trợ');
+        return const Text('Unsupported field type');
     }
   }
 
@@ -727,7 +743,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
   void _copyPreviewText() {
     Clipboard.setData(ClipboardData(text: _previewText)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã sao chép vào clipboard')),
+        const SnackBar(content: Text('Copied to clipboard')),
       );
     });
   }
@@ -736,7 +752,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Văn bản đã hoàn thành'),
+        title: const Text('Completed Document'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -756,11 +772,11 @@ class _TemplateUseScreenState extends State<TemplateUseScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
+            child: const Text('Close'),
           ),
           FilledButton.icon(
             icon: const Icon(Icons.copy),
-            label: const Text('Sao chép'),
+            label: const Text('Copy'),
             onPressed: () {
               _copyPreviewText();
               Navigator.pop(context);

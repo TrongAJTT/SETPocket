@@ -12,7 +12,8 @@ class TemplateEditScreen extends StatefulWidget {
   State<TemplateEditScreen> createState() => _TemplateEditScreenState();
 }
 
-class _TemplateEditScreenState extends State<TemplateEditScreen> {
+class _TemplateEditScreenState extends State<TemplateEditScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
@@ -22,10 +23,21 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
   Map<String, List<TemplateElement>> _duplicateIds = {};
   int _elementCount = 0;
   TextSelection? _savedCursorPosition;
-
+  // Tab controller
+  late TabController _tabController;
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          // Refresh when tab changes
+          _refreshElements();
+        });
+      }
+    });
+
     if (widget.template != null) {
       _titleController.text = widget.template!.title;
       _contentController.text = widget.template!.content;
@@ -38,6 +50,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
     _titleController.dispose();
     _contentController.dispose();
     _contentFocusNode.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -56,14 +69,27 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Sửa mẫu' : 'Tạo mẫu mới'),
+        title: Text(isEditing ? 'Edit Template' : 'Create New Template'),
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.save),
-            label: const Text('Lưu'),
+            label: const Text('Save'),
             onPressed: _isLoading ? null : _saveTemplate,
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.edit_document),
+              text: 'Content',
+            ),
+            Tab(
+              icon: Icon(Icons.view_module),
+              text: 'Structure',
+            ),
+          ],
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -78,13 +104,13 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
-                        labelText: 'Tiêu đề mẫu *',
+                        labelText: 'Template Title *',
                         border: OutlineInputBorder(),
-                        hintText: 'Nhập tiêu đề cho mẫu này',
+                        hintText: 'Enter title for this template',
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Vui lòng nhập tiêu đề';
+                          return 'Please enter a title';
                         }
                         return null;
                       },
@@ -98,7 +124,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                           child: ElevatedButton.icon(
                             onPressed: _showAddFieldDialog,
                             icon: const Icon(Icons.add_circle_outline),
-                            label: const Text('Thêm trường dữ liệu'),
+                            label: const Text('Add Data Field'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -106,59 +132,26 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                           child: ElevatedButton.icon(
                             onPressed: () => _showAddLoopDialog(),
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Thêm vòng lặp dữ liệu'),
+                            label: const Text('Add Data Loop'),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
 
-                    // Content field
+                    // TabBarView for content and structure
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                      child: TabBarView(
+                        controller: _tabController,
                         children: [
-                          const Text(
-                            'Nội dung mẫu *',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: TextFormField(
-                                controller: _contentController,
-                                focusNode: _contentFocusNode,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.all(16),
-                                  hintText:
-                                      'Nhập nội dung mẫu và thêm các trường dữ liệu...',
-                                ),
-                                maxLines: null,
-                                expands: true,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return 'Vui lòng nhập nội dung mẫu';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (_) => _refreshElements(),
-                              ),
-                            ),
-                          ),
+                          // Tab 1: Content
+                          _buildContentTab(),
+
+                          // Tab 2: Structure
+                          _buildStructureTab(),
                         ],
                       ),
                     ),
-
-                    // Element summary
-                    const SizedBox(height: 16),
-                    _buildElementSummary(),
                   ],
                 ),
               ),
@@ -549,7 +542,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text('Thêm trường dữ liệu'),
+            title: const Text('Add Data Field'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -570,26 +563,26 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                       selectedType = value;
                     });
                   }),
-                  _buildRadioOption('number', 'Số', Icons.numbers, selectedType,
+                  _buildRadioOption(
+                      'number', 'Number', Icons.numbers, selectedType, (value) {
+                    setState(() {
+                      selectedType = value;
+                    });
+                  }),
+                  _buildRadioOption(
+                      'date', 'Date', Icons.calendar_today, selectedType,
                       (value) {
                     setState(() {
                       selectedType = value;
                     });
                   }),
                   _buildRadioOption(
-                      'date', 'Ngày', Icons.calendar_today, selectedType,
-                      (value) {
+                      'time', 'Time', Icons.access_time, selectedType, (value) {
                     setState(() {
                       selectedType = value;
                     });
                   }),
-                  _buildRadioOption(
-                      'time', 'Giờ', Icons.access_time, selectedType, (value) {
-                    setState(() {
-                      selectedType = value;
-                    });
-                  }),
-                  _buildRadioOption('datetime', 'Ngày giờ',
+                  _buildRadioOption('datetime', 'DateTime',
                       Icons.calendar_month, selectedType, (value) {
                     setState(() {
                       selectedType = value;
@@ -599,8 +592,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                   TextField(
                     controller: titleController,
                     decoration: const InputDecoration(
-                      labelText: 'Tiêu đề trường *',
-                      hintText: 'Ví dụ: Tên khách hàng',
+                      labelText: 'Field title *',
+                      hintText: 'E.g. Customer name',
                       border: OutlineInputBorder(),
                     ),
                     autofocus: true,
@@ -643,7 +636,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                   });
                 },
                 icon: const Icon(Icons.copy),
-                label: const Text('Sao chép và đóng'),
+                label: const Text('Copy and Close'),
               ),
               FilledButton.icon(
                 onPressed: () {
@@ -667,7 +660,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                   Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.add_task),
-                label: const Text('Thêm vào vị trí hiện tại'),
+                label: const Text('Insert at Cursor'),
               ),
               FilledButton.icon(
                 onPressed: () {
@@ -691,7 +684,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
                   Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.arrow_downward),
-                label: const Text('Thêm vào cuối'),
+                label: const Text('Append to End'),
               ),
             ],
           );
@@ -774,7 +767,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Thêm vòng lặp dữ liệu'),
+        title: const Text('Add Data Loop'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -785,8 +778,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
               TextField(
                 controller: titleController,
                 decoration: const InputDecoration(
-                  labelText: 'Tiêu đề vòng lặp *',
-                  hintText: 'Ví dụ: Danh sách sản phẩm',
+                  labelText: 'Loop title *',
+                  hintText: 'E.g. Product list',
                   border: OutlineInputBorder(),
                 ),
                 autofocus: true,
@@ -826,7 +819,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
               });
             },
             icon: const Icon(Icons.copy),
-            label: const Text('Sao chép và đóng'),
+            label: const Text('Copy and Close'),
           ),
           FilledButton.icon(
             onPressed: () {
@@ -849,7 +842,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.add_task),
-            label: const Text('Thêm vào vị trí hiện tại'),
+            label: const Text('Insert at Cursor'),
           ),
           FilledButton.icon(
             onPressed: () {
@@ -872,7 +865,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_downward),
-            label: const Text('Thêm vào cuối'),
+            label: const Text('Append to End'),
           ),
         ],
       ),
@@ -880,7 +873,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
   }
 
   String _generateLoopId() {
-    return 'loop_${DateTime.now().millisecondsSinceEpoch % 10000}';
+    return 'loop_${DateTime.now().millisecondsSinceEpoch % 10000}'; // Loop ID
   }
 
   void _insertLoopAtCursor(DataLoop loop) {
@@ -916,7 +909,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
   void _appendLoopAtEnd(DataLoop loop) {
     final loopStartString = loop.toLoopStartString();
     final loopEndString = loop.toLoopEndString();
-    final defaultContent = '\nNội dung vòng lặp\n';
+    final defaultContent = '\nLoop content\n'; // Default loop content
     final loopString = '$loopStartString$defaultContent$loopEndString';
 
     final text = _contentController.text;
@@ -936,8 +929,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
     if (_duplicateIds.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'Vui lòng sửa các ID trùng lặp không nhất quán trước khi lưu'),
+          content: Text('Please fix inconsistent duplicate IDs before saving'),
           backgroundColor: Colors.red,
         ),
       );
@@ -971,9 +963,227 @@ class _TemplateEditScreenState extends State<TemplateEditScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi khi lưu mẫu: ${e.toString()}')),
+          SnackBar(content: Text('Error saving template: ${e.toString()}')),
         );
       }
     }
+  }
+
+  Widget _buildContentTab() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Template Content *',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: TextFormField(
+              controller: _contentController,
+              focusNode: _contentFocusNode,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.all(16),
+                hintText: 'Enter template content and add data fields...',
+              ),
+              maxLines: null,
+              expands: true,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter template content';
+                }
+                return null;
+              },
+              onChanged: (_) => _refreshElements(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStructureTab() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Template Structure',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'View an overview of fields and loops in your template.',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const Divider(),
+                  _buildElementSummary(),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Detailed field list
+          if (_elements.isNotEmpty) _buildStructureDetails(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStructureDetails() {
+    // Find loops in content
+    final loops =
+        TemplateManager.findDataLoopsInContent(_contentController.text);
+    final elementsNotInLoop = _elements.where((e) => e.loopId == null).toList();
+
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Chi tiết cấu trúc',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Trường dữ liệu cơ bản
+            if (elementsNotInLoop.isNotEmpty) ...[
+              _buildStructureSection(
+                'Trường dữ liệu cơ bản',
+                elementsNotInLoop,
+                Icons.text_fields,
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Trường dữ liệu trong vòng lặp
+            ...loops.map((loop) {
+              final loopElements =
+                  _elements.where((e) => e.loopId == loop.id).toList();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStructureSection(
+                    'Vòng lặp: ${loop.title}',
+                    loopElements,
+                    Icons.refresh,
+                    isLoop: true,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStructureSection(
+      String title, List<TemplateElement> elements, IconData icon,
+      {bool isLoop = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(${elements.length})',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isLoop
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+                  : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(8),
+            color: isLoop
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
+                : null,
+          ),
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: elements.map((element) {
+              final isDuplicate = _duplicateIds.containsKey(element.id);
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Row(
+                  children: [
+                    _getElementTypeIcon(element.type, isDuplicate),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        element.title,
+                        style: TextStyle(
+                          color: isDuplicate
+                              ? Theme.of(context).colorScheme.error
+                              : null,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      element.id,
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.6),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
   }
 }

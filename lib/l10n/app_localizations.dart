@@ -215,6 +215,18 @@ abstract class AppLocalizations {
   /// **'Personalize your experience'**
   String get settingsDesc;
 
+  /// No description provided for @random.
+  ///
+  /// In en, this message translates to:
+  /// **'Random Generator'**
+  String get random;
+
+  /// No description provided for @randomDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random passwords, numbers, dates, and more'**
+  String get randomDesc;
+
   /// No description provided for @batchVideoDetailViewer.
   ///
   /// In en, this message translates to:
@@ -988,6 +1000,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed Document'**
   String get completedDocument;
+
+  /// No description provided for @passwordGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Generator'**
+  String get passwordGenerator;
+
+  /// No description provided for @numCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of characters'**
+  String get numCharacters;
+
+  /// No description provided for @includeLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Include lowercase letters'**
+  String get includeLowercase;
+
+  /// No description provided for @includeUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Include uppercase letters'**
+  String get includeUppercase;
+
+  /// No description provided for @includeNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Include numbers'**
+  String get includeNumbers;
+
+  /// No description provided for @includeSpecial.
+  ///
+  /// In en, this message translates to:
+  /// **'Include special characters'**
+  String get includeSpecial;
+
+  /// No description provided for @generate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get generate;
+
+  /// No description provided for @generatedPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated Password'**
+  String get generatedPassword;
+
+  /// No description provided for @copyToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to Clipboard'**
+  String get copyToClipboard;
+
+  /// No description provided for @copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied!'**
+  String get copied;
+
+  /// No description provided for @numberGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Number Generator'**
+  String get numberGenerator;
+
+  /// No description provided for @integers.
+  ///
+  /// In en, this message translates to:
+  /// **'Integers'**
+  String get integers;
+
+  /// No description provided for @floatingPoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Floating Point'**
+  String get floatingPoint;
+
+  /// No description provided for @minValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum Value'**
+  String get minValue;
+
+  /// No description provided for @maxValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum Value'**
+  String get maxValue;
+
+  /// No description provided for @quantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get quantity;
+
+  /// No description provided for @allowDuplicates.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Duplicates'**
+  String get allowDuplicates;
+
+  /// No description provided for @generatedNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated Numbers'**
+  String get generatedNumbers;
+
+  /// No description provided for @yesNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes or No?'**
+  String get yesNo;
+
+  /// No description provided for @flipCoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip Coin'**
+  String get flipCoin;
+
+  /// No description provided for @rockPaperScissors.
+  ///
+  /// In en, this message translates to:
+  /// **'Rock Paper Scissors'**
+  String get rockPaperScissors;
+
+  /// No description provided for @rollDice.
+  ///
+  /// In en, this message translates to:
+  /// **'Roll Dice'**
+  String get rollDice;
+
+  /// No description provided for @diceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of dice'**
+  String get diceCount;
+
+  /// No description provided for @diceSides.
+  ///
+  /// In en, this message translates to:
+  /// **'Sides per die'**
+  String get diceSides;
+
+  /// No description provided for @colorGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Color Generator'**
+  String get colorGenerator;
+
+  /// No description provided for @hex6.
+  ///
+  /// In en, this message translates to:
+  /// **'HEX (6-digit)'**
+  String get hex6;
+
+  /// No description provided for @hex8.
+  ///
+  /// In en, this message translates to:
+  /// **'HEX (8-digit with alpha)'**
+  String get hex8;
+
+  /// No description provided for @generatedColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated Color'**
+  String get generatedColor;
+
+  /// No description provided for @latinLetters.
+  ///
+  /// In en, this message translates to:
+  /// **'Latin Letters'**
+  String get latinLetters;
+
+  /// No description provided for @letterCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of letters'**
+  String get letterCount;
+
+  /// No description provided for @playingCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Playing Cards'**
+  String get playingCards;
+
+  /// No description provided for @cardCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of cards'**
+  String get cardCount;
+
+  /// No description provided for @dateGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Generator'**
+  String get dateGenerator;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @dateCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of dates'**
+  String get dateCount;
+
+  /// No description provided for @timeGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Generator'**
+  String get timeGenerator;
+
+  /// No description provided for @startTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Time'**
+  String get startTime;
+
+  /// No description provided for @endTime.
+  ///
+  /// In en, this message translates to:
+  /// **'End Time'**
+  String get endTime;
+
+  /// No description provided for @timeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of times'**
+  String get timeCount;
+
+  /// No description provided for @dateTimeGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Date & Time Generator'**
+  String get dateTimeGenerator;
+
+  /// No description provided for @heads.
+  ///
+  /// In en, this message translates to:
+  /// **'Heads'**
+  String get heads;
+
+  /// No description provided for @tails.
+  ///
+  /// In en, this message translates to:
+  /// **'Tails'**
+  String get tails;
+
+  /// No description provided for @rock.
+  ///
+  /// In en, this message translates to:
+  /// **'Rock'**
+  String get rock;
+
+  /// No description provided for @paper.
+  ///
+  /// In en, this message translates to:
+  /// **'Paper'**
+  String get paper;
+
+  /// No description provided for @scissors.
+  ///
+  /// In en, this message translates to:
+  /// **'Scissors'**
+  String get scissors;
+
+  /// No description provided for @randomResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get randomResult;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

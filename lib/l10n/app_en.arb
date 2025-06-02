@@ -20,6 +20,9 @@
     "selectTool": "Select a tool from the sidebar",
     "settingsDesc": "Personalize your experience",
     
+    "random": "Random Generator",
+    "randomDesc": "Generate random passwords, numbers, dates, and more",
+    
     "batchVideoDetailViewer": "Batch Video Detail Viewer",
     "batchVideoDetailViewerDesc": "View details of multiple videos at once. You can see size, duration, bitrate, resolution, frame rate, and audio info.",
     "addVideos": "Add Videos",
@@ -148,7 +151,62 @@
     "unsupportedFieldType": "Field type {type} not supported",
     "selectDate": "Select date",
     "selectTime": "Select time",
-    "selectDateTime": "Select date and time",
-    "copiedToClipboard": "Copied to clipboard",
-    "completedDocument": "Completed Document"
+    "selectDateTime": "Select date and time",    "copiedToClipboard": "Copied to clipboard",
+    "completedDocument": "Completed Document",
+    
+    "passwordGenerator": "Password Generator",
+    "numCharacters": "Number of characters",
+    "includeLowercase": "Include lowercase letters",
+    "includeUppercase": "Include uppercase letters",
+    "includeNumbers": "Include numbers",
+    "includeSpecial": "Include special characters",
+    "generate": "Generate",
+    "generatedPassword": "Generated Password",
+    "copyToClipboard": "Copy to Clipboard",
+    "copied": "Copied!",
+    
+    "numberGenerator": "Number Generator",
+    "integers": "Integers",
+    "floatingPoint": "Floating Point",
+    "minValue": "Minimum Value",
+    "maxValue": "Maximum Value",
+    "quantity": "Quantity",
+    "allowDuplicates": "Allow Duplicates",
+    "generatedNumbers": "Generated Numbers",
+    
+    "yesNo": "Yes or No?",
+    "flipCoin": "Flip Coin",
+    "rockPaperScissors": "Rock Paper Scissors",
+    "rollDice": "Roll Dice",
+    "diceCount": "Number of dice",
+    "diceSides": "Sides per die",
+    
+    "colorGenerator": "Color Generator",
+    "hex6": "HEX (6-digit)",
+    "hex8": "HEX (8-digit with alpha)",
+    "generatedColor": "Generated Color",
+    
+    "latinLetters": "Latin Letters",
+    "letterCount": "Number of letters",
+    
+    "playingCards": "Playing Cards",
+    "cardCount": "Number of cards",
+    
+    "dateGenerator": "Date Generator",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "dateCount": "Number of dates",
+    
+    "timeGenerator": "Time Generator",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "timeCount": "Number of times",
+    
+    "dateTimeGenerator": "Date & Time Generator",
+    "heads": "Heads",
+    "tails": "Tails",
+    "rock": "Rock",
+    "paper": "Paper", 
+    "scissors": "Scissors",
+    "randomResult": "Result"
 }

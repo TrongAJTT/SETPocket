@@ -69,6 +69,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsDesc => 'Cá nhân hóa trải nghiệm sử dụng ứng dụng';
 
   @override
+  String get random => 'Trình tạo ngẫu nhiên';
+
+  @override
+  String get randomDesc => 'Tạo mật khẩu, số, ngày và nhiều thứ ngẫu nhiên khác';
+
+  @override
   String get batchVideoDetailViewer => 'Xem chi tiết video hàng loạt';
 
   @override
@@ -480,4 +486,145 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get completedDocument => 'Tài liệu đã hoàn thành';
+
+  @override
+  String get passwordGenerator => 'Tạo mật khẩu';
+
+  @override
+  String get numCharacters => 'Số ký tự';
+
+  @override
+  String get includeLowercase => 'Bao gồm chữ thường';
+
+  @override
+  String get includeUppercase => 'Bao gồm chữ hoa';
+
+  @override
+  String get includeNumbers => 'Bao gồm số';
+
+  @override
+  String get includeSpecial => 'Bao gồm ký tự đặc biệt';
+
+  @override
+  String get generate => 'Tạo';
+
+  @override
+  String get generatedPassword => 'Mật khẩu đã tạo';
+
+  @override
+  String get copyToClipboard => 'Sao chép';
+
+  @override
+  String get copied => 'Đã sao chép!';
+
+  @override
+  String get numberGenerator => 'Tạo số ngẫu nhiên';
+
+  @override
+  String get integers => 'Số nguyên';
+
+  @override
+  String get floatingPoint => 'Số thực';
+
+  @override
+  String get minValue => 'Giá trị tối thiểu';
+
+  @override
+  String get maxValue => 'Giá trị tối đa';
+
+  @override
+  String get quantity => 'Số lượng';
+
+  @override
+  String get allowDuplicates => 'Cho phép trùng lặp';
+
+  @override
+  String get generatedNumbers => 'Các số đã tạo';
+
+  @override
+  String get yesNo => 'Có hay Không?';
+
+  @override
+  String get flipCoin => 'Tung đồng xu';
+
+  @override
+  String get rockPaperScissors => 'Kéo búa bao';
+
+  @override
+  String get rollDice => 'Tung xúc xắc';
+
+  @override
+  String get diceCount => 'Số lượng xúc xắc';
+
+  @override
+  String get diceSides => 'Số mặt mỗi xúc xắc';
+
+  @override
+  String get colorGenerator => 'Tạo màu ngẫu nhiên';
+
+  @override
+  String get hex6 => 'HEX (6 chữ số)';
+
+  @override
+  String get hex8 => 'HEX (8 chữ số với alpha)';
+
+  @override
+  String get generatedColor => 'Màu đã tạo';
+
+  @override
+  String get latinLetters => 'Chữ cái Latin';
+
+  @override
+  String get letterCount => 'Số lượng chữ cái';
+
+  @override
+  String get playingCards => 'Bài tây';
+
+  @override
+  String get cardCount => 'Số lượng lá bài';
+
+  @override
+  String get dateGenerator => 'Tạo ngày ngẫu nhiên';
+
+  @override
+  String get startDate => 'Ngày bắt đầu';
+
+  @override
+  String get endDate => 'Ngày kết thúc';
+
+  @override
+  String get dateCount => 'Số lượng ngày';
+
+  @override
+  String get timeGenerator => 'Tạo giờ ngẫu nhiên';
+
+  @override
+  String get startTime => 'Giờ bắt đầu';
+
+  @override
+  String get endTime => 'Giờ kết thúc';
+
+  @override
+  String get timeCount => 'Số lượng giờ';
+
+  @override
+  String get dateTimeGenerator => 'Tạo ngày giờ ngẫu nhiên';
+
+  @override
+  String get heads => 'Sấp';
+
+  @override
+  String get tails => 'Ngửa';
+
+  @override
+  String get rock => 'Búa';
+
+  @override
+  String get paper => 'Giấy';
+
+  @override
+  String get scissors => 'Kéo';
+
+  @override
+  String get randomResult => 'Kết quả';
 }

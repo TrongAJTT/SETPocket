@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:my_multi_tools/models/random_generator.dart';
+
+class YesNoGeneratorScreen extends StatefulWidget {
+  const YesNoGeneratorScreen({super.key});
+
+  @override
+  State<YesNoGeneratorScreen> createState() => _YesNoGeneratorScreenState();
+}
+
+class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
+    with SingleTickerProviderStateMixin {
+  bool? _result;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.2),
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.2, end: 1.0),
+        weight: 1,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _generateResult() {
+    _controller.reset();
+    _controller.forward();
+
+    setState(() {
+      _result = RandomGenerator.generateYesNo();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(loc.yesNo),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_result != null)
+              AnimatedBuilder(
+                animation: _scaleAnimation,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _scaleAnimation.value,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _result!
+                            ? Colors.green.withOpacity(0.8)
+                            : Colors.red.withOpacity(0.8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _result! ? 'YES' : 'NO',
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+            else
+              Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey.withOpacity(0.3),
+                ),
+                child: Center(
+                  child: Text(
+                    '?',
+                    style: TextStyle(
+                      fontSize: 80,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 48),
+            SizedBox(
+              width: 200,
+              height: 50,
+              child: FilledButton.icon(
+                onPressed: _generateResult,
+                icon: const Icon(Icons.help_outline),
+                label: Text(_result == null ? loc.generate : loc.randomResult),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

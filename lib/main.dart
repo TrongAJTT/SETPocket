@@ -5,6 +5,7 @@ import 'package:my_multi_tools/widgets/tool_card.dart';
 import 'screens/batch_video_detail_viewer.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
+import 'screens/random_tools_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -196,6 +197,24 @@ class ToolSelectionScreen extends StatelessWidget {
           iconColor: Colors.blue.shade800,
           onTap: () {
             final tool = const TemplateListScreen();
+            if (isDesktop) {
+              onToolSelected?.call(tool);
+            } else {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => tool,
+                ),
+              );
+            }
+          },
+        ),
+        ToolCard(
+          title: loc.random,
+          description: loc.randomDesc,
+          icon: Icons.casino,
+          iconColor: Colors.purple,
+          onTap: () {
+            final tool = const RandomToolsScreen();
             if (isDesktop) {
               onToolSelected?.call(tool);
             } else {

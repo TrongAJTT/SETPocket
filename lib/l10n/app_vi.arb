@@ -19,6 +19,9 @@
     "cancel": "Hủy",
     "selectTool": "Chọn một chức năng ở thanh bên",
     "settingsDesc": "Cá nhân hóa trải nghiệm sử dụng ứng dụng",
+    
+    "random": "Trình tạo ngẫu nhiên",
+    "randomDesc": "Tạo mật khẩu, số, ngày và nhiều thứ ngẫu nhiên khác",
 
     "batchVideoDetailViewer": "Xem chi tiết video hàng loạt",
     "batchVideoDetailViewerDesc": "Xem thông tin chi tiết của nhiều video cùng lúc. Bạn có thể xem kích thước, thời lượng, bitrate, độ phân giải, tốc độ khung hình và thông tin âm thanh.",
@@ -148,7 +151,62 @@
     "unsupportedFieldType": "Không hỗ trợ kiểu trường {type}",
     "selectDate": "Chọn ngày",
     "selectTime": "Chọn giờ",
-    "selectDateTime": "Chọn ngày và giờ",
-    "copiedToClipboard": "Đã sao chép vào clipboard",
-    "completedDocument": "Tài liệu đã hoàn thành"
+    "selectDateTime": "Chọn ngày và giờ",    "copiedToClipboard": "Đã sao chép vào clipboard",
+    "completedDocument": "Tài liệu đã hoàn thành",
+    
+    "passwordGenerator": "Tạo mật khẩu",
+    "numCharacters": "Số ký tự",
+    "includeLowercase": "Bao gồm chữ thường",
+    "includeUppercase": "Bao gồm chữ hoa",
+    "includeNumbers": "Bao gồm số",
+    "includeSpecial": "Bao gồm ký tự đặc biệt",
+    "generate": "Tạo",
+    "generatedPassword": "Mật khẩu đã tạo",
+    "copyToClipboard": "Sao chép",
+    "copied": "Đã sao chép!",
+    
+    "numberGenerator": "Tạo số ngẫu nhiên",
+    "integers": "Số nguyên",
+    "floatingPoint": "Số thực",
+    "minValue": "Giá trị tối thiểu",
+    "maxValue": "Giá trị tối đa",
+    "quantity": "Số lượng",
+    "allowDuplicates": "Cho phép trùng lặp",
+    "generatedNumbers": "Các số đã tạo",
+    
+    "yesNo": "Có hay Không?",
+    "flipCoin": "Tung đồng xu",
+    "rockPaperScissors": "Kéo búa bao",
+    "rollDice": "Tung xúc xắc",
+    "diceCount": "Số lượng xúc xắc",
+    "diceSides": "Số mặt mỗi xúc xắc",
+    
+    "colorGenerator": "Tạo màu ngẫu nhiên",
+    "hex6": "HEX (6 chữ số)",
+    "hex8": "HEX (8 chữ số với alpha)",
+    "generatedColor": "Màu đã tạo",
+    
+    "latinLetters": "Chữ cái Latin",
+    "letterCount": "Số lượng chữ cái",
+    
+    "playingCards": "Bài tây",
+    "cardCount": "Số lượng lá bài",
+    
+    "dateGenerator": "Tạo ngày ngẫu nhiên",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "dateCount": "Số lượng ngày",
+    
+    "timeGenerator": "Tạo giờ ngẫu nhiên",
+    "startTime": "Giờ bắt đầu",
+    "endTime": "Giờ kết thúc",
+    "timeCount": "Số lượng giờ",
+    
+    "dateTimeGenerator": "Tạo ngày giờ ngẫu nhiên",
+    "heads": "Sấp",
+    "tails": "Ngửa",
+    "rock": "Búa",
+    "paper": "Giấy", 
+    "scissors": "Kéo",
+    "randomResult": "Kết quả"
 }

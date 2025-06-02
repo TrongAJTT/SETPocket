@@ -69,6 +69,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDesc => 'Personalize your experience';
 
   @override
+  String get random => 'Random Generator';
+
+  @override
+  String get randomDesc => 'Generate random passwords, numbers, dates, and more';
+
+  @override
   String get batchVideoDetailViewer => 'Batch Video Detail Viewer';
 
   @override
@@ -480,4 +486,145 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get completedDocument => 'Completed Document';
+
+  @override
+  String get passwordGenerator => 'Password Generator';
+
+  @override
+  String get numCharacters => 'Number of characters';
+
+  @override
+  String get includeLowercase => 'Include lowercase letters';
+
+  @override
+  String get includeUppercase => 'Include uppercase letters';
+
+  @override
+  String get includeNumbers => 'Include numbers';
+
+  @override
+  String get includeSpecial => 'Include special characters';
+
+  @override
+  String get generate => 'Generate';
+
+  @override
+  String get generatedPassword => 'Generated Password';
+
+  @override
+  String get copyToClipboard => 'Copy to Clipboard';
+
+  @override
+  String get copied => 'Copied!';
+
+  @override
+  String get numberGenerator => 'Number Generator';
+
+  @override
+  String get integers => 'Integers';
+
+  @override
+  String get floatingPoint => 'Floating Point';
+
+  @override
+  String get minValue => 'Minimum Value';
+
+  @override
+  String get maxValue => 'Maximum Value';
+
+  @override
+  String get quantity => 'Quantity';
+
+  @override
+  String get allowDuplicates => 'Allow Duplicates';
+
+  @override
+  String get generatedNumbers => 'Generated Numbers';
+
+  @override
+  String get yesNo => 'Yes or No?';
+
+  @override
+  String get flipCoin => 'Flip Coin';
+
+  @override
+  String get rockPaperScissors => 'Rock Paper Scissors';
+
+  @override
+  String get rollDice => 'Roll Dice';
+
+  @override
+  String get diceCount => 'Number of dice';
+
+  @override
+  String get diceSides => 'Sides per die';
+
+  @override
+  String get colorGenerator => 'Color Generator';
+
+  @override
+  String get hex6 => 'HEX (6-digit)';
+
+  @override
+  String get hex8 => 'HEX (8-digit with alpha)';
+
+  @override
+  String get generatedColor => 'Generated Color';
+
+  @override
+  String get latinLetters => 'Latin Letters';
+
+  @override
+  String get letterCount => 'Number of letters';
+
+  @override
+  String get playingCards => 'Playing Cards';
+
+  @override
+  String get cardCount => 'Number of cards';
+
+  @override
+  String get dateGenerator => 'Date Generator';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get dateCount => 'Number of dates';
+
+  @override
+  String get timeGenerator => 'Time Generator';
+
+  @override
+  String get startTime => 'Start Time';
+
+  @override
+  String get endTime => 'End Time';
+
+  @override
+  String get timeCount => 'Number of times';
+
+  @override
+  String get dateTimeGenerator => 'Date & Time Generator';
+
+  @override
+  String get heads => 'Heads';
+
+  @override
+  String get tails => 'Tails';
+
+  @override
+  String get rock => 'Rock';
+
+  @override
+  String get paper => 'Paper';
+
+  @override
+  String get scissors => 'Scissors';
+
+  @override
+  String get randomResult => 'Result';
 }

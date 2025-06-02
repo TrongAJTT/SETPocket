@@ -77,3 +77,19 @@ Giao diện đơn giản như sau:
         - 1 section vòng lặp dữ liệu bao gồm dòng chữ tiêu đề và danh sách section các widget dữ liệu tương ứng trong vòng lặp dữ liệu kèm nút 'Thêm 1 dòng', khi nhấn vào nút thêm 1 dòng thì sẽ thêm 1 section các widget dữ liệu mới trong section vòng lặp dữ liệu tương ứng.
             - Mỗi section các widget dữ liệu bao gồm danh sách các widget dữ iệu được tạo tự động (theo cơ chế bên trên) và nút 'Xóa dòng này', nếu chỉ còn 1 dòng dữ liệu trong vòng lặp dữ liệu thì nút này sẽ bị ẩn đi. Khi nhấn nút thì hiện dialog xác nhận xóa trước khi xóa.
         - Khi nhấn vào nút 'Tạo văn bản', hiển thị một dialog bao gồm widget TextField hiển thị nội dung của widget xem trước văn bản để người dùng có thể tùy ý copy và xử lý với dữ liệu đó.
+
+
+## 3. Random
+    - Bao gồm hàng loạt chức năng random con với các thành phần và điều kiện như liệt kê sau:
+        - Mật khẩu: (Số ký tự, các checkbox chữ thường, chữ hoa, số và ký tự đặc biệt, cần chọn ít nhất 1 checkbox).
+        - Số học: (Số nguyên dương hay số thực, random bao nhiêu số, giới hạn min max, cho phép random trùng).
+        - Yes or No?
+        - Tung đồng xu (Sấp hay ngửa)
+        - Kéo búa bao.
+        - Tung xúc xắc (tung bao nhiêu cục, số mặt? 3,4,5,6,7,8,10,12,14,16,20,24,30,48,50,100)
+        - Random màu (dựa trên hex6, hex8)
+        - Random chữ cái Latin (Bao nhiêu chữ cái)
+        - Random lá bài trong bộ bài tây (bài chuẩn 52 lá)
+        - Random ngày (Số lượng, giới hạn min max, cho phép random trùng).
+        - Random giờ (Số lượng, giới hạn min, max, cho phép random trùng).
+        - Random cả ngày và giờ (Số lượng, giới hạn min max ngày, giới hạn min max giờ, cho phép random trùng).

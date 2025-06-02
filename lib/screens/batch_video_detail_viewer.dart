@@ -106,14 +106,46 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
     try {
       final fileStats = await file.stat();
 
+      // First, try to get dimensions directly using our helper
+      Map<String, int> dimensions = {'width': 0, 'height': 0};
+      if (!kIsWeb &&
+          (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+        try {
+          dimensions = await _getVideoResolution(file.path);
+          print(
+              'Dimensions extracted: ${dimensions['width']} x ${dimensions['height']}');
+        } catch (e) {
+          print('Dimension extraction error: $e');
+        }
+      }
+
       if (kIsWeb) {
-        // Web không hỗ trợ lấy thông tin chi tiết, sử dụng thông tin cơ bản
+        // Web doesn't support detailed info extraction
         return _getBasicFileInfo(file, fileStats);
       }
       if (Platform.isWindows) {
         try {
-          // Sử dụng phương pháp ước tính
-          return await _getVideoInfoUsingVideoPlayer(file, fileStats);
+          // Use video player method for other information
+          VideoInfo info = await _getVideoInfoUsingVideoPlayer(file, fileStats);
+
+          // If we successfully got dimensions earlier, use those values
+          if (dimensions['width']! > 0 && dimensions['height']! > 0) {
+            info = VideoInfo(
+              name: info.name,
+              extension: info.extension,
+              createdDate: info.createdDate,
+              sizeMB: info.sizeMB,
+              duration: info.duration,
+              totalBitrate: info.totalBitrate,
+              frameWidth: dimensions['width']!,
+              frameHeight: dimensions['height']!,
+              framerate: info.framerate,
+              audioBitrate: info.audioBitrate,
+              audioChannels: info.audioChannels,
+            );
+          }
+
+          return info;
         } catch (e) {
           print('Basic video info error: $e');
           try {
@@ -126,19 +158,36 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
               final output = await session.getOutput();
               final json = jsonDecode(output ?? '{}');
               final streams = json['streams'] as List<dynamic>? ?? [];
-              final videoStream = streams.firstWhere(
+              Map<String, dynamic>? videoStream;
+              Map<String, dynamic>? audioStream;
+
+              try {
+                videoStream = streams.firstWhere(
                   (s) => s['codec_type'] == 'video',
-                  orElse: () => null);
-              final audioStream = streams.firstWhere(
+                ) as Map<String, dynamic>;
+              } catch (e) {
+                videoStream = null;
+              }
+
+              try {
+                audioStream = streams.firstWhere(
                   (s) => s['codec_type'] == 'audio',
-                  orElse: () => null);
+                ) as Map<String, dynamic>;
+              } catch (e) {
+                audioStream = null;
+              }
 
               final duration =
                   double.tryParse(json['format']?['duration'] ?? '0') ?? 0;
               final bitrate =
                   int.tryParse(json['format']?['bit_rate'] ?? '0') ?? 0;
-              final width = videoStream?['width'] ?? 0;
-              final height = videoStream?['height'] ?? 0;
+              final width = videoStream != null
+                  ? (int.tryParse(videoStream['width']?.toString() ?? '0') ?? 0)
+                  : 0;
+              final height = videoStream != null
+                  ? (int.tryParse(videoStream['height']?.toString() ?? '0') ??
+                      0)
+                  : 0;
               final framerate = double.tryParse(
                       (videoStream?['avg_frame_rate'] ?? '0/1')
                           .toString()
@@ -175,22 +224,41 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
         }
       } else {
         try {
-          final mediaInfo = await MediaInfo().getMediaInfo(file.path);
-          final durationMs =
-              int.tryParse(mediaInfo['duration']?.toString() ?? '0') ?? 0;
+          final mediaInfo = await MediaInfo().getMediaInfo(file
+              .path); // Safely extract and parse media info values with proper null handling
+          final durationMs = mediaInfo['duration'] != null
+              ? int.tryParse(mediaInfo['duration'].toString()) ?? 0
+              : 0;
+
           final duration = Duration(milliseconds: durationMs);
-          final width =
-              int.tryParse(mediaInfo['width']?.toString() ?? '0') ?? 0;
-          final height =
-              int.tryParse(mediaInfo['height']?.toString() ?? '0') ?? 0;
-          final bitrate =
-              int.tryParse(mediaInfo['bitrate']?.toString() ?? '0') ?? 0;
-          final framerate =
-              double.tryParse(mediaInfo['framerate']?.toString() ?? '0') ?? 0.0;
-          final audioBitrate =
-              int.tryParse(mediaInfo['audioBitrate']?.toString() ?? '0') ?? 0;
-          final audioChannels =
-              int.tryParse(mediaInfo['audioChannels']?.toString() ?? '0') ?? 0;
+
+          // Ensure width and height are properly extracted and converted
+          final width = mediaInfo['width'] != null
+              ? int.tryParse(mediaInfo['width'].toString()) ?? 0
+              : 0;
+
+          final height = mediaInfo['height'] != null
+              ? int.tryParse(mediaInfo['height'].toString()) ?? 0
+              : 0;
+
+          final bitrate = mediaInfo['bitrate'] != null
+              ? int.tryParse(mediaInfo['bitrate'].toString()) ?? 0
+              : 0;
+
+          final framerate = mediaInfo['framerate'] != null
+              ? double.tryParse(mediaInfo['framerate'].toString()) ?? 0.0
+              : 0.0;
+
+          final audioBitrate = mediaInfo['audioBitrate'] != null
+              ? int.tryParse(mediaInfo['audioBitrate'].toString()) ?? 0
+              : 0;
+
+          final audioChannels = mediaInfo['audioChannels'] != null
+              ? int.tryParse(mediaInfo['audioChannels'].toString()) ?? 0
+              : 0;
+
+          // Debug print to verify extraction
+          print('Media info width: $width, height: $height');
 
           return VideoInfo(
             name: file.path.split(Platform.pathSeparator).last.split('.').first,
@@ -220,23 +288,55 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   Future<VideoInfo> _getVideoInfoUsingVideoPlayer(
       File file, FileStat fileStats) async {
     try {
-      // Thử lấy kích thước từ thumbnail (có thể không chính xác nhưng cho ta biết được nếu video hợp lệ)
+      // Attempt to get dimensions from thumbnail
       int width = 0;
       int height = 0;
 
       try {
-        // Nếu có thể tạo thumbnail, video có khả năng hợp lệ
+        // Use a higher maxWidth to potentially get better dimension information
         final thumbnailPath = await VideoThumbnail.thumbnailFile(
           video: file.path,
           imageFormat: ImageFormat.JPEG,
-          maxWidth: 128,
-          quality: 25,
+          maxWidth: 1280, // Higher resolution may provide better metadata
+          quality: 50,
+          timeMs: 1000, // Sample 1 second into the video for better frame
         );
 
         if (thumbnailPath != null) {
-          // Video hợp lệ, nhưng kích thước có thể không chính xác từ thumbnail nhỏ
-          width = 640; // Giả định kích thước video phổ biến
-          height = 360;
+          // Try to get more accurate dimensions using FFmpeg if available
+          try {
+            final cmd =
+                '-v quiet -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "${file.path}"';
+            final session = await FFmpegKit.executeAsync('ffprobe $cmd');
+            final returnCode = await session.getReturnCode();
+            if (ReturnCode.isSuccess(returnCode)) {
+              final output = await session.getOutput();
+              if (output != null && output.isNotEmpty) {
+                final dimensions = output.trim().split(',');
+                if (dimensions.length >= 2) {
+                  width = int.tryParse(dimensions[0]) ?? 640;
+                  height = int.tryParse(dimensions[1]) ?? 360;
+                  print("FFprobe dimensions: $width x $height");
+                } else {
+                  // Fallback to common dimensions
+                  width = 640;
+                  height = 360;
+                }
+              } else {
+                width = 640;
+                height = 360;
+              }
+            } else {
+              // Fallback to common dimensions
+              width = 640;
+              height = 360;
+            }
+          } catch (e) {
+            print('FFmpeg dimension extraction error: $e');
+            // Fallback to common dimensions
+            width = 640;
+            height = 360;
+          }
         }
       } catch (e) {
         print('Thumbnail generation error: $e');
@@ -306,12 +406,24 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   Map<String, dynamic> _calculateStats(List<VideoInfo> infos) {
     if (infos.isEmpty) return {};
 
+    // Filter out entries with zero dimensions to avoid skewing statistics
+    final validInfos = infos
+        .where((info) => info.frameWidth > 0 && info.frameHeight > 0)
+        .toList();
+
+    // If no valid videos with dimensions, use all videos but set dimensions to defaults
+    final hasValidDimensions = validInfos.isNotEmpty;
+    final infoList = hasValidDimensions ? validInfos : infos;
+
     final numericFields = {
       'sizeMB': (VideoInfo info) => info.sizeMB,
       'totalBitrate': (VideoInfo info) => info.totalBitrate.toDouble(),
-      'frameWidth': (VideoInfo info) => info.frameWidth.toDouble(),
-      'frameHeight': (VideoInfo info) => info.frameHeight.toDouble(),
-      'framerate': (VideoInfo info) => info.framerate,
+      'frameWidth': (VideoInfo info) =>
+          info.frameWidth > 0 ? info.frameWidth.toDouble() : 640.0,
+      'frameHeight': (VideoInfo info) =>
+          info.frameHeight > 0 ? info.frameHeight.toDouble() : 360.0,
+      'framerate': (VideoInfo info) =>
+          info.framerate > 0 ? info.framerate : 30.0,
       'audioBitrate': (VideoInfo info) => info.audioBitrate.toDouble(),
       'audioChannels': (VideoInfo info) => info.audioChannels.toDouble(),
     };
@@ -319,13 +431,32 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
     Map<String, dynamic> stats = {};
 
     for (var field in numericFields.keys) {
-      final values = infos.map(numericFields[field]!).toList();
-      stats[field] = {
-        'max': values.reduce((a, b) => a > b ? a : b),
-        'min': values.reduce((a, b) => a < b ? a : b),
-        'avg': values.reduce((a, b) => a + b) / values.length,
-        'common': _findMostCommon(values),
-      };
+      if (infoList.isEmpty) continue;
+
+      final values = infoList.map(numericFields[field]!).toList();
+
+      // Print debug information for dimensions
+      if (field == 'frameWidth' || field == 'frameHeight') {
+        print('$field values: $values');
+      }
+
+      // Ensure there are values to calculate stats from
+      if (values.isNotEmpty) {
+        stats[field] = {
+          'max': values.reduce((a, b) => a > b ? a : b),
+          'min': values.reduce((a, b) => a < b ? a : b),
+          'avg': values.reduce((a, b) => a + b) / values.length,
+          'common': _findMostCommon(values),
+        };
+      } else {
+        // Default values if we can't calculate
+        stats[field] = {
+          'max': 0,
+          'min': 0,
+          'avg': 0,
+          'common': 0,
+        };
+      }
     }
 
     return stats;
@@ -337,6 +468,32 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
       counts[value] = (counts[value] ?? 0) + 1;
     }
     return counts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+  }
+
+  // Helper method to extract video dimensions using ffprobe
+  Future<Map<String, int>> _getVideoResolution(String filePath) async {
+    try {
+      final cmd =
+          '-v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$filePath"';
+      final session = await FFmpegKit.executeAsync('ffprobe $cmd');
+      final returnCode = await session.getReturnCode();
+
+      if (ReturnCode.isSuccess(returnCode)) {
+        final output = await session.getOutput();
+        if (output != null && output.isNotEmpty) {
+          final dimensions = output.trim().split('x');
+          if (dimensions.length == 2) {
+            final width = int.tryParse(dimensions[0]) ?? 0;
+            final height = int.tryParse(dimensions[1]) ?? 0;
+            print('Extracted dimensions: $width x $height from $filePath');
+            return {'width': width, 'height': height};
+          }
+        }
+      }
+    } catch (e) {
+      print('Error extracting video dimensions: $e');
+    }
+    return {'width': 0, 'height': 0};
   }
 
   @override
@@ -563,8 +720,12 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                                         Text(_formatDuration(info.duration))),
                                     DataCell(Text(
                                         '${(info.totalBitrate / 1000).toStringAsFixed(2)} kbps')),
-                                    DataCell(Text(info.frameWidth.toString())),
-                                    DataCell(Text(info.frameHeight.toString())),
+                                    DataCell(Text(info.frameWidth > 0
+                                        ? info.frameWidth.toString()
+                                        : "N/A")),
+                                    DataCell(Text(info.frameHeight > 0
+                                        ? info.frameHeight.toString()
+                                        : "N/A")),
                                     DataCell(Text(
                                         info.framerate.toStringAsFixed(2))),
                                     DataCell(Text(

@@ -11,8 +11,8 @@ class MainSettingsScreen extends StatefulWidget {
 }
 
 class _MainSettingsScreenState extends State<MainSettingsScreen> {
-  ThemeMode _themeMode = ThemeMode.system;
-  String _language = 'en';
+  late ThemeMode _themeMode;
+  late String _language;
   String _cacheInfo = 'Calculating...';
   bool _clearing = false;
 

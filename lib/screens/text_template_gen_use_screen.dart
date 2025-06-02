@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../models/template.dart';
+import 'package:my_multi_tools/l10n/app_localizations.dart';
+import '../models/text_template.dart';
 
 class TemplateUseScreen extends StatefulWidget {
   final Template template;
@@ -123,7 +124,6 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
           final loopElements =
               _elements.where((e) => e.loopId == loopId).toList();
           for (var element in loopElements) {
-            final instanceKey = '${element.id}_${loopId}_$i';
             String replacement;
             final value = instance[element.id];
 
@@ -156,22 +156,23 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final loops =
         TemplateManager.findDataLoopsInContent(widget.template.content);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Generate Document: ${widget.template.title}'),
+        title: Text(l10n.generateDocumentTitle(widget.template.title)),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.edit), text: 'Fill Data'),
-            Tab(icon: Icon(Icons.visibility), text: 'Preview'),
+          tabs: [
+            Tab(icon: const Icon(Icons.edit), text: l10n.fillDataTab),
+            Tab(icon: const Icon(Icons.visibility), text: l10n.previewTab),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.description),
-            tooltip: 'Show Document',
+            tooltip: l10n.showDocument,
             onPressed: _showFinalDocument,
           ),
         ],
@@ -186,29 +187,30 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Fill Information',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.fillInformation,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  ..._buildFieldInputs(),
+                  ..._buildFieldInputs(l10n),
                   if (loops.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    const Text(
-                      'Data Loops',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    Text(
+                      l10n.dataLoops,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
                     ...loops
-                        .map((loop) => _buildDataLoopSection(loop))
+                        .map((loop) => _buildDataLoopSection(loop, l10n))
                         .toList(),
                   ],
                   const SizedBox(height: 32),
                   FilledButton.icon(
                     onPressed: _showFinalDocument,
                     icon: const Icon(Icons.text_snippet),
-                    label: const Text('Generate Document'),
+                    label: Text(l10n.generateDocument),
                   ),
                 ],
               ),
@@ -229,7 +231,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Preview',
+                            l10n.preview,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -237,8 +239,8 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                           ),
                           TextButton.icon(
                             icon: const Icon(Icons.copy),
-                            label: const Text('Copy'),
-                            onPressed: () => _copyPreviewText(),
+                            label: Text(l10n.copy),
+                            onPressed: () => _copyPreviewText(l10n),
                           ),
                         ],
                       ),
@@ -258,7 +260,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
     );
   }
 
-  List<Widget> _buildFieldInputs() {
+  List<Widget> _buildFieldInputs(AppLocalizations l10n) {
     final inputFields = <Widget>[];
 
     // Chỉ lấy các phần tử không thuộc vòng lặp
@@ -269,9 +271,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
 
     // Tạo 1 widget input cho mỗi ID duy nhất
     for (var entry in elementGroups.entries) {
-      // Lấy element đại diện đầu tiên
       final element = entry.value.first;
-
       inputFields.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
@@ -283,28 +283,22 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 8),
-              _buildInputForElement(element),
+              _buildInputForElement(element, l10n),
             ],
           ),
         ),
       );
     }
-
     return inputFields;
   }
 
-  Widget _buildDataLoopSection(DataLoop loop) {
+  Widget _buildDataLoopSection(DataLoop loop, AppLocalizations l10n) {
     final loopId = loop.id;
-
-    // Tìm các phần tử trong vòng lặp này
     final loopElements = _elements.where((e) => e.loopId == loopId).toList();
     if (loopElements.isEmpty) {
       return const SizedBox.shrink();
     }
-
-    // Lấy danh sách các instance hiện tại
     final loopInstances = _getLoopInstances(loopId);
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -325,15 +319,14 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                 FilledButton.icon(
                   onPressed: () => _addLoopInstance(loopId),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add New Row'),
+                  label: Text(l10n.addNewRow),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-
-            // Hiển thị từng instance của vòng lặp
             ...List.generate(loopInstances.length, (index) {
-              return _buildLoopInstanceSection(loopId, index, loopElements);
+              return _buildLoopInstanceSection(
+                  loopId, index, loopElements, l10n);
             }),
           ],
         ),
@@ -341,15 +334,16 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
     );
   }
 
-  Widget _buildLoopInstanceSection(
-      String loopId, int instanceIndex, List<TemplateElement> loopElements) {
+  Widget _buildLoopInstanceSection(String loopId, int instanceIndex,
+      List<TemplateElement> loopElements, AppLocalizations l10n) {
     final instances = _getLoopInstances(loopId);
-    final instance = instances[instanceIndex];
     final showDeleteButton = instances.length > 1;
-
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withAlpha((0.4 * 255).toInt()),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -359,7 +353,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Row ${instanceIndex + 1}',
+                  l10n.rowNumber(instanceIndex + 1),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 if (showDeleteButton)
@@ -369,7 +363,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                       color: Theme.of(context).colorScheme.error,
                     ),
                     onPressed: () => _removeLoopInstance(loopId, instanceIndex),
-                    tooltip: 'Delete this row',
+                    tooltip: l10n.deleteThisRow,
                   ),
               ],
             ),
@@ -385,7 +379,8 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 4),
-                    _buildLoopElementInput(element, loopId, instanceIndex),
+                    _buildLoopElementInput(
+                        element, loopId, instanceIndex, l10n),
                   ],
                 ),
               );
@@ -396,17 +391,16 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
     );
   }
 
-  Widget _buildLoopElementInput(
-      TemplateElement element, String loopId, int instanceIndex) {
+  Widget _buildLoopElementInput(TemplateElement element, String loopId,
+      int instanceIndex, AppLocalizations l10n) {
     final instances = _getLoopInstances(loopId);
     final instance = instances[instanceIndex];
     final value = instance[element.id];
-
     switch (element.type) {
       case 'text':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Enter ${element.title.toLowerCase()}',
+            hintText: l10n.enterField(element.title),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_fields),
           ),
@@ -415,11 +409,10 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
             _updateLoopInstanceValue(loopId, instanceIndex, element.id, value);
           },
         );
-
       case 'largetext':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Enter ${element.title.toLowerCase()}',
+            hintText: l10n.enterField(element.title),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_snippet),
           ),
@@ -431,11 +424,10 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
             _updateLoopInstanceValue(loopId, instanceIndex, element.id, value);
           },
         );
-
       case 'number':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Enter ${element.title.toLowerCase()}',
+            hintText: l10n.enterField(element.title),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.numbers),
           ),
@@ -446,54 +438,17 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
                 loopId, instanceIndex, element.id, int.tryParse(value) ?? 0);
           },
         );
-
       default:
-        return Text('Field type ${element.type} not supported in loop');
+        return Text(l10n.unsupportedFieldType(element.type));
     }
   }
 
-  // Thêm một instance mới cho vòng lặp
-  void _addLoopInstance(String loopId) {
-    setState(() {
-      final key = 'loop_instances_$loopId';
-      List<Map<String, dynamic>> instances = _getLoopInstances(loopId);
-      instances.add({});
-      _fieldValues[key] = instances;
-      _updatePreview();
-    });
-  }
-
-  // Xóa một instance của vòng lặp
-  void _removeLoopInstance(String loopId, int instanceIndex) {
-    setState(() {
-      final key = 'loop_instances_$loopId';
-      List<Map<String, dynamic>> instances = _getLoopInstances(loopId);
-      if (instances.length > 1) {
-        instances.removeAt(instanceIndex);
-        _fieldValues[key] = instances;
-        _updatePreview();
-      }
-    });
-  }
-
-  // Cập nhật giá trị trong một instance của vòng lặp
-  void _updateLoopInstanceValue(
-      String loopId, int instanceIndex, String elementId, dynamic value) {
-    setState(() {
-      final key = 'loop_instances_$loopId';
-      List<Map<String, dynamic>> instances = _getLoopInstances(loopId);
-      instances[instanceIndex][elementId] = value;
-      _fieldValues[key] = instances;
-      _updatePreview();
-    });
-  }
-
-  Widget _buildInputForElement(TemplateElement element) {
+  Widget _buildInputForElement(TemplateElement element, AppLocalizations l10n) {
     switch (element.type) {
       case 'text':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Enter ${element.title.toLowerCase()}',
+            hintText: l10n.enterField(element.title),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_fields),
           ),
@@ -502,11 +457,10 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
             _updatePreview();
           },
         );
-
       case 'largetext':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Enter ${element.title.toLowerCase()}',
+            hintText: l10n.enterField(element.title),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.text_snippet),
           ),
@@ -518,11 +472,10 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
             _updatePreview();
           },
         );
-
       case 'number':
         return TextField(
           decoration: InputDecoration(
-            hintText: 'Enter ${element.title.toLowerCase()}',
+            hintText: l10n.enterField(element.title),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.numbers),
           ),
@@ -532,7 +485,6 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
             _updatePreview();
           },
         );
-
       case 'date':
         return InkWell(
           onTap: () async {
@@ -579,11 +531,10 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
               _fieldValues[element.id] != null
                   ? DateFormat('dd/MM/yyyy')
                       .format(_fieldValues[element.id] as DateTime)
-                  : 'Select date',
+                  : l10n.selectDate,
             ),
           ),
         );
-
       case 'time':
         return InkWell(
           onTap: () async {
@@ -625,11 +576,10 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
             child: Text(
               _fieldValues[element.id] != null
                   ? '${(_fieldValues[element.id] as TimeOfDay).hour.toString().padLeft(2, '0')}:${(_fieldValues[element.id] as TimeOfDay).minute.toString().padLeft(2, '0')}'
-                  : 'Select time',
+                  : l10n.selectTime,
             ),
           ),
         );
-
       case 'datetime':
         return InkWell(
           onTap: () async {
@@ -650,48 +600,97 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
               _fieldValues[element.id] != null
                   ? DateFormat('dd/MM/yyyy HH:mm')
                       .format(_fieldValues[element.id] as DateTime)
-                  : 'Select date and time',
+                  : l10n.selectDateTime,
             ),
           ),
         );
-
       default:
-        return const Text('Unsupported field type');
+        return Text(l10n.unsupportedFieldType(element.type));
     }
   }
 
-  Future<void> _pickDateTime(String elementId) async {
-    final currentDate = _fieldValues[elementId] as DateTime?;
-    final initialDate = currentDate ?? DateTime.now();
-
-    // Pick date first
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-    );
-
-    if (pickedDate != null) {
-      // Then pick time
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(initialDate),
+  void _copyPreviewText(AppLocalizations l10n) {
+    Clipboard.setData(ClipboardData(text: _previewText)).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.copiedToClipboard)),
       );
+    });
+  }
 
-      if (pickedTime != null) {
-        setState(() {
-          _fieldValues[elementId] = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-          _updatePreview();
-        });
+  void _showFinalDocument() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.completedDocument),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: _previewText,
+              maxLines: 10,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+              ),
+              readOnly: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.close),
+          ),
+          FilledButton.icon(
+            icon: const Icon(Icons.copy),
+            label: Text(l10n.copy),
+            onPressed: () {
+              _copyPreviewText(l10n);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Thêm một instance mới cho vòng lặp
+  void _addLoopInstance(String loopId) {
+    setState(() {
+      final key = 'loop_instances_$loopId';
+      List<Map<String, dynamic>> instances = _getLoopInstances(loopId);
+      instances.add({});
+      _fieldValues[key] = instances;
+      _updatePreview();
+    });
+  }
+
+  // Xóa một instance của vòng lặp
+  void _removeLoopInstance(String loopId, int instanceIndex) {
+    setState(() {
+      final key = 'loop_instances_$loopId';
+      List<Map<String, dynamic>> instances = _getLoopInstances(loopId);
+      if (instances.length > 1) {
+        instances.removeAt(instanceIndex);
+        _fieldValues[key] = instances;
+        _updatePreview();
       }
-    }
+    });
+  }
+
+  // Cập nhật giá trị trong một instance của vòng lặp
+  void _updateLoopInstanceValue(
+      String loopId, int instanceIndex, String elementId, dynamic value) {
+    setState(() {
+      final key = 'loop_instances_$loopId';
+      List<Map<String, dynamic>> instances = _getLoopInstances(loopId);
+      instances[instanceIndex][elementId] = value;
+      _fieldValues[key] = instances;
+      _updatePreview();
+    });
   }
 
   // Lấy danh sách các instance của một vòng lặp
@@ -710,6 +709,44 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
       }).toList();
     }
     return [];
+  }
+
+  // Hàm chọn ngày và giờ cho kiểu 'datetime'
+  Future<void> _pickDateTime(String elementId) async {
+    DateTime? currentDateTime = _fieldValues[elementId] as DateTime?;
+    final DateTime initialDate = currentDateTime ?? DateTime.now();
+
+    // Pick date
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate == null) return;
+
+    // Pick time
+    final TimeOfDay initialTime = currentDateTime != null
+        ? TimeOfDay(hour: currentDateTime.hour, minute: currentDateTime.minute)
+        : TimeOfDay.now();
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+    );
+    if (pickedTime == null) return;
+
+    final DateTime pickedDateTime = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    setState(() {
+      _fieldValues[elementId] = pickedDateTime;
+      _updatePreview();
+    });
   }
 
   // Lấy giá trị string hiển thị của một phần tử theo loại
@@ -738,52 +775,5 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
       default:
         return '';
     }
-  }
-
-  void _copyPreviewText() {
-    Clipboard.setData(ClipboardData(text: _previewText)).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Copied to clipboard')),
-      );
-    });
-  }
-
-  void _showFinalDocument() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Completed Document'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              initialValue: _previewText,
-              maxLines: 10,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-              ),
-              readOnly: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          FilledButton.icon(
-            icon: const Icon(Icons.copy),
-            label: const Text('Copy'),
-            onPressed: () {
-              _copyPreviewText();
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
   }
 }

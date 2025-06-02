@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/template.dart';
+import 'package:my_multi_tools/l10n/app_localizations.dart';
+import '../models/text_template.dart';
 import '../services/template_service.dart';
 
 class TemplateEditScreen extends StatefulWidget {
@@ -69,24 +70,26 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Template' : 'Create New Template'),
+        title: Text(isEditing
+            ? AppLocalizations.of(context)!.editTemplate
+            : AppLocalizations.of(context)!.createTemplate),
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.save),
-            label: const Text('Save'),
+            label: Text(AppLocalizations.of(context)!.save),
             onPressed: _isLoading ? null : _saveTemplate,
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
+          tabs: [
             Tab(
-              icon: Icon(Icons.edit_document),
-              text: 'Content',
+              icon: const Icon(Icons.edit_document),
+              text: AppLocalizations.of(context)!.contentTab,
             ),
             Tab(
-              icon: Icon(Icons.view_module),
-              text: 'Structure',
+              icon: const Icon(Icons.view_module),
+              text: AppLocalizations.of(context)!.structureTab,
             ),
           ],
         ),
@@ -103,14 +106,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                     // Title field
                     TextFormField(
                       controller: _titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Template Title *',
-                        border: OutlineInputBorder(),
-                        hintText: 'Enter title for this template',
+                      decoration: InputDecoration(
+                        labelText:
+                            AppLocalizations.of(context)!.templateTitleLabel,
+                        border: const OutlineInputBorder(),
+                        hintText:
+                            AppLocalizations.of(context)!.templateTitleHint,
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter a title';
+                          return AppLocalizations.of(context)!.pleaseEnterTitle;
                         }
                         return null;
                       },
@@ -124,7 +129,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                           child: ElevatedButton.icon(
                             onPressed: _showAddFieldDialog,
                             icon: const Icon(Icons.add_circle_outline),
-                            label: const Text('Add Data Field'),
+                            label: Text(
+                                AppLocalizations.of(context)!.addDataField),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -132,7 +138,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                           child: ElevatedButton.icon(
                             onPressed: () => _showAddLoopDialog(),
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Add Data Loop'),
+                            label:
+                                Text(AppLocalizations.of(context)!.addDataLoop),
                           ),
                         ),
                       ],
@@ -542,7 +549,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text('Add Data Field'),
+            title: Text(AppLocalizations.of(context)!.addDataField),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -551,39 +558,55 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   const Text('Loại trường:'),
                   const SizedBox(height: 8),
                   _buildRadioOption(
-                      'text', 'Văn bản', Icons.text_fields, selectedType,
-                      (value) {
-                    setState(() {
-                      selectedType = value;
-                    });
-                  }),
-                  _buildRadioOption('largetext', 'Văn bản nhiều dòng',
-                      Icons.text_snippet, selectedType, (value) {
-                    setState(() {
-                      selectedType = value;
-                    });
-                  }),
-                  _buildRadioOption(
-                      'number', 'Number', Icons.numbers, selectedType, (value) {
+                      'text',
+                      AppLocalizations.of(context)!.fieldTypeText,
+                      Icons.text_fields,
+                      selectedType, (value) {
                     setState(() {
                       selectedType = value;
                     });
                   }),
                   _buildRadioOption(
-                      'date', 'Date', Icons.calendar_today, selectedType,
-                      (value) {
+                      'largetext',
+                      AppLocalizations.of(context)!.fieldTypeLargeText,
+                      Icons.text_snippet,
+                      selectedType, (value) {
                     setState(() {
                       selectedType = value;
                     });
                   }),
                   _buildRadioOption(
-                      'time', 'Time', Icons.access_time, selectedType, (value) {
+                      'number',
+                      AppLocalizations.of(context)!.fieldTypeNumber,
+                      Icons.numbers,
+                      selectedType, (value) {
                     setState(() {
                       selectedType = value;
                     });
                   }),
-                  _buildRadioOption('datetime', 'DateTime',
-                      Icons.calendar_month, selectedType, (value) {
+                  _buildRadioOption(
+                      'date',
+                      AppLocalizations.of(context)!.fieldTypeDate,
+                      Icons.calendar_today,
+                      selectedType, (value) {
+                    setState(() {
+                      selectedType = value;
+                    });
+                  }),
+                  _buildRadioOption(
+                      'time',
+                      AppLocalizations.of(context)!.fieldTypeTime,
+                      Icons.access_time,
+                      selectedType, (value) {
+                    setState(() {
+                      selectedType = value;
+                    });
+                  }),
+                  _buildRadioOption(
+                      'datetime',
+                      AppLocalizations.of(context)!.fieldTypeDateTime,
+                      Icons.calendar_month,
+                      selectedType, (value) {
                     setState(() {
                       selectedType = value;
                     });
@@ -591,10 +614,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   const SizedBox(height: 16),
                   TextField(
                     controller: titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Field title *',
-                      hintText: 'E.g. Customer name',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.fieldTitleLabel,
+                      hintText: AppLocalizations.of(context)!.fieldTitleHint,
+                      border: const OutlineInputBorder(),
                     ),
                     autofocus: true,
                   ),
@@ -611,8 +634,9 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   final title = titleController.text.trim();
                   if (title.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Vui lòng nhập tiêu đề trường')),
+                      SnackBar(
+                          content: Text(AppLocalizations.of(context)!
+                              .pleaseEnterFieldTitle)),
                     );
                     return;
                   }
@@ -636,15 +660,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   });
                 },
                 icon: const Icon(Icons.copy),
-                label: const Text('Copy and Close'),
+                label: Text(AppLocalizations.of(context)!.copyAndClose),
               ),
               FilledButton.icon(
                 onPressed: () {
                   final title = titleController.text.trim();
                   if (title.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Vui lòng nhập tiêu đề trường')),
+                      SnackBar(
+                          content: Text(AppLocalizations.of(context)!
+                              .pleaseEnterFieldTitle)),
                     );
                     return;
                   }
@@ -660,15 +685,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.add_task),
-                label: const Text('Insert at Cursor'),
+                label: Text(AppLocalizations.of(context)!.insertAtCursor),
               ),
               FilledButton.icon(
                 onPressed: () {
                   final title = titleController.text.trim();
                   if (title.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Vui lòng nhập tiêu đề trường')),
+                      SnackBar(
+                          content: Text(AppLocalizations.of(context)!
+                              .pleaseEnterFieldTitle)),
                     );
                     return;
                   }
@@ -684,7 +710,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.arrow_downward),
-                label: const Text('Append to End'),
+                label: Text(AppLocalizations.of(context)!.appendToEnd),
               ),
             ],
           );
@@ -767,7 +793,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Data Loop'),
+        title: Text(AppLocalizations.of(context)!.addDataLoop),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -777,10 +803,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               const SizedBox(height: 8),
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Loop title *',
-                  hintText: 'E.g. Product list',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.loopTitleLabel,
+                  hintText: AppLocalizations.of(context)!.loopTitleHint,
+                  border: const OutlineInputBorder(),
                 ),
                 autofocus: true,
               ),
@@ -797,8 +823,9 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               final title = titleController.text.trim();
               if (title.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Vui lòng nhập tiêu đề vòng lặp')),
+                  SnackBar(
+                      content: Text(
+                          AppLocalizations.of(context)!.pleaseEnterFieldTitle)),
                 );
                 return;
               }
@@ -819,15 +846,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               });
             },
             icon: const Icon(Icons.copy),
-            label: const Text('Copy and Close'),
+            label: Text(AppLocalizations.of(context)!.copyAndClose),
           ),
           FilledButton.icon(
             onPressed: () {
               final title = titleController.text.trim();
               if (title.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Vui lòng nhập tiêu đề vòng lặp')),
+                  SnackBar(
+                      content: Text(
+                          AppLocalizations.of(context)!.pleaseEnterFieldTitle)),
                 );
                 return;
               }
@@ -842,15 +870,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.add_task),
-            label: const Text('Insert at Cursor'),
+            label: Text(AppLocalizations.of(context)!.insertAtCursor),
           ),
           FilledButton.icon(
             onPressed: () {
               final title = titleController.text.trim();
               if (title.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Vui lòng nhập tiêu đề vòng lặp')),
+                  SnackBar(
+                      content: Text(
+                          AppLocalizations.of(context)!.pleaseEnterFieldTitle)),
                 );
                 return;
               }
@@ -865,7 +894,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_downward),
-            label: const Text('Append to End'),
+            label: Text(AppLocalizations.of(context)!.appendToEnd),
           ),
         ],
       ),
@@ -928,8 +957,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
 
     if (_duplicateIds.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fix inconsistent duplicate IDs before saving'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pleaseFixDuplicateIds),
           backgroundColor: Colors.red,
         ),
       );
@@ -963,7 +992,9 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving template: ${e.toString()}')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!
+                  .errorSavingTemplate(e.toString()))),
         );
       }
     }
@@ -973,9 +1004,9 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          'Template Content *',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        Text(
+          AppLocalizations.of(context)!.templateContentLabel,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Expanded(
@@ -989,16 +1020,17 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
             child: TextFormField(
               controller: _contentController,
               focusNode: _contentFocusNode,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.all(16),
-                hintText: 'Enter template content and add data fields...',
+                contentPadding: const EdgeInsets.all(16),
+                hintText: AppLocalizations.of(context)!.templateContentHint,
               ),
               maxLines: null,
               expands: true,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter template content';
+                  return AppLocalizations.of(context)!
+                      .pleaseEnterTemplateContent;
                 }
                 return null;
               },
@@ -1023,7 +1055,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Template Structure',
+                    AppLocalizations.of(context)!.templateStructure,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -1031,9 +1063,9 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'View an overview of fields and loops in your template.',
-                    style: TextStyle(fontSize: 14),
+                  Text(
+                    AppLocalizations.of(context)!.templateStructureOverview,
+                    style: const TextStyle(fontSize: 14),
                   ),
                   const Divider(),
                   _buildElementSummary(),

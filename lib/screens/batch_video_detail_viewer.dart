@@ -8,6 +8,7 @@ import 'package:media_info/media_info.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'dart:convert';
+import 'package:my_multi_tools/l10n/app_localizations.dart';
 
 class VideoInfo {
   final String name;
@@ -47,7 +48,7 @@ class BatchVideoDetailViewer extends StatefulWidget {
 class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   List<VideoInfo> videoInfos = [];
   bool isLoading = false;
-  int _selectedIndex = 0; // 0: Dữ liệu, 1: Thống kê
+  int _selectedIndex = 0; // 0: Data, 1: Stats
 
   Future<void> pickVideos() async {
     try {
@@ -91,7 +92,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Error: $message'),
+        content: Text(AppLocalizations.of(context)!.error(message)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
       ),
@@ -351,47 +352,50 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Batch Video Detail Viewer'),
+        title: Text(AppLocalizations.of(context)!.batchVideoDetailViewer),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Add Videos',
+            tooltip: AppLocalizations.of(context)!.addVideos,
             onPressed: isLoading ? null : pickVideos,
           ),
           IconButton(
             icon: const Icon(Icons.help_outline),
-            tooltip: 'Help',
+            tooltip: AppLocalizations.of(context)!.help,
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Help'),
-                  content: const SingleChildScrollView(
+                  title: Text(AppLocalizations.of(context)!.help),
+                  content: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Text("Help"),
+                        const SizedBox(height: 12),
+                        Text(AppLocalizations.of(context)!.features),
+                        const SizedBox(height: 8),
+                        Text('• ' +
+                            AppLocalizations.of(context)!.featureViewMultiple),
+                        Text('• ' +
+                            AppLocalizations.of(context)!.featureSeeTechnical),
+                        Text('• ' +
+                            AppLocalizations.of(context)!.featureCompareStats),
+                        const SizedBox(height: 12),
+                        Text(AppLocalizations.of(context)!.addVideosBy),
+                        Text('• ' +
+                            AppLocalizations.of(context)!.clickAddButton),
                         Text(
-                            'This tool shows detailed information about video files.'),
-                        SizedBox(height: 12),
-                        Text('Features:'),
-                        SizedBox(height: 8),
-                        Text('• View multiple video files at once'),
-                        Text(
-                            '• See technical details like bitrate, resolution, etc'),
-                        Text('• Compare stats across videos'),
-                        SizedBox(height: 12),
-                        Text('You can add videos by:'),
-                        Text('• Clicking the + button'),
-                        Text('• Dragging and dropping files'),
+                            '• ' + AppLocalizations.of(context)!.dragDropFiles),
                       ],
                     ),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Close'),
+                      child: Text(AppLocalizations.of(context)!.close),
                     ),
                   ],
                 ),
@@ -415,14 +419,14 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                   _selectedIndex = index;
                 });
               },
-              items: const [
+              items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.table_chart),
-                  label: 'Dữ liệu',
+                  icon: const Icon(Icons.table_chart),
+                  label: AppLocalizations.of(context)!.dataTab,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.bar_chart),
-                  label: 'Thống kê',
+                  icon: const Icon(Icons.bar_chart),
+                  label: AppLocalizations.of(context)!.statsTab,
                 ),
               ],
             )
@@ -430,7 +434,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
       floatingActionButton: isMobile && !isLoading
           ? FloatingActionButton(
               onPressed: pickVideos,
-              tooltip: 'Add videos',
+              tooltip: AppLocalizations.of(context)!.addVideos,
               child: const Icon(Icons.add),
             )
           : null,
@@ -439,6 +443,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
 
   Widget _buildDataTab(Map<String, dynamic> stats, DateFormat dateFormat,
       TextStyle headingStyle, bool isMobile) {
+    final loc = AppLocalizations.of(context)!;
     return DragTarget<List<File>>(
       onWillAccept: (files) => files != null && files.isNotEmpty,
       onAcceptWithDetails: (details) async {
@@ -479,9 +484,9 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                               vertical: 8, horizontal: 16),
                           width: double.infinity,
                           color: Theme.of(context).colorScheme.primaryContainer,
-                          child: const Text(
-                            'Drop files to add them',
-                            style: TextStyle(
+                          child: Text(
+                            loc.dropFilesToAdd,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -510,29 +515,31 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                           ),
                           columns: [
                             DataColumn(
-                                label: Text('Name', style: headingStyle)),
-                            DataColumn(label: Text('Ext', style: headingStyle)),
+                                label: Text(loc.name, style: headingStyle)),
+                            DataColumn(
+                                label: Text(loc.ext, style: headingStyle)),
                             DataColumn(
                                 label:
-                                    Text('Created Date', style: headingStyle)),
+                                    Text(loc.createdDate, style: headingStyle)),
                             DataColumn(
-                                label: Text('Size (MB)', style: headingStyle)),
+                                label: Text(loc.sizeMB, style: headingStyle)),
                             DataColumn(
-                                label: Text('Duration', style: headingStyle)),
+                                label: Text(loc.duration, style: headingStyle)),
                             DataColumn(
-                                label:
-                                    Text('Total Bitrate', style: headingStyle)),
+                                label: Text(loc.totalBitrate,
+                                    style: headingStyle)),
                             DataColumn(
-                                label: Text('Width', style: headingStyle)),
+                                label: Text(loc.width, style: headingStyle)),
                             DataColumn(
-                                label: Text('Height', style: headingStyle)),
-                            DataColumn(
-                                label: Text('Framerate', style: headingStyle)),
+                                label: Text(loc.height, style: headingStyle)),
                             DataColumn(
                                 label:
-                                    Text('Audio Bitrate', style: headingStyle)),
+                                    Text(loc.framerate, style: headingStyle)),
                             DataColumn(
-                                label: Text('Audio Channels',
+                                label: Text(loc.audioBitrate,
+                                    style: headingStyle)),
+                            DataColumn(
+                                label: Text(loc.audioChannels,
                                     style: headingStyle)),
                           ],
                           rows: [
@@ -596,8 +603,9 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   }
 
   Widget _buildStatsTab(Map<String, dynamic> stats, TextStyle headingStyle) {
+    final loc = AppLocalizations.of(context)!;
     if (stats.isEmpty) {
-      return const Center(child: Text('No statistics available'));
+      return Center(child: Text(loc.noStatsAvailable));
     }
 
     return SingleChildScrollView(
@@ -606,7 +614,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Video Statistics Summary',
+            loc.videoStatsSummary,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -623,7 +631,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Resolution',
+                    loc.resolution,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -671,7 +679,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bitrate',
+                    loc.bitrate,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -731,7 +739,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'File Size',
+                    loc.fileSize,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -778,7 +786,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Framerate',
+                    loc.framerate,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -847,6 +855,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   }
 
   Widget _buildEmptyState(bool isMobile) {
+    final loc = AppLocalizations.of(context)!;
     return DragTarget<List<File>>(
       onWillAccept: (files) => files != null && files.isNotEmpty,
       onAcceptWithDetails: (details) async {
@@ -883,8 +892,8 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
               const SizedBox(height: 24),
               Text(
                 candidateFiles.isNotEmpty
-                    ? 'Drop video files here'
-                    : 'No videos selected',
+                    ? loc.dropVideosHere
+                    : loc.noVideosSelected,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
@@ -902,9 +911,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 child: Column(
                   children: [
                     Text(
-                      isMobile
-                          ? 'Tap the + button to add videos'
-                          : 'Drag and drop video files here or click the + button',
+                      isMobile ? loc.tapAddVideos : loc.dragDropOrAdd,
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -912,7 +919,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                     FilledButton.icon(
                       onPressed: pickVideos,
                       icon: const Icon(Icons.add),
-                      label: const Text('Add Videos'),
+                      label: Text(loc.addVideos),
                     ),
                   ],
                 ),

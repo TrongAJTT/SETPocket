@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import '../models/template.dart';
+import 'package:my_multi_tools/l10n/app_localizations.dart';
+import '../models/text_template.dart';
 import '../services/template_service.dart';
-import 'template_edit_screen.dart';
-import 'template_use_screen.dart';
+import 'text_template_gen_edit_screen.dart';
+import 'text_template_gen_use_screen.dart';
 
 class TemplateListScreen extends StatefulWidget {
   const TemplateListScreen({super.key});
@@ -47,13 +48,14 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Templates'),
+        title: Text(l10n.textTemplatesTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
-            tooltip: 'Help',
+            tooltip: l10n.help,
             onPressed: () {
               _showHelpDialog();
             },
@@ -63,17 +65,17 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _templates.isEmpty
-              ? _buildEmptyState()
-              : _buildTemplateList(),
+              ? _buildEmptyState(l10n)
+              : _buildTemplateList(l10n),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddTemplateOptions(),
-        tooltip: 'Add new template',
+        onPressed: () => _showAddTemplateOptions(l10n),
+        tooltip: l10n.addNewTemplate,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -87,21 +89,21 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'No templates yet',
+              l10n.noTemplatesYet,
               style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
-              'Create templates to improve your workflow. Press + button to start.',
+              l10n.createTemplatesHint,
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => _showAddTemplateOptions(),
+              onPressed: () => _showAddTemplateOptions(l10n),
               icon: const Icon(Icons.add),
-              label: const Text('Create new template'),
+              label: Text(l10n.createNewTemplate),
             ),
           ],
         ),
@@ -109,7 +111,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     );
   }
 
-  Widget _buildTemplateList() {
+  Widget _buildTemplateList(AppLocalizations l10n) {
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),
       itemCount: _templates.length,
@@ -126,43 +128,44 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                 if (value == 'edit') {
                   await _navigateToEditTemplate(template);
                 } else if (value == 'delete') {
-                  _confirmDeleteTemplate(template);
+                  _confirmDeleteTemplate(template, l10n);
                 } else if (value == 'copy') {
-                  await _duplicateTemplate(template);
+                  await _duplicateTemplate(template, l10n);
                 } else if (value == 'export') {
-                  await _exportTemplateToJson(template);
+                  await _exportTemplateToJson(template, l10n);
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
                   child: ListTile(
-                    leading: Icon(Icons.edit),
-                    title: Text('Edit'),
+                    leading: const Icon(Icons.edit),
+                    title: Text(l10n.edit),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'copy',
                   child: ListTile(
-                    leading: Icon(Icons.copy),
-                    title: Text('Copy'),
+                    leading: const Icon(Icons.copy),
+                    title: Text(l10n.copy),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'export',
                   child: ListTile(
-                    leading: Icon(Icons.download),
-                    title: Text('Export to JSON'),
+                    leading: const Icon(Icons.download),
+                    title: Text(l10n.exportToJson),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: ListTile(
-                    leading: Icon(Icons.delete, color: Colors.red),
-                    title: Text('Delete', style: TextStyle(color: Colors.red)),
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    title: Text(l10n.delete,
+                        style: const TextStyle(color: Colors.red)),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
@@ -214,17 +217,16 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     );
   }
 
-  void _confirmDeleteTemplate(Template template) {
+  void _confirmDeleteTemplate(Template template, AppLocalizations l10n) {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Deletion'),
-        content: Text(
-            'Are you sure you want to delete "${template.title}" template?'),
+        title: Text(l10n.confirmDeletion),
+        content: Text(l10n.confirmDeleteTemplateMsg(template.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -232,56 +234,56 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
             ),
             onPressed: () async {
               Navigator.of(context).pop();
-              await _deleteTemplate(template.id);
+              await _deleteTemplate(template.id, l10n);
             },
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _deleteTemplate(String id) async {
+  Future<void> _deleteTemplate(String id, AppLocalizations l10n) async {
     try {
       await TemplateService.deleteTemplate(id);
       _loadTemplates();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Template deleted successfully')),
+          SnackBar(content: Text(l10n.templateDeleted)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting template: ${e.toString()}')),
+          SnackBar(content: Text(l10n.errorDeletingTemplate(e.toString()))),
         );
       }
     }
   }
 
   void _showHelpDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Usage Guide'),
-        content: const SingleChildScrollView(
+        title: Text(l10n.usageGuide),
+        content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'This tool helps you create reusable document templates.',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                l10n.textTemplateToolIntro,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 16),
-              Text('• Press + button to create a new template'),
-              Text('• Tap on a template to use it and create a document'),
+              const SizedBox(height: 16),
+              Text('• ${l10n.helpCreateNewTemplate}'),
+              Text('• ${l10n.helpTapToUseTemplate}'),
+              Text('• ${l10n.helpTapMenuForActions}'),
+              const SizedBox(height: 16),
               Text(
-                  '• Tap on ... button to edit, copy, export or delete templates'),
-              SizedBox(height: 16),
-              Text(
-                'In the template creation screen, you can add data fields to fill in later such as text, numbers, dates...',
-                style: TextStyle(fontStyle: FontStyle.italic),
+                l10n.textTemplateScreenHint,
+                style: const TextStyle(fontStyle: FontStyle.italic),
               ),
             ],
           ),
@@ -289,39 +291,39 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it'),
+            child: Text(l10n.gotIt),
           ),
         ],
       ),
     );
   }
 
-  void _showAddTemplateOptions() {
+  void _showAddTemplateOptions(AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Add Template'),
+        title: Text(l10n.addTemplate),
         children: [
           SimpleDialogOption(
             onPressed: () {
               Navigator.pop(context);
               _navigateToCreateTemplate();
             },
-            child: const ListTile(
-              leading: Icon(Icons.create),
-              title: Text('Add manually'),
-              subtitle: Text('Create a new template from scratch'),
+            child: ListTile(
+              leading: const Icon(Icons.create),
+              title: Text(l10n.addManually),
+              subtitle: Text(l10n.createTemplateFromScratch),
             ),
           ),
           SimpleDialogOption(
             onPressed: () {
               Navigator.pop(context);
-              _importTemplateFromFile();
+              _importTemplateFromFile(l10n);
             },
-            child: const ListTile(
-              leading: Icon(Icons.upload_file),
-              title: Text('Add from file'),
-              subtitle: Text('Import a template from JSON file'),
+            child: ListTile(
+              leading: const Icon(Icons.upload_file),
+              title: Text(l10n.addFromFile),
+              subtitle: Text(l10n.importTemplateFromJson),
             ),
           ),
         ],
@@ -329,7 +331,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     );
   }
 
-  Future<void> _importTemplateFromFile() async {
+  Future<void> _importTemplateFromFile(AppLocalizations l10n) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -354,8 +356,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Template imported successfully'),
+              SnackBar(
+                content: Text(l10n.templateImported),
               ),
             );
           }
@@ -363,7 +365,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Invalid template format: ${e.toString()}'),
+                content: Text(l10n.invalidTemplateFormat(e.toString())),
               ),
             );
           }
@@ -373,19 +375,20 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error importing template: ${e.toString()}'),
+            content: Text(l10n.errorImportingTemplate(e.toString())),
           ),
         );
       }
     }
   }
 
-  Future<void> _duplicateTemplate(Template template) async {
+  Future<void> _duplicateTemplate(
+      Template template, AppLocalizations l10n) async {
     try {
       // Create a new template with copied data and a new ID
       final newTemplate = Template(
         id: TemplateService.generateTemplateId(),
-        title: '${template.title} (Copy)',
+        title: '${template.title} (${l10n.copySuffix})',
         content: template.content,
       );
 
@@ -395,8 +398,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Template copied successfully'),
+          SnackBar(
+            content: Text(l10n.templateCopied),
           ),
         );
       }
@@ -404,14 +407,15 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error copying template: ${e.toString()}'),
+            content: Text(l10n.errorCopyingTemplate(e.toString())),
           ),
         );
       }
     }
   }
 
-  Future<void> _exportTemplateToJson(Template template) async {
+  Future<void> _exportTemplateToJson(
+      Template template, AppLocalizations l10n) async {
     try {
       // Convert template to JSON
       final jsonData = template.toJson();
@@ -419,7 +423,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
       // Choose directory to save the file
       String? outputPath = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save Template as JSON',
+        dialogTitle: l10n.saveTemplateAsJson,
         fileName: '${template.title.replaceAll(' ', '_')}.json',
         type: FileType.custom,
         allowedExtensions: ['json'],
@@ -438,7 +442,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Template exported to: $outputPath'),
+              content: Text(l10n.templateExported(outputPath)),
               duration: const Duration(seconds: 4),
             ),
           );
@@ -448,7 +452,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error exporting template: ${e.toString()}'),
+            content: Text(l10n.errorExportingTemplate(e.toString())),
           ),
         );
       }

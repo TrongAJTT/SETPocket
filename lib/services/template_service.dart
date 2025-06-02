@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/template.dart';
+import '../models/text_template.dart';
 
 class TemplateService {
   static const String _templatesKey = 'templates';

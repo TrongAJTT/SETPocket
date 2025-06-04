@@ -270,7 +270,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: Text(
                           AppLocalizations.of(context)!.normalFields,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 14),
                         ),
                       ),
@@ -848,9 +848,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 id: id,
               );
               // Copy to clipboard and close dialog
-              final loopString = '${loop.toLoopStartString()}\n' +
-                  AppLocalizations.of(context)!.loopContent +
-                  '\n${loop.toLoopEndString()}';
+              final loopString =
+                  '${loop.toLoopStartString()}\n${AppLocalizations.of(context)!.loopContent}\n${loop.toLoopEndString()}';
               Clipboard.setData(ClipboardData(text: loopString)).then((_) {
                 if (!mounted) return;
                 // ignore: use_build_context_synchronously
@@ -924,9 +923,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void _insertLoopAtCursor(DataLoop loop) {
     final loopStartString = loop.toLoopStartString();
     final loopEndString = loop.toLoopEndString();
-    final defaultContent = '\n' +
-        AppLocalizations.of(context)!.loopContent +
-        '\n'; // Default loop content
+    final defaultContent =
+        '\n${AppLocalizations.of(context)!.loopContent}\n'; // Default loop content
     final loopString = '$loopStartString$defaultContent$loopEndString';
 
     final text = _contentController.text;
@@ -956,8 +954,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void _appendLoopAtEnd(DataLoop loop) {
     final loopStartString = loop.toLoopStartString();
     final loopEndString = loop.toLoopEndString();
-    final defaultContent =
-        '\n' + AppLocalizations.of(context)!.loopContent + '\n';
+    final defaultContent = '\n${AppLocalizations.of(context)!.loopContent}\n';
     final loopString = '$loopStartString$defaultContent$loopEndString';
 
     final text = _contentController.text;

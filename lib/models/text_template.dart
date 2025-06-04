@@ -31,6 +31,21 @@ class Template {
     );
   }
 
+  /// Get the character count of the template content
+  int get characterCount => content.length;
+
+  /// Get the number of data fields in the template
+  int get fieldCount {
+    final elements = TemplateManager.findElementsInContent(content);
+    return elements.length;
+  }
+
+  /// Get the number of data loops in the template
+  int get loopCount {
+    final loops = TemplateManager.findDataLoopsInContent(content);
+    return loops.length;
+  }
+
   @override
   String toString() => 'Template(id: $id, title: $title)';
 }

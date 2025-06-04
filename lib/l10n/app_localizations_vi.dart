@@ -596,6 +596,76 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String characterCount(Object count) {
+    return '$count ký tự';
+  }
+
+  @override
+  String fieldsAndLoops(Object fields, Object loops) {
+    return '$fields trường, $loops vòng lặp';
+  }
+
+  @override
+  String get longPressToSelect => 'Nhấn giữ để chọn mẫu';
+
+  @override
+  String selectedTemplates(Object count) {
+    return 'Đã chọn $count';
+  }
+
+  @override
+  String get selectAll => 'Chọn tất cả';
+
+  @override
+  String get deselectAll => 'Bỏ chọn tất cả';
+
+  @override
+  String get batchExport => 'Xuất đã chọn';
+
+  @override
+  String get batchDelete => 'Xóa đã chọn';
+
+  @override
+  String get exportTemplates => 'Xuất mẫu';
+
+  @override
+  String get editFilenames => 'Chỉnh sửa tên tệp trước khi xuất:';
+
+  @override
+  String filenameFor(Object title) {
+    return 'Tên tệp cho \"$title\":';
+  }
+
+  @override
+  String get confirmBatchDelete => 'Xác nhận xóa hàng loạt';
+
+  @override
+  String typeConfirmToDelete(Object count) {
+    return 'Gõ \"confirm\" để xóa $count mẫu đã chọn:';
+  }
+
+  @override
+  String get confirmText => 'confirm';
+
+  @override
+  String get confirmationRequired => 'Vui lòng gõ \"confirm\" để tiếp tục';
+
+  @override
+  String batchExportCompleted(Object count) {
+    return 'Đã xuất $count mẫu thành công';
+  }
+
+  @override
+  String batchDeleteCompleted(Object count) {
+    return 'Đã xóa $count mẫu thành công';
+  }
+
+  @override
+  String errorDuringBatchExport(Object errors) {
+    return 'Lỗi khi xuất một số mẫu: $errors';
+  }
+
+  @override
   String get passwordGenerator => 'Tạo mật khẩu';
 
   @override

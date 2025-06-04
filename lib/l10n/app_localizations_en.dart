@@ -596,6 +596,76 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String characterCount(Object count) {
+    return '$count characters';
+  }
+
+  @override
+  String fieldsAndLoops(Object fields, Object loops) {
+    return '$fields fields, $loops loops';
+  }
+
+  @override
+  String get longPressToSelect => 'Long press to select templates';
+
+  @override
+  String selectedTemplates(Object count) {
+    return '$count selected';
+  }
+
+  @override
+  String get selectAll => 'Select All';
+
+  @override
+  String get deselectAll => 'Deselect All';
+
+  @override
+  String get batchExport => 'Export Selected';
+
+  @override
+  String get batchDelete => 'Delete Selected';
+
+  @override
+  String get exportTemplates => 'Export Templates';
+
+  @override
+  String get editFilenames => 'Edit file names before export:';
+
+  @override
+  String filenameFor(Object title) {
+    return 'Filename for \"$title\":';
+  }
+
+  @override
+  String get confirmBatchDelete => 'Confirm Batch Delete';
+
+  @override
+  String typeConfirmToDelete(Object count) {
+    return 'Type \"confirm\" to delete $count selected templates:';
+  }
+
+  @override
+  String get confirmText => 'confirm';
+
+  @override
+  String get confirmationRequired => 'Please type \"confirm\" to proceed';
+
+  @override
+  String batchExportCompleted(Object count) {
+    return 'Exported $count templates successfully';
+  }
+
+  @override
+  String batchDeleteCompleted(Object count) {
+    return 'Deleted $count templates successfully';
+  }
+
+  @override
+  String errorDuringBatchExport(Object errors) {
+    return 'Error exporting some templates: $errors';
+  }
+
+  @override
   String get passwordGenerator => 'Password Generator';
 
   @override

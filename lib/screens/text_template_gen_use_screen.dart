@@ -611,6 +611,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
 
   void _copyPreviewText(AppLocalizations l10n) {
     Clipboard.setData(ClipboardData(text: _previewText)).then((_) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.copiedToClipboard)),
       );
@@ -723,7 +724,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
-    if (pickedDate == null) return;
+    if (!mounted || pickedDate == null) return;
 
     // Pick time
     final TimeOfDay initialTime = currentDateTime != null
@@ -733,7 +734,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
       context: context,
       initialTime: initialTime,
     );
-    if (pickedTime == null) return;
+    if (!mounted || pickedTime == null) return;
 
     final DateTime pickedDateTime = DateTime(
       pickedDate.year,

@@ -34,9 +34,11 @@ class ImportStatusDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [            // Summary
+          children: [
+            // Summary
             Text(
-              l10n.importSummary(failedImports.length, successfulImports.length),
+              l10n.importSummary(
+                  failedImports.length, successfulImports.length),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -61,7 +63,8 @@ class ImportStatusDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         ...successfulImports.map((result) => Padding(
-                              padding: const EdgeInsets.only(left: 16, bottom: 4),
+                              padding:
+                                  const EdgeInsets.only(left: 16, bottom: 4),
                               child: Row(
                                 children: [
                                   Icon(
@@ -73,7 +76,9 @@ class ImportStatusDialog extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       result.fileName,
-                                      style: Theme.of(context).textTheme.bodyMedium,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
                                     ),
                                   ),
                                 ],
@@ -93,7 +98,8 @@ class ImportStatusDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         ...failedImports.map((result) => Padding(
-                              padding: const EdgeInsets.only(left: 16, bottom: 8),
+                              padding:
+                                  const EdgeInsets.only(left: 16, bottom: 8),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -108,19 +114,25 @@ class ImportStatusDialog extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           result.fileName,
-                                          style: Theme.of(context).textTheme.bodyMedium,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
                                         ),
                                       ),
                                     ],
                                   ),
                                   if (result.errorMessage != null)
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 24, top: 2),
+                                      padding: const EdgeInsets.only(
+                                          left: 24, top: 2),
                                       child: Text(
                                         result.errorMessage!,
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Colors.red[600],
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Colors.red[600],
+                                            ),
                                       ),
                                     ),
                                 ],

@@ -6,6 +6,8 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import '../models/text_template.dart';
 import '../services/template_service.dart';
 import '../widgets/import_status_dialog.dart';
+import '../widgets/batch_export_dialog.dart';
+import '../widgets/batch_delete_dialog.dart';
 import 'text_template_gen_edit_screen.dart';
 import 'text_template_gen_use_screen.dart';
 
@@ -19,6 +21,8 @@ class TemplateListScreen extends StatefulWidget {
 class _TemplateListScreenState extends State<TemplateListScreen> {
   List<Template> _templates = [];
   bool _isLoading = true;
+  bool _isSelectionMode = false;
+  Set<String> _selectedTemplateIds = {};
 
   @override
   void initState() {
@@ -38,9 +42,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading templates: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading templates: ${e.toString()}')),
+        );
+      }
       setState(() {
         _isLoading = false;
       });
@@ -52,27 +58,53 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.textTemplatesTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: l10n.help,
-            onPressed: () {
-              _showHelpDialog();
-            },
-          ),
-        ],
+        title: _isSelectionMode
+            ? Text(l10n.selectedTemplates(_selectedTemplateIds.length))
+            : Text(l10n.textTemplatesTitle),
+        leading: _isSelectionMode
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _exitSelectionMode,
+              )
+            : null,
+        actions: _isSelectionMode
+            ? [
+                if (_selectedTemplateIds.length < _templates.length)
+                  TextButton(
+                    onPressed: _selectAll,
+                    child: Text(l10n.selectAll),
+                  ),
+                if (_selectedTemplateIds.isNotEmpty)
+                  TextButton(
+                    onPressed: _deselectAll,
+                    child: Text(l10n.deselectAll),
+                  ),
+              ]
+            : [
+                IconButton(
+                  icon: const Icon(Icons.info_outline),
+                  tooltip: l10n.help,
+                  onPressed: () {
+                    _showHelpDialog();
+                  },
+                ),
+              ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _templates.isEmpty
               ? _buildEmptyState(l10n)
               : _buildTemplateList(l10n),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddTemplateOptions(l10n),
-        tooltip: l10n.addNewTemplate,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _isSelectionMode
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _showAddTemplateOptions(l10n),
+              tooltip: l10n.addNewTemplate,
+              child: const Icon(Icons.add),
+            ),
+      bottomNavigationBar: _isSelectionMode && _selectedTemplateIds.isNotEmpty
+          ? _buildBottomActionBar(l10n)
+          : null,
     );
   }
 
@@ -118,61 +150,88 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       itemCount: _templates.length,
       itemBuilder: (context, index) {
         final template = _templates[index];
+        final isSelected = _selectedTemplateIds.contains(template.id);
+
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : null,
           child: ListTile(
-            leading: const Icon(Icons.description),
+            leading: _isSelectionMode
+                ? Checkbox(
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      _toggleTemplateSelection(template.id);
+                    },
+                  )
+                : const Icon(Icons.description),
             title: Text(template.title),
-            trailing: PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              onSelected: (value) async {
-                if (value == 'edit') {
-                  await _navigateToEditTemplate(template);
-                } else if (value == 'delete') {
-                  _confirmDeleteTemplate(template, l10n);
-                } else if (value == 'copy') {
-                  await _duplicateTemplate(template, l10n);
-                } else if (value == 'export') {
-                  await _exportTemplateToJson(template, l10n);
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: ListTile(
-                    leading: const Icon(Icons.edit),
-                    title: Text(l10n.edit),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'copy',
-                  child: ListTile(
-                    leading: const Icon(Icons.copy),
-                    title: Text(l10n.copy),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'export',
-                  child: ListTile(
-                    leading: const Icon(Icons.download),
-                    title: Text(l10n.exportToJson),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: ListTile(
-                    leading: const Icon(Icons.delete, color: Colors.red),
-                    title: Text(l10n.delete,
-                        style: const TextStyle(color: Colors.red)),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.characterCount(template.characterCount)),
+                Text(l10n.fieldsAndLoops(
+                    template.fieldCount, template.loopCount)),
               ],
             ),
-            onTap: () => _navigateToUseTemplate(template),
+            trailing: _isSelectionMode
+                ? null
+                : PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) async {
+                      if (value == 'edit') {
+                        await _navigateToEditTemplate(template);
+                      } else if (value == 'delete') {
+                        _confirmDeleteTemplate(template, l10n);
+                      } else if (value == 'copy') {
+                        await _duplicateTemplate(template, l10n);
+                      } else if (value == 'export') {
+                        await _exportTemplateToJson(template, l10n);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          leading: const Icon(Icons.edit),
+                          title: Text(l10n.edit),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'copy',
+                        child: ListTile(
+                          leading: const Icon(Icons.copy),
+                          title: Text(l10n.copy),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'export',
+                        child: ListTile(
+                          leading: const Icon(Icons.download),
+                          title: Text(l10n.exportToJson),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: ListTile(
+                          leading: const Icon(Icons.delete, color: Colors.red),
+                          title: Text(l10n.delete,
+                              style: const TextStyle(color: Colors.red)),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+            onTap: _isSelectionMode
+                ? () => _toggleTemplateSelection(template.id)
+                : () => _navigateToUseTemplate(template),
+            onLongPress: _isSelectionMode
+                ? null
+                : () => _enterSelectionMode(template.id),
           ),
         );
       },
@@ -281,6 +340,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
               Text('• ${l10n.helpCreateNewTemplate}'),
               Text('• ${l10n.helpTapToUseTemplate}'),
               Text('• ${l10n.helpTapMenuForActions}'),
+              Text('• ${l10n.longPressToSelect}'),
               const SizedBox(height: 16),
               Text(
                 l10n.textTemplateScreenHint,
@@ -331,6 +391,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       ),
     );
   }
+
   Future<void> _importTemplateFromFile(AppLocalizations l10n) async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -357,7 +418,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
               );
 
               await TemplateService.saveTemplate(newTemplate);
-              
+
               importResults.add(ImportResult(
                 fileName: file.name,
                 success: true,
@@ -420,6 +481,212 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.errorCopyingTemplate(e.toString())),
+          ),
+        );
+      }
+    }
+  }
+
+  // Multi-select functionality methods
+  void _enterSelectionMode(String templateId) {
+    setState(() {
+      _isSelectionMode = true;
+      _selectedTemplateIds.add(templateId);
+    });
+  }
+
+  void _exitSelectionMode() {
+    setState(() {
+      _isSelectionMode = false;
+      _selectedTemplateIds.clear();
+    });
+  }
+
+  void _toggleTemplateSelection(String templateId) {
+    setState(() {
+      if (_selectedTemplateIds.contains(templateId)) {
+        _selectedTemplateIds.remove(templateId);
+        if (_selectedTemplateIds.isEmpty) {
+          _exitSelectionMode();
+        }
+      } else {
+        _selectedTemplateIds.add(templateId);
+      }
+    });
+  }
+
+  void _selectAll() {
+    setState(() {
+      _selectedTemplateIds.addAll(_templates.map((t) => t.id));
+    });
+  }
+
+  void _deselectAll() {
+    setState(() {
+      _selectedTemplateIds.clear();
+    });
+  }
+
+  Widget _buildBottomActionBar(AppLocalizations l10n) {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          FilledButton.icon(
+            onPressed: _batchExport,
+            icon: const Icon(Icons.download),
+            label: Text(l10n.batchExport),
+          ),
+          FilledButton.icon(
+            onPressed: _batchDelete,
+            icon: const Icon(Icons.delete),
+            label: Text(l10n.batchDelete),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _batchExport() async {
+    final l10n = AppLocalizations.of(context)!;
+    final selectedTemplates =
+        _templates.where((t) => _selectedTemplateIds.contains(t.id)).toList();
+
+    if (selectedTemplates.isEmpty) return;
+
+    await _showBatchExportDialog(selectedTemplates, l10n);
+  }
+
+  void _batchDelete() async {
+    final l10n = AppLocalizations.of(context)!;
+    final selectedTemplates =
+        _templates.where((t) => _selectedTemplateIds.contains(t.id)).toList();
+
+    if (selectedTemplates.isEmpty) return;
+
+    await _showBatchDeleteDialog(selectedTemplates, l10n);
+  }
+
+  Future<void> _showBatchExportDialog(
+      List<Template> templates, AppLocalizations l10n) async {
+    final Map<String, String> filenames = {};
+
+    // Initialize with default filenames
+    for (final template in templates) {
+      filenames[template.id] = '${template.title.replaceAll(' ', '_')}.json';
+    }
+
+    await showDialog(
+      context: context,
+      builder: (context) => BatchExportDialog(
+        templates: templates,
+        initialFilenames: filenames,
+        onExport: (Map<String, String> finalFilenames) async {
+          await _performBatchExport(templates, finalFilenames, l10n);
+        },
+      ),
+    );
+  }
+
+  Future<void> _showBatchDeleteDialog(
+      List<Template> templates, AppLocalizations l10n) async {
+    await showDialog(
+      context: context,
+      builder: (context) => BatchDeleteDialog(
+        templateCount: templates.length,
+        onConfirm: () async {
+          await _performBatchDelete(templates, l10n);
+        },
+      ),
+    );
+  }
+
+  Future<void> _performBatchExport(List<Template> templates,
+      Map<String, String> filenames, AppLocalizations l10n) async {
+    try {
+      // Choose directory
+      String? directoryPath = await FilePicker.platform.getDirectoryPath();
+      if (directoryPath == null) return;
+
+      final List<String> errors = [];
+      int successCount = 0;
+
+      for (final template in templates) {
+        try {
+          final filename = filenames[template.id] ??
+              '${template.title.replaceAll(' ', '_')}.json';
+          final jsonData = template.toJson();
+          final jsonString = jsonEncode(jsonData);
+
+          final filePath = '$directoryPath/$filename';
+          final file = File(filePath);
+          await file.writeAsString(jsonString);
+
+          successCount++;
+        } catch (e) {
+          errors.add('${template.title}: ${e.toString()}');
+        }
+      }
+
+      _exitSelectionMode();
+
+      if (mounted) {
+        if (errors.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.batchExportCompleted(successCount)),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.errorDuringBatchExport(errors.join(', '))),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error during export: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _performBatchDelete(
+      List<Template> templates, AppLocalizations l10n) async {
+    try {
+      for (final template in templates) {
+        await TemplateService.deleteTemplate(template.id);
+      }
+
+      _exitSelectionMode();
+      _loadTemplates();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.batchDeleteCompleted(templates.length)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error during batch delete: ${e.toString()}'),
+            backgroundColor: Colors.red,
           ),
         );
       }

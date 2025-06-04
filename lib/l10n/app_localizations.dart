@@ -1169,6 +1169,114 @@ abstract class AppLocalizations {
   /// **'Field \"{field}\" belongs to loop \"{loop}\"'**
   String fieldInLoop(Object field, Object loop);
 
+  /// No description provided for @characterCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} characters'**
+  String characterCount(Object count);
+
+  /// No description provided for @fieldsAndLoops.
+  ///
+  /// In en, this message translates to:
+  /// **'{fields} fields, {loops} loops'**
+  String fieldsAndLoops(Object fields, Object loops);
+
+  /// No description provided for @longPressToSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press to select templates'**
+  String get longPressToSelect;
+
+  /// No description provided for @selectedTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String selectedTemplates(Object count);
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get selectAll;
+
+  /// No description provided for @deselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect All'**
+  String get deselectAll;
+
+  /// No description provided for @batchExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Selected'**
+  String get batchExport;
+
+  /// No description provided for @batchDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Selected'**
+  String get batchDelete;
+
+  /// No description provided for @exportTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Templates'**
+  String get exportTemplates;
+
+  /// No description provided for @editFilenames.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit file names before export:'**
+  String get editFilenames;
+
+  /// No description provided for @filenameFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Filename for \"{title}\":'**
+  String filenameFor(Object title);
+
+  /// No description provided for @confirmBatchDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Batch Delete'**
+  String get confirmBatchDelete;
+
+  /// No description provided for @typeConfirmToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Type \"confirm\" to delete {count} selected templates:'**
+  String typeConfirmToDelete(Object count);
+
+  /// No description provided for @confirmText.
+  ///
+  /// In en, this message translates to:
+  /// **'confirm'**
+  String get confirmText;
+
+  /// No description provided for @confirmationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please type \"confirm\" to proceed'**
+  String get confirmationRequired;
+
+  /// No description provided for @batchExportCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported {count} templates successfully'**
+  String batchExportCompleted(Object count);
+
+  /// No description provided for @batchDeleteCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} templates successfully'**
+  String batchDeleteCompleted(Object count);
+
+  /// No description provided for @errorDuringBatchExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Error exporting some templates: {errors}'**
+  String errorDuringBatchExport(Object errors);
+
   /// No description provided for @passwordGenerator.
   ///
   /// In en, this message translates to:

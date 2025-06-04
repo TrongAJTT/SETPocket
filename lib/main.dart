@@ -117,6 +117,7 @@ class DesktopLayout extends StatefulWidget {
 
 class _DesktopLayoutState extends State<DesktopLayout> {
   Widget? currentTool;
+  String? selectedToolType;
 
   @override
   Widget build(BuildContext context) {
@@ -135,9 +136,11 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                 width: sidebarWidth,
                 child: ToolSelectionScreen(
                   isDesktop: true,
+                  selectedToolType: selectedToolType,
                   onToolSelected: (Widget tool) {
                     setState(() {
                       currentTool = tool;
+                      selectedToolType = tool.runtimeType.toString();
                     });
                   },
                 ),
@@ -160,11 +163,13 @@ class _DesktopLayoutState extends State<DesktopLayout> {
 class ToolSelectionScreen extends StatelessWidget {
   final bool isDesktop;
   final Function(Widget)? onToolSelected;
+  final String? selectedToolType;
 
   const ToolSelectionScreen({
     super.key,
     this.isDesktop = false,
     this.onToolSelected,
+    this.selectedToolType,
   });
   @override
   Widget build(BuildContext context) {
@@ -177,6 +182,7 @@ class ToolSelectionScreen extends StatelessWidget {
           description: loc.batchVideoDetailViewerDesc,
           icon: Icons.video_library,
           iconColor: Colors.red.shade700,
+          isSelected: selectedToolType == 'BatchVideoDetailViewer',
           onTap: () {
             const tool = BatchVideoDetailViewer();
             if (isDesktop) {
@@ -195,6 +201,7 @@ class ToolSelectionScreen extends StatelessWidget {
           description: loc.textTemplateGenDesc,
           icon: Icons.description,
           iconColor: Colors.blue.shade800,
+          isSelected: selectedToolType == 'TemplateListScreen',
           onTap: () {
             const tool = TemplateListScreen();
             if (isDesktop) {
@@ -213,6 +220,7 @@ class ToolSelectionScreen extends StatelessWidget {
           description: loc.randomDesc,
           icon: Icons.casino,
           iconColor: Colors.purple,
+          isSelected: selectedToolType == 'RandomToolsScreen',
           onTap: () {
             const tool = RandomToolsScreen();
             if (isDesktop) {
@@ -232,6 +240,7 @@ class ToolSelectionScreen extends StatelessWidget {
           description: loc.settings,
           icon: Icons.settings,
           iconColor: Colors.grey,
+          isSelected: selectedToolType == 'MainSettingsScreen',
           onTap: () {
             const tool = MainSettingsScreen();
             if (isDesktop) {

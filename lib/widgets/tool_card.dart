@@ -8,6 +8,7 @@ class ToolCard extends StatelessWidget {
   final IconData icon;
   final Color? iconColor;
   final bool showActions;
+  final bool isSelected;
 
   const ToolCard({
     super.key,
@@ -17,69 +18,89 @@ class ToolCard extends StatelessWidget {
     this.icon = Icons.apps,
     this.iconColor,
     this.showActions = true,
+    this.isSelected = false,
   });
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Card(
-      elevation: 2,
+      elevation: isSelected ? 4 : 2,
       margin: const EdgeInsets.only(bottom: 16),
+      color: isSelected ? colorScheme.primaryContainer : null,
       child: Tooltip(
         message: description,
         waitDuration: const Duration(milliseconds: 500),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(icon,
-                    size: 28,
-                    color: iconColor ?? Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                ),
-                if (showActions)
-                  PopupMenuButton<String>(
-                    tooltip: AppLocalizations.of(context)!.options,
-                    icon: const Icon(Icons.more_vert),
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'info',
-                        child: ListTile(
-                          leading: const Icon(Icons.info_outline),
-                          title: Text(AppLocalizations.of(context)!.about),
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ],
-                    onSelected: (value) {
-                      if (value == 'info') {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(title),
-                            content: Text(description),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child:
-                                    Text(AppLocalizations.of(context)!.close),
-                              ),
-                            ],
+          child: Container(
+            decoration: isSelected
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.primary,
+                      width: 2,
+                    ),
+                  )
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(icon,
+                      size: 28,
+                      color: isSelected
+                          ? colorScheme.primary
+                          : (iconColor ?? colorScheme.primary)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w500,
+                            color: isSelected
+                                ? colorScheme.onPrimaryContainer
+                                : null,
                           ),
-                        );
-                      }
-                    },
+                    ),
                   ),
-              ],
+                  if (showActions)
+                    PopupMenuButton<String>(
+                      tooltip: AppLocalizations.of(context)!.options,
+                      icon: const Icon(Icons.more_vert),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'info',
+                          child: ListTile(
+                            leading: const Icon(Icons.info_outline),
+                            title: Text(AppLocalizations.of(context)!.about),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                      onSelected: (value) {
+                        if (value == 'info') {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(title),
+                              content: Text(description),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child:
+                                      Text(AppLocalizations.of(context)!.close),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                ],
+              ),
             ),
           ),
         ),

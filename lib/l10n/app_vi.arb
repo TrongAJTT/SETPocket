@@ -17,6 +17,7 @@
     "edit": "Chỉnh sửa",
     "copy": "Sao chép",
     "cancel": "Hủy",
+    "total": "Tổng cộng",
     "selectTool": "Chọn một chức năng ở thanh bên",
     "settingsDesc": "Cá nhân hóa trải nghiệm sử dụng ứng dụng",
     
@@ -217,11 +218,21 @@
     "endTime": "Giờ kết thúc",
     "timeCount": "Số lượng giờ",
     
-    "dateTimeGenerator": "Tạo ngày giờ ngẫu nhiên",
-    "heads": "Sấp",
+    "dateTimeGenerator": "Tạo ngày giờ ngẫu nhiên",    "heads": "Sấp",
     "tails": "Ngửa",
     "rock": "Búa",
     "paper": "Giấy", 
     "scissors": "Kéo",
-    "randomResult": "Kết quả"
+    "randomResult": "Kết quả",
+    
+    "cacheDetails": "Chi tiết bộ nhớ đệm",
+    "viewCacheDetails": "Xem chi tiết",
+    "cacheSize": "Kích thước bộ nhớ đệm",
+    "cacheItems": "Mục",
+    "clearAllCache": "Xóa tất cả bộ nhớ đệm",
+    "confirmClearCache": "Bạn có chắc chắn muốn xóa bộ nhớ đệm \"{cacheName}\"?",
+    "confirmClearAllCache": "Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu bộ nhớ đệm? Điều này sẽ xóa tất cả template đã lưu nhưng giữ lại cài đặt của bạn.",
+    "cacheCleared": "Đã xóa bộ nhớ đệm {cacheName} thành công",
+    "allCacheCleared": "Đã xóa tất cả bộ nhớ đệm thành công",
+    "errorClearingCache": "Lỗi khi xóa bộ nhớ đệm: {error}"
 }

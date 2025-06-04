@@ -42,6 +42,42 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearCache => 'Xóa bộ nhớ đệm';
 
   @override
+  String get cacheDetails => 'Chi tiết bộ nhớ đệm';
+
+  @override
+  String get viewCacheDetails => 'Xem chi tiết';
+
+  @override
+  String get cacheSize => 'Kích thước bộ nhớ đệm';
+
+  @override
+  String get cacheItems => 'Mục';
+
+  @override
+  String get clearAllCache => 'Xóa tất cả bộ nhớ đệm';
+
+  @override
+  String confirmClearCache(Object cacheName) {
+    return 'Bạn có chắc chắn muốn xóa bộ nhớ đệm \"$cacheName\"?';
+  }
+
+  @override
+  String get confirmClearAllCache => 'Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu bộ nhớ đệm? Điều này sẽ xóa tất cả template đã lưu nhưng giữ lại cài đặt của bạn.';
+
+  @override
+  String cacheCleared(Object cacheName) {
+    return 'Đã xóa bộ nhớ đệm $cacheName thành công';
+  }
+
+  @override
+  String get allCacheCleared => 'Đã xóa tất cả bộ nhớ đệm thành công';
+
+  @override
+  String errorClearingCache(Object error) {
+    return 'Lỗi khi xóa bộ nhớ đệm: $error';
+  }
+
+  @override
   String get close => 'Đóng';
 
   @override
@@ -61,6 +97,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get cancel => 'Hủy';
+
+  @override
+  String get total => 'Tổng cộng';
 
   @override
   String get selectTool => 'Chọn một chức năng ở thanh bên';

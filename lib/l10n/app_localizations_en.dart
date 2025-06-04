@@ -42,6 +42,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearCache => 'Clear Cache';
 
   @override
+  String get cacheDetails => 'Cache Details';
+
+  @override
+  String get viewCacheDetails => 'View Details';
+
+  @override
+  String get cacheSize => 'Cache Size';
+
+  @override
+  String get cacheItems => 'Items';
+
+  @override
+  String get clearAllCache => 'Clear All Cache';
+
+  @override
+  String confirmClearCache(Object cacheName) {
+    return 'Are you sure you want to clear \"$cacheName\" cache?';
+  }
+
+  @override
+  String get confirmClearAllCache => 'Are you sure you want to clear ALL cache data? This will remove all saved templates but preserve your settings.';
+
+  @override
+  String cacheCleared(Object cacheName) {
+    return '$cacheName cache cleared successfully';
+  }
+
+  @override
+  String get allCacheCleared => 'All cache cleared successfully';
+
+  @override
+  String errorClearingCache(Object error) {
+    return 'Error clearing cache: $error';
+  }
+
+  @override
   String get close => 'Close';
 
   @override
@@ -61,6 +97,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get total => 'Total';
 
   @override
   String get selectTool => 'Select a tool from the sidebar';

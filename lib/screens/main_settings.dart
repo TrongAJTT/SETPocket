@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
+import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
@@ -38,25 +40,61 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _loadCacheInfo() async {
-    setState(() {
-      _cacheInfo = 'Approx. 0 MB';
-    });
+    try {
+      final totalSize = await CacheService.getTotalCacheSize();
+      setState(() {
+        _cacheInfo = CacheService.formatCacheSize(totalSize);
+      });
+    } catch (e) {
+      setState(() {
+        _cacheInfo = 'Unknown';
+      });
+    }
   }
 
   Future<void> _clearCache() async {
     setState(() {
       _clearing = true;
     });
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _cacheInfo = 'Approx. 0 MB';
-      _clearing = false;
-    });
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.clearCache)),
-      );
+
+    try {
+      await CacheService.clearAllCache();
+      await _loadCacheInfo(); // Refresh cache info
+      setState(() {
+        _clearing = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.clearCache),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _clearing = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
+  }
+
+  Future<void> _showCacheDetails() async {
+    await showDialog(
+      context: context,
+      builder: (context) => const CacheDetailsDialog(),
+    );
+    // Refresh cache info after dialog closes
+    await _loadCacheInfo();
   }
 
   void _onThemeChanged(ThemeMode? mode) async {
@@ -256,26 +294,48 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                             Text('${loc.cache}: $_cacheInfo',
                                 style: Theme.of(context).textTheme.bodyMedium),
                             const SizedBox(height: 12),
-                            ElevatedButton.icon(
-                              icon: _clearing
-                                  ? const SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    )
-                                  : const Icon(Icons.delete),
-                              label: Text(loc.clearCache),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.error,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8)),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                              ),
-                              onPressed: _clearing ? null : _clearCache,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    icon: _clearing
+                                        ? const SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2),
+                                          )
+                                        : const Icon(Icons.delete),
+                                    label: Text(loc.clearCache),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context).colorScheme.error,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 12),
+                                    ),
+                                    onPressed: _clearing ? null : _clearCache,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    icon: const Icon(Icons.info_outline),
+                                    label: Text(loc.viewCacheDetails),
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 12),
+                                    ),
+                                    onPressed: _showCacheDetails,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

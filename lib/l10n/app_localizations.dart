@@ -161,6 +161,66 @@ abstract class AppLocalizations {
   /// **'Clear Cache'**
   String get clearCache;
 
+  /// No description provided for @cacheDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Details'**
+  String get cacheDetails;
+
+  /// No description provided for @viewCacheDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get viewCacheDetails;
+
+  /// No description provided for @cacheSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Size'**
+  String get cacheSize;
+
+  /// No description provided for @cacheItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get cacheItems;
+
+  /// No description provided for @clearAllCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Cache'**
+  String get clearAllCache;
+
+  /// No description provided for @confirmClearCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear \"{cacheName}\" cache?'**
+  String confirmClearCache(Object cacheName);
+
+  /// No description provided for @confirmClearAllCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear ALL cache data? This will remove all saved templates but preserve your settings.'**
+  String get confirmClearAllCache;
+
+  /// No description provided for @cacheCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'{cacheName} cache cleared successfully'**
+  String cacheCleared(Object cacheName);
+
+  /// No description provided for @allCacheCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'All cache cleared successfully'**
+  String get allCacheCleared;
+
+  /// No description provided for @errorClearingCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Error clearing cache: {error}'**
+  String errorClearingCache(Object error);
+
   /// No description provided for @close.
   ///
   /// In en, this message translates to:
@@ -202,6 +262,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
 
   /// No description provided for @selectTool.
   ///

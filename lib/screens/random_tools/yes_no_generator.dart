@@ -73,8 +73,8 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _result!
-                            ? Colors.green.withOpacity(0.8)
-                            : Colors.red.withOpacity(0.8),
+                            ? Colors.green.withValues(alpha: 0.8)
+                            : Colors.red.withValues(alpha: 0.8),
                       ),
                       child: Center(
                         child: Text(
@@ -96,7 +96,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.withOpacity(0.3),
+                  color: Colors.grey.withValues(alpha: 0.3),
                 ),
                 child: Center(
                   child: Text(

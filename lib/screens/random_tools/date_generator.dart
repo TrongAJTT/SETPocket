@@ -15,6 +15,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 365));
   DateTime _endDate = DateTime.now().add(const Duration(days: 365));
   int _dateCount = 5;
+  double _dateCountSlider = 5.0;
   bool _allowDuplicates = true;
   List<DateTime> _generatedDates = [];
   bool _copied = false;
@@ -60,6 +61,186 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
     );
   }
 
+  Widget _buildDateSelector(String label, DateTime date, VoidCallback onTap) {
+    final dateFormat = DateFormat('yyyy-MM-dd');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(dateFormat.format(date)),
+                const Icon(Icons.calendar_today),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateSelectors(AppLocalizations loc) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    final startDateSelector = _buildDateSelector(
+      loc.startDate,
+      _startDate,
+      () async {
+        final date = await showDatePicker(
+          context: context,
+          initialDate: _startDate,
+          firstDate: DateTime(1900),
+          lastDate: DateTime(2100),
+        );
+        if (date != null) {
+          setState(() {
+            _startDate = date;
+            // Ensure start date is before end date
+            if (_startDate.isAfter(_endDate)) {
+              _endDate = _startDate.add(const Duration(days: 1));
+            }
+          });
+        }
+      },
+    );
+
+    final endDateSelector = _buildDateSelector(
+      loc.endDate,
+      _endDate,
+      () async {
+        final date = await showDatePicker(
+          context: context,
+          initialDate: _endDate,
+          firstDate: _startDate,
+          lastDate: DateTime(2100),
+        );
+        if (date != null) {
+          setState(() {
+            _endDate = date;
+          });
+        }
+      },
+    );
+
+    if (isWideScreen) {
+      // Side-by-side layout for desktop/tablet
+      return Row(
+        children: [
+          Expanded(child: startDateSelector),
+          const SizedBox(width: 16),
+          Expanded(child: endDateSelector),
+        ],
+      );
+    } else {
+      // Stacked layout for mobile
+      return Column(
+        children: [
+          startDateSelector,
+          const SizedBox(height: 16),
+          endDateSelector,
+        ],
+      );
+    }
+  }
+
+  Widget _buildCountSlider(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.dateCount,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _dateCountSlider,
+                min: 1,
+                max: 10,
+                divisions: 9,
+                label: _dateCount.toString(),
+                onChanged: (value) {
+                  setState(() {
+                    _dateCountSlider = value;
+                    _dateCount = value.toInt();
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _dateCount.toString().padLeft(2, '0'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtherSection(AppLocalizations loc) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    final duplicatesCheckbox = CheckboxListTile(
+      title: Text(loc.allowDuplicates),
+      value: _allowDuplicates,
+      onChanged: (value) {
+        setState(() {
+          _allowDuplicates = value ?? true;
+        });
+      },
+      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.other,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        if (isWideScreen)
+          // Center vertically on PC
+          Center(
+            child: duplicatesCheckbox,
+          )
+        else
+          // Normal layout on mobile
+          duplicatesCheckbox,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -81,137 +262,28 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Start date
-                    Text(
-                      loc.startDate,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: _startDate,
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime(2100),
-                        );
-                        if (date != null) {
-                          setState(() {
-                            _startDate = date;
-                            // Ensure start date is before end date
-                            if (_startDate.isAfter(_endDate)) {
-                              _endDate =
-                                  _startDate.add(const Duration(days: 1));
-                            }
-                          });
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(dateFormat.format(_startDate)),
-                            const Icon(Icons.calendar_today),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Date selectors (responsive layout)
+                    _buildDateSelectors(loc),
 
                     const SizedBox(height: 16),
 
-                    // End date
-                    Text(
-                      loc.endDate,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: _endDate,
-                          firstDate: _startDate,
-                          lastDate: DateTime(2100),
-                        );
-                        if (date != null) {
-                          setState(() {
-                            _endDate = date;
-                          });
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(dateFormat.format(_endDate)),
-                            const Icon(Icons.calendar_today),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Date count
-                    Text(
-                      loc.dateCount,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: _dateCount > 1
-                              ? () => setState(() => _dateCount--)
-                              : null,
-                          icon: const Icon(Icons.remove),
-                        ),
-                        Container(
-                          width: 60,
-                          alignment: Alignment.center,
-                          child: Text(
-                            '$_dateCount',
-                            style: Theme.of(context).textTheme.headlineSmall,
+                    // Count slider and Other section (responsive layout)
+                    MediaQuery.of(context).size.width > 600
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 3, child: _buildCountSlider(loc)),
+                              const SizedBox(width: 32),
+                              Expanded(flex: 2, child: _buildOtherSection(loc)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              _buildCountSlider(loc),
+                              const SizedBox(height: 16),
+                              _buildOtherSection(loc),
+                            ],
                           ),
-                        ),
-                        IconButton(
-                          onPressed: _dateCount < 30
-                              ? () => setState(() => _dateCount++)
-                              : null,
-                          icon: const Icon(Icons.add),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Allow duplicates
-                    CheckboxListTile(
-                      title: Text(loc.allowDuplicates),
-                      value: _allowDuplicates,
-                      onChanged: (value) {
-                        setState(() {
-                          _allowDuplicates = value ?? true;
-                        });
-                      },
-                    ),
 
                     const SizedBox(height: 16),
 

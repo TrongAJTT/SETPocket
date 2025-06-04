@@ -21,9 +21,9 @@ class RandomToolsScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     final width = MediaQuery.of(context).size.width;
     int crossAxisCount;
-    if (width < 600) {
+    if (width < 700) {
       crossAxisCount = 1;
-    } else if (width < 1024) {
+    } else if (width < 1100) {
       crossAxisCount = 2;
     } else {
       crossAxisCount = 3;
@@ -38,7 +38,7 @@ class RandomToolsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossAxisCount,
-          childAspectRatio: width < 600 ? 3 : 2.5,
+          childAspectRatio: width < 700 ? 3.2 : 2.8,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
         ),
@@ -143,7 +143,7 @@ class RandomToolsScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: iconColor.withOpacity(0.2),
+                      backgroundColor: iconColor.withValues(alpha: 0.2),
                       radius: 24,
                       child: Icon(
                         icon,

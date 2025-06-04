@@ -52,6 +52,114 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
     );
   }
 
+  Widget _buildCheckboxOptions(BuildContext context, AppLocalizations loc) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800; // More conservative desktop threshold
+
+    final checkboxOptions = [
+      {
+        'title': loc.includeLowercase,
+        'value': _includeLowercase,
+        'onChanged': (bool? value) {
+          setState(() {
+            _includeLowercase = value ?? true;
+          });
+        },
+      },
+      {
+        'title': loc.includeUppercase,
+        'value': _includeUppercase,
+        'onChanged': (bool? value) {
+          setState(() {
+            _includeUppercase = value ?? true;
+          });
+        },
+      },
+      {
+        'title': loc.includeNumbers,
+        'value': _includeNumbers,
+        'onChanged': (bool? value) {
+          setState(() {
+            _includeNumbers = value ?? true;
+          });
+        },
+      },
+      {
+        'title': loc.includeSpecial,
+        'value': _includeSpecial,
+        'onChanged': (bool? value) {
+          setState(() {
+            _includeSpecial = value ?? true;
+          });
+        },
+      },
+    ];
+
+    if (isDesktop) {
+      // Desktop layout: 2 columns
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: CheckboxListTile(
+                  title: Text(checkboxOptions[0]['title'] as String),
+                  value: checkboxOptions[0]['value'] as bool,
+                  onChanged:
+                      checkboxOptions[0]['onChanged'] as void Function(bool?),
+                  dense: true,
+                ),
+              ),
+              Expanded(
+                child: CheckboxListTile(
+                  title: Text(checkboxOptions[1]['title'] as String),
+                  value: checkboxOptions[1]['value'] as bool,
+                  onChanged:
+                      checkboxOptions[1]['onChanged'] as void Function(bool?),
+                  dense: true,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: CheckboxListTile(
+                  title: Text(checkboxOptions[2]['title'] as String),
+                  value: checkboxOptions[2]['value'] as bool,
+                  onChanged:
+                      checkboxOptions[2]['onChanged'] as void Function(bool?),
+                  dense: true,
+                ),
+              ),
+              Expanded(
+                child: CheckboxListTile(
+                  title: Text(checkboxOptions[3]['title'] as String),
+                  value: checkboxOptions[3]['value'] as bool,
+                  onChanged:
+                      checkboxOptions[3]['onChanged'] as void Function(bool?),
+                  dense: true,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      // Mobile layout: 1 column
+      return Column(
+        children: checkboxOptions.map((option) {
+          return CheckboxListTile(
+            title: Text(option['title'] as String),
+            value: option['value'] as bool,
+            onChanged: option['onChanged'] as void Function(bool?),
+            dense: true,
+          );
+        }).toList(),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -101,46 +209,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    CheckboxListTile(
-                      title: Text(loc.includeLowercase),
-                      value: _includeLowercase,
-                      onChanged: (value) {
-                        setState(() {
-                          _includeLowercase = value ?? true;
-                        });
-                      },
-                      dense: true,
-                    ),
-                    CheckboxListTile(
-                      title: Text(loc.includeUppercase),
-                      value: _includeUppercase,
-                      onChanged: (value) {
-                        setState(() {
-                          _includeUppercase = value ?? true;
-                        });
-                      },
-                      dense: true,
-                    ),
-                    CheckboxListTile(
-                      title: Text(loc.includeNumbers),
-                      value: _includeNumbers,
-                      onChanged: (value) {
-                        setState(() {
-                          _includeNumbers = value ?? true;
-                        });
-                      },
-                      dense: true,
-                    ),
-                    CheckboxListTile(
-                      title: Text(loc.includeSpecial),
-                      value: _includeSpecial,
-                      onChanged: (value) {
-                        setState(() {
-                          _includeSpecial = value ?? true;
-                        });
-                      },
-                      dense: true,
-                    ),
+                    _buildCheckboxOptions(context, loc),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,

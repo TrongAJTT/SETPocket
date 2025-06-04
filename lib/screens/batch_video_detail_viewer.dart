@@ -9,6 +9,7 @@ import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'dart:convert';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:logger/logger.dart';
 
 class VideoInfo {
   final String name;
@@ -46,6 +47,7 @@ class BatchVideoDetailViewer extends StatefulWidget {
 }
 
 class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
+  final Logger _logger = Logger(printer: PrettyPrinter());
   List<VideoInfo> videoInfos = [];
   bool isLoading = false;
   int _selectedIndex = 0; // 0: Data, 1: Stats
@@ -112,10 +114,10 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
           (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
         try {
           dimensions = await _getVideoResolution(file.path);
-          print(
-              'Dimensions extracted: ${dimensions['width']} x ${dimensions['height']}');
+          _logger.i(
+              'Dimensions extracted: \\${dimensions['width']} x \\${dimensions['height']}');
         } catch (e) {
-          print('Dimension extraction error: $e');
+          _logger.w('Dimension extraction error: $e');
         }
       }
 
@@ -147,11 +149,11 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
 
           return info;
         } catch (e) {
-          print('Basic video info error: $e');
+          _logger.w('Basic video info error: $e');
           try {
             // Thử sử dụng ffprobe (dự phòng)
             final cmd =
-                '-v quiet -print_format json -show_format -show_streams "${file.path}"';
+                '-v quiet -print_format json -show_format -show_streams "[200m${file.path}[0m"';
             final session = await FFmpegKit.executeAsync('ffprobe $cmd');
             final returnCode = await session.getReturnCode();
             if (ReturnCode.isSuccess(returnCode)) {
@@ -217,7 +219,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
               );
             }
           } catch (ffmpegError) {
-            print('FFmpeg plugin error: $ffmpegError');
+            _logger.e('FFmpeg plugin error: $ffmpegError');
           }
           // Nếu cả hai cách đều không hoạt động, sử dụng thông tin cơ bản
           return _getBasicFileInfo(file, fileStats);
@@ -258,7 +260,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
               : 0;
 
           // Debug print to verify extraction
-          print('Media info width: $width, height: $height');
+          _logger.i('Media info width: $width, height: $height');
 
           return VideoInfo(
             name: file.path.split(Platform.pathSeparator).last.split('.').first,
@@ -274,12 +276,12 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
             audioChannels: audioChannels,
           );
         } catch (e) {
-          print('MediaInfo error: $e');
+          _logger.e('MediaInfo error: $e');
           return _getBasicFileInfo(file, fileStats);
         }
       }
     } catch (e) {
-      print('Error getting video info: $e');
+      _logger.e('Error getting video info: $e');
       final fileStats = await file.stat();
       return _getBasicFileInfo(file, fileStats);
     }
@@ -306,7 +308,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
           // Try to get more accurate dimensions using FFmpeg if available
           try {
             final cmd =
-                '-v quiet -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "${file.path}"';
+                '-v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "[200m${file.path}[0m"';
             final session = await FFmpegKit.executeAsync('ffprobe $cmd');
             final returnCode = await session.getReturnCode();
             if (ReturnCode.isSuccess(returnCode)) {
@@ -316,7 +318,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 if (dimensions.length >= 2) {
                   width = int.tryParse(dimensions[0]) ?? 640;
                   height = int.tryParse(dimensions[1]) ?? 360;
-                  print("FFprobe dimensions: $width x $height");
+                  _logger.i("FFprobe dimensions: $width x $height");
                 } else {
                   // Fallback to common dimensions
                   width = 640;
@@ -332,14 +334,14 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
               height = 360;
             }
           } catch (e) {
-            print('FFmpeg dimension extraction error: $e');
+            _logger.w('FFmpeg dimension extraction error: $e');
             // Fallback to common dimensions
             width = 640;
             height = 360;
           }
         }
       } catch (e) {
-        print('Thumbnail generation error: $e');
+        _logger.w('Thumbnail generation error: $e');
       }
 
       // Ước lượng thời lượng dựa trên kích thước file (không chính xác)
@@ -366,7 +368,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
         audioChannels: 2, // Giả định stereo
       );
     } catch (e) {
-      print('Video info extraction error: $e');
+      _logger.e('Video info extraction error: $e');
       return _getBasicFileInfo(file, fileStats);
     }
   }
@@ -437,7 +439,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
 
       // Print debug information for dimensions
       if (field == 'frameWidth' || field == 'frameHeight') {
-        print('$field values: $values');
+        _logger.i('$field values: $values');
       }
 
       // Ensure there are values to calculate stats from
@@ -485,13 +487,13 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
           if (dimensions.length == 2) {
             final width = int.tryParse(dimensions[0]) ?? 0;
             final height = int.tryParse(dimensions[1]) ?? 0;
-            print('Extracted dimensions: $width x $height from $filePath');
+            _logger.i('Extracted dimensions: $width x $height from $filePath');
             return {'width': width, 'height': height};
           }
         }
       }
     } catch (e) {
-      print('Error extracting video dimensions: $e');
+      _logger.e('Error extracting video dimensions: $e');
     }
     return {'width': 0, 'height': 0};
   }
@@ -530,22 +532,20 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Help"),
-                        const SizedBox(height: 12),
                         Text(AppLocalizations.of(context)!.features),
                         const SizedBox(height: 8),
-                        Text('• ' +
-                            AppLocalizations.of(context)!.featureViewMultiple),
-                        Text('• ' +
-                            AppLocalizations.of(context)!.featureSeeTechnical),
-                        Text('• ' +
-                            AppLocalizations.of(context)!.featureCompareStats),
+                        Text(
+                            '• ${AppLocalizations.of(context)!.featureViewMultiple}'),
+                        Text(
+                            '• ${AppLocalizations.of(context)!.featureSeeTechnical}'),
+                        Text(
+                            '• ${AppLocalizations.of(context)!.featureCompareStats}'),
                         const SizedBox(height: 12),
                         Text(AppLocalizations.of(context)!.addVideosBy),
-                        Text('• ' +
-                            AppLocalizations.of(context)!.clickAddButton),
                         Text(
-                            '• ' + AppLocalizations.of(context)!.dragDropFiles),
+                            '• ${AppLocalizations.of(context)!.clickAddButton}'),
+                        Text(
+                            '• ${AppLocalizations.of(context)!.dragDropFiles}'),
                       ],
                     ),
                   ),
@@ -602,7 +602,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
       TextStyle headingStyle, bool isMobile) {
     final loc = AppLocalizations.of(context)!;
     return DragTarget<List<File>>(
-      onWillAccept: (files) => files != null && files.isNotEmpty,
+      onWillAcceptWithDetails: (details) => details.data.isNotEmpty,
       onAcceptWithDetails: (details) async {
         final files = details.data;
         if (files.isNotEmpty) {
@@ -624,7 +624,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                   ? Theme.of(context)
                       .colorScheme
                       .primaryContainer
-                      .withOpacity(0.2)
+                      .withValues(alpha: 0.2 * 255)
                   : null,
             ),
             child: SingleChildScrollView(
@@ -659,15 +659,17 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                           dataRowMaxHeight: 64,
                           horizontalMargin: 24,
                           columnSpacing: 20,
-                          headingRowColor: MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.surfaceVariant,
+                          headingRowColor: WidgetStateProperty.all(
+                            Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                           ),
                           border: TableBorder(
                             horizontalInside: BorderSide(
                               width: 1,
                               color: Theme.of(context)
                                   .dividerColor
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3 * 255),
                             ),
                           ),
                           columns: [
@@ -746,7 +748,8 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
           if (candidates.isNotEmpty)
             Positioned.fill(
               child: Container(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                color:
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 13),
                 child: const Center(
                   child: Text(
                     'Drop videos here',
@@ -996,7 +999,10 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
               title,
               style: TextStyle(
                 fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7 * 255),
               ),
               textAlign: TextAlign.center,
             ),
@@ -1018,7 +1024,7 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
   Widget _buildEmptyState(bool isMobile) {
     final loc = AppLocalizations.of(context)!;
     return DragTarget<List<File>>(
-      onWillAccept: (files) => files != null && files.isNotEmpty,
+      onWillAcceptWithDetails: (details) => details.data.isNotEmpty,
       onAcceptWithDetails: (details) async {
         final files = details.data;
         if (files.isNotEmpty) {
@@ -1040,7 +1046,10 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
           width: double.infinity,
           height: double.infinity,
           color: candidateFiles.isNotEmpty
-              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.15)
+              ? Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withValues(alpha: 0.15 * 255)
               : null,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1065,8 +1074,8 @@ class _BatchVideoDetailViewerState extends State<BatchVideoDetailViewer> {
                 decoration: BoxDecoration(
                   color: Theme.of(context)
                       .colorScheme
-                      .surfaceVariant
-                      .withOpacity(0.5),
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.5 * 255),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(

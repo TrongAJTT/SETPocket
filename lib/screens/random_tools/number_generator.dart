@@ -45,7 +45,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
       // Ensure min is less than max
       if (min >= max) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Min must be less than max'),
             backgroundColor: Colors.red,
           ),
@@ -101,6 +101,83 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
     }
   }
 
+  Widget _buildMinMaxInputs(BuildContext context, AppLocalizations loc) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800; // Desktop threshold
+
+    if (isDesktop) {
+      // Desktop layout: Min and Max in same row
+      return Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _minValueController,
+              decoration: InputDecoration(
+                labelText: loc.minValue,
+                border: const OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                _isInteger
+                    ? FilteringTextInputFormatter.digitsOnly
+                    : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: TextField(
+              controller: _maxValueController,
+              decoration: InputDecoration(
+                labelText: loc.maxValue,
+                border: const OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                _isInteger
+                    ? FilteringTextInputFormatter.digitsOnly
+                    : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else {
+      // Mobile layout: Min and Max in separate rows
+      return Column(
+        children: [
+          TextField(
+            controller: _minValueController,
+            decoration: InputDecoration(
+              labelText: loc.minValue,
+              border: const OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              _isInteger
+                  ? FilteringTextInputFormatter.digitsOnly
+                  : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            ],
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _maxValueController,
+            decoration: InputDecoration(
+              labelText: loc.maxValue,
+              border: const OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              _isInteger
+                  ? FilteringTextInputFormatter.digitsOnly
+                  : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            ],
+          ),
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -153,39 +230,8 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Min value input
-                    TextField(
-                      controller: _minValueController,
-                      decoration: InputDecoration(
-                        labelText: loc.minValue,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        _isInteger
-                            ? FilteringTextInputFormatter.digitsOnly
-                            : FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9.]')),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Max value input
-                    TextField(
-                      controller: _maxValueController,
-                      decoration: InputDecoration(
-                        labelText: loc.maxValue,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        _isInteger
-                            ? FilteringTextInputFormatter.digitsOnly
-                            : FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9.]')),
-                      ],
-                    ),
+                    // Min and Max value input
+                    _buildMinMaxInputs(context, loc),
 
                     const SizedBox(height: 16),
 

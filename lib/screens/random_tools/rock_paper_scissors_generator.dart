@@ -117,7 +117,7 @@ class _RockPaperScissorsGeneratorScreenState
                       height: 200,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _getResultColor().withOpacity(0.2),
+                        color: _getResultColor().withValues(alpha: 0.2),
                         border: Border.all(
                           color: _getResultColor(),
                           width: 4,
@@ -167,12 +167,12 @@ class _RockPaperScissorsGeneratorScreenState
               height: 50,
               child: FilledButton(
                 onPressed: _generateResult,
-                child: Text(loc.generate),
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
                   ),
                 ),
+                child: Text(loc.generate),
               ),
             ),
           ],
@@ -190,7 +190,7 @@ class _RockPaperScissorsGeneratorScreenState
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: isSelected ? color.withOpacity(0.2) : Colors.transparent,
+        color: isSelected ? color.withValues(alpha: 0.2) : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSelected ? color : Colors.transparent,

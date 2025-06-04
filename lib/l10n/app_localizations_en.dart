@@ -488,6 +488,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completedDocument => 'Completed Document';
 
   @override
+  String fieldCount(Object count) {
+    return 'Fields: $count';
+  }
+
+  @override
+  String get basicFieldCount => 'basic fields';
+
+  @override
+  String get loopFieldCount => 'fields in loops';
+
+  @override
+  String loopDataCount(Object count) {
+    return 'Data loops: $count';
+  }
+
+  @override
+  String duplicateIdWarning(Object count) {
+    return 'Detected $count inconsistent duplicate IDs. Elements with the same ID must have the same type and title.';
+  }
+
+  @override
+  String get normalFields => 'Normal fields:';
+
+  @override
+  String loopLabel(Object title) {
+    return 'Loop: $title';
+  }
+
+  @override
+  String get structureDetail => 'Structure details';
+
+  @override
+  String get basicFields => 'Basic fields';
+
+  @override
+  String get loopContent => 'Loop content';
+
+  @override
+  String fieldInLoop(Object field, Object loop) {
+    return 'Field \"$field\" belongs to loop \"$loop\"';
+  }
+
+  @override
   String get passwordGenerator => 'Password Generator';
 
   @override
@@ -542,10 +585,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generatedNumbers => 'Generated Numbers';
 
   @override
+  String get other => 'Other';
+
+  @override
   String get yesNo => 'Yes or No?';
 
   @override
   String get flipCoin => 'Flip Coin';
+
+  @override
+  String get flipCoinInstruction => 'Flip the coin to see the result';
 
   @override
   String get rockPaperScissors => 'Rock Paper Scissors';
@@ -576,6 +625,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get letterCount => 'Number of letters';
+
+  @override
+  String get tens => 'Tens';
+
+  @override
+  String get units => 'Units';
 
   @override
   String get playingCards => 'Playing Cards';
@@ -627,4 +682,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get randomResult => 'Result';
+
+  @override
+  String get flipping => 'Flipping...';
 }

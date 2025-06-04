@@ -15,6 +15,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   TimeOfDay _startTime = const TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _endTime = const TimeOfDay(hour: 23, minute: 59);
   int _timeCount = 5;
+  double _timeCountSlider = 5.0;
   bool _allowDuplicates = true;
   List<TimeOfDay> _generatedTimes = [];
   bool _copied = false;
@@ -77,6 +78,187 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     return '$hours:$minutes';
   }
 
+  Widget _buildTimeSelector(
+      String label, TimeOfDay time, Function(TimeOfDay?) onTimeSelected) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () async {
+            final selectedTime = await showTimePicker(
+              context: context,
+              initialTime: time,
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    alwaysUse24HourFormat: true,
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (selectedTime != null) {
+              onTimeSelected(selectedTime);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.access_time),
+                const SizedBox(width: 12),
+                Text(_formatTimeOfDay(time)),
+                const Spacer(),
+                const Icon(Icons.arrow_drop_down),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimeSelectors(AppLocalizations loc) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    final startTimeSelector = _buildTimeSelector(
+      loc.startTime,
+      _startTime,
+      (time) {
+        if (time != null) {
+          setState(() {
+            _startTime = time;
+          });
+        }
+      },
+    );
+
+    final endTimeSelector = _buildTimeSelector(
+      loc.endTime,
+      _endTime,
+      (time) {
+        if (time != null) {
+          setState(() {
+            _endTime = time;
+          });
+        }
+      },
+    );
+
+    if (isWideScreen) {
+      // Side-by-side layout for desktop/tablet
+      return Row(
+        children: [
+          Expanded(child: startTimeSelector),
+          const SizedBox(width: 16),
+          Expanded(child: endTimeSelector),
+        ],
+      );
+    } else {
+      // Always side-by-side for mobile too (like Date Generator)
+      return Row(
+        children: [
+          Expanded(child: startTimeSelector),
+          const SizedBox(width: 16),
+          Expanded(child: endTimeSelector),
+        ],
+      );
+    }
+  }
+
+  Widget _buildCountSlider(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.timeCount,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _timeCountSlider,
+                min: 1,
+                max: 10,
+                divisions: 9,
+                label: _timeCount.toString(),
+                onChanged: (value) {
+                  setState(() {
+                    _timeCountSlider = value;
+                    _timeCount = value.toInt();
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _timeCount.toString().padLeft(2, '0'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtherSection(AppLocalizations loc) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    final duplicatesCheckbox = CheckboxListTile(
+      title: Text(loc.allowDuplicates),
+      value: _allowDuplicates,
+      onChanged: (value) {
+        setState(() {
+          _allowDuplicates = value ?? true;
+        });
+      },
+      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.other,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        if (isWideScreen)
+          // Center vertically on PC
+          Center(
+            child: duplicatesCheckbox,
+          )
+        else
+          // Normal layout on mobile
+          duplicatesCheckbox,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -97,145 +279,38 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Start time
-                    Text(
-                      loc.startTime,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: _startTime,
-                          builder: (context, child) {
-                            return MediaQuery(
-                              data: MediaQuery.of(context).copyWith(
-                                alwaysUse24HourFormat: true,
-                              ),
-                              child: child!,
-                            );
-                          },
-                        );
-                        if (time != null) {
-                          setState(() {
-                            _startTime = time;
-                          });
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.access_time),
-                            const SizedBox(width: 12),
-                            Text(_formatTimeOfDay(_startTime)),
-                            const Spacer(),
-                            const Icon(Icons.arrow_drop_down),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Time selectors (responsive layout)
+                    _buildTimeSelectors(loc),
+
                     const SizedBox(height: 16),
 
-                    // End time
-                    Text(
-                      loc.endTime,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: _endTime,
-                          builder: (context, child) {
-                            return MediaQuery(
-                              data: MediaQuery.of(context).copyWith(
-                                alwaysUse24HourFormat: true,
-                              ),
-                              child: child!,
-                            );
-                          },
-                        );
-                        if (time != null) {
-                          setState(() {
-                            _endTime = time;
-                          });
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.access_time),
-                            const SizedBox(width: 12),
-                            Text(_formatTimeOfDay(_endTime)),
-                            const Spacer(),
-                            const Icon(Icons.arrow_drop_down),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // Count slider and Other section (responsive layout)
+                    MediaQuery.of(context).size.width > 600
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 3, child: _buildCountSlider(loc)),
+                              const SizedBox(width: 32),
+                              Expanded(flex: 2, child: _buildOtherSection(loc)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              _buildCountSlider(loc),
+                              const SizedBox(height: 16),
+                              _buildOtherSection(loc),
+                            ],
+                          ),
 
-                    // Time count
-                    Text(
-                      loc.timeCount,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Slider(
-                      value: _timeCount.toDouble(),
-                      min: 1,
-                      max: 20,
-                      divisions: 19,
-                      label: _timeCount.toString(),
-                      onChanged: (value) {
-                        setState(() {
-                          _timeCount = value.toInt();
-                        });
-                      },
-                    ),
-                    Text(_timeCount.toString()),
-                    const SizedBox(height: 16),
-
-                    // Allow duplicates
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _allowDuplicates,
-                          onChanged: (value) {
-                            setState(() {
-                              _allowDuplicates = value!;
-                            });
-                          },
-                        ),
-                        Text(loc.allowDuplicates),
-                      ],
-                    ),
                     const SizedBox(height: 16),
 
                     // Generate button
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: FilledButton.icon(
                         onPressed: _generateTimes,
-                        child: Text(loc.generate),
+                        icon: const Icon(Icons.refresh),
+                        label: Text(loc.generate),
                       ),
                     ),
                   ],

@@ -1001,6 +1001,72 @@ abstract class AppLocalizations {
   /// **'Completed Document'**
   String get completedDocument;
 
+  /// No description provided for @fieldCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Fields: {count}'**
+  String fieldCount(Object count);
+
+  /// No description provided for @basicFieldCount.
+  ///
+  /// In en, this message translates to:
+  /// **'basic fields'**
+  String get basicFieldCount;
+
+  /// No description provided for @loopFieldCount.
+  ///
+  /// In en, this message translates to:
+  /// **'fields in loops'**
+  String get loopFieldCount;
+
+  /// No description provided for @loopDataCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Data loops: {count}'**
+  String loopDataCount(Object count);
+
+  /// No description provided for @duplicateIdWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected {count} inconsistent duplicate IDs. Elements with the same ID must have the same type and title.'**
+  String duplicateIdWarning(Object count);
+
+  /// No description provided for @normalFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal fields:'**
+  String get normalFields;
+
+  /// No description provided for @loopLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Loop: {title}'**
+  String loopLabel(Object title);
+
+  /// No description provided for @structureDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Structure details'**
+  String get structureDetail;
+
+  /// No description provided for @basicFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic fields'**
+  String get basicFields;
+
+  /// No description provided for @loopContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Loop content'**
+  String get loopContent;
+
+  /// No description provided for @fieldInLoop.
+  ///
+  /// In en, this message translates to:
+  /// **'Field \"{field}\" belongs to loop \"{loop}\"'**
+  String fieldInLoop(Object field, Object loop);
+
   /// No description provided for @passwordGenerator.
   ///
   /// In en, this message translates to:
@@ -1109,6 +1175,12 @@ abstract class AppLocalizations {
   /// **'Generated Numbers'**
   String get generatedNumbers;
 
+  /// No description provided for @other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
   /// No description provided for @yesNo.
   ///
   /// In en, this message translates to:
@@ -1120,6 +1192,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flip Coin'**
   String get flipCoin;
+
+  /// No description provided for @flipCoinInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip the coin to see the result'**
+  String get flipCoinInstruction;
 
   /// No description provided for @rockPaperScissors.
   ///
@@ -1180,6 +1258,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Number of letters'**
   String get letterCount;
+
+  /// No description provided for @tens.
+  ///
+  /// In en, this message translates to:
+  /// **'Tens'**
+  String get tens;
+
+  /// No description provided for @units.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get units;
 
   /// No description provided for @playingCards.
   ///
@@ -1282,6 +1372,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Result'**
   String get randomResult;
+
+  /// No description provided for @flipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Flipping...'**
+  String get flipping;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

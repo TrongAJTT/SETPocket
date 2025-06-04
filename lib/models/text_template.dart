@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'package:logger/logger.dart';
 
 class Template {
   final String id;
@@ -219,7 +219,9 @@ class TemplateManager {
         loops.add(loop);
       } catch (e) {
         // Skip invalid loop formats
-        print('Error parsing loop: $e');
+        var logger = Logger(printer: PrettyPrinter());
+        logger.e('Error parsing loop: $e',
+            error: e, stackTrace: StackTrace.current);
       }
     }
 

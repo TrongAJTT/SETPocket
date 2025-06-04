@@ -17,6 +17,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   DateTime _startDateTime = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDateTime = DateTime.now().add(const Duration(days: 30));
   int _dateTimeCount = 5;
+  double _dateTimeCountSlider = 5.0;
   bool _allowDuplicates = true;
   List<DateTime> _generatedDateTimes = [];
   bool _copied = false;
@@ -74,6 +75,87 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
     );
   }
 
+  Widget _buildCountSlider(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.quantity,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _dateTimeCountSlider,
+                min: 1,
+                max: 10,
+                divisions: 9,
+                label: _dateTimeCount.toString(),
+                onChanged: (value) {
+                  setState(() {
+                    _dateTimeCountSlider = value;
+                    _dateTimeCount = value.toInt();
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _dateTimeCount.toString().padLeft(2, '0'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtherSection(AppLocalizations loc) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    final duplicatesCheckbox = CheckboxListTile(
+      title: Text(loc.allowDuplicates),
+      value: _allowDuplicates,
+      onChanged: (value) {
+        setState(() {
+          _allowDuplicates = value ?? true;
+        });
+      },
+      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.other,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        if (isWideScreen)
+          // Center vertically on PC
+          Center(
+            child: duplicatesCheckbox,
+          )
+        else
+          // Normal layout on mobile
+          duplicatesCheckbox,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -107,6 +189,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                       children: [
                         // Date picker
                         Expanded(
+                          flex: 3,
                           child: InkWell(
                             onTap: () async {
                               final date = await showDatePicker(
@@ -149,6 +232,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                         const SizedBox(width: 8),
                         // Time picker
                         Expanded(
+                          flex: 2,
                           child: InkWell(
                             onTap: () async {
                               final time = await showTimePicker(
@@ -211,6 +295,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                       children: [
                         // Date picker
                         Expanded(
+                          flex: 3,
                           child: InkWell(
                             onTap: () async {
                               final date = await showDatePicker(
@@ -258,6 +343,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                         const SizedBox(width: 8),
                         // Time picker
                         Expanded(
+                          flex: 2,
                           child: InkWell(
                             onTap: () async {
                               final time = await showTimePicker(
@@ -315,49 +401,33 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                     ),
                     const SizedBox(height: 16),
 
-                    // Date time count
-                    Text(
-                      loc.quantity,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Slider(
-                      value: _dateTimeCount.toDouble(),
-                      min: 1,
-                      max: 20,
-                      divisions: 19,
-                      label: _dateTimeCount.toString(),
-                      onChanged: (value) {
-                        setState(() {
-                          _dateTimeCount = value.toInt();
-                        });
-                      },
-                    ),
-                    Text(_dateTimeCount.toString()),
-                    const SizedBox(height: 16),
+                    // Count slider and Other section (responsive layout)
+                    MediaQuery.of(context).size.width > 600
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 3, child: _buildCountSlider(loc)),
+                              const SizedBox(width: 32),
+                              Expanded(flex: 2, child: _buildOtherSection(loc)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              _buildCountSlider(loc),
+                              const SizedBox(height: 16),
+                              _buildOtherSection(loc),
+                            ],
+                          ),
 
-                    // Allow duplicates
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _allowDuplicates,
-                          onChanged: (value) {
-                            setState(() {
-                              _allowDuplicates = value!;
-                            });
-                          },
-                        ),
-                        Text(loc.allowDuplicates),
-                      ],
-                    ),
                     const SizedBox(height: 16),
 
                     // Generate button
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: FilledButton.icon(
                         onPressed: _generateDateTimes,
-                        child: Text(loc.generate),
+                        icon: const Icon(Icons.refresh),
+                        label: Text(loc.generate),
                       ),
                     ),
                   ],

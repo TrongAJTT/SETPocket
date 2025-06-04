@@ -93,31 +93,33 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Dice count selector
-                    Text(
-                      loc.diceCount,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(
-                          onPressed: _diceCount > 1
-                              ? () => setState(() => _diceCount--)
-                              : null,
-                          icon: const Icon(Icons.remove_circle_outline),
+                        Text(
+                          loc.diceCount,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
-                          _diceCount.toString(),
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        IconButton(
-                          onPressed: _diceCount < 10
-                              ? () => setState(() => _diceCount++)
-                              : null,
-                          icon: const Icon(Icons.add_circle_outline),
+                          '$_diceCount',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ],
+                    ),
+                    Slider(
+                      value: _diceCount.toDouble(),
+                      min: 1,
+                      max: 10,
+                      divisions: 9,
+                      label: _diceCount.toString(),
+                      onChanged: (double value) {
+                        setState(() {
+                          _diceCount = value.round();
+                        });
+                      },
                     ),
 
                     const SizedBox(height: 24),
@@ -239,11 +241,11 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 4,
-              offset: const Offset(2, 2),
+              offset: Offset(2, 2),
             ),
           ],
         ),
@@ -321,8 +323,8 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
           children: [
             Positioned(top: 10, left: 10, child: _DiceDot()),
             Positioned(top: 10, right: 10, child: _DiceDot()),
-            Positioned(left: 10, child: _DiceDot()),
-            Positioned(right: 10, child: _DiceDot()),
+            Positioned(top: 25, left: 10, child: _DiceDot()),
+            Positioned(top: 25, right: 10, child: _DiceDot()),
             Positioned(bottom: 10, left: 10, child: _DiceDot()),
             Positioned(bottom: 10, right: 10, child: _DiceDot()),
           ],

@@ -21,10 +21,10 @@ class RandomGenerator {
       throw ArgumentError('At least one character set must be selected');
     }
 
-    final lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    final uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    final numbers = '0123456789';
-    final special = '!@#\$%^&*()-_=+[]{}|;:,.<>?/';
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const special = '!@#\$%^&*()-_=+[]{}|;:,.<>?/';
 
     String allowedChars = '';
     if (includeLowercase) allowedChars += lowercase;

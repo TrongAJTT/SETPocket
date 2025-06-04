@@ -13,7 +13,9 @@ class CoinFlipGeneratorScreen extends StatefulWidget {
 
 class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
     with TickerProviderStateMixin {
-  bool? _result;
+  bool _currentSide = true; // true = heads, false = tails
+  bool? _finalResult;
+  bool _isFlipping = false;
   late AnimationController _flipController;
   late Animation<double> _flipAnimation;
   late AnimationController _scaleController;
@@ -23,28 +25,42 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
   void initState() {
     super.initState();
     _flipController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 2000), // Longer animation
       vsync: this,
     );
     _flipAnimation = Tween<double>(
       begin: 0,
-      end: 2 * math.pi,
+      end: 6 * math.pi, // More rotations for better effect
     ).animate(CurvedAnimation(
       parent: _flipController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOut,
     ));
 
     _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.1,
+      end: 1.05,
     ).animate(CurvedAnimation(
       parent: _scaleController,
       curve: Curves.easeInOut,
     ));
+
+    // Listen to animation to alternate sides in real-time
+    _flipAnimation.addListener(() {
+      if (_isFlipping) {
+        // Change side every half rotation (π radians)
+        int halfRotations = (_flipAnimation.value / math.pi).floor();
+        bool newSide = halfRotations.isEven;
+        if (newSide != _currentSide) {
+          setState(() {
+            _currentSide = newSide;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -55,15 +71,26 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
   }
 
   Future<void> _flipCoin() async {
+    if (_isFlipping) return; // Prevent multiple flips at once
+
+    setState(() {
+      _isFlipping = true;
+      _finalResult = null; // Clear previous result
+    });
+
     _scaleController.reset();
     _scaleController.forward().then((_) => _scaleController.reverse());
 
     _flipController.reset();
     await _flipController.forward();
 
-    // Set result after animation
+    // Determine final result
+    final result = RandomGenerator.generateCoinFlip();
+
     setState(() {
-      _result = RandomGenerator.generateCoinFlip();
+      _isFlipping = false;
+      _finalResult = result;
+      _currentSide = result; // Set final side
     });
   }
 
@@ -94,34 +121,27 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
                       height: 200,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        // Show heads or tails based on animation value (for smooth transition)
-                        color: _showHeadsDuringAnimation()
-                            ? Colors.amber.shade800
-                            : Colors.amber.shade600,
-                        boxShadow: [
+                        // Different colors for heads and tails
+                        color: _currentSide
+                            ? Colors.amber.shade700 // Heads - golden
+                            : Colors.grey.shade600, // Tails - silver
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 10,
-                            offset: const Offset(0, 5),
+                            offset: Offset(0, 5),
                           ),
                         ],
                       ),
                       child: Center(
-                        child: _result != null
-                            ? Text(
-                                _result! ? loc.heads : loc.tails,
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('?',
-                                style: TextStyle(
-                                  fontSize: 60,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                )),
+                        child: Text(
+                          _currentSide ? loc.heads : loc.tails,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -133,9 +153,9 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
               width: 200,
               height: 50,
               child: FilledButton.icon(
-                onPressed: _flipCoin,
+                onPressed: _isFlipping ? null : _flipCoin,
                 icon: const Icon(Icons.monetization_on),
-                label: Text(loc.flipCoin),
+                label: Text(_isFlipping ? loc.flipping : loc.flipCoin),
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
@@ -143,34 +163,22 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
                 ),
               ),
             ),
-            if (_result != null) ...[
-              const SizedBox(height: 24),
-              Text(
-                '${loc.randomResult}: ${_result! ? loc.heads : loc.tails}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            const SizedBox(height: 24),
+            Text(
+              _finalResult != null
+                  ? '${loc.randomResult}: ${_finalResult! ? loc.heads : loc.tails}'
+                  : loc.flipCoinInstruction,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: _finalResult != null
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-            ],
+            ),
           ],
         ),
       ),
     );
-  }
-
-  // Helper to determine if we show heads or tails during animation
-  bool _showHeadsDuringAnimation() {
-    if (_result == null) return true;
-
-    // During first half of animation show one side, during second half show the other
-    double animValue = _flipAnimation.value;
-    bool firstHalf = animValue < math.pi;
-
-    if (_result!) {
-      return firstHalf;
-    } else {
-      return !firstHalf;
-    }
   }
 }

@@ -182,7 +182,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     return Card(
       color: (_duplicateIds.isNotEmpty || !loopsValid)
           ? Theme.of(context).colorScheme.errorContainer
-          : Theme.of(context).colorScheme.surfaceVariant,
+          : Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -200,7 +200,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Trường dữ liệu: $_elementCount',
+                  AppLocalizations.of(context)!
+                      .fieldCount(_elementCount.toString()),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: _duplicateIds.isNotEmpty
@@ -215,10 +216,11 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('• ${elementsNotInLoop.length} trường dữ liệu cơ bản'),
+                  Text(
+                      '• ${elementsNotInLoop.length} ${AppLocalizations.of(context)!.basicFieldCount}'),
                   if (loopCount > 0)
                     Text(
-                        '• $elementsInLoopCount trường dữ liệu trong vòng lặp'),
+                        '• $elementsInLoopCount ${AppLocalizations.of(context)!.loopFieldCount}'),
                 ],
               ),
             ),
@@ -235,7 +237,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Vòng lặp dữ liệu: $loopCount',
+                      AppLocalizations.of(context)!
+                          .loopDataCount(loopCount.toString()),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: !loopsValid
@@ -250,7 +253,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  'Phát hiện ${_duplicateIds.length} ID trùng lặp không nhất quán. Element có cùng ID phải có cùng loại và tiêu đề.',
+                  AppLocalizations.of(context)!
+                      .duplicateIdWarning(_duplicateIds.length.toString()),
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
@@ -262,10 +266,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   children: [
                     // Tiêu đề cho trường dữ liệu thông thường
                     if (_elements.any((e) => e.loopId == null))
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 4.0),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
                         child: Text(
-                          'Trường dữ liệu thông thường:',
+                          AppLocalizations.of(context)!.normalFields,
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 14),
                         ),
@@ -340,7 +344,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                     const Icon(Icons.refresh, size: 18),
                     const SizedBox(width: 6),
                     Text(
-                      'Vòng lặp: ${loop.title}',
+                      AppLocalizations.of(context)!.loopLabel(loop.title),
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -353,12 +357,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withAlpha((0.3 * 255).toInt()),
                   ),
                   borderRadius: BorderRadius.circular(10),
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withAlpha((0.05 * 255).toInt()),
                 ),
                 padding: const EdgeInsets.all(8.0),
                 margin: const EdgeInsets.only(left: 12.0),
@@ -379,7 +387,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
-                                    .withOpacity(0.3),
+                                    .withAlpha((0.3 * 255).toInt()),
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -390,7 +398,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                                   color: Theme.of(context)
                                       .colorScheme
                                       .primary
-                                      .withOpacity(0.3),
+                                      .withAlpha((0.3 * 255).toInt()),
                                   borderRadius: BorderRadius.circular(1),
                                 ),
                               ),
@@ -402,7 +410,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
-                                    .withOpacity(0.3),
+                                    .withAlpha((0.3 * 255).toInt()),
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -432,7 +440,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                               : Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withOpacity(0.1),
+                                  .withAlpha((0.1 * 255).toInt()),
                           side: isDuplicate
                               ? BorderSide(
                                   color: Theme.of(context).colorScheme.error)
@@ -440,18 +448,19 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                                   color: Theme.of(context)
                                       .colorScheme
                                       .primary
-                                      .withOpacity(0.5)),
+                                      .withAlpha((0.5 * 255).toInt())),
                           elevation: 2,
                           shadowColor: Theme.of(context)
                               .colorScheme
                               .primary
-                              .withOpacity(0.3),
+                              .withAlpha((0.3 * 255).toInt()),
                           onPressed: () {
                             // Hiển thị tooltip hoặc thông tin chi tiết về trường dữ liệu trong vòng lặp
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Trường "${element.title}" thuộc vòng lặp "${loop.title}"',
+                                  AppLocalizations.of(context)!
+                                      .fieldInLoop(element.title, loop.title),
                                 ),
                                 duration: const Duration(seconds: 2),
                               ),
@@ -464,11 +473,11 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                                     ? Theme.of(context)
                                         .colorScheme
                                         .errorContainer
-                                        .withOpacity(0.7)
+                                        .withAlpha((0.7 * 255).toInt())
                                     : Theme.of(context)
                                         .colorScheme
                                         .tertiary
-                                        .withOpacity(0.2),
+                                        .withAlpha((0.2 * 255).toInt()),
                                 radius: 12,
                                 child: _getElementTypeIcon(
                                     element.type, isDuplicate),
@@ -652,10 +661,13 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                   Clipboard.setData(
                           ClipboardData(text: element.toElementString()))
                       .then((_) {
+                    if (!mounted) return;
+                    // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text('Đã sao chép vào clipboard')),
                     );
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   });
                 },
@@ -836,12 +848,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 id: id,
               );
               // Copy to clipboard and close dialog
-              final loopString =
-                  '${loop.toLoopStartString()}\nNội dung vòng lặp\n${loop.toLoopEndString()}';
+              final loopString = '${loop.toLoopStartString()}\n' +
+                  AppLocalizations.of(context)!.loopContent +
+                  '\n${loop.toLoopEndString()}';
               Clipboard.setData(ClipboardData(text: loopString)).then((_) {
+                if (!mounted) return;
+                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Đã sao chép vào clipboard')),
                 );
+                // ignore: use_build_context_synchronously
                 Navigator.of(context).pop();
               });
             },
@@ -908,7 +924,9 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void _insertLoopAtCursor(DataLoop loop) {
     final loopStartString = loop.toLoopStartString();
     final loopEndString = loop.toLoopEndString();
-    final defaultContent = '\nNội dung vòng lặp\n';
+    final defaultContent = '\n' +
+        AppLocalizations.of(context)!.loopContent +
+        '\n'; // Default loop content
     final loopString = '$loopStartString$defaultContent$loopEndString';
 
     final text = _contentController.text;
@@ -938,7 +956,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void _appendLoopAtEnd(DataLoop loop) {
     final loopStartString = loop.toLoopStartString();
     final loopEndString = loop.toLoopEndString();
-    final defaultContent = '\nLoop content\n'; // Default loop content
+    final defaultContent =
+        '\n' + AppLocalizations.of(context)!.loopContent + '\n';
     final loopString = '$loopStartString$defaultContent$loopEndString';
 
     final text = _contentController.text;
@@ -1097,7 +1116,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Chi tiết cấu trúc',
+              AppLocalizations.of(context)!.structureDetail,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1109,7 +1128,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
             // Trường dữ liệu cơ bản
             if (elementsNotInLoop.isNotEmpty) ...[
               _buildStructureSection(
-                'Trường dữ liệu cơ bản',
+                AppLocalizations.of(context)!.basicFields,
                 elementsNotInLoop,
                 Icons.text_fields,
               ),
@@ -1124,7 +1143,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStructureSection(
-                    'Vòng lặp: ${loop.title}',
+                    AppLocalizations.of(context)!.loopLabel(loop.title),
                     loopElements,
                     Icons.refresh,
                     isLoop: true,
@@ -1170,12 +1189,21 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
           decoration: BoxDecoration(
             border: Border.all(
               color: isLoop
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
-                  : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                  ? Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withAlpha((0.3 * 255).toInt())
+                  : Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withAlpha((0.3 * 255).toInt()),
             ),
             borderRadius: BorderRadius.circular(8),
             color: isLoop
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
+                ? Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withAlpha((0.05 * 255).toInt())
                 : null,
           ),
           padding: const EdgeInsets.all(12.0),
@@ -1205,7 +1233,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withAlpha((0.6 * 255).toInt()),
                         fontSize: 12,
                       ),
                     ),

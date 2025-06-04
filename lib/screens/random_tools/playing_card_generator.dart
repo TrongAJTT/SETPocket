@@ -13,6 +13,8 @@ class PlayingCardGeneratorScreen extends StatefulWidget {
 class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     with TickerProviderStateMixin {
   int _cardCount = 5;
+  double _tens = 0.0; // 0-5 representing tens place (0-50)
+  double _units = 5.0; // 0-9 representing units place (0-9)
   List<String> _generatedCards = [];
   late AnimationController _dealController;
   List<AnimationController> _flipControllers = [];
@@ -25,8 +27,30 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
+    // Initialize sliders based on initial _cardCount
+    _updateSlidersFromCount(_cardCount);
     // Initialize with some default values
     _generateCards();
+  }
+
+  void _updateSlidersFromCount(int count) {
+    _tens = (count ~/ 10).toDouble();
+    _units = (count % 10).toDouble();
+  }
+
+  void _updateCountFromSliders() {
+    final newCount = (_tens * 10 + _units).toInt();
+    // Ensure count is within valid range (1-52 for playing cards)
+    final validCount = newCount.clamp(1, 52);
+    if (validCount != _cardCount) {
+      setState(() {
+        _cardCount = validCount;
+      });
+      // Update sliders if count was clamped
+      if (validCount != newCount) {
+        _updateSlidersFromCount(validCount);
+      }
+    }
   }
 
   @override
@@ -89,6 +113,84 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     }
   }
 
+  Widget _buildSliderControls(AppLocalizations loc) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    final tensSlider = Column(
+      children: [
+        Text(
+          loc.tens,
+          style: Theme.of(context).textTheme.labelMedium,
+        ),
+        Slider(
+          value: _tens,
+          min: 0,
+          max: 5, // Maximum 50 cards
+          divisions: 5,
+          label: '${_tens.toInt()}0',
+          onChanged: (value) {
+            setState(() {
+              _tens = value;
+              // Special handling for 52 card limit
+              final newCount = (value * 10 + _units).toInt();
+              if (newCount > 52) {
+                _units = 2.0; // Set units to 2 if tens is 5 (making it 52)
+              }
+            });
+            _updateCountFromSliders();
+          },
+        ),
+      ],
+    );
+
+    final unitsSlider = Column(
+      children: [
+        Text(
+          loc.units,
+          style: Theme.of(context).textTheme.labelMedium,
+        ),
+        Slider(
+          value: _units,
+          min: 0,
+          max: 9,
+          divisions: 9,
+          label: _units.toInt().toString(),
+          onChanged: (value) {
+            setState(() {
+              _units = value;
+              // Special handling for 52 card limit
+              final newCount = (_tens * 10 + value).toInt();
+              if (newCount > 52) {
+                _units = 2.0; // Set to 2 if tens is 5 (making it 52)
+              }
+            });
+            _updateCountFromSliders();
+          },
+        ),
+      ],
+    );
+
+    if (isWideScreen) {
+      // Horizontal layout for desktop/tablet
+      return Row(
+        children: [
+          Expanded(child: tensSlider),
+          const SizedBox(width: 16),
+          Expanded(child: unitsSlider),
+        ],
+      );
+    } else {
+      // Vertical layout for mobile
+      return Column(
+        children: [
+          tensSlider,
+          const SizedBox(height: 8),
+          unitsSlider,
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -134,32 +236,36 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
                     loc.cardCount,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: _cardCount > 1
-                            ? () => setState(() => _cardCount--)
-                            : null,
-                        icon: const Icon(Icons.remove),
+                  const SizedBox(height: 16),
+
+                  // Current count display
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 24),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      Container(
-                        width: 60,
-                        alignment: Alignment.center,
-                        child: Text(
-                          '$_cardCount',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
+                      child: Text(
+                        '$_cardCount',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        textAlign: TextAlign.center,
                       ),
-                      IconButton(
-                        onPressed: _cardCount < 52
-                            ? () => setState(() => _cardCount++)
-                            : null,
-                        icon: const Icon(Icons.add),
-                      ),
-                    ],
+                    ),
                   ),
+                  const SizedBox(height: 16),
+
+                  // Slider controls
+                  _buildSliderControls(loc),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -174,7 +280,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
             ),
           ), // Cards display
           Expanded(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -212,8 +318,8 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
         final value = _flipAnimations[index].value;
         final isBack = value < 0.5;
         final transform = Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // perspective
-          ..rotateY(isBack ? 0 : 3.14159); // 180 degrees in radians
+          ..setEntry(3, 2, 0.001); // perspective
+        // ..rotateX(isBack ? 3.14159 : 0); // 180 degrees in radians
 
         return Transform(
           transform: transform,
@@ -227,7 +333,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
               border: Border.all(color: Colors.white, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 5,
                   offset: const Offset(2, 2),
                 ),
@@ -239,7 +345,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
                       '♠♥♦♣',
                       style: TextStyle(
                         fontSize: 24,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   )

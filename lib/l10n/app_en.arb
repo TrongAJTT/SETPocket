@@ -153,6 +153,17 @@
     "selectTime": "Select time",
     "selectDateTime": "Select date and time",    "copiedToClipboard": "Copied to clipboard",
     "completedDocument": "Completed Document",
+    "fieldCount": "Fields: {count}",
+    "basicFieldCount": "basic fields",
+    "loopFieldCount": "fields in loops",
+    "loopDataCount": "Data loops: {count}",
+    "duplicateIdWarning": "Detected {count} inconsistent duplicate IDs. Elements with the same ID must have the same type and title.",
+    "normalFields": "Normal fields:",
+    "loopLabel": "Loop: {title}",
+    "structureDetail": "Structure details",
+    "basicFields": "Basic fields",
+    "loopContent": "Loop content",
+    "fieldInLoop": "Field \"{field}\" belongs to loop \"{loop}\"",
     
     "passwordGenerator": "Password Generator",
     "numCharacters": "Number of characters",
@@ -170,12 +181,14 @@
     "floatingPoint": "Floating Point",
     "minValue": "Minimum Value",
     "maxValue": "Maximum Value",
-    "quantity": "Quantity",
-    "allowDuplicates": "Allow Duplicates",
+    "quantity": "Quantity",    "allowDuplicates": "Allow Duplicates",
     "generatedNumbers": "Generated Numbers",
+    
+    "other": "Other",
     
     "yesNo": "Yes or No?",
     "flipCoin": "Flip Coin",
+    "flipCoinInstruction": "Flip the coin to see the result",
     "rockPaperScissors": "Rock Paper Scissors",
     "rollDice": "Roll Dice",
     "diceCount": "Number of dice",
@@ -185,9 +198,10 @@
     "hex6": "HEX (6-digit)",
     "hex8": "HEX (8-digit with alpha)",
     "generatedColor": "Generated Color",
-    
-    "latinLetters": "Latin Letters",
+      "latinLetters": "Latin Letters",
     "letterCount": "Number of letters",
+    "tens": "Tens",
+    "units": "Units",
     
     "playingCards": "Playing Cards",
     "cardCount": "Number of cards",
@@ -208,5 +222,6 @@
     "rock": "Rock",
     "paper": "Paper", 
     "scissors": "Scissors",
-    "randomResult": "Result"
+    "randomResult": "Result",
+    "flipping": "Flipping..."
 }

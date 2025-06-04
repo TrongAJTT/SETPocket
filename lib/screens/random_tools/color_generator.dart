@@ -48,17 +48,17 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
 
   String _getHexColor() {
     if (_withAlpha) {
-      return '#${_generatedColor.value.toRadixString(16).padLeft(8, '0')}';
+      return '#${_generatedColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
     } else {
-      return '#${_generatedColor.value.toRadixString(16).substring(2).padLeft(6, '0')}';
+      return '#${_generatedColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
     }
   }
 
   String _getRgbColor() {
     if (_withAlpha) {
-      return 'rgba(${_generatedColor.red}, ${_generatedColor.green}, ${_generatedColor.blue}, ${_generatedColor.alpha / 255})';
+      return 'rgba(${(_generatedColor.r).toStringAsFixed(2)}, ${(_generatedColor.g).toStringAsFixed(2)}, ${(_generatedColor.b).toStringAsFixed(2)}, ${(_generatedColor.a / 255).toStringAsFixed(2)})';
     } else {
-      return 'rgb(${_generatedColor.red}, ${_generatedColor.green}, ${_generatedColor.blue})';
+      return 'rgb(${(_generatedColor.r).toStringAsFixed(2)}, ${(_generatedColor.g).toStringAsFixed(2)}, ${(_generatedColor.b).toStringAsFixed(2)})';
     }
   }
 
@@ -81,9 +81,9 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Color display
-          Expanded(
-            flex: 3,
+          // Color display - Fixed height instead of flex
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.4,
             child: AnimatedBuilder(
               animation: _animation,
               builder: (context, child) {
@@ -118,10 +118,9 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
             ),
           ),
 
-          // Controls
+          // Controls - Scrollable to prevent overflow
           Expanded(
-            flex: 2,
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,6 +142,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
                                   _generateColor();
                                 });
                               },
+                              dense: true,
                             ),
                           ),
                           Expanded(
@@ -156,6 +156,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
                                   _generateColor();
                                 });
                               },
+                              dense: true,
                             ),
                           ),
                         ],
@@ -253,7 +254,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
   bool _isColorDark(Color color) {
     // Calculate luminance of the color
     double luminance =
-        (0.299 * color.red + 0.587 * color.green + 0.114 * color.blue) / 255;
+        (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255;
     return luminance < 0.5;
   }
 }

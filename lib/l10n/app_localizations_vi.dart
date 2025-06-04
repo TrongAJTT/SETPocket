@@ -488,6 +488,49 @@ class AppLocalizationsVi extends AppLocalizations {
   String get completedDocument => 'Tài liệu đã hoàn thành';
 
   @override
+  String fieldCount(Object count) {
+    return 'Trường dữ liệu: $count';
+  }
+
+  @override
+  String get basicFieldCount => 'trường dữ liệu cơ bản';
+
+  @override
+  String get loopFieldCount => 'trường dữ liệu trong vòng lặp';
+
+  @override
+  String loopDataCount(Object count) {
+    return 'Vòng lặp dữ liệu: $count';
+  }
+
+  @override
+  String duplicateIdWarning(Object count) {
+    return 'Phát hiện $count ID trùng lặp không nhất quán. Element có cùng ID phải có cùng loại và tiêu đề.';
+  }
+
+  @override
+  String get normalFields => 'Trường dữ liệu thông thường:';
+
+  @override
+  String loopLabel(Object title) {
+    return 'Vòng lặp: $title';
+  }
+
+  @override
+  String get structureDetail => 'Chi tiết cấu trúc';
+
+  @override
+  String get basicFields => 'Trường dữ liệu cơ bản';
+
+  @override
+  String get loopContent => 'Nội dung vòng lặp';
+
+  @override
+  String fieldInLoop(Object field, Object loop) {
+    return 'Trường \"$field\" thuộc vòng lặp \"$loop\"';
+  }
+
+  @override
   String get passwordGenerator => 'Tạo mật khẩu';
 
   @override
@@ -542,10 +585,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get generatedNumbers => 'Các số đã tạo';
 
   @override
+  String get other => 'Khác';
+
+  @override
   String get yesNo => 'Có hay Không?';
 
   @override
   String get flipCoin => 'Tung đồng xu';
+
+  @override
+  String get flipCoinInstruction => 'Lật đồng xu để xem kết quả';
 
   @override
   String get rockPaperScissors => 'Kéo búa bao';
@@ -576,6 +625,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get letterCount => 'Số lượng chữ cái';
+
+  @override
+  String get tens => 'Chục';
+
+  @override
+  String get units => 'Đơn vị';
 
   @override
   String get playingCards => 'Bài tây';
@@ -627,4 +682,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get randomResult => 'Kết quả';
+
+  @override
+  String get flipping => 'Đang lật...';
 }

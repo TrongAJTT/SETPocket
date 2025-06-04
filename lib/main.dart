@@ -63,7 +63,7 @@ class MainApp extends StatelessWidget {
           themeMode: settingsController.themeMode,
           locale: settingsController.locale,
           supportedLocales: AppLocalizations.supportedLocales,
-          localizationsDelegates: [
+          localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
@@ -178,7 +178,7 @@ class ToolSelectionScreen extends StatelessWidget {
           icon: Icons.video_library,
           iconColor: Colors.red.shade700,
           onTap: () {
-            final tool = const BatchVideoDetailViewer();
+            const tool = BatchVideoDetailViewer();
             if (isDesktop) {
               onToolSelected?.call(tool);
             } else {
@@ -196,7 +196,7 @@ class ToolSelectionScreen extends StatelessWidget {
           icon: Icons.description,
           iconColor: Colors.blue.shade800,
           onTap: () {
-            final tool = const TemplateListScreen();
+            const tool = TemplateListScreen();
             if (isDesktop) {
               onToolSelected?.call(tool);
             } else {
@@ -214,7 +214,7 @@ class ToolSelectionScreen extends StatelessWidget {
           icon: Icons.casino,
           iconColor: Colors.purple,
           onTap: () {
-            final tool = const RandomToolsScreen();
+            const tool = RandomToolsScreen();
             if (isDesktop) {
               onToolSelected?.call(tool);
             } else {
@@ -233,7 +233,7 @@ class ToolSelectionScreen extends StatelessWidget {
           icon: Icons.settings,
           iconColor: Colors.grey,
           onTap: () {
-            final tool = const MainSettingsScreen();
+            const tool = MainSettingsScreen();
             if (isDesktop) {
               onToolSelected?.call(tool);
             } else {

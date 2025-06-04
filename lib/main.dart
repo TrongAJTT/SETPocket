@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/widgets/tool_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/batch_video_detail_viewer.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize settings controller and load saved settings
+  await settingsController.loadSettings();
   runApp(const MainApp());
 }
 
@@ -19,13 +22,32 @@ class SettingsController extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   Locale get locale => _locale;
 
-  void setThemeMode(ThemeMode mode) {
-    _themeMode = mode;
+  // Load settings from SharedPreferences
+  Future<void> loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Load theme mode
+    final themeIndex = prefs.getInt('themeMode') ?? 0;
+    _themeMode = ThemeMode.values[themeIndex];
+
+    // Load language
+    final languageCode = prefs.getString('language') ?? 'en';
+    _locale = Locale(languageCode);
+
     notifyListeners();
   }
 
-  void setLocale(Locale locale) {
+  Future<void> setThemeMode(ThemeMode mode) async {
+    _themeMode = mode;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('themeMode', mode.index);
+    notifyListeners();
+  }
+
+  Future<void> setLocale(Locale locale) async {
     _locale = locale;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', locale.languageCode);
     notifyListeners();
   }
 }

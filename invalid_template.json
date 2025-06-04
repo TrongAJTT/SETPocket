@@ -1,0 +1,14 @@
+{
+  "id": "invalid_template",
+  "title": "Invalid Template",
+  "content": "This template has invalid field types",
+  "fields": [
+    {
+      "id": "invalid_field",
+      "title": "Invalid Field",
+      "type": "invalid_type",
+      "required": true
+    }
+  ],
+  "loops": "this should be an array"
+}

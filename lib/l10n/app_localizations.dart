@@ -902,7 +902,7 @@ abstract class AppLocalizations {
   /// No description provided for @importTemplateFromJson.
   ///
   /// In en, this message translates to:
-  /// **'Import a template from JSON file'**
+  /// **'Import multiple templates from JSON files'**
   String get importTemplateFromJson;
 
   /// No description provided for @templateImported.
@@ -910,6 +910,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Template imported successfully.'**
   String get templateImported;
+
+  /// No description provided for @templatesImported.
+  ///
+  /// In en, this message translates to:
+  /// **'Templates imported successfully.'**
+  String templatesImported(Object count);
+
+  /// No description provided for @importResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Results'**
+  String get importResults;
+
+  /// No description provided for @importSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{successCount} successful, {failCount} failed'**
+  String importSummary(Object failCount, Object successCount);
+
+  /// No description provided for @successfulImports.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful imports ({count})'**
+  String successfulImports(Object count);
+
+  /// No description provided for @failedImports.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed imports ({count})'**
+  String failedImports(Object count);
+
+  /// No description provided for @noImportsAttempted.
+  ///
+  /// In en, this message translates to:
+  /// **'No files were selected for import'**
+  String get noImportsAttempted;
 
   /// No description provided for @invalidTemplateFormat.
   ///

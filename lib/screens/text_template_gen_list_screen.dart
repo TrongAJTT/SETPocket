@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import '../models/text_template.dart';
 import '../services/template_service.dart';
+import '../widgets/import_status_dialog.dart';
 import 'text_template_gen_edit_screen.dart';
 import 'text_template_gen_use_screen.dart';
 
@@ -330,45 +331,56 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       ),
     );
   }
-
   Future<void> _importTemplateFromFile(AppLocalizations l10n) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
+        allowMultiple: true, // Enable multiple file selection
       );
 
-      if (result != null && result.files.single.path != null) {
-        final file = File(result.files.single.path!);
-        final jsonString = await file.readAsString();
+      if (result != null && result.files.isNotEmpty) {
+        List<ImportResult> importResults = [];
 
-        try {
-          final jsonData = jsonDecode(jsonString);
-          final template = Template.fromJson(jsonData);
+        // Process each selected file
+        for (final file in result.files) {
+          if (file.path != null) {
+            try {
+              final fileObj = File(file.path!);
+              final jsonString = await fileObj.readAsString();
+              final jsonData = jsonDecode(jsonString);
+              final template = Template.fromJson(jsonData);
 
-          // Generate a new ID for the imported template
-          final newTemplate = template.copyWith(
-            id: TemplateService.generateTemplateId(),
+              // Generate a new ID for the imported template
+              final newTemplate = template.copyWith(
+                id: TemplateService.generateTemplateId(),
+              );
+
+              await TemplateService.saveTemplate(newTemplate);
+              
+              importResults.add(ImportResult(
+                fileName: file.name,
+                success: true,
+              ));
+            } catch (e) {
+              importResults.add(ImportResult(
+                fileName: file.name,
+                success: false,
+                errorMessage: e.toString(),
+              ));
+            }
+          }
+        }
+
+        // Reload templates after import
+        _loadTemplates();
+
+        // Show import status dialog
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => ImportStatusDialog(results: importResults),
           );
-
-          await TemplateService.saveTemplate(newTemplate);
-          _loadTemplates();
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.templateImported),
-              ),
-            );
-          }
-        } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.invalidTemplateFormat(e.toString())),
-              ),
-            );
-          }
         }
       }
     } catch (e) {

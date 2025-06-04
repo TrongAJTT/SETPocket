@@ -425,10 +425,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addFromFile => 'Add from file';
 
   @override
-  String get importTemplateFromJson => 'Import a template from JSON file';
+  String get importTemplateFromJson => 'Import multiple templates from JSON files';
 
   @override
   String get templateImported => 'Template imported successfully.';
+
+  @override
+  String templatesImported(Object count) {
+    return 'Templates imported successfully.';
+  }
+
+  @override
+  String get importResults => 'Import Results';
+
+  @override
+  String importSummary(Object failCount, Object successCount) {
+    return '$successCount successful, $failCount failed';
+  }
+
+  @override
+  String successfulImports(Object count) {
+    return 'Successful imports ($count)';
+  }
+
+  @override
+  String failedImports(Object count) {
+    return 'Failed imports ($count)';
+  }
+
+  @override
+  String get noImportsAttempted => 'No files were selected for import';
 
   @override
   String invalidTemplateFormat(Object error) {

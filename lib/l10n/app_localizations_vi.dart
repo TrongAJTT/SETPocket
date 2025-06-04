@@ -425,14 +425,40 @@ class AppLocalizationsVi extends AppLocalizations {
   String get addFromFile => 'Thêm từ file';
 
   @override
-  String get importTemplateFromJson => 'Nhập mẫu từ file JSON';
+  String get importTemplateFromJson => 'Nhập nhiều template từ file JSON';
 
   @override
-  String get templateImported => 'Nhập mẫu thành công.';
+  String get templateImported => 'Nhập template thành công.';
+
+  @override
+  String templatesImported(Object count) {
+    return 'Đã nhập $count template thành công.';
+  }
+
+  @override
+  String get importResults => 'Kết quả nhập';
+
+  @override
+  String importSummary(Object failCount, Object successCount) {
+    return '$successCount thành công, $failCount thất bại';
+  }
+
+  @override
+  String successfulImports(Object count) {
+    return 'Nhập thành công ($count)';
+  }
+
+  @override
+  String failedImports(Object count) {
+    return 'Nhập thất bại ($count)';
+  }
+
+  @override
+  String get noImportsAttempted => 'Không có file nào được chọn để nhập';
 
   @override
   String invalidTemplateFormat(Object error) {
-    return 'Định dạng mẫu không hợp lệ: $error';
+    return 'Định dạng template không hợp lệ: $error';
   }
 
   @override

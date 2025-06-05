@@ -170,16 +170,8 @@ class _DesktopLayoutState extends State<DesktopLayout> {
           return Row(
             children: [
               // Sidebar với danh sách tools
-              Container(
+              SizedBox(
                 width: sidebarWidth,
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
                 child: ToolSelectionScreen(
                   isDesktop: true,
                   selectedToolType: selectedToolType,

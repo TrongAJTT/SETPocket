@@ -76,14 +76,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           // Header with actions
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1,
-                ),
-              ),
-            ),
             child: Row(
               children: [
                 Expanded(
@@ -133,14 +125,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           if (!_isSelectionMode)
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Theme.of(context).dividerColor,
-                    width: 1,
-                  ),
-                ),
-              ),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(

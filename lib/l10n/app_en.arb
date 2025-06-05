@@ -208,10 +208,16 @@
     "timeCount": "Number of times",
     "dateTimeGenerator": "Date & Time Generator",
     "heads": "Heads",
-    "tails": "Tails",
-    "rock": "Rock",
+    "tails": "Tails",    "rock": "Rock",
     "paper": "Paper", 
     "scissors": "Scissors",
     "randomResult": "Result",
-    "flipping": "Flipping..."
+    "flipping": "Flipping...",
+    
+    "cacheTypeTextTemplates": "Text Templates",
+    "cacheTypeTextTemplatesDesc": "Saved text templates and content",
+    "cacheTypeAppSettings": "App Settings",
+    "cacheTypeAppSettingsDesc": "Theme, language, and user preferences",
+    "cacheTypeRandomGenerators": "Random Generators",
+    "cacheTypeRandomGeneratorsDesc": "Generated results cache (currently empty)"
 }

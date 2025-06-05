@@ -683,4 +683,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get flipping => 'Đang lật...';
+
+  @override
+  String get cacheTypeTextTemplates => 'Mẫu văn bản';
+
+  @override
+  String get cacheTypeTextTemplatesDesc => 'Các mẫu văn bản và nội dung đã lưu';
+
+  @override
+  String get cacheTypeAppSettings => 'Cài đặt ứng dụng';
+
+  @override
+  String get cacheTypeAppSettingsDesc => 'Giao diện, ngôn ngữ và tùy chọn người dùng';
+
+  @override
+  String get cacheTypeRandomGenerators => 'Trình tạo ngẫu nhiên';
+
+  @override
+  String get cacheTypeRandomGeneratorsDesc => 'Bộ nhớ đệm kết quả đã tạo (hiện tại trống)';
 }

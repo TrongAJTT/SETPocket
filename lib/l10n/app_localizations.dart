@@ -92,7 +92,6 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale.fromSubtags(languageCode: 'en', scriptCode: 'backup'),
     Locale('vi')
   ];
 
@@ -1319,6 +1318,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flipping...'**
   String get flipping;
+
+  /// No description provided for @cacheTypeTextTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Templates'**
+  String get cacheTypeTextTemplates;
+
+  /// No description provided for @cacheTypeTextTemplatesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved text templates and content'**
+  String get cacheTypeTextTemplatesDesc;
+
+  /// No description provided for @cacheTypeAppSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'App Settings'**
+  String get cacheTypeAppSettings;
+
+  /// No description provided for @cacheTypeAppSettingsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme, language, and user preferences'**
+  String get cacheTypeAppSettingsDesc;
+
+  /// No description provided for @cacheTypeRandomGenerators.
+  ///
+  /// In en, this message translates to:
+  /// **'Random Generators'**
+  String get cacheTypeRandomGenerators;
+
+  /// No description provided for @cacheTypeRandomGeneratorsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated results cache (currently empty)'**
+  String get cacheTypeRandomGeneratorsDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
@@ -1338,15 +1373,6 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
 
-  // Lookup logic when language+script codes are specified.
-  switch (locale.languageCode) {
-    case 'en': {
-  switch (locale.scriptCode) {
-    case 'backup': return AppLocalizationsEnBackup();
-   }
-  break;
-   }
-  }
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {

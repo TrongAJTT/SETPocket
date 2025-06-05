@@ -12,22 +12,40 @@ class CacheDetailsDialog extends StatefulWidget {
 class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
   Map<String, CacheInfo> _cacheInfo = {};
   bool _loading = true;
+  bool _hasLoadedOnce = false;
 
   @override
   void initState() {
     super.initState();
-    _loadCacheInfo();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasLoadedOnce) {
+      _hasLoadedOnce = true;
+      _loadCacheInfo();
+    }
   }
 
   Future<void> _loadCacheInfo() async {
     setState(() => _loading = true);
     try {
-      final cacheInfo = await CacheService.getAllCacheInfo();
+      final loc = AppLocalizations.of(context)!;
+      final cacheInfo = await CacheService.getAllCacheInfo(
+        textTemplatesName: loc.cacheTypeTextTemplates,
+        textTemplatesDesc: loc.cacheTypeTextTemplatesDesc,
+        appSettingsName: loc.cacheTypeAppSettings,
+        appSettingsDesc: loc.cacheTypeAppSettingsDesc,
+        randomGeneratorsName: loc.cacheTypeRandomGenerators,
+        randomGeneratorsDesc: loc.cacheTypeRandomGeneratorsDesc,
+      );
       setState(() {
         _cacheInfo = cacheInfo;
         _loading = false;
       });
     } catch (e) {
+      print('Error loading cache info: $e');
       setState(() => _loading = false);
     }
   }
@@ -166,6 +184,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                         ? () => _clearCache(cacheType, info.name)
                         : null,
                     icon: const Icon(Icons.delete_outline, size: 16),
+                    tooltip: AppLocalizations.of(context)!.clearCache,
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.red.shade600,
                       foregroundColor: Colors.white,

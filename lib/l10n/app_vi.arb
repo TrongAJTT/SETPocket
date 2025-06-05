@@ -196,8 +196,7 @@
     "tails": "Ngửa",
     "rock": "Búa",
     "paper": "Giấy", 
-    "scissors": "Kéo",
-    "randomResult": "Kết quả",
+    "scissors": "Kéo",    "randomResult": "Kết quả",
       "cacheDetails": "Chi tiết bộ nhớ đệm",
     "viewCacheDetails": "Xem chi tiết",
     "cacheSize": "Kích thước bộ nhớ đệm",
@@ -207,5 +206,12 @@
     "confirmClearAllCache": "Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu bộ nhớ đệm? Điều này sẽ xóa tất cả template đã lưu nhưng giữ lại cài đặt của bạn.",
     "cacheCleared": "Đã xóa bộ nhớ đệm {cacheName} thành công",
     "allCacheCleared": "Đã xóa tất cả bộ nhớ đệm thành công",
-    "errorClearingCache": "Lỗi khi xóa bộ nhớ đệm: {error}"
+    "errorClearingCache": "Lỗi khi xóa bộ nhớ đệm: {error}",
+    
+    "cacheTypeTextTemplates": "Mẫu văn bản",
+    "cacheTypeTextTemplatesDesc": "Các mẫu văn bản và nội dung đã lưu",
+    "cacheTypeAppSettings": "Cài đặt ứng dụng",
+    "cacheTypeAppSettingsDesc": "Giao diện, ngôn ngữ và tùy chọn người dùng",
+    "cacheTypeRandomGenerators": "Trình tạo ngẫu nhiên",
+    "cacheTypeRandomGeneratorsDesc": "Bộ nhớ đệm kết quả đã tạo (hiện tại trống)"
 }

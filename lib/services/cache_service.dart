@@ -37,8 +37,14 @@ class CacheService {
       'lastGeneratedDates'
     ],
   };
-
-  static Future<Map<String, CacheInfo>> getAllCacheInfo() async {
+  static Future<Map<String, CacheInfo>> getAllCacheInfo({
+    String? textTemplatesName,
+    String? textTemplatesDesc,
+    String? appSettingsName,
+    String? appSettingsDesc,
+    String? randomGeneratorsName,
+    String? randomGeneratorsDesc,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, CacheInfo> cacheInfoMap = {};
 
@@ -48,8 +54,8 @@ class CacheService {
     final templatesSize = _calculateStringListSize(templatesJson);
 
     cacheInfoMap['text_templates'] = CacheInfo(
-      name: 'Text Templates',
-      description: 'Saved text templates and content',
+      name: textTemplatesName ?? 'Text Templates',
+      description: textTemplatesDesc ?? 'Saved text templates and content',
       itemCount: templates.length,
       sizeBytes: templatesSize,
       keys: [_templatesKey],
@@ -73,8 +79,8 @@ class CacheService {
     }
 
     cacheInfoMap['settings'] = CacheInfo(
-      name: 'App Settings',
-      description: 'Theme, language, and user preferences',
+      name: appSettingsName ?? 'App Settings',
+      description: appSettingsDesc ?? 'Theme, language, and user preferences',
       itemCount: settingsCount,
       sizeBytes: settingsSize,
       keys: settingsKeys,
@@ -82,8 +88,8 @@ class CacheService {
 
     // Random Generators Cache (potential future cache)
     cacheInfoMap['random_generators'] = CacheInfo(
-      name: 'Random Generators',
-      description: 'Generated results cache (currently empty)',
+      name: randomGeneratorsName ?? 'Random Generators',
+      description: randomGeneratorsDesc ?? 'Generated results cache (currently empty)',
       itemCount: 0,
       sizeBytes: 0,
       keys: [

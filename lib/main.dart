@@ -383,6 +383,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _clearCache() async {
+    final confirmed = await _showConfirmDialog();
+    if (confirmed != true) return;
+
     setState(() {
       _clearing = true;
     });
@@ -439,6 +442,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _language = lang);
       settingsController.setLocale(Locale(lang));
     }
+  }
+
+  Future<bool?> _showConfirmDialog() async {
+    final loc = AppLocalizations.of(context)!;
+    final textController = TextEditingController();
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(loc.clearAllCache),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(loc.confirmClearAllCache),
+              const SizedBox(height: 16),
+              Text(
+                loc.typeConfirmToProceed,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: textController,
+                decoration: const InputDecoration(
+                  hintText: 'confirm',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => setState(() {}),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(loc.cancel),
+            ),
+            FilledButton(
+              onPressed: textController.text.toLowerCase() == 'confirm'
+                  ? () => Navigator.of(context).pop(true)
+                  : null,
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(loc.clearAllCache),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
+import 'generation_history_service.dart';
 
 class CacheInfo {
   final String name;
@@ -26,15 +27,23 @@ class CacheInfo {
 
 class CacheService {
   static const String _templatesKey = 'templates';
-
   // Cache keys for different features
   static const Map<String, List<String>> _cacheKeys = {
     'text_templates': [_templatesKey],
     'settings': ['themeMode', 'language'],
     'random_generators': [
-      'lastGeneratedPasswords',
-      'lastGeneratedNumbers',
-      'lastGeneratedDates'
+      'generation_history_enabled',
+      'generation_history_password',
+      'generation_history_number',
+      'generation_history_date',
+      'generation_history_time',
+      'generation_history_date_time',
+      'generation_history_color',
+      'generation_history_latin_letter',
+      'generation_history_playing_card',
+      'generation_history_coin_flip',
+      'generation_history_dice_roll',
+      'generation_history_rock_paper_scissors',
     ],
   };
   static Future<Map<String, CacheInfo>> getAllCacheInfo({
@@ -65,7 +74,6 @@ class CacheService {
     final settingsKeys = ['themeMode', 'language'];
     int settingsSize = 0;
     int settingsCount = 0;
-
     for (final key in settingsKeys) {
       if (prefs.containsKey(key)) {
         settingsCount++;
@@ -74,6 +82,8 @@ class CacheService {
           settingsSize += value.length * 2; // UTF-16 encoding
         } else if (value is int) {
           settingsSize += 4; // 32-bit integer
+        } else if (value is bool) {
+          settingsSize += 1; // 1 byte for boolean
         }
       }
     }
@@ -84,19 +94,18 @@ class CacheService {
       itemCount: settingsCount,
       sizeBytes: settingsSize,
       keys: settingsKeys,
-    );
+    ); // Random Generators Cache - Get actual history data
+    final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
+    final historyCount = await GenerationHistoryService.getTotalHistoryCount();
+    final historySize = await GenerationHistoryService.getHistoryDataSize();
 
-    // Random Generators Cache (potential future cache)
     cacheInfoMap['random_generators'] = CacheInfo(
       name: randomGeneratorsName ?? 'Random Generators',
-      description: randomGeneratorsDesc ?? 'Generated results cache (currently empty)',
-      itemCount: 0,
-      sizeBytes: 0,
-      keys: [
-        'lastGeneratedPasswords',
-        'lastGeneratedNumbers',
-        'lastGeneratedDates'
-      ],
+      description: randomGeneratorsDesc ?? 'Generation history and settings',
+      itemCount:
+          historyCount + (historyEnabled ? 1 : 0), // +1 for the enabled setting
+      sizeBytes: historySize + (historyEnabled ? 4 : 0), // +4 bytes for boolean
+      keys: _cacheKeys['random_generators'] ?? [],
     );
 
     return cacheInfoMap;
@@ -104,10 +113,17 @@ class CacheService {
 
   static Future<void> clearCache(String cacheType) async {
     final prefs = await SharedPreferences.getInstance();
-    final keys = _cacheKeys[cacheType] ?? [];
 
-    for (final key in keys) {
-      await prefs.remove(key);
+    if (cacheType == 'random_generators') {
+      // Clear all generation history through the service
+      await GenerationHistoryService.clearAllHistory();
+      // Also clear the history enabled setting
+      await prefs.remove('generation_history_enabled');
+    } else {
+      final keys = _cacheKeys[cacheType] ?? [];
+      for (final key in keys) {
+        await prefs.remove(key);
+      }
     }
   }
 

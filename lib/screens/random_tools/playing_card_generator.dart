@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
-import 'package:my_multi_tools/models/random_generator.dart';
+import 'package:my_multi_tools/services/generation_history_service.dart';
+import 'dart:math';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -13,292 +15,516 @@ class PlayingCardGeneratorScreen extends StatefulWidget {
 }
 
 class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   int _cardCount = 5;
-  double _tens = 0.0; // 0-5 representing tens place (0-50)
-  double _units = 5.0; // 0-9 representing units place (0-9)
-  List<String> _generatedCards = [];
-  late AnimationController _dealController;
-  List<AnimationController> _flipControllers = [];
-  List<Animation<double>> _flipAnimations = [];
+  double _cardCountSlider = 5.0;
+  bool _includeJokers = false;
+  bool _allowDuplicates = true;
+  List<PlayingCard> _generatedCards = [];
+  bool _copied = false;
+  late AnimationController _animationController;
+  List<GenerationHistoryItem> _history = [];
+  bool _historyEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _dealController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    _animationController = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 800),
     );
-    // Initialize sliders based on initial _cardCount
-    _updateSlidersFromCount(_cardCount);
-    // Initialize with some default values
-    _generateCards();
-  }
-
-  void _updateSlidersFromCount(int count) {
-    _tens = (count ~/ 10).toDouble();
-    _units = (count % 10).toDouble();
-  }
-
-  void _updateCountFromSliders() {
-    final newCount = (_tens * 10 + _units).toInt();
-    // Ensure count is within valid range (1-52 for playing cards)
-    final validCount = newCount.clamp(1, 52);
-    if (validCount != _cardCount) {
-      setState(() {
-        _cardCount = validCount;
-      });
-      // Update sliders if count was clamped
-      if (validCount != newCount) {
-        _updateSlidersFromCount(validCount);
-      }
-    }
+    _loadHistory();
   }
 
   @override
   void dispose() {
-    _dealController.dispose();
-    for (var controller in _flipControllers) {
-      controller.dispose();
-    }
+    _animationController.dispose();
     super.dispose();
   }
 
+  Future<void> _loadHistory() async {
+    final enabled = await GenerationHistoryService.isHistoryEnabled();
+    final history = await GenerationHistoryService.getHistory('playing_cards');
+    setState(() {
+      _historyEnabled = enabled;
+      _history = history;
+    });
+  }
+
   void _generateCards() {
-    // Reset and dispose old controllers
-    for (var controller in _flipControllers) {
-      controller.dispose();
-    } // Generate new cards
-    final cards = RandomGenerator.generatePlayingCards(_cardCount);
-    // Không cần đảo thứ tự nữa, hiển thị đúng thứ tự đã tạo
+    final random = Random();
+    final cards = <PlayingCard>[];
+    final availableCards = _createDeck();
 
-    // Create flip controllers for each card
-    _flipControllers = List.generate(
-      cards.length,
-      (index) => AnimationController(
-        duration: const Duration(milliseconds: 400),
-        vsync: this,
-      ),
-    );
+    if (!_allowDuplicates && _cardCount > availableCards.length) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Cannot generate $_cardCount cards. Only ${availableCards.length} are available.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-    _flipAnimations = _flipControllers
-        .map((controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
-              CurvedAnimation(parent: controller, curve: Curves.easeInOut),
-            ))
-        .toList();
+    final usedCards = <PlayingCard>{};
 
-    // Deal animation setup
-    _dealController.reset();
+    for (int i = 0; i < _cardCount; i++) {
+      PlayingCard selectedCard;
+
+      if (_allowDuplicates) {
+        selectedCard = availableCards[random.nextInt(availableCards.length)];
+      } else {
+        final availableForSelection =
+            availableCards.where((card) => !usedCards.contains(card)).toList();
+        if (availableForSelection.isEmpty) break;
+        selectedCard =
+            availableForSelection[random.nextInt(availableForSelection.length)];
+        usedCards.add(selectedCard);
+      }
+
+      cards.add(selectedCard);
+    }
 
     setState(() {
       _generatedCards = cards;
+      _copied = false;
     });
 
-    // Deal cards with animation
-    _dealController.forward();
+    _animationController.forward(from: 0);
 
-    // Flip cards with staggered animation
-    Future.delayed(const Duration(milliseconds: 800), () {
-      for (int i = 0; i < _flipControllers.length; i++) {
-        Future.delayed(Duration(milliseconds: 150 * i), () {
-          _flipControllers[i].forward();
-        });
+    // Save to history if enabled
+    if (_historyEnabled) {
+      final cardStrings = cards.map((card) => card.toString()).toList();
+      GenerationHistoryService.addHistoryItem(
+        cardStrings.join(', '),
+        'playing_cards',
+      ).then((_) => _loadHistory());
+    }
+  }
+
+  List<PlayingCard> _createDeck() {
+    final cards = <PlayingCard>[];
+
+    // Standard 52 cards
+    for (final suit in ['♠', '♥', '♦', '♣']) {
+      for (final rank in [
+        'A',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        'J',
+        'Q',
+        'K'
+      ]) {
+        cards.add(PlayingCard(suit: suit, rank: rank));
       }
+    }
+
+    // Add jokers if enabled
+    if (_includeJokers) {
+      cards.add(PlayingCard(suit: '🃏', rank: 'Joker'));
+      cards.add(PlayingCard(suit: '🃏', rank: 'Joker'));
+    }
+
+    return cards;
+  }
+
+  void _copyToClipboard() {
+    if (_generatedCards.isEmpty) return;
+
+    final cardStrings =
+        _generatedCards.map((card) => card.toString()).join(', ');
+    Clipboard.setData(ClipboardData(text: cardStrings));
+    setState(() {
+      _copied = true;
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.copied),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
-  Color _getSuitColor(String card) {
-    if (card.contains('♥') || card.contains('♦')) {
+  void _copyHistoryItem(String value) {
+    Clipboard.setData(ClipboardData(text: value));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.copied),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Color _getSuitColor(String suit) {
+    if (suit == '♥' || suit == '♦') {
       return Colors.red;
-    } else {
+    } else if (suit == '♠' || suit == '♣') {
       return Colors.black;
+    } else {
+      return Colors.purple; // Joker
     }
   }
 
-  Widget _buildSliderControls(AppLocalizations loc) {
-    final isWideScreen = MediaQuery.of(context).size.width > 600;
-
-    final tensSlider = Column(
-      children: [
-        Text(
-          loc.tens,
-          style: Theme.of(context).textTheme.labelMedium,
+  Widget _buildSliderControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.cardCount,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Slider(
+                    value: _cardCountSlider,
+                    min: 1,
+                    max: _includeJokers ? 54 : 52,
+                    divisions: _includeJokers ? 53 : 51,
+                    label: _cardCount.toString(),
+                    onChanged: (value) {
+                      setState(() {
+                        _cardCountSlider = value;
+                        _cardCount = value.round();
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  width: 60,
+                  margin: const EdgeInsets.only(left: 16),
+                  child: TextFormField(
+                    controller:
+                        TextEditingController(text: _cardCount.toString()),
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.all(8),
+                    ),
+                    onChanged: (value) {
+                      final newCount = int.tryParse(value);
+                      if (newCount != null &&
+                          newCount >= 1 &&
+                          newCount <= (_includeJokers ? 54 : 52)) {
+                        setState(() {
+                          _cardCount = newCount;
+                          _cardCountSlider = newCount.toDouble();
+                        });
+                      }
+                    },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: Text('Include Jokers'),
+              value: _includeJokers,
+              onChanged: (value) {
+                setState(() {
+                  _includeJokers = value;
+                  // Update slider max and reset count if necessary
+                  final maxCards = value ? 54 : 52;
+                  if (_cardCount > maxCards) {
+                    _cardCount = maxCards;
+                    _cardCountSlider = maxCards.toDouble();
+                  }
+                });
+              },
+            ),
+            SwitchListTile(
+              title: Text(AppLocalizations.of(context)!.allowDuplicates),
+              value: _allowDuplicates,
+              onChanged: (value) {
+                setState(() {
+                  _allowDuplicates = value;
+                });
+              },
+            ),
+          ],
         ),
-        Slider(
-          value: _tens,
-          min: 0,
-          max: 5, // Maximum 50 cards
-          divisions: 5,
-          label: '${_tens.toInt()}0',
-          onChanged: (value) {
-            setState(() {
-              _tens = value;
-              // Special handling for 52 card limit
-              final newCount = (value * 10 + _units).toInt();
-              if (newCount > 52) {
-                _units = 2.0; // Set units to 2 if tens is 5 (making it 52)
-              }
-            });
-            _updateCountFromSliders();
-          },
-        ),
-      ],
+      ),
     );
+  }
 
-    final unitsSlider = Column(
-      children: [
-        Text(
-          loc.units,
-          style: Theme.of(context).textTheme.labelMedium,
+  Widget _buildResultCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.randomResult,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                if (_generatedCards.isNotEmpty)
+                  IconButton(
+                    icon: Icon(
+                      _copied ? Icons.check : Icons.copy,
+                      color: _copied ? Colors.green : null,
+                    ),
+                    onPressed: _copyToClipboard,
+                    tooltip: AppLocalizations.of(context)!.copyToClipboard,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (_generatedCards.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.style,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      AppLocalizations.of(context)!.generate,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _animationController.value,
+                    child: Transform.scale(
+                      scale: 0.8 + (0.2 * _animationController.value),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _generatedCards
+                            .map((card) => _buildCardWidget(card))
+                            .toList(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+          ],
         ),
-        Slider(
-          value: _units,
-          min: 0,
-          max: 9,
-          divisions: 9,
-          label: _units.toInt().toString(),
-          onChanged: (value) {
-            setState(() {
-              _units = value;
-              // Special handling for 52 card limit
-              final newCount = (_tens * 10 + value).toInt();
-              if (newCount > 52) {
-                _units = 2.0; // Set to 2 if tens is 5 (making it 52)
-              }
-            });
-            _updateCountFromSliders();
-          },
-        ),
-      ],
+      ),
     );
+  }
 
-    if (isWideScreen) {
-      // Horizontal layout for desktop/tablet
-      return Row(
-        children: [
-          Expanded(child: tensSlider),
-          const SizedBox(width: 16),
-          Expanded(child: unitsSlider),
+  Widget _buildCardWidget(PlayingCard card) {
+    return Container(
+      width: 60,
+      height: 84,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black, width: 2),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
         ],
-      );
-    } else {
-      // Vertical layout for mobile
-      return Column(
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          tensSlider,
-          const SizedBox(height: 8),
-          unitsSlider,
+          Text(
+            card.rank,
+            style: TextStyle(
+              fontSize: card.rank == '10' ? 10 : 12,
+              fontWeight: FontWeight.bold,
+              color: _getSuitColor(card.suit),
+            ),
+          ),
+          Text(
+            card.suit,
+            style: TextStyle(
+              fontSize: 16,
+              color: _getSuitColor(card.suit),
+            ),
+          ),
+          Text(
+            card.rank,
+            style: TextStyle(
+              fontSize: card.rank == '10' ? 10 : 12,
+              fontWeight: FontWeight.bold,
+              color: _getSuitColor(card.suit),
+            ),
+          ),
         ],
-      );
+      ),
+    );
+  }
+
+  Widget _buildHistoryWidget() {
+    if (!_historyEnabled || _history.isEmpty) {
+      return const SizedBox.shrink();
     }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.generationHistory,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    await GenerationHistoryService.clearHistory(
+                        'playing_cards');
+                    _loadHistory();
+                  },
+                  icon: const Icon(Icons.clear_all),
+                  label: Text(AppLocalizations.of(context)!.clearHistory),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _history.length,
+                itemBuilder: (context, index) {
+                  final item = _history[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      title: Text(
+                        item.value,
+                        style: const TextStyle(fontFamily: 'monospace'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        '${AppLocalizations.of(context)!.generatedAt}: ${item.timestamp.toString().split('.')[0]}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.copy),
+                        onPressed: () => _copyHistoryItem(item.value),
+                        tooltip: AppLocalizations.of(context)!.copyToClipboard,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final width = MediaQuery.of(context).size.width;
-    int maxCardsPerRow;
-    if (width < 400) {
-      maxCardsPerRow = 3;
-    } else if (width < 600) {
-      maxCardsPerRow = 4;
-    } else if (width < 900) {
-      maxCardsPerRow = 6;
-    } else if (width < 1200) {
-      maxCardsPerRow = 8;
-    } else {
-      maxCardsPerRow = 10;
-    }
 
-    // Chia các lá bài thành các dòng (giữ nguyên thứ tự)
-    List<List<int>> cardRows = [];
-    for (int i = 0; i < _generatedCards.length; i += maxCardsPerRow) {
-      int end = (i + maxCardsPerRow < _generatedCards.length)
-          ? i + maxCardsPerRow
-          : _generatedCards.length;
-      cardRows.add(List.generate(end - i, (j) => i + j));
-    }
-
-    final content = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    // Build main content and history widgets
+    final mainContent = Column(
       children: [
-        // Card count controls
-        Card(
-          margin: const EdgeInsets.all(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  loc.cardCount,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
-
-                // Current count display
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '$_cardCount',
-                      style:
-                          Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Slider controls
-                _buildSliderControls(loc),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _generateCards,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(loc.generate),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ), // Cards display
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (final row in cardRows)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (final idx in row)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 8),
-                          child: _buildCard(idx, 0),
-                        ),
-                    ],
-                  ),
-              ],
-            ),
+        _buildSliderControls(),
+        const SizedBox(height: 16),
+        _buildResultCard(),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: _generateCards,
+            icon: const Icon(Icons.casino),
+            label: Text(loc.generate),
           ),
         ),
       ],
     );
+
+    final historyWidget = _buildHistoryWidget();
+
+    // Responsive layout: side-by-side for large screens, vertical for small screens
+    Widget content;
+    if (MediaQuery.of(context).size.width >= 1200 &&
+        _historyEnabled &&
+        _history.isNotEmpty) {
+      // Large screen: side-by-side layout
+      content = Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Main content takes 60% of width
+            Expanded(
+              flex: 3,
+              child: SingleChildScrollView(
+                child: mainContent,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // History takes 40% of width
+            Expanded(
+              flex: 2,
+              child: SingleChildScrollView(
+                child: historyWidget,
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Small screen: vertical layout
+      content = SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            mainContent,
+            historyWidget,
+          ],
+        ),
+      );
+    }
 
     if (widget.isEmbedded) {
       return content;
@@ -311,99 +537,25 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
       );
     }
   }
+}
 
-  Widget _buildCard(int index, double offsetX) {
-    if (index >= _flipAnimations.length || index >= _generatedCards.length) {
-      return const SizedBox.shrink();
-    }
+class PlayingCard {
+  final String suit;
+  final String rank;
 
-    return AnimatedBuilder(
-      animation: _flipAnimations[index],
-      builder: (context, child) {
-        // 3D flip effect
-        final value = _flipAnimations[index].value;
-        final isBack = value < 0.5;
-        final transform = Matrix4.identity()
-          ..setEntry(3, 2, 0.001); // perspective
-        // ..rotateX(isBack ? 3.14159 : 0); // 180 degrees in radians
+  PlayingCard({required this.suit, required this.rank});
 
-        return Transform(
-          transform: transform,
-          alignment: Alignment.center,
-          child: Container(
-            width: 70,
-            height: 100,
-            decoration: BoxDecoration(
-              color: isBack ? Colors.blue.shade800 : Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 5,
-                  offset: const Offset(2, 2),
-                ),
-              ],
-            ),
-            child: isBack
-                ? Center(
-                    child: Text(
-                      '♠♥♦♣',
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.white.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _generatedCards[index],
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: _getSuitColor(_generatedCards[index]),
-                          ),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              _getCardSuit(_generatedCards[index]),
-                              style: TextStyle(
-                                fontSize: 32,
-                                color: _getSuitColor(_generatedCards[index]),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Transform.rotate(
-                            angle: 3.14159, // 180 degrees
-                            child: Text(
-                              _generatedCards[index],
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: _getSuitColor(_generatedCards[index]),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
-        );
-      },
-    );
-  }
+  @override
+  String toString() => '$rank$suit';
 
-  String _getCardSuit(String card) {
-    // Extract the suit (last character)
-    return card.substring(card.length - 1);
-  }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlayingCard &&
+          runtimeType == other.runtimeType &&
+          suit == other.suit &&
+          rank == other.rank;
+
+  @override
+  int get hashCode => suit.hashCode ^ rank.hashCode;
 }

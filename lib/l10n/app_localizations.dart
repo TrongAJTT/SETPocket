@@ -1352,8 +1352,50 @@ abstract class AppLocalizations {
   /// No description provided for @cacheTypeRandomGeneratorsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Generated results cache (currently empty)'**
+  /// **'Generation history and settings'**
   String get cacheTypeRandomGeneratorsDesc;
+
+  /// No description provided for @saveGenerationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Generation History'**
+  String get saveGenerationHistory;
+
+  /// No description provided for @saveGenerationHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember and display history of generated items'**
+  String get saveGenerationHistoryDesc;
+
+  /// No description provided for @generationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation History'**
+  String get generationHistory;
+
+  /// No description provided for @generatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated at'**
+  String get generatedAt;
+
+  /// No description provided for @noHistoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get noHistoryYet;
+
+  /// No description provided for @clearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear History'**
+  String get clearHistory;
+
+  /// No description provided for @typeConfirmToProceed.
+  ///
+  /// In en, this message translates to:
+  /// **'Type \"confirm\" to proceed:'**
+  String get typeConfirmToProceed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

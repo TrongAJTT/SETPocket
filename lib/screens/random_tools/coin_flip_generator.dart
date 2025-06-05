@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
+import 'package:my_multi_tools/services/generation_history_service.dart';
 
 class CoinFlipGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -22,6 +24,8 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
   late Animation<double> _flipAnimation;
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+  List<GenerationHistoryItem> _history = [];
+  bool _historyEnabled = false;
 
   @override
   void initState() {
@@ -63,6 +67,16 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
         }
       }
     });
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    final enabled = await GenerationHistoryService.isHistoryEnabled();
+    final history = await GenerationHistoryService.getHistory('coin_flip');
+    setState(() {
+      _historyEnabled = enabled;
+      _history = history;
+    });
   }
 
   @override
@@ -71,7 +85,6 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
     _scaleController.dispose();
     super.dispose();
   }
-
   Future<void> _flipCoin() async {
     if (_isFlipping) return; // Prevent multiple flips at once
 
@@ -93,14 +106,96 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       _isFlipping = false;
       _finalResult = result;
       _currentSide = result; // Set final side
-    });
+    });    // Save to history if enabled
+    if (_historyEnabled && _finalResult != null) {
+      final loc = AppLocalizations.of(context)!;
+      String resultText = _finalResult! ? loc.heads : loc.tails;
+      GenerationHistoryService.addHistoryItem(
+        resultText,
+        'coin_flip',
+      ).then((_) => _loadHistory()); // Refresh history
+    }
   }
 
+  void _copyHistoryItem(String value) {
+    Clipboard.setData(ClipboardData(text: value));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context)!.copied)),
+    );
+  }
+
+  Widget _buildHistoryWidget(AppLocalizations loc) {
+    if (!_historyEnabled || _history.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  loc.generationHistory,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await GenerationHistoryService.clearHistory('coin_flip');
+                    await _loadHistory();
+                  },
+                  child: Text(loc.clearHistory),
+                ),
+              ],
+            ),
+            const Divider(),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _history.length,
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final item = _history[index];
+                  return ListTile(
+                    dense: true,
+                    title: Text(
+                      item.value,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.copy, size: 18),
+                      onPressed: () => _copyHistoryItem(item.value),
+                      tooltip: loc.copyToClipboard,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth > 1200;
 
-    final content = Center(
+    final generatorCard = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -177,6 +272,47 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
         ],
       ),
     );
+
+    final historyWidget = _buildHistoryWidget(l10n);
+
+    Widget content;
+    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
+      // Large screen layout: generator on left, history on right
+      content = Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: generatorCard,
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: 1,
+              child: historyWidget,
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Small screen layout: vertical stack
+      content = SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: generatorCard,
+            ),
+            if (_historyEnabled && _history.isNotEmpty) ...[
+              const SizedBox(height: 32),
+              historyWidget,
+            ],
+          ],
+        ),
+      );
+    }
 
     // Return either the content directly (if embedded) or wrapped in a Scaffold
     if (widget.isEmbedded) {

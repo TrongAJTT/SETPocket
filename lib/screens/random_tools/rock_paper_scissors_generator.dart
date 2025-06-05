@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
+import 'package:my_multi_tools/services/generation_history_service.dart';
 
 class RockPaperScissorsGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -18,7 +20,8 @@ class _RockPaperScissorsGeneratorScreenState
   int? _result;
   late AnimationController _controller;
   late Animation<double> _animation;
-
+  List<GenerationHistoryItem> _history = [];
+  bool _historyEnabled = false;
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,16 @@ class _RockPaperScissorsGeneratorScreenState
       parent: _controller,
       curve: Curves.easeInOut,
     );
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    final enabled = await GenerationHistoryService.isHistoryEnabled();
+    final history = await GenerationHistoryService.getHistory('rock_paper_scissors');
+    setState(() {
+      _historyEnabled = enabled;
+      _history = history;
+    });
   }
 
   @override
@@ -37,14 +50,94 @@ class _RockPaperScissorsGeneratorScreenState
     _controller.dispose();
     super.dispose();
   }
-
   Future<void> _generateResult() async {
     _controller.reset();
     await _controller.forward();
 
     setState(() {
       _result = RandomGenerator.generateRockPaperScissors();
-    });
+    });    // Save to history if enabled
+    if (_historyEnabled && _result != null) {
+      final loc = AppLocalizations.of(context)!;
+      String resultText = _getResultText(loc);
+      GenerationHistoryService.addHistoryItem(
+        resultText,
+        'rock_paper_scissors',
+      ).then((_) => _loadHistory()); // Refresh history
+    }
+  }
+
+  void _copyHistoryItem(String value) {
+    Clipboard.setData(ClipboardData(text: value));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context)!.copied)),
+    );
+  }
+
+  Widget _buildHistoryWidget(AppLocalizations loc) {
+    if (!_historyEnabled || _history.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  loc.generationHistory,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await GenerationHistoryService.clearHistory('rock_paper_scissors');
+                    await _loadHistory();
+                  },
+                  child: Text(loc.clearHistory),
+                ),
+              ],
+            ),
+            const Divider(),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _history.length,
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final item = _history[index];
+                  return ListTile(
+                    dense: true,
+                    title: Text(
+                      item.value,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.copy, size: 18),
+                      onPressed: () => _copyHistoryItem(item.value),
+                      tooltip: loc.copyToClipboard,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   IconData _getIcon() {
@@ -94,12 +187,13 @@ class _RockPaperScissorsGeneratorScreenState
         return Colors.grey.shade400;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth > 1200;
 
-    final content = Center(
+    final generatorCard = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -176,6 +270,47 @@ class _RockPaperScissorsGeneratorScreenState
         ],
       ),
     );
+
+    final historyWidget = _buildHistoryWidget(loc);
+
+    Widget content;
+    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
+      // Large screen layout: generator on left, history on right
+      content = Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: generatorCard,
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: 1,
+              child: historyWidget,
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Small screen layout: vertical stack
+      content = SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: generatorCard,
+            ),
+            if (_historyEnabled && _history.isNotEmpty) ...[
+              const SizedBox(height: 32),
+              historyWidget,
+            ],
+          ],
+        ),
+      );
+    }
 
     if (widget.isEmbedded) {
       return content;

@@ -700,5 +700,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cacheTypeRandomGenerators => 'Random Generators';
 
   @override
-  String get cacheTypeRandomGeneratorsDesc => 'Generated results cache (currently empty)';
+  String get cacheTypeRandomGeneratorsDesc => 'Generation history and settings';
+
+  @override
+  String get saveGenerationHistory => 'Save Generation History';
+
+  @override
+  String get saveGenerationHistoryDesc => 'Remember and display history of generated items';
+
+  @override
+  String get generationHistory => 'Generation History';
+
+  @override
+  String get generatedAt => 'Generated at';
+
+  @override
+  String get noHistoryYet => 'No history yet';
+
+  @override
+  String get clearHistory => 'Clear History';
+
+  @override
+  String get typeConfirmToProceed => 'Type \"confirm\" to proceed:';
 }

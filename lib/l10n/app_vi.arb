@@ -207,11 +207,16 @@
     "cacheCleared": "Đã xóa bộ nhớ đệm {cacheName} thành công",
     "allCacheCleared": "Đã xóa tất cả bộ nhớ đệm thành công",
     "errorClearingCache": "Lỗi khi xóa bộ nhớ đệm: {error}",
-    
-    "cacheTypeTextTemplates": "Mẫu văn bản",
+      "cacheTypeTextTemplates": "Mẫu văn bản",
     "cacheTypeTextTemplatesDesc": "Các mẫu văn bản và nội dung đã lưu",
     "cacheTypeAppSettings": "Cài đặt ứng dụng",
-    "cacheTypeAppSettingsDesc": "Giao diện, ngôn ngữ và tùy chọn người dùng",
-    "cacheTypeRandomGenerators": "Trình tạo ngẫu nhiên",
-    "cacheTypeRandomGeneratorsDesc": "Bộ nhớ đệm kết quả đã tạo (hiện tại trống)"
+    "cacheTypeAppSettingsDesc": "Giao diện, ngôn ngữ và tùy chọn người dùng",    "cacheTypeRandomGenerators": "Trình tạo ngẫu nhiên",
+    "cacheTypeRandomGeneratorsDesc": "Lịch sử tạo và cài đặt",
+      "saveGenerationHistory": "Ghi nhớ lịch sử tạo",
+    "saveGenerationHistoryDesc": "Ghi nhớ và hiển thị lịch sử các mục đã tạo",
+    "generationHistory": "Lịch sử tạo",
+    "generatedAt": "Tạo lúc",
+    "noHistoryYet": "Chưa có lịch sử",
+    "clearHistory": "Xóa lịch sử",
+    "typeConfirmToProceed": "Nhập \"confirm\" để tiếp tục:"
 }

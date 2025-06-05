@@ -700,5 +700,26 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cacheTypeRandomGenerators => 'Trình tạo ngẫu nhiên';
 
   @override
-  String get cacheTypeRandomGeneratorsDesc => 'Bộ nhớ đệm kết quả đã tạo (hiện tại trống)';
+  String get cacheTypeRandomGeneratorsDesc => 'Lịch sử tạo và cài đặt';
+
+  @override
+  String get saveGenerationHistory => 'Ghi nhớ lịch sử tạo';
+
+  @override
+  String get saveGenerationHistoryDesc => 'Ghi nhớ và hiển thị lịch sử các mục đã tạo';
+
+  @override
+  String get generationHistory => 'Lịch sử tạo';
+
+  @override
+  String get generatedAt => 'Tạo lúc';
+
+  @override
+  String get noHistoryYet => 'Chưa có lịch sử';
+
+  @override
+  String get clearHistory => 'Xóa lịch sử';
+
+  @override
+  String get typeConfirmToProceed => 'Nhập \"confirm\" để tiếp tục:';
 }

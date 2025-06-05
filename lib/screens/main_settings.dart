@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
+import 'package:my_multi_tools/services/generation_history_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
@@ -20,6 +21,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   String _cacheInfo = 'Calculating...';
   bool _clearing = false;
   bool _loading = true;
+  bool _historyEnabled = false;
 
   @override
   void initState() {
@@ -32,11 +34,13 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     final themeIndex = prefs.getInt('themeMode');
     final lang = prefs.getString('language');
+    final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
     setState(() {
       _themeMode = themeIndex != null
           ? ThemeMode.values[themeIndex]
           : settingsController.themeMode;
       _language = lang ?? settingsController.locale.languageCode;
+      _historyEnabled = historyEnabled;
       _loading = false;
     });
   }
@@ -55,6 +59,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _clearCache() async {
+    final confirmed = await _showConfirmDialog();
+    if (confirmed != true) return;
+
     setState(() {
       _clearing = true;
     });
@@ -115,6 +122,63 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('language', lang);
     }
+  }
+
+  void _onHistoryEnabledChanged(bool enabled) async {
+    setState(() => _historyEnabled = enabled);
+    await GenerationHistoryService.setHistoryEnabled(enabled);
+  }
+
+  Future<bool?> _showConfirmDialog() async {
+    final loc = AppLocalizations.of(context)!;
+    final textController = TextEditingController();
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(loc.clearAllCache),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(loc.confirmClearAllCache),
+              const SizedBox(height: 16),
+              Text(
+                loc.typeConfirmToProceed,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: textController,
+                decoration: const InputDecoration(
+                  hintText: 'confirm',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => setState(() {}),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(loc.cancel),
+            ),
+            FilledButton(
+              onPressed: textController.text.toLowerCase() == 'confirm'
+                  ? () => Navigator.of(context).pop(true)
+                  : null,
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(loc.clearAllCache),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -178,6 +242,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             _buildThemeCard(loc),
             const SizedBox(height: 24),
             _buildLanguageCard(loc),
+            const SizedBox(height: 24),
+            _buildHistoryCard(loc),
             const SizedBox(height: 24),
             _buildCacheSection(loc),
           ],
@@ -302,6 +368,47 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               ],
               onChanged: _onLanguageChanged,
               isExpanded: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryCard(AppLocalizations loc) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.casino,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(loc.random,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SwitchListTile(
+              title: Text(loc.saveGenerationHistory),
+              subtitle: Text(
+                loc.saveGenerationHistoryDesc,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              value: _historyEnabled,
+              onChanged: _onHistoryEnabledChanged,
+              contentPadding: EdgeInsets.zero,
+              dense: false,
             ),
           ],
         ),

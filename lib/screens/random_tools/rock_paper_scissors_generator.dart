@@ -38,7 +38,8 @@ class _RockPaperScissorsGeneratorScreenState
 
   Future<void> _loadHistory() async {
     final enabled = await GenerationHistoryService.isHistoryEnabled();
-    final history = await GenerationHistoryService.getHistory('rock_paper_scissors');
+    final history =
+        await GenerationHistoryService.getHistory('rock_paper_scissors');
     setState(() {
       _historyEnabled = enabled;
       _history = history;
@@ -50,13 +51,14 @@ class _RockPaperScissorsGeneratorScreenState
     _controller.dispose();
     super.dispose();
   }
+
   Future<void> _generateResult() async {
     _controller.reset();
     await _controller.forward();
 
     setState(() {
       _result = RandomGenerator.generateRockPaperScissors();
-    });    // Save to history if enabled
+    }); // Save to history if enabled
     if (_historyEnabled && _result != null) {
       final loc = AppLocalizations.of(context)!;
       String resultText = _getResultText(loc);
@@ -85,23 +87,60 @@ class _RockPaperScissorsGeneratorScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('rock_paper_scissors');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory(
+                                'rock_paper_scissors');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory(
+                              'rock_paper_scissors');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -187,6 +226,7 @@ class _RockPaperScissorsGeneratorScreenState
         return Colors.grey.shade400;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;

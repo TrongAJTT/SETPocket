@@ -71,6 +71,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
     _rollController.dispose();
     super.dispose();
   }
+
   void _rollDice() {
     _rollController.reset();
     _rollController.forward();
@@ -84,7 +85,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
 
     // Save to history if enabled
     if (_historyEnabled && _results.isNotEmpty) {
-      String resultText = _results.length == 1 
+      String resultText = _results.length == 1
           ? 'd$_diceSides: ${_results[0]}'
           : '${_results.length}d$_diceSides: ${_results.join(", ")} (Total: ${_getTotal()})';
       GenerationHistoryService.addHistoryItem(
@@ -112,23 +113,60 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('dice_roll');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory(
+                                'dice_roll');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory(
+                              'dice_roll');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -170,6 +208,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
   int _getTotal() {
     return _results.fold(0, (sum, value) => sum + value);
   }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -195,10 +234,9 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                     ),
                     Text(
                       '$_diceCount',
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ],
                 ),
@@ -306,9 +344,8 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                         'Total: ${_getTotal()}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
                         ),
                       ),
                     ),

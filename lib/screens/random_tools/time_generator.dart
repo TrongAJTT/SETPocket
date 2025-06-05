@@ -117,23 +117,58 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('time');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory('time');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory('time');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -179,10 +214,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     final minutes = tod.minute.toString().padLeft(2, '0');
     return '$hours:$minutes';
   }
-
   Widget _buildTimeSelectors(AppLocalizations loc) {
-    final isWideScreen = MediaQuery.of(context).size.width > 600;
-
     final startTimeSelector = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -265,25 +297,14 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
           ),
         ),
       ],
+    );    // Always use vertical layout for Start Time and End Time
+    return Column(
+      children: [
+        startTimeSelector,
+        const SizedBox(height: 16),
+        endTimeSelector,
+      ],
     );
-
-    if (isWideScreen) {
-      return Row(
-        children: [
-          Expanded(child: startTimeSelector),
-          const SizedBox(width: 16),
-          Expanded(child: endTimeSelector),
-        ],
-      );
-    } else {
-      return Column(
-        children: [
-          startTimeSelector,
-          const SizedBox(height: 16),
-          endTimeSelector,
-        ],
-      );
-    }
   }
 
   Widget _buildCountSlider(AppLocalizations loc) {

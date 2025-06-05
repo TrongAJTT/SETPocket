@@ -125,23 +125,60 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('date_time');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory(
+                                'date_time');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory(
+                              'date_time');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -180,10 +217,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         ),
       ),
     );
-  }
-
-  Widget _buildDateTimeSelectors(AppLocalizations loc) {
-    final isWideScreen = MediaQuery.of(context).size.width > 600;
+  }  Widget _buildDateTimeSelectors(AppLocalizations loc) {
     final dateFormat = DateFormat('yyyy-MM-dd');
     final timeFormat = DateFormat('HH:mm');
 
@@ -320,25 +354,14 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
           }
         });
       },
+    );    // Always use vertical layout for Start Date and End Date
+    return Column(
+      children: [
+        startSelector,
+        const SizedBox(height: 16),
+        endSelector,
+      ],
     );
-
-    if (isWideScreen) {
-      return Row(
-        children: [
-          Expanded(child: startSelector),
-          const SizedBox(width: 16),
-          Expanded(child: endSelector),
-        ],
-      );
-    } else {
-      return Column(
-        children: [
-          startSelector,
-          const SizedBox(height: 16),
-          endSelector,
-        ],
-      );
-    }
   }
 
   Widget _buildCountSlider(AppLocalizations loc) {

@@ -99,23 +99,60 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('password');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory(
+                                'password');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory(
+                              'password');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -263,6 +300,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -284,10 +322,9 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
                 ),
                 Text(
                   '$_passwordLength',
-                  style:
-                      Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -319,7 +356,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
       ),
     );
 
-    final resultCard = _generatedPassword.isNotEmpty 
+    final resultCard = _generatedPassword.isNotEmpty
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -388,7 +425,8 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
           ],
         ),
       );
-    } else {      // Small screen layout: vertical stack
+    } else {
+      // Small screen layout: vertical stack
       content = SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

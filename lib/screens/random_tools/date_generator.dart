@@ -14,7 +14,8 @@ class DateGeneratorScreen extends StatefulWidget {
   State<DateGeneratorScreen> createState() => _DateGeneratorScreenState();
 }
 
-class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _startDate = DateTime.now().subtract(const Duration(days: 365));
+class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
+  DateTime _startDate = DateTime.now().subtract(const Duration(days: 365));
   DateTime _endDate = DateTime.now().add(const Duration(days: 365));
   int _dateCount = 5;
   double _dateCountSlider = 5.0;
@@ -37,6 +38,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
       _history = history;
     });
   }
+
   void _generateDates() {
     try {
       setState(() {
@@ -52,7 +54,8 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
       // Save to history if enabled
       if (_historyEnabled && _generatedDates.isNotEmpty) {
         final formatter = DateFormat('yyyy-MM-dd');
-        final datesText = _generatedDates.map((date) => formatter.format(date)).join(', ');
+        final datesText =
+            _generatedDates.map((date) => formatter.format(date)).join(', ');
         GenerationHistoryService.addHistoryItem(
           datesText,
           'date',
@@ -124,10 +127,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
       ],
     );
   }
-
   Widget _buildDateSelectors(AppLocalizations loc) {
-    final isWideScreen = MediaQuery.of(context).size.width > 600;
-
     final startDateSelector = _buildDateSelector(
       loc.startDate,
       _startDate,
@@ -166,27 +166,14 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
           });
         }
       },
+    );    // Always use vertical layout for Start Date and End Date
+    return Column(
+      children: [
+        startDateSelector,
+        const SizedBox(height: 16),
+        endDateSelector,
+      ],
     );
-
-    if (isWideScreen) {
-      // Side-by-side layout for desktop/tablet
-      return Row(
-        children: [
-          Expanded(child: startDateSelector),
-          const SizedBox(width: 16),
-          Expanded(child: endDateSelector),
-        ],
-      );
-    } else {
-      // Stacked layout for mobile
-      return Column(
-        children: [
-          startDateSelector,
-          const SizedBox(height: 16),
-          endDateSelector,
-        ],
-      );
-    }
   }
 
   Widget _buildCountSlider(AppLocalizations loc) {
@@ -281,23 +268,58 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('date');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory('date');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory('date');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -337,6 +359,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -452,7 +475,9 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {  DateTime _
 
     // Responsive layout: side-by-side for large screens, vertical for small screens
     Widget content;
-    if (MediaQuery.of(context).size.width >= 1200 && _historyEnabled && _history.isNotEmpty) {
+    if (MediaQuery.of(context).size.width >= 1200 &&
+        _historyEnabled &&
+        _history.isNotEmpty) {
       // Large screen: side-by-side layout
       content = Padding(
         padding: const EdgeInsets.all(16),

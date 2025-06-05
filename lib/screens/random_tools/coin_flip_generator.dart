@@ -85,6 +85,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
     _scaleController.dispose();
     super.dispose();
   }
+
   Future<void> _flipCoin() async {
     if (_isFlipping) return; // Prevent multiple flips at once
 
@@ -106,7 +107,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       _isFlipping = false;
       _finalResult = result;
       _currentSide = result; // Set final side
-    });    // Save to history if enabled
+    }); // Save to history if enabled
     if (_historyEnabled && _finalResult != null) {
       final loc = AppLocalizations.of(context)!;
       String resultText = _finalResult! ? loc.heads : loc.tails;
@@ -135,23 +136,60 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  loc.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory('coin_flip');
-                    await _loadHistory();
-                  },
-                  child: Text(loc.clearHistory),
-                ),
-              ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory(
+                                'coin_flip');
+                            await _loadHistory();
+                          },
+                          child: Text(loc.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          loc.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory(
+                              'coin_flip');
+                          await _loadHistory();
+                        },
+                        child: Text(loc.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const Divider(),
             ConstrainedBox(
@@ -189,6 +227,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;

@@ -404,23 +404,63 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.generationHistory,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                TextButton.icon(
-                  onPressed: () async {
-                    await GenerationHistoryService.clearHistory(
-                        'playing_cards');
-                    _loadHistory();
-                  },
-                  icon: const Icon(Icons.clear_all),
-                  label: Text(AppLocalizations.of(context)!.clearHistory),
-                ),
-              ],
+            // Responsive header that wraps on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If space is limited, use Column layout
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.generationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () async {
+                            await GenerationHistoryService.clearHistory(
+                                'playing_cards');
+                            _loadHistory();
+                          },
+                          icon: const Icon(Icons.clear_all),
+                          label:
+                              Text(AppLocalizations.of(context)!.clearHistory),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use Row layout when there's enough space
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          AppLocalizations.of(context)!.generationHistory,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: () async {
+                          await GenerationHistoryService.clearHistory(
+                              'playing_cards');
+                          _loadHistory();
+                        },
+                        icon: const Icon(Icons.clear_all),
+                        label: Text(AppLocalizations.of(context)!.clearHistory),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const SizedBox(height: 8),
             ConstrainedBox(

@@ -4,7 +4,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class NumberGeneratorScreen extends StatefulWidget {
-  const NumberGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const NumberGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<NumberGeneratorScreen> createState() => _NumberGeneratorScreenState();
@@ -182,161 +184,168 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.numberGenerator),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Number type selector
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<bool>(
+                          title: Text(loc.integers),
+                          value: true,
+                          groupValue: _isInteger,
+                          onChanged: (value) {
+                            setState(() {
+                              _isInteger = value ?? true;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<bool>(
+                          title: Text(loc.floatingPoint),
+                          value: false,
+                          groupValue: _isInteger,
+                          onChanged: (value) {
+                            setState(() {
+                              _isInteger = value ?? true;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Min and Max value input
+                  _buildMinMaxInputs(context, loc),
+
+                  const SizedBox(height: 16),
+
+                  // Quantity
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        loc.quantity,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Text(
+                        '$_quantity',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: _quantity.toDouble(),
+                    min: 1,
+                    max: 30,
+                    divisions: 29,
+                    label: _quantity.toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        _quantity = value.round();
+                      });
+                    },
+                  ),
+
+                  // Allow duplicates
+                  CheckboxListTile(
+                    title: Text(loc.allowDuplicates),
+                    value: _allowDuplicates,
+                    onChanged: (value) {
+                      setState(() {
+                        _allowDuplicates = value ?? true;
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Generate button
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _generateNumbers,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(loc.generate),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Display generated numbers
+          if (_generatedNumbers.isNotEmpty) ...[
+            Text(
+              loc.generatedNumbers,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Number type selector
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: Text(loc.integers),
-                            value: true,
-                            groupValue: _isInteger,
-                            onChanged: (value) {
-                              setState(() {
-                                _isInteger = value ?? true;
-                              });
-                            },
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _generatedNumbers.map((number) {
+                        return Chip(
+                          label: Text(_formatNumber(number)),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          labelStyle: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                           ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: Text(loc.floatingPoint),
-                            value: false,
-                            groupValue: _isInteger,
-                            onChanged: (value) {
-                              setState(() {
-                                _isInteger = value ?? true;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Min and Max value input
-                    _buildMinMaxInputs(context, loc),
-
-                    const SizedBox(height: 16),
-
-                    // Quantity
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          loc.quantity,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          '$_quantity',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: _quantity.toDouble(),
-                      min: 1,
-                      max: 30,
-                      divisions: 29,
-                      label: _quantity.toString(),
-                      onChanged: (double value) {
-                        setState(() {
-                          _quantity = value.round();
-                        });
-                      },
-                    ),
-
-                    // Allow duplicates
-                    CheckboxListTile(
-                      title: Text(loc.allowDuplicates),
-                      value: _allowDuplicates,
-                      onChanged: (value) {
-                        setState(() {
-                          _allowDuplicates = value ?? true;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Generate button
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _generateNumbers,
-                        icon: const Icon(Icons.refresh),
-                        label: Text(loc.generate),
-                      ),
+                    OutlinedButton.icon(
+                      onPressed: _copyToClipboard,
+                      icon: Icon(_copied ? Icons.check : Icons.copy),
+                      label: Text(_copied ? loc.copied : loc.copyToClipboard),
                     ),
                   ],
                 ),
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            // Display generated numbers
-            if (_generatedNumbers.isNotEmpty) ...[
-              Text(
-                loc.generatedNumbers,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _generatedNumbers.map((number) {
-                          return Chip(
-                            label: Text(_formatNumber(number)),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            labelStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: _copyToClipboard,
-                        icon: Icon(_copied ? Icons.check : Icons.copy),
-                        label: Text(_copied ? loc.copied : loc.copyToClipboard),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
+
+    // Return either the content directly (if embedded) or wrapped in a Scaffold
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.numberGenerator),
+          elevation: 0,
+        ),
+        body: content,
+      );
+    }
   }
 }

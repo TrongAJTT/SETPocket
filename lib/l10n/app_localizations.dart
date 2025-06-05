@@ -92,6 +92,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale.fromSubtags(languageCode: 'en', scriptCode: 'backup'),
     Locale('vi')
   ];
 
@@ -274,6 +275,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select a tool from the sidebar'**
   String get selectTool;
+
+  /// No description provided for @selectToolDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a tool from the left sidebar to get started'**
+  String get selectToolDesc;
 
   /// No description provided for @settingsDesc.
   ///
@@ -1331,6 +1338,15 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
 
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'en': {
+  switch (locale.scriptCode) {
+    case 'backup': return AppLocalizationsEnBackup();
+   }
+  break;
+   }
+  }
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {

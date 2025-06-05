@@ -3,7 +3,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class RockPaperScissorsGeneratorScreen extends StatefulWidget {
-  const RockPaperScissorsGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const RockPaperScissorsGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<RockPaperScissorsGeneratorScreen> createState() =>
@@ -97,88 +99,94 @@ class _RockPaperScissorsGeneratorScreenState
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.rockPaperScissors),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: 1 + _animation.value * 0.3,
-                  child: Opacity(
-                    opacity: 0.7 + (_animation.value * 0.3),
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _getResultColor().withValues(alpha: 0.2),
-                        border: Border.all(
-                          color: _getResultColor(),
-                          width: 4,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _getIcon(),
-                            size: 80,
-                            color: _getResultColor(),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _getResultText(loc),
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: _getResultColor(),
-                            ),
-                          ),
-                        ],
+    final content = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: 1 + _animation.value * 0.3,
+                child: Opacity(
+                  opacity: 0.7 + (_animation.value * 0.3),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _getResultColor().withValues(alpha: 0.2),
+                      border: Border.all(
+                        color: _getResultColor(),
+                        width: 4,
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 48),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildOptionButton(
-                    Icons.sports_mma, loc.rock, 0, Colors.brown.shade700),
-                const SizedBox(width: 16),
-                _buildOptionButton(
-                    Icons.article, loc.paper, 1, Colors.blue.shade700),
-                const SizedBox(width: 16),
-                _buildOptionButton(
-                    Icons.content_cut, loc.scissors, 2, Colors.red.shade700),
-              ],
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: 200,
-              height: 50,
-              child: FilledButton(
-                onPressed: _generateResult,
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _getIcon(),
+                          size: 80,
+                          color: _getResultColor(),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _getResultText(loc),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: _getResultColor(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Text(loc.generate),
+              );
+            },
+          ),
+          const SizedBox(height: 48),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildOptionButton(
+                  Icons.sports_mma, loc.rock, 0, Colors.brown.shade700),
+              const SizedBox(width: 16),
+              _buildOptionButton(
+                  Icons.article, loc.paper, 1, Colors.blue.shade700),
+              const SizedBox(width: 16),
+              _buildOptionButton(
+                  Icons.content_cut, loc.scissors, 2, Colors.red.shade700),
+            ],
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: 200,
+            height: 50,
+            child: FilledButton(
+              onPressed: _generateResult,
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
               ),
+              child: Text(loc.generate),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.rockPaperScissors),
+        ),
+        body: content,
+      );
+    }
   }
 
   Widget _buildOptionButton(

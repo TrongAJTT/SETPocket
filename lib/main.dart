@@ -141,39 +141,105 @@ class DesktopLayout extends StatefulWidget {
 class _DesktopLayoutState extends State<DesktopLayout> {
   Widget? currentTool;
   String? selectedToolType;
+  String? currentToolTitle;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.title),
+        title: Text(currentToolTitle ?? AppLocalizations.of(context)!.title),
+        leading: currentTool != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    currentTool = null;
+                    selectedToolType = null;
+                    currentToolTitle = null;
+                  });
+                },
+              )
+            : null,
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final totalWidth = constraints.maxWidth;
-          // Sidebar chiếm 1/5, main chiếm 4/5, nhưng sidebar min 250, max 350
-          double sidebarWidth = (totalWidth / 4).clamp(250, 400);
+          // Sidebar chiếm 1/4, main chiếm 3/4, nhưng sidebar min 280, max 380
+          double sidebarWidth = (totalWidth / 4).clamp(280, 380);
+
           return Row(
             children: [
-              SizedBox(
+              // Sidebar với danh sách tools
+              Container(
                 width: sidebarWidth,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
                 child: ToolSelectionScreen(
                   isDesktop: true,
                   selectedToolType: selectedToolType,
-                  onToolSelected: (Widget tool) {
+                  onToolSelected: (Widget tool, String title) {
                     setState(() {
                       currentTool = tool;
                       selectedToolType = tool.runtimeType.toString();
+                      currentToolTitle = title;
                     });
                   },
                 ),
               ),
-              SizedBox(
-                width: totalWidth - sidebarWidth,
-                child: currentTool ??
-                    Center(
-                      child: Text(AppLocalizations.of(context)!.selectTool),
-                    ),
+              // Main content area
+              Expanded(
+                child: currentTool != null
+                    ? ClipRect(
+                        child: currentTool!,
+                      )
+                    : Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.5),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              AppLocalizations.of(context)!.selectTool,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.of(context)!.selectToolDesc,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.5),
+                                  ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ],
           );
@@ -185,7 +251,7 @@ class _DesktopLayoutState extends State<DesktopLayout> {
 
 class ToolSelectionScreen extends StatelessWidget {
   final bool isDesktop;
-  final Function(Widget)? onToolSelected;
+  final Function(Widget, String)? onToolSelected;
   final String? selectedToolType;
 
   const ToolSelectionScreen({
@@ -207,9 +273,13 @@ class ToolSelectionScreen extends StatelessWidget {
           iconColor: Colors.blue.shade800,
           isSelected: selectedToolType == 'TemplateListScreen',
           onTap: () {
-            const tool = TemplateListScreen();
+            final tool = TemplateListScreen(
+              isEmbedded: isDesktop,
+              onToolSelected:
+                  onToolSelected, // Truyền callback để xử lý sub-navigation
+            );
             if (isDesktop) {
-              onToolSelected?.call(tool);
+              onToolSelected?.call(tool, loc.textTemplateGen);
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -226,9 +296,13 @@ class ToolSelectionScreen extends StatelessWidget {
           iconColor: Colors.purple,
           isSelected: selectedToolType == 'RandomToolsScreen',
           onTap: () {
-            const tool = RandomToolsScreen();
+            final tool = RandomToolsScreen(
+              isEmbedded: isDesktop,
+              onToolSelected:
+                  onToolSelected, // Truyền callback để xử lý sub-navigation
+            );
             if (isDesktop) {
-              onToolSelected?.call(tool);
+              onToolSelected?.call(tool, loc.random);
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -246,9 +320,9 @@ class ToolSelectionScreen extends StatelessWidget {
           iconColor: Colors.grey,
           isSelected: selectedToolType == 'MainSettingsScreen',
           onTap: () {
-            const tool = MainSettingsScreen();
+            final tool = MainSettingsScreen(isEmbedded: isDesktop);
             if (isDesktop) {
-              onToolSelected?.call(tool);
+              onToolSelected?.call(tool, loc.settings);
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(

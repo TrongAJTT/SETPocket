@@ -4,7 +4,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class ColorGeneratorScreen extends StatefulWidget {
-  const ColorGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const ColorGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<ColorGeneratorScreen> createState() => _ColorGeneratorScreenState();
@@ -74,139 +76,145 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.colorGenerator),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Color display - Fixed height instead of flex
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.4,
-            child: AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) {
-                return Container(
-                  color: _generatedColor,
-                  child: Center(
-                    child: Transform.scale(
-                      scale: 0.7 + (_animation.value * 0.3),
-                      child: Text(
-                        _getHexColor(),
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: _isColorDark(_generatedColor)
-                              ? Colors.white
-                              : Colors.black,
-                          shadows: [
-                            Shadow(
-                              color: _isColorDark(_generatedColor)
-                                  ? Colors.black38
-                                  : Colors.white38,
-                              blurRadius: 2,
-                              offset: const Offset(1, 1),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Controls - Scrollable to prevent overflow
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Format selection
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile<bool>(
-                              title: Text(loc.hex6),
-                              value: false,
-                              groupValue: _withAlpha,
-                              onChanged: (value) {
-                                setState(() {
-                                  _withAlpha = value ?? false;
-                                  _generateColor();
-                                });
-                              },
-                              dense: true,
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile<bool>(
-                              title: Text(loc.hex8),
-                              value: true,
-                              groupValue: _withAlpha,
-                              onChanged: (value) {
-                                setState(() {
-                                  _withAlpha = value ?? true;
-                                  _generateColor();
-                                });
-                              },
-                              dense: true,
-                            ),
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Color display - Fixed height instead of flex
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.4,
+          child: AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return Container(
+                color: _generatedColor,
+                child: Center(
+                  child: Transform.scale(
+                    scale: 0.7 + (_animation.value * 0.3),
+                    child: Text(
+                      _getHexColor(),
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: _isColorDark(_generatedColor)
+                            ? Colors.white
+                            : Colors.black,
+                        shadows: [
+                          Shadow(
+                            color: _isColorDark(_generatedColor)
+                                ? Colors.black38
+                                : Colors.white38,
+                            blurRadius: 2,
+                            offset: const Offset(1, 1),
                           ),
                         ],
                       ),
                     ),
                   ),
+                ),
+              );
+            },
+          ),
+        ),
 
-                  const SizedBox(height: 16),
-
-                  // Color info
-                  Text(
-                    loc.generatedColor,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildColorInfoCard(
-                          'HEX',
-                          _getHexColor(),
-                          onTap: () => _copyToClipboard(_getHexColor()),
+        // Controls - Scrollable to prevent overflow
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Format selection
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<bool>(
+                            title: Text(loc.hex6),
+                            value: false,
+                            groupValue: _withAlpha,
+                            onChanged: (value) {
+                              setState(() {
+                                _withAlpha = value ?? false;
+                                _generateColor();
+                              });
+                            },
+                            dense: true,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildColorInfoCard(
-                          'RGB',
-                          _getRgbColor(),
-                          onTap: () => _copyToClipboard(_getRgbColor()),
+                        Expanded(
+                          child: RadioListTile<bool>(
+                            title: Text(loc.hex8),
+                            value: true,
+                            groupValue: _withAlpha,
+                            onChanged: (value) {
+                              setState(() {
+                                _withAlpha = value ?? true;
+                                _generateColor();
+                              });
+                            },
+                            dense: true,
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Color info
+                Text(
+                  loc.generatedColor,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildColorInfoCard(
+                        'HEX',
+                        _getHexColor(),
+                        onTap: () => _copyToClipboard(_getHexColor()),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildColorInfoCard(
+                        'RGB',
+                        _getRgbColor(),
+                        onTap: () => _copyToClipboard(_getRgbColor()),
+                      ),
+                    ),
+                  ],
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                  // Generate button
-                  FilledButton.icon(
-                    onPressed: _generateColor,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(loc.generate),
-                  ),
-                ],
-              ),
+                // Generate button
+                FilledButton.icon(
+                  onPressed: _generateColor,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(loc.generate),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
+
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.colorGenerator),
+        ),
+        body: content,
+      );
+    }
   }
 
   Widget _buildColorInfoCard(String title, String value,

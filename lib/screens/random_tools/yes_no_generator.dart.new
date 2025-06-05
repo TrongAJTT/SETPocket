@@ -4,7 +4,7 @@ import 'package:my_multi_tools/models/random_generator.dart';
 
 class YesNoGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
-
+  
   const YesNoGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
@@ -125,10 +125,10 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
         ],
       ),
     );
-
+    
     // Return either the content directly (if embedded) or wrapped in a Scaffold
     if (widget.isEmbedded) {
-      return content;
+      return content; 
     } else {
       return Scaffold(
         appBar: AppBar(

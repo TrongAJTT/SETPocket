@@ -1,4 +1,5 @@
 {
+    "@@locale": "vi",
     "title": "Nhiều Công Cụ",
     "settings": "Cài đặt",
     "theme": "Giao diện",
@@ -16,9 +17,9 @@
     "save": "Lưu",
     "edit": "Chỉnh sửa",
     "copy": "Sao chép",
-    "cancel": "Hủy",
-    "total": "Tổng cộng",
+    "cancel": "Hủy",    "total": "Tổng cộng",
     "selectTool": "Chọn một chức năng ở thanh bên",
+    "selectToolDesc": "Chọn một công cụ từ thanh bên trái để bắt đầu",
     "settingsDesc": "Cá nhân hóa trải nghiệm sử dụng ứng dụng",
       "random": "Trình tạo ngẫu nhiên",
     "randomDesc": "Tạo mật khẩu, số, ngày và nhiều thứ ngẫu nhiên khác",

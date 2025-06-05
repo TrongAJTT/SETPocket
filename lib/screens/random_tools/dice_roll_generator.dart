@@ -4,7 +4,9 @@ import 'package:my_multi_tools/models/random_generator.dart';
 import 'dart:math' as math;
 
 class DiceRollGeneratorScreen extends StatefulWidget {
-  const DiceRollGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const DiceRollGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<DiceRollGeneratorScreen> createState() =>
@@ -77,159 +79,164 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.rollDice),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Dice count selector
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          loc.diceCount,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          '$_diceCount',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: _diceCount.toDouble(),
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      label: _diceCount.toString(),
-                      onChanged: (double value) {
-                        setState(() {
-                          _diceCount = value.round();
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Dice sides selector
-                    Text(
-                      loc.diceSides,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Wrap with dice side options
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _availableSides.map((sides) {
-                        return ChoiceChip(
-                          label: Text('d$sides'),
-                          selected: _diceSides == sides,
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() {
-                                _diceSides = sides;
-                              });
-                            }
-                          },
-                        );
-                      }).toList(),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Roll button
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _rollDice,
-                        icon: const Icon(Icons.casino),
-                        label: Text(loc.generate),
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Dice count selector
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        loc.diceCount,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
+                      Text(
+                        '$_diceCount',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: _diceCount.toDouble(),
+                    min: 1,
+                    max: 10,
+                    divisions: 9,
+                    label: _diceCount.toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        _diceCount = value.round();
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Dice sides selector
+                  Text(
+                    loc.diceSides,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Wrap with dice side options
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _availableSides.map((sides) {
+                      return ChoiceChip(
+                        label: Text('d$sides'),
+                        selected: _diceSides == sides,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _diceSides = sides;
+                            });
+                          }
+                        },
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Roll button
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _rollDice,
+                      icon: const Icon(Icons.casino),
+                      label: Text(loc.generate),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            if (_results.isNotEmpty) ...[
-              AnimatedBuilder(
-                animation: _rollAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_rollAnimation.value * 0.1),
-                    child: child,
-                  );
-                },
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        // Result heading
-                        Text(
-                          loc.randomResult,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 24),
+          if (_results.isNotEmpty) ...[
+            AnimatedBuilder(
+              animation: _rollAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1.0 + (_rollAnimation.value * 0.1),
+                  child: child,
+                );
+              },
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // Result heading
+                      Text(
+                        loc.randomResult,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 16),
 
-                        // Dice display
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          alignment: WrapAlignment.center,
-                          children: _results.map((result) {
-                            return _buildDie(result);
-                          }).toList(),
+                      // Dice display
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        alignment: WrapAlignment.center,
+                        children: _results.map((result) {
+                          return _buildDie(result);
+                        }).toList(),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Total
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
                         ),
-
-                        const SizedBox(height: 16),
-
-                        // Total
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            'Total: ${_getTotal()}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Text(
+                          'Total: ${_getTotal()}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
+
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.rollDice),
+        ),
+        body: content,
+      );
+    }
   }
 
   Widget _buildDie(int value) {

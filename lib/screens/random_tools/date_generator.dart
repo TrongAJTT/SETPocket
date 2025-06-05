@@ -5,7 +5,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class DateGeneratorScreen extends StatefulWidget {
-  const DateGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const DateGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<DateGeneratorScreen> createState() => _DateGeneratorScreenState();
@@ -244,120 +246,124 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final dateFormat = DateFormat('yyyy-MM-dd');
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.dateGenerator),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Configuration card
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Configuration card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Date selectors (responsive layout)
+                  _buildDateSelectors(loc),
+
+                  const SizedBox(height: 16),
+
+                  // Count slider and Other section (responsive layout)
+                  MediaQuery.of(context).size.width > 600
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 3, child: _buildCountSlider(loc)),
+                            const SizedBox(width: 32),
+                            Expanded(flex: 2, child: _buildOtherSection(loc)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _buildCountSlider(loc),
+                            const SizedBox(height: 16),
+                            _buildOtherSection(loc),
+                          ],
+                        ),
+
+                  const SizedBox(height: 16),
+
+                  // Generate button
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _generateDates,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(loc.generate),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Results
+          if (_generatedDates.isNotEmpty) ...[
+            Text(
+              loc.randomResult,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Date selectors (responsive layout)
-                    _buildDateSelectors(loc),
-
-                    const SizedBox(height: 16),
-
-                    // Count slider and Other section (responsive layout)
-                    MediaQuery.of(context).size.width > 600
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(flex: 3, child: _buildCountSlider(loc)),
-                              const SizedBox(width: 32),
-                              Expanded(flex: 2, child: _buildOtherSection(loc)),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              _buildCountSlider(loc),
-                              const SizedBox(height: 16),
-                              _buildOtherSection(loc),
-                            ],
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _generatedDates.length,
+                      separatorBuilder: (context, index) => const Divider(),
+                      itemBuilder: (context, index) {
+                        final date = _generatedDates[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            child: Text('${index + 1}'),
                           ),
-
+                          title: Text(
+                            dateFormat.format(date),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            DateFormat('EEEE').format(date),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary),
+                          ),
+                          trailing: Text(
+                            DateFormat.yMMMMd().format(date),
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 16),
-
-                    // Generate button
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _generateDates,
-                        icon: const Icon(Icons.refresh),
-                        label: Text(loc.generate),
-                      ),
+                    OutlinedButton.icon(
+                      onPressed: _copyToClipboard,
+                      icon: Icon(_copied ? Icons.check : Icons.copy),
+                      label: Text(_copied ? loc.copied : loc.copyToClipboard),
                     ),
                   ],
                 ),
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            // Results
-            if (_generatedDates.isNotEmpty) ...[
-              Text(
-                loc.randomResult,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _generatedDates.length,
-                        separatorBuilder: (context, index) => const Divider(),
-                        itemBuilder: (context, index) {
-                          final date = _generatedDates[index];
-                          return ListTile(
-                            leading: CircleAvatar(
-                              child: Text('${index + 1}'),
-                            ),
-                            title: Text(
-                              dateFormat.format(date),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              DateFormat('EEEE').format(date),
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
-                            ),
-                            trailing: Text(
-                              DateFormat.yMMMMd().format(date),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: _copyToClipboard,
-                        icon: Icon(_copied ? Icons.check : Icons.copy),
-                        label: Text(_copied ? loc.copied : loc.copyToClipboard),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
+
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.dateGenerator),
+        ),
+        body: content,
+      );
+    }
   }
 }

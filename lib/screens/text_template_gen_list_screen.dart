@@ -12,7 +12,12 @@ import 'text_template_gen_edit_screen.dart';
 import 'text_template_gen_use_screen.dart';
 
 class TemplateListScreen extends StatefulWidget {
-  const TemplateListScreen({super.key});
+  final bool isEmbedded;
+  final Function(Widget, String)?
+      onToolSelected; // Callback để chuyển tool trong desktop mode
+
+  const TemplateListScreen(
+      {super.key, this.isEmbedded = false, this.onToolSelected});
 
   @override
   State<TemplateListScreen> createState() => _TemplateListScreenState();
@@ -53,9 +58,103 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     }
   }
 
+  bool get _isEmbeddedInDesktop {
+    // Check if this screen is embedded (no AppBar needed)
+    return widget.isEmbedded ||
+        (context.findAncestorWidgetOfExactType<Scaffold>()?.appBar != null &&
+            MediaQuery.of(context).size.width >= 600);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (_isEmbeddedInDesktop) {
+      // Desktop embedded view - no AppBar, just the content
+      return Column(
+        children: [
+          // Header with actions
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _isSelectionMode
+                        ? l10n.selectedTemplates(_selectedTemplateIds.length)
+                        : l10n.textTemplatesTitle,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                if (_isSelectionMode) ...[
+                  if (_selectedTemplateIds.length < _templates.length)
+                    TextButton(
+                      onPressed: _selectAll,
+                      child: Text(l10n.selectAll),
+                    ),
+                  if (_selectedTemplateIds.isNotEmpty)
+                    TextButton(
+                      onPressed: _deselectAll,
+                      child: Text(l10n.deselectAll),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: _exitSelectionMode,
+                  ),
+                ] else ...[
+                  IconButton(
+                    icon: const Icon(Icons.info_outline),
+                    tooltip: l10n.help,
+                    onPressed: () {
+                      _showHelpDialog();
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
+          // Main content
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _templates.isEmpty
+                    ? _buildEmptyState(l10n)
+                    : _buildTemplateList(l10n),
+          ),
+          // FAB replacement for desktop
+          if (!_isSelectionMode)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => _showAddTemplateOptions(l10n),
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.addNewTemplate),
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+
+    // Mobile view - normal Scaffold with AppBar
     return Scaffold(
       appBar: AppBar(
         title: _isSelectionMode
@@ -99,7 +198,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           ? null
           : FloatingActionButton(
               onPressed: () => _showAddTemplateOptions(l10n),
-              tooltip: l10n.addNewTemplate,
               child: const Icon(Icons.add),
             ),
       bottomNavigationBar: _isSelectionMode && _selectedTemplateIds.isNotEmpty
@@ -267,14 +365,20 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   }
 
   Future<void> _navigateToUseTemplate(Template template) async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TemplateUseScreen(
-          template: template,
+    final useScreen = TemplateUseScreen(template: template);
+
+    if (widget.isEmbedded && widget.onToolSelected != null) {
+      // Desktop mode: callback để hiển thị trong main widget
+      widget.onToolSelected!(useScreen, 'Generate Document: ${template.title}');
+    } else {
+      // Mobile mode: navigation bình thường
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => useScreen,
         ),
-      ),
-    );
+      );
+    }
   }
 
   void _confirmDeleteTemplate(Template template, AppLocalizations l10n) {

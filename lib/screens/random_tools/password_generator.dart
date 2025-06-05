@@ -4,7 +4,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class PasswordGeneratorScreen extends StatefulWidget {
-  const PasswordGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const PasswordGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<PasswordGeneratorScreen> createState() =>
@@ -164,101 +166,108 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.passwordGenerator),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        loc.numCharacters,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Text(
+                        '$_passwordLength',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: _passwordLength.toDouble(),
+                    min: 4,
+                    max: 32,
+                    divisions: 28,
+                    label: _passwordLength.toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        _passwordLength = value.round();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCheckboxOptions(context, loc),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _generatePassword,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(loc.generate),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          if (_generatedPassword.isNotEmpty) ...[
+            Text(
+              loc.generatedPassword,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          loc.numCharacters,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          '$_passwordLength',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: _passwordLength.toDouble(),
-                      min: 4,
-                      max: 32,
-                      divisions: 28,
-                      label: _passwordLength.toString(),
-                      onChanged: (double value) {
-                        setState(() {
-                          _passwordLength = value.round();
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCheckboxOptions(context, loc),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _generatePassword,
-                        icon: const Icon(Icons.refresh),
-                        label: Text(loc.generate),
+                    SelectableText(
+                      _generatedPassword,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 20,
+                        letterSpacing: 1.2,
                       ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: _copyToClipboard,
+                      icon: Icon(_copied ? Icons.check : Icons.copy),
+                      label: Text(_copied ? loc.copied : loc.copyToClipboard),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            if (_generatedPassword.isNotEmpty) ...[
-              Text(
-                loc.generatedPassword,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SelectableText(
-                        _generatedPassword,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 20,
-                          letterSpacing: 1.2,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: _copyToClipboard,
-                        icon: Icon(_copied ? Icons.check : Icons.copy),
-                        label: Text(_copied ? loc.copied : loc.copyToClipboard),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
+
+    // Return either the content directly (if embedded) or wrapped in a Scaffold
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.passwordGenerator),
+          elevation: 0,
+        ),
+        body: content,
+      );
+    }
   }
 }

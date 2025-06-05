@@ -4,7 +4,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class TimeGeneratorScreen extends StatefulWidget {
-  const TimeGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const TimeGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<TimeGeneratorScreen> createState() => _TimeGeneratorScreenState();
@@ -263,113 +265,119 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.timeGenerator),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Configuration card
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Configuration card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Time selectors (responsive layout)
+                  _buildTimeSelectors(loc),
+
+                  const SizedBox(height: 16),
+
+                  // Count slider and Other section (responsive layout)
+                  MediaQuery.of(context).size.width > 600
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 3, child: _buildCountSlider(loc)),
+                            const SizedBox(width: 32),
+                            Expanded(flex: 2, child: _buildOtherSection(loc)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _buildCountSlider(loc),
+                            const SizedBox(height: 16),
+                            _buildOtherSection(loc),
+                          ],
+                        ),
+
+                  const SizedBox(height: 16),
+
+                  // Generate button
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _generateTimes,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(loc.generate),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Results card
+          if (_generatedTimes.isNotEmpty)
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Time selectors (responsive layout)
-                    _buildTimeSelectors(loc),
-
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          loc.randomResult,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        IconButton(
+                          icon: Icon(_copied ? Icons.check : Icons.copy),
+                          onPressed: _copyToClipboard,
+                          tooltip: loc.copyToClipboard,
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 16),
-
-                    // Count slider and Other section (responsive layout)
-                    MediaQuery.of(context).size.width > 600
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(flex: 3, child: _buildCountSlider(loc)),
-                              const SizedBox(width: 32),
-                              Expanded(flex: 2, child: _buildOtherSection(loc)),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              _buildCountSlider(loc),
-                              const SizedBox(height: 16),
-                              _buildOtherSection(loc),
-                            ],
-                          ),
-
-                    const SizedBox(height: 16),
-
-                    // Generate button
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _generateTimes,
-                        icon: const Icon(Icons.refresh),
-                        label: Text(loc.generate),
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _animationController.value,
+                          child: child,
+                        );
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _generatedTimes.map((time) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Text(
+                              _formatTimeOfDay(time),
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Results card
-            if (_generatedTimes.isNotEmpty)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            loc.randomResult,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          IconButton(
-                            icon: Icon(_copied ? Icons.check : Icons.copy),
-                            onPressed: _copyToClipboard,
-                            tooltip: loc.copyToClipboard,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      AnimatedBuilder(
-                        animation: _animationController,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _animationController.value,
-                            child: child,
-                          );
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _generatedTimes.map((time) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text(
-                                _formatTimeOfDay(time),
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
+
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.timeGenerator),
+        ),
+        body: content,
+      );
+    }
   }
 }

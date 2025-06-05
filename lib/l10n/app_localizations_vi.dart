@@ -105,6 +105,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get selectTool => 'Chọn một chức năng ở thanh bên';
 
   @override
+  String get selectToolDesc => 'Chọn một công cụ từ thanh bên trái để bắt đầu';
+
+  @override
   String get settingsDesc => 'Cá nhân hóa trải nghiệm sử dụng ứng dụng';
 
   @override

@@ -4,7 +4,9 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/random_generator.dart';
 
 class CoinFlipGeneratorScreen extends StatefulWidget {
-  const CoinFlipGeneratorScreen({super.key});
+  final bool isEmbedded;
+
+  const CoinFlipGeneratorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<CoinFlipGeneratorScreen> createState() =>
@@ -96,89 +98,97 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.flipCoin),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: Listenable.merge([_flipAnimation, _scaleAnimation]),
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()
-                      ..setEntry(3, 2, 0.001) // perspective
-                      ..rotateX(_flipAnimation.value),
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        // Different colors for heads and tails
-                        color: _currentSide
-                            ? Colors.amber.shade700 // Heads - golden
-                            : Colors.grey.shade600, // Tails - silver
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          _currentSide ? loc.heads : loc.tails,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+    final content = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedBuilder(
+            animation: Listenable.merge([_flipAnimation, _scaleAnimation]),
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.001) // perspective
+                    ..rotateX(_flipAnimation.value),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      // Different colors for heads and tails
+                      color: _currentSide
+                          ? Colors.amber.shade700 // Heads - golden
+                          : Colors.grey.shade600, // Tails - silver
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        _currentSide ? l10n.heads : l10n.tails,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-            const SizedBox(height: 48),
-            SizedBox(
-              width: 200,
-              height: 50,
-              child: FilledButton.icon(
-                onPressed: _isFlipping ? null : _flipCoin,
-                icon: const Icon(Icons.monetization_on),
-                label: Text(_isFlipping ? loc.flipping : loc.flipCoin),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 48),
+          SizedBox(
+            width: 200,
+            height: 50,
+            child: FilledButton.icon(
+              onPressed: _isFlipping ? null : _flipCoin,
+              icon: const Icon(Icons.monetization_on),
+              label: Text(_isFlipping ? l10n.flipping : l10n.flipCoin),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              _finalResult != null
-                  ? '${loc.randomResult}: ${_finalResult! ? loc.heads : loc.tails}'
-                  : loc.flipCoinInstruction,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: _finalResult != null
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            _finalResult != null
+                ? '${l10n.randomResult}: ${_finalResult! ? l10n.heads : l10n.tails}'
+                : l10n.flipCoinInstruction,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: _finalResult != null
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+
+    // Return either the content directly (if embedded) or wrapped in a Scaffold
+    if (widget.isEmbedded) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.flipCoin),
+          elevation: 0,
+        ),
+        body: content,
+      );
+    }
   }
 }

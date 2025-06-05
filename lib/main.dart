@@ -5,7 +5,6 @@ import 'package:my_multi_tools/widgets/tool_card.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/batch_video_detail_viewer.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
@@ -201,25 +200,6 @@ class ToolSelectionScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        ToolCard(
-          title: loc.batchVideoDetailViewer,
-          description: loc.batchVideoDetailViewerDesc,
-          icon: Icons.video_library,
-          iconColor: Colors.red.shade700,
-          isSelected: selectedToolType == 'BatchVideoDetailViewer',
-          onTap: () {
-            const tool = BatchVideoDetailViewer();
-            if (isDesktop) {
-              onToolSelected?.call(tool);
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => tool,
-                ),
-              );
-            }
-          },
-        ),
         ToolCard(
           title: loc.textTemplateGen,
           description: loc.textTemplateGenDesc,

@@ -114,149 +114,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get randomDesc => 'Generate random passwords, numbers, dates, and more';
 
   @override
-  String get batchVideoDetailViewer => 'Batch Video Detail Viewer';
-
-  @override
-  String get batchVideoDetailViewerDesc => 'View details of multiple videos at once. You can see size, duration, bitrate, resolution, frame rate, and audio info.';
-
-  @override
-  String get addVideos => 'Add Videos';
-
-  @override
-  String get help => 'Help';
-
-  @override
-  String error(Object message) {
-    return 'Error: $message';
-  }
-
-  @override
-  String get dataTab => 'Data';
-
-  @override
-  String get statsTab => 'Stats';
-
-  @override
-  String get dropFilesToAdd => 'Drop files to add them';
-
-  @override
-  String get name => 'Name';
-
-  @override
-  String get ext => 'Ext';
-
-  @override
-  String get createdDate => 'Created Date';
-
-  @override
-  String get sizeMB => 'Size (MB)';
-
-  @override
-  String get duration => 'Duration';
-
-  @override
-  String get totalBitrate => 'Total Bitrate';
-
-  @override
-  String get width => 'Width';
-
-  @override
-  String get height => 'Height';
-
-  @override
-  String get framerate => 'Framerate';
-
-  @override
-  String get audioBitrate => 'Audio Bitrate';
-
-  @override
-  String get audioChannels => 'Audio Channels';
-
-  @override
-  String get noStatsAvailable => 'No statistics available';
-
-  @override
-  String get videoStatsSummary => 'Video Statistics Summary';
-
-  @override
-  String get resolution => 'Resolution';
-
-  @override
-  String get bitrate => 'Bitrate';
-
-  @override
-  String get fileSize => 'File Size';
-
-  @override
-  String get commonResolution => 'Common Resolution';
-
-  @override
-  String get maxResolution => 'Max Resolution';
-
-  @override
-  String get minResolution => 'Min Resolution';
-
-  @override
-  String get averageVideoBitrate => 'Average Video Bitrate';
-
-  @override
-  String get maxVideoBitrate => 'Max Video Bitrate';
-
-  @override
-  String get averageAudioBitrate => 'Average Audio Bitrate';
-
-  @override
-  String get commonAudioChannels => 'Common Audio Channels';
-
-  @override
-  String get averageSize => 'Average Size';
-
-  @override
-  String get largest => 'Largest';
-
-  @override
-  String get smallest => 'Smallest';
-
-  @override
-  String get commonFramerate => 'Common Framerate';
-
-  @override
-  String get averageFramerate => 'Average Framerate';
-
-  @override
-  String get dropVideosHere => 'Drop videos here';
-
-  @override
-  String get noVideosSelected => 'No videos selected';
-
-  @override
-  String get tapAddVideos => 'Tap the + button to add videos';
-
-  @override
-  String get dragDropOrAdd => 'Drag and drop video files here or click the + button';
-
-  @override
-  String get features => 'Features:';
-
-  @override
-  String get featureViewMultiple => 'View multiple video files at once';
-
-  @override
-  String get featureSeeTechnical => 'See technical details like bitrate, resolution, etc';
-
-  @override
-  String get featureCompareStats => 'Compare stats across videos';
-
-  @override
-  String get addVideosBy => 'You can add videos by:';
-
-  @override
-  String get clickAddButton => 'Clicking the + button';
-
-  @override
-  String get dragDropFiles => 'Dragging and dropping files';
-
-  @override
   String get textTemplateGen => 'Text Template Generator';
 
   @override
@@ -390,6 +247,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String errorDeletingTemplate(Object error) {
     return 'Error deleting template: $error';
   }
+
+  @override
+  String get help => 'Help';
 
   @override
   String get usageGuide => 'Usage Guide';

@@ -11,23 +11,7 @@ Giao diện đơn giản như sau:
 
 # Các chức năng:
 
-## 1. Xem thông tin của hàng loạt video.
-    - Chọn một hoặc nhiều video, màn hình sẽ hiển thị bảng thông tin với các thông tin tương ứng của video:
-        + Tên video.
-        + Tiện ích (phần mở rộng video).
-        + Ngày tạo (dd/MM/yyyy HH:mm).
-        + Kích thước (MB).
-        + Thời lượng (HH:mm:ss).
-        + Bitrate tổng (Kbps).
-        + Chiều cao khung hình (pixel).
-        + Chiều rộng khung hình (pixel).
-        + Tần số khung hình (fps).
-        + Bitrate âm thanh.
-        + Số kênh âm thanh.
-    - Mỗi dòng trong bảng tương ứng với 1 video, mỗi cột ứng với 1 thông số.
-    - Sau khi hiển thị hết thì hiện 4 dòng thống kê min, max, avg và common (thông số hiện nhiều nhất).
-
-## 2. Tạo custom paragraph theo biểu mẫu:
+## 1. Tạo custom paragraph theo biểu mẫu:
     - Chức năng này nhằm giúp soạn văn bản theo một format cố định, chỉ cần điền lại các trường thông tin thay đổi mà thôi.
     - Màn hình chính:
         - Bao gồm list view (builder) liệt kê các template và nút thêm template.
@@ -75,11 +59,10 @@ Giao diện đơn giản như sau:
         - Danh sách các widget dữ liệu được tạo tự động dựa trên các template element, lấy các kiểu dữ liệu tương ứng của widget element ('text', 'largetext', 'number', 'date', 'time', 'datetime') để quyết định các widget được tạo tương ứng. Trên mỗi widget dữ liệu là các dòng chữ tiêu đề (TITLE) để người dùng biết các widget đó đóng vai trò gì. Khi một widget dữ liệu thay đổi thì widget hiển thị văn bản xem trước sẽ được cập nhật tương ứng.
             - Đối với widget 'largetext', cho phép kéo thả để co dãn chiều cao của widget tùy ý.
         - 1 section vòng lặp dữ liệu bao gồm dòng chữ tiêu đề và danh sách section các widget dữ liệu tương ứng trong vòng lặp dữ liệu kèm nút 'Thêm 1 dòng', khi nhấn vào nút thêm 1 dòng thì sẽ thêm 1 section các widget dữ liệu mới trong section vòng lặp dữ liệu tương ứng.
-            - Mỗi section các widget dữ liệu bao gồm danh sách các widget dữ iệu được tạo tự động (theo cơ chế bên trên) và nút 'Xóa dòng này', nếu chỉ còn 1 dòng dữ liệu trong vòng lặp dữ liệu thì nút này sẽ bị ẩn đi. Khi nhấn nút thì hiện dialog xác nhận xóa trước khi xóa.
-        - Khi nhấn vào nút 'Tạo văn bản', hiển thị một dialog bao gồm widget TextField hiển thị nội dung của widget xem trước văn bản để người dùng có thể tùy ý copy và xử lý với dữ liệu đó.
+            - Mỗi section các widget dữ liệu bao gồm danh sách các widget dữ iệu được tạo tự động (theo cơ chế bên trên) và nút 'Xóa dòng này', nếu chỉ còn 1 dòng dữ liệu trong vòng lặp dữ liệu thì nút này sẽ bị ẩn đi. Khi nhấn nút thì hiện dialog xác nhận xóa trước khi xóa.        - Khi nhấn vào nút 'Tạo văn bản', hiển thị một dialog bao gồm widget TextField hiển thị nội dung của widget xem trước văn bản để người dùng có thể tùy ý copy và xử lý với dữ liệu đó.
 
 
-## 3. Random
+## 2. Random
     - Bao gồm hàng loạt chức năng random con với các thành phần và điều kiện như liệt kê sau:
         - Mật khẩu: (Số ký tự, các checkbox chữ thường, chữ hoa, số và ký tự đặc biệt, cần chọn ít nhất 1 checkbox).
         - Số học: (Số nguyên dương hay số thực, random bao nhiêu số, giới hạn min max, cho phép random trùng).

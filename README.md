@@ -5,13 +5,7 @@ Supports both mobile and desktop/tablet layouts with responsive UI.
 
 ## Features
 
-### 1. Batch Video Detail Viewer
-- Select one or more video files to view a detailed table of their properties:
-  - Name, extension, creation date, size (MB), duration, total bitrate, resolution, frame rate, audio bitrate, audio channels.
-- Each row represents a video, each column a property.
-- Includes summary rows for min, max, average, and most common values.
-
-### 2. Text Template Generator
+### 1. Text Template Generator
 - Create and manage reusable text templates with dynamic fields.
 - Features:
   - List, add, edit, and delete templates.

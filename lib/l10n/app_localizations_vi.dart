@@ -114,149 +114,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get randomDesc => 'Tạo mật khẩu, số, ngày và nhiều thứ ngẫu nhiên khác';
 
   @override
-  String get batchVideoDetailViewer => 'Xem chi tiết video hàng loạt';
-
-  @override
-  String get batchVideoDetailViewerDesc => 'Xem thông tin chi tiết của nhiều video cùng lúc. Bạn có thể xem kích thước, thời lượng, bitrate, độ phân giải, tốc độ khung hình và thông tin âm thanh.';
-
-  @override
-  String get addVideos => 'Thêm video';
-
-  @override
-  String get help => 'Trợ giúp';
-
-  @override
-  String error(Object message) {
-    return 'Lỗi: $message';
-  }
-
-  @override
-  String get dataTab => 'Dữ liệu';
-
-  @override
-  String get statsTab => 'Thống kê';
-
-  @override
-  String get dropFilesToAdd => 'Kéo thả file vào đây để thêm';
-
-  @override
-  String get name => 'Tên';
-
-  @override
-  String get ext => 'Phần mở rộng';
-
-  @override
-  String get createdDate => 'Ngày tạo';
-
-  @override
-  String get sizeMB => 'Kích thước (MB)';
-
-  @override
-  String get duration => 'Thời lượng';
-
-  @override
-  String get totalBitrate => 'Tổng bitrate';
-
-  @override
-  String get width => 'Rộng';
-
-  @override
-  String get height => 'Cao';
-
-  @override
-  String get framerate => 'Tốc độ khung hình';
-
-  @override
-  String get audioBitrate => 'Bitrate âm thanh';
-
-  @override
-  String get audioChannels => 'Kênh âm thanh';
-
-  @override
-  String get noStatsAvailable => 'Không có thống kê';
-
-  @override
-  String get videoStatsSummary => 'Tổng quan thống kê video';
-
-  @override
-  String get resolution => 'Độ phân giải';
-
-  @override
-  String get bitrate => 'Bitrate';
-
-  @override
-  String get fileSize => 'Kích thước file';
-
-  @override
-  String get commonResolution => 'Độ phân giải phổ biến';
-
-  @override
-  String get maxResolution => 'Độ phân giải lớn nhất';
-
-  @override
-  String get minResolution => 'Độ phân giải nhỏ nhất';
-
-  @override
-  String get averageVideoBitrate => 'Bitrate video trung bình';
-
-  @override
-  String get maxVideoBitrate => 'Bitrate video lớn nhất';
-
-  @override
-  String get averageAudioBitrate => 'Bitrate âm thanh trung bình';
-
-  @override
-  String get commonAudioChannels => 'Kênh âm thanh phổ biến';
-
-  @override
-  String get averageSize => 'Kích thước trung bình';
-
-  @override
-  String get largest => 'Lớn nhất';
-
-  @override
-  String get smallest => 'Nhỏ nhất';
-
-  @override
-  String get commonFramerate => 'Tốc độ khung hình phổ biến';
-
-  @override
-  String get averageFramerate => 'Tốc độ khung hình trung bình';
-
-  @override
-  String get dropVideosHere => 'Kéo thả video vào đây';
-
-  @override
-  String get noVideosSelected => 'Chưa chọn video nào';
-
-  @override
-  String get tapAddVideos => 'Nhấn nút + để thêm video';
-
-  @override
-  String get dragDropOrAdd => 'Kéo thả video vào đây hoặc nhấn nút +';
-
-  @override
-  String get features => 'Tính năng:';
-
-  @override
-  String get featureViewMultiple => 'Xem nhiều video cùng lúc';
-
-  @override
-  String get featureSeeTechnical => 'Xem thông số kỹ thuật như bitrate, độ phân giải, v.v.';
-
-  @override
-  String get featureCompareStats => 'So sánh thống kê giữa các video';
-
-  @override
-  String get addVideosBy => 'Bạn có thể thêm video bằng cách:';
-
-  @override
-  String get clickAddButton => 'Nhấn nút +';
-
-  @override
-  String get dragDropFiles => 'Kéo thả file';
-
-  @override
   String get textTemplateGen => 'Tạo văn bản theo mẫu';
 
   @override
@@ -390,6 +247,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String errorDeletingTemplate(Object error) {
     return 'Lỗi khi xóa mẫu: $error';
   }
+
+  @override
+  String get help => 'Trợ giúp';
 
   @override
   String get usageGuide => 'Hướng dẫn sử dụng';

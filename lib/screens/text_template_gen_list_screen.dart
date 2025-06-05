@@ -22,7 +22,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   List<Template> _templates = [];
   bool _isLoading = true;
   bool _isSelectionMode = false;
-  Set<String> _selectedTemplateIds = {};
+  final Set<String> _selectedTemplateIds = {};
 
   @override
   void initState() {

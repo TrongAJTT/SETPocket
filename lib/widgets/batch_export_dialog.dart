@@ -30,10 +30,10 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
     for (final template in widget.templates) {
       // Remove .json extension for editing, keep only the filename part
       final fullFilename = _filenames[template.id] ?? '';
-      final filenameWithoutExtension = fullFilename.endsWith('.json') 
+      final filenameWithoutExtension = fullFilename.endsWith('.json')
           ? fullFilename.substring(0, fullFilename.length - 5)
           : fullFilename;
-      
+
       _controllers[template.id] = TextEditingController(
         text: filenameWithoutExtension,
       );
@@ -79,7 +79,8 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
                           l10n.filenameFor(template.title),
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(height: 4),                        TextFormField(
+                        const SizedBox(height: 4),
+                        TextFormField(
                           controller: controller,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
@@ -103,7 +104,8 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancel),
-        ),        FilledButton(
+        ),
+        FilledButton(
           onPressed: () {
             // Update filenames from controllers
             for (final template in widget.templates) {

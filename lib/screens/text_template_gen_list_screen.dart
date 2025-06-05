@@ -121,6 +121,9 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                     ? _buildEmptyState(l10n)
                     : _buildTemplateList(l10n),
           ),
+          // Bottom action bar for desktop selection mode
+          if (_isSelectionMode && _selectedTemplateIds.isNotEmpty)
+            _buildBottomActionBar(l10n),
           // FAB replacement for desktop
           if (!_isSelectionMode)
             Container(

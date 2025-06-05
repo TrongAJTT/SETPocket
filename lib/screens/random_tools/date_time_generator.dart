@@ -217,7 +217,9 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         ),
       ),
     );
-  }  Widget _buildDateTimeSelectors(AppLocalizations loc) {
+  }
+
+  Widget _buildDateTimeSelectors(AppLocalizations loc) {
     final dateFormat = DateFormat('yyyy-MM-dd');
     final timeFormat = DateFormat('HH:mm');
 
@@ -354,7 +356,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
           }
         });
       },
-    );    // Always use vertical layout for Start Date and End Date
+    ); // Always use vertical layout for Start Date and End Date
     return Column(
       children: [
         startSelector,

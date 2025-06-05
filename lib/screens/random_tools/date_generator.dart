@@ -127,6 +127,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
       ],
     );
   }
+
   Widget _buildDateSelectors(AppLocalizations loc) {
     final startDateSelector = _buildDateSelector(
       loc.startDate,
@@ -166,7 +167,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
           });
         }
       },
-    );    // Always use vertical layout for Start Date and End Date
+    ); // Always use vertical layout for Start Date and End Date
     return Column(
       children: [
         startDateSelector,

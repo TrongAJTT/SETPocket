@@ -214,6 +214,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     final minutes = tod.minute.toString().padLeft(2, '0');
     return '$hours:$minutes';
   }
+
   Widget _buildTimeSelectors(AppLocalizations loc) {
     final startTimeSelector = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,7 +298,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
           ),
         ),
       ],
-    );    // Always use vertical layout for Start Time and End Time
+    ); // Always use vertical layout for Start Time and End Time
     return Column(
       children: [
         startTimeSelector,

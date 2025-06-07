@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:my_multi_tools/models/tool_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tool_visibility_service.dart';
 
@@ -11,8 +12,8 @@ import 'package:quick_actions/quick_actions.dart';
 /// or using 3D Touch/Haptic Touch (iOS)
 class QuickActionsService {
   static const String _quickActionsKey = 'quick_actions_enabled';
-  static const int _maxQuickActions =
-      4; // Maximum number of quick actions allowed  /// Initialize quick actions on app startup
+  static const int _maxQuickActions = 4;
+  // Maximum number of quick actions allowed  /// Initialize quick actions on app startup
   static Future<void> initialize() async {
     // Quick actions only supported on Android and iOS
     if (!Platform.isAndroid && !Platform.isIOS) {
@@ -49,15 +50,7 @@ class QuickActionsService {
       // Return tools in the same order as saved, filtered by enabled IDs
       return enabledIds
           .map((id) => allTools.firstWhere((tool) => tool.id == id,
-              orElse: () => const ToolConfig(
-                    id: '',
-                    nameKey: '',
-                    descKey: '',
-                    icon: '',
-                    iconColor: '',
-                    isVisible: false,
-                    order: 0,
-                  )))
+              orElse: () => ToolConfig.empty()))
           .where((tool) => tool.id.isNotEmpty)
           .toList();
     } catch (e) {
@@ -96,26 +89,12 @@ class QuickActionsService {
     final shortcutItems = tools
         .map((tool) => ShortcutItem(
               type: tool.id,
-              localizedTitle: tool.nameKey, // This will need to be localized
-              icon: _getIconForTool(tool),
+              localizedTitle: tool.fixName,
+              icon: tool.quickActionIcon,
             ))
         .toList();
 
     await quickActions.setShortcutItems(shortcutItems);
-  }
-
-  /// Get appropriate icon name for platform quick actions
-  static String _getIconForTool(ToolConfig tool) {
-    // For Android, we need to use drawable resources
-    // TODO: Replace with actual icons after icon files are added
-    switch (tool.id) {
-      case 'textTemplate':
-        return 'ic_shortcut_text_template_todo'; // TODO: rename to ic_shortcut_text_template
-      case 'randomTools':
-        return 'ic_random_generator_todo'; // TODO: rename to ic_random_generator
-      default:
-        return 'ic_shortcut_text_template_todo'; // Default fallback
-    }
   }
 
   /// Set up quick action handler to navigate to specific tools

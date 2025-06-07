@@ -808,4 +808,337 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearAll => 'Clear All';
+
+  @override
+  String get converterTools => 'Converter Tools';
+
+  @override
+  String get converterToolsDesc => 'Convert between different units and systems';
+
+  @override
+  String get calculatorTools => 'Calculator Tools';
+
+  @override
+  String get calculatorToolsDesc => 'Specialized calculators for health, finance, and more';
+
+  @override
+  String get lengthConverter => 'Length Converter';
+
+  @override
+  String get weightConverter => 'Weight Converter';
+
+  @override
+  String get temperatureConverter => 'Temperature Converter';
+
+  @override
+  String get volumeConverter => 'Volume Converter';
+
+  @override
+  String get areaConverter => 'Area Converter';
+
+  @override
+  String get speedConverter => 'Speed Converter';
+
+  @override
+  String get timeConverter => 'Time Converter';
+
+  @override
+  String get dataConverter => 'Data Storage Converter';
+
+  @override
+  String get numberSystemConverter => 'Number System Converter';
+
+  @override
+  String get currencyConverter => 'Currency Converter';
+
+  @override
+  String get tableView => 'Table View';
+
+  @override
+  String get listView => 'List View';
+
+  @override
+  String get customizeUnits => 'Customize Units';
+
+  @override
+  String get visibleUnits => 'Visible Units';
+
+  @override
+  String get selectUnitsToShow => 'Select units to display';
+
+  @override
+  String get enterValue => 'Enter value';
+
+  @override
+  String get conversionResults => 'Conversion Results';
+
+  @override
+  String get meters => 'Meters';
+
+  @override
+  String get kilometers => 'Kilometers';
+
+  @override
+  String get centimeters => 'Centimeters';
+
+  @override
+  String get millimeters => 'Millimeters';
+
+  @override
+  String get inches => 'Inches';
+
+  @override
+  String get feet => 'Feet';
+
+  @override
+  String get yards => 'Yards';
+
+  @override
+  String get miles => 'Miles';
+
+  @override
+  String get grams => 'Grams';
+
+  @override
+  String get kilograms => 'Kilograms';
+
+  @override
+  String get pounds => 'Pounds';
+
+  @override
+  String get ounces => 'Ounces';
+
+  @override
+  String get tons => 'Tons';
+
+  @override
+  String get celsius => 'Celsius';
+
+  @override
+  String get fahrenheit => 'Fahrenheit';
+
+  @override
+  String get kelvin => 'Kelvin';
+
+  @override
+  String get liters => 'Liters';
+
+  @override
+  String get milliliters => 'Milliliters';
+
+  @override
+  String get gallons => 'Gallons';
+
+  @override
+  String get quarts => 'Quarts';
+
+  @override
+  String get pints => 'Pints';
+
+  @override
+  String get cups => 'Cups';
+
+  @override
+  String get squareMeters => 'Square Meters';
+
+  @override
+  String get squareKilometers => 'Square Kilometers';
+
+  @override
+  String get squareFeet => 'Square Feet';
+
+  @override
+  String get squareInches => 'Square Inches';
+
+  @override
+  String get acres => 'Acres';
+
+  @override
+  String get hectares => 'Hectares';
+
+  @override
+  String get metersPerSecond => 'Meters per Second';
+
+  @override
+  String get kilometersPerHour => 'Kilometers per Hour';
+
+  @override
+  String get milesPerHour => 'Miles per Hour';
+
+  @override
+  String get knots => 'Knots';
+
+  @override
+  String get seconds => 'Seconds';
+
+  @override
+  String get minutes => 'Minutes';
+
+  @override
+  String get hours => 'Hours';
+
+  @override
+  String get days => 'Days';
+
+  @override
+  String get weeks => 'Weeks';
+
+  @override
+  String get months => 'Months';
+
+  @override
+  String get years => 'Years';
+
+  @override
+  String get bytes => 'Bytes';
+
+  @override
+  String get kilobytes => 'Kilobytes';
+
+  @override
+  String get megabytes => 'Megabytes';
+
+  @override
+  String get gigabytes => 'Gigabytes';
+
+  @override
+  String get terabytes => 'Terabytes';
+
+  @override
+  String get bits => 'Bits';
+
+  @override
+  String get decimal => 'Decimal';
+
+  @override
+  String get binary => 'Binary';
+
+  @override
+  String get octal => 'Octal';
+
+  @override
+  String get hexadecimal => 'Hexadecimal';
+
+  @override
+  String get usd => 'US Dollar';
+
+  @override
+  String get eur => 'Euro';
+
+  @override
+  String get gbp => 'British Pound';
+
+  @override
+  String get jpy => 'Japanese Yen';
+
+  @override
+  String get cad => 'Canadian Dollar';
+
+  @override
+  String get aud => 'Australian Dollar';
+
+  @override
+  String get vnd => 'Vietnamese Dong';
+
+  @override
+  String get currencyConverterDesc => 'Convert between different currencies';
+
+  @override
+  String get lengthConverterDesc => 'Convert between different units of length';
+
+  @override
+  String get weightConverterDesc => 'Convert between different units of weight';
+
+  @override
+  String get temperatureConverterDesc => 'Convert between different temperature scales';
+
+  @override
+  String get volumeConverterDesc => 'Convert between different units of volume';
+
+  @override
+  String get areaConverterDesc => 'Convert between different units of area';
+
+  @override
+  String get speedConverterDesc => 'Convert between different units of speed';
+
+  @override
+  String get timeConverterDesc => 'Convert between different units of time';
+
+  @override
+  String get dataConverterDesc => 'Convert between different units of data storage';
+
+  @override
+  String get numberSystemConverterDesc => 'Convert between different number systems';
+
+  @override
+  String get fromUnit => 'From Unit';
+
+  @override
+  String get unit => 'Unit';
+
+  @override
+  String get value => 'Value';
+
+  @override
+  String get showAll => 'Show All';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get bmiCalculator => 'BMI Calculator';
+
+  @override
+  String get bmiCalculatorDesc => 'Calculate Body Mass Index and health category';
+
+  @override
+  String get scientificCalculator => 'Scientific Calculator';
+
+  @override
+  String get scientificCalculatorDesc => 'Advanced calculator with trigonometric, logarithmic functions';
+
+  @override
+  String get graphingCalculator => 'Graphing Calculator';
+
+  @override
+  String get graphingCalculatorDesc => 'Plot and visualize mathematical functions';
+
+  @override
+  String get metric => 'Metric';
+
+  @override
+  String get imperial => 'Imperial';
+
+  @override
+  String get enterMeasurements => 'Enter your measurements';
+
+  @override
+  String get heightCm => 'Height (cm)';
+
+  @override
+  String get heightInches => 'Height (inches)';
+
+  @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get weightPounds => 'Weight (pounds)';
+
+  @override
+  String get yourBMI => 'Your BMI';
+
+  @override
+  String get bmiScale => 'BMI Scale';
+
+  @override
+  String get underweight => 'Underweight';
+
+  @override
+  String get normalWeight => 'Normal Weight';
+
+  @override
+  String get overweight => 'Overweight';
+
+  @override
+  String get obese => 'Obese';
 }

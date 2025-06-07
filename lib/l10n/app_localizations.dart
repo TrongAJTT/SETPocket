@@ -1564,6 +1564,672 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear All'**
   String get clearAll;
+
+  /// No description provided for @converterTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Converter Tools'**
+  String get converterTools;
+
+  /// No description provided for @converterToolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units and systems'**
+  String get converterToolsDesc;
+
+  /// No description provided for @calculatorTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator Tools'**
+  String get calculatorTools;
+
+  /// No description provided for @calculatorToolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized calculators for health, finance, and more'**
+  String get calculatorToolsDesc;
+
+  /// No description provided for @lengthConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Length Converter'**
+  String get lengthConverter;
+
+  /// No description provided for @weightConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Converter'**
+  String get weightConverter;
+
+  /// No description provided for @temperatureConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Converter'**
+  String get temperatureConverter;
+
+  /// No description provided for @volumeConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume Converter'**
+  String get volumeConverter;
+
+  /// No description provided for @areaConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Area Converter'**
+  String get areaConverter;
+
+  /// No description provided for @speedConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Converter'**
+  String get speedConverter;
+
+  /// No description provided for @timeConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Converter'**
+  String get timeConverter;
+
+  /// No description provided for @dataConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Storage Converter'**
+  String get dataConverter;
+
+  /// No description provided for @numberSystemConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Number System Converter'**
+  String get numberSystemConverter;
+
+  /// No description provided for @currencyConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Converter'**
+  String get currencyConverter;
+
+  /// No description provided for @tableView.
+  ///
+  /// In en, this message translates to:
+  /// **'Table View'**
+  String get tableView;
+
+  /// No description provided for @listView.
+  ///
+  /// In en, this message translates to:
+  /// **'List View'**
+  String get listView;
+
+  /// No description provided for @customizeUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Units'**
+  String get customizeUnits;
+
+  /// No description provided for @visibleUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible Units'**
+  String get visibleUnits;
+
+  /// No description provided for @selectUnitsToShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Select units to display'**
+  String get selectUnitsToShow;
+
+  /// No description provided for @enterValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter value'**
+  String get enterValue;
+
+  /// No description provided for @conversionResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion Results'**
+  String get conversionResults;
+
+  /// No description provided for @meters.
+  ///
+  /// In en, this message translates to:
+  /// **'Meters'**
+  String get meters;
+
+  /// No description provided for @kilometers.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilometers'**
+  String get kilometers;
+
+  /// No description provided for @centimeters.
+  ///
+  /// In en, this message translates to:
+  /// **'Centimeters'**
+  String get centimeters;
+
+  /// No description provided for @millimeters.
+  ///
+  /// In en, this message translates to:
+  /// **'Millimeters'**
+  String get millimeters;
+
+  /// No description provided for @inches.
+  ///
+  /// In en, this message translates to:
+  /// **'Inches'**
+  String get inches;
+
+  /// No description provided for @feet.
+  ///
+  /// In en, this message translates to:
+  /// **'Feet'**
+  String get feet;
+
+  /// No description provided for @yards.
+  ///
+  /// In en, this message translates to:
+  /// **'Yards'**
+  String get yards;
+
+  /// No description provided for @miles.
+  ///
+  /// In en, this message translates to:
+  /// **'Miles'**
+  String get miles;
+
+  /// No description provided for @grams.
+  ///
+  /// In en, this message translates to:
+  /// **'Grams'**
+  String get grams;
+
+  /// No description provided for @kilograms.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilograms'**
+  String get kilograms;
+
+  /// No description provided for @pounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Pounds'**
+  String get pounds;
+
+  /// No description provided for @ounces.
+  ///
+  /// In en, this message translates to:
+  /// **'Ounces'**
+  String get ounces;
+
+  /// No description provided for @tons.
+  ///
+  /// In en, this message translates to:
+  /// **'Tons'**
+  String get tons;
+
+  /// No description provided for @celsius.
+  ///
+  /// In en, this message translates to:
+  /// **'Celsius'**
+  String get celsius;
+
+  /// No description provided for @fahrenheit.
+  ///
+  /// In en, this message translates to:
+  /// **'Fahrenheit'**
+  String get fahrenheit;
+
+  /// No description provided for @kelvin.
+  ///
+  /// In en, this message translates to:
+  /// **'Kelvin'**
+  String get kelvin;
+
+  /// No description provided for @liters.
+  ///
+  /// In en, this message translates to:
+  /// **'Liters'**
+  String get liters;
+
+  /// No description provided for @milliliters.
+  ///
+  /// In en, this message translates to:
+  /// **'Milliliters'**
+  String get milliliters;
+
+  /// No description provided for @gallons.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallons'**
+  String get gallons;
+
+  /// No description provided for @quarts.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarts'**
+  String get quarts;
+
+  /// No description provided for @pints.
+  ///
+  /// In en, this message translates to:
+  /// **'Pints'**
+  String get pints;
+
+  /// No description provided for @cups.
+  ///
+  /// In en, this message translates to:
+  /// **'Cups'**
+  String get cups;
+
+  /// No description provided for @squareMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'Square Meters'**
+  String get squareMeters;
+
+  /// No description provided for @squareKilometers.
+  ///
+  /// In en, this message translates to:
+  /// **'Square Kilometers'**
+  String get squareKilometers;
+
+  /// No description provided for @squareFeet.
+  ///
+  /// In en, this message translates to:
+  /// **'Square Feet'**
+  String get squareFeet;
+
+  /// No description provided for @squareInches.
+  ///
+  /// In en, this message translates to:
+  /// **'Square Inches'**
+  String get squareInches;
+
+  /// No description provided for @acres.
+  ///
+  /// In en, this message translates to:
+  /// **'Acres'**
+  String get acres;
+
+  /// No description provided for @hectares.
+  ///
+  /// In en, this message translates to:
+  /// **'Hectares'**
+  String get hectares;
+
+  /// No description provided for @metersPerSecond.
+  ///
+  /// In en, this message translates to:
+  /// **'Meters per Second'**
+  String get metersPerSecond;
+
+  /// No description provided for @kilometersPerHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilometers per Hour'**
+  String get kilometersPerHour;
+
+  /// No description provided for @milesPerHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Miles per Hour'**
+  String get milesPerHour;
+
+  /// No description provided for @knots.
+  ///
+  /// In en, this message translates to:
+  /// **'Knots'**
+  String get knots;
+
+  /// No description provided for @seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Seconds'**
+  String get seconds;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get minutes;
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours'**
+  String get hours;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get days;
+
+  /// No description provided for @weeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get weeks;
+
+  /// No description provided for @months.
+  ///
+  /// In en, this message translates to:
+  /// **'Months'**
+  String get months;
+
+  /// No description provided for @years.
+  ///
+  /// In en, this message translates to:
+  /// **'Years'**
+  String get years;
+
+  /// No description provided for @bytes.
+  ///
+  /// In en, this message translates to:
+  /// **'Bytes'**
+  String get bytes;
+
+  /// No description provided for @kilobytes.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilobytes'**
+  String get kilobytes;
+
+  /// No description provided for @megabytes.
+  ///
+  /// In en, this message translates to:
+  /// **'Megabytes'**
+  String get megabytes;
+
+  /// No description provided for @gigabytes.
+  ///
+  /// In en, this message translates to:
+  /// **'Gigabytes'**
+  String get gigabytes;
+
+  /// No description provided for @terabytes.
+  ///
+  /// In en, this message translates to:
+  /// **'Terabytes'**
+  String get terabytes;
+
+  /// No description provided for @bits.
+  ///
+  /// In en, this message translates to:
+  /// **'Bits'**
+  String get bits;
+
+  /// No description provided for @decimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Decimal'**
+  String get decimal;
+
+  /// No description provided for @binary.
+  ///
+  /// In en, this message translates to:
+  /// **'Binary'**
+  String get binary;
+
+  /// No description provided for @octal.
+  ///
+  /// In en, this message translates to:
+  /// **'Octal'**
+  String get octal;
+
+  /// No description provided for @hexadecimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Hexadecimal'**
+  String get hexadecimal;
+
+  /// No description provided for @usd.
+  ///
+  /// In en, this message translates to:
+  /// **'US Dollar'**
+  String get usd;
+
+  /// No description provided for @eur.
+  ///
+  /// In en, this message translates to:
+  /// **'Euro'**
+  String get eur;
+
+  /// No description provided for @gbp.
+  ///
+  /// In en, this message translates to:
+  /// **'British Pound'**
+  String get gbp;
+
+  /// No description provided for @jpy.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese Yen'**
+  String get jpy;
+
+  /// No description provided for @cad.
+  ///
+  /// In en, this message translates to:
+  /// **'Canadian Dollar'**
+  String get cad;
+
+  /// No description provided for @aud.
+  ///
+  /// In en, this message translates to:
+  /// **'Australian Dollar'**
+  String get aud;
+
+  /// No description provided for @vnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese Dong'**
+  String get vnd;
+
+  /// No description provided for @currencyConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different currencies'**
+  String get currencyConverterDesc;
+
+  /// No description provided for @lengthConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of length'**
+  String get lengthConverterDesc;
+
+  /// No description provided for @weightConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of weight'**
+  String get weightConverterDesc;
+
+  /// No description provided for @temperatureConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different temperature scales'**
+  String get temperatureConverterDesc;
+
+  /// No description provided for @volumeConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of volume'**
+  String get volumeConverterDesc;
+
+  /// No description provided for @areaConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of area'**
+  String get areaConverterDesc;
+
+  /// No description provided for @speedConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of speed'**
+  String get speedConverterDesc;
+
+  /// No description provided for @timeConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of time'**
+  String get timeConverterDesc;
+
+  /// No description provided for @dataConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different units of data storage'**
+  String get dataConverterDesc;
+
+  /// No description provided for @numberSystemConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different number systems'**
+  String get numberSystemConverterDesc;
+
+  /// No description provided for @fromUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'From Unit'**
+  String get fromUnit;
+
+  /// No description provided for @unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get unit;
+
+  /// No description provided for @value.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get value;
+
+  /// No description provided for @showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show All'**
+  String get showAll;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// No description provided for @bmiCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI Calculator'**
+  String get bmiCalculator;
+
+  /// No description provided for @bmiCalculatorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Body Mass Index and health category'**
+  String get bmiCalculatorDesc;
+
+  /// No description provided for @scientificCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific Calculator'**
+  String get scientificCalculator;
+
+  /// No description provided for @scientificCalculatorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced calculator with trigonometric, logarithmic functions'**
+  String get scientificCalculatorDesc;
+
+  /// No description provided for @graphingCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Graphing Calculator'**
+  String get graphingCalculator;
+
+  /// No description provided for @graphingCalculatorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Plot and visualize mathematical functions'**
+  String get graphingCalculatorDesc;
+
+  /// No description provided for @metric.
+  ///
+  /// In en, this message translates to:
+  /// **'Metric'**
+  String get metric;
+
+  /// No description provided for @imperial.
+  ///
+  /// In en, this message translates to:
+  /// **'Imperial'**
+  String get imperial;
+
+  /// No description provided for @enterMeasurements.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your measurements'**
+  String get enterMeasurements;
+
+  /// No description provided for @heightCm.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get heightCm;
+
+  /// No description provided for @heightInches.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (inches)'**
+  String get heightInches;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// No description provided for @weightPounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (pounds)'**
+  String get weightPounds;
+
+  /// No description provided for @yourBMI.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI'**
+  String get yourBMI;
+
+  /// No description provided for @bmiScale.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI Scale'**
+  String get bmiScale;
+
+  /// No description provided for @underweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Underweight'**
+  String get underweight;
+
+  /// No description provided for @normalWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Weight'**
+  String get normalWeight;
+
+  /// No description provided for @overweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Overweight'**
+  String get overweight;
+
+  /// No description provided for @obese.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese'**
+  String get obese;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

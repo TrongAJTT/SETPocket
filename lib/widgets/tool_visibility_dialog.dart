@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:my_multi_tools/models/tool_config.dart';
 import 'package:my_multi_tools/services/tool_visibility_service.dart';
 
 class ToolVisibilityDialog extends StatefulWidget {
@@ -81,40 +82,6 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
       _tools.insert(newIndex, item);
       _hasChanges = true;
     });
-  }
-
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'description':
-        return Icons.description;
-      case 'casino':
-        return Icons.casino;
-      default:
-        return Icons.extension;
-    }
-  }
-
-  Color _getIconColor(String colorName) {
-    switch (colorName) {
-      case 'blue800':
-        return const Color.fromARGB(255, 21, 101, 192);
-      case 'purple':
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getLocalizedName(BuildContext context, String nameKey) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (nameKey) {
-      case 'textTemplateGen':
-        return l10n.textTemplateGen;
-      case 'random':
-        return l10n.random;
-      default:
-        return nameKey;
-    }
   }
 
   bool _hasVisibleTools() {
@@ -365,19 +332,18 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                                     radius: isDesktop
                                         ? 20
                                         : 18, // Smaller avatar on mobile
-                                    backgroundColor:
-                                        _getIconColor(tool.iconColor)
-                                            .withValues(alpha: 0.1),
+                                    backgroundColor: tool.iconColorData
+                                        .withValues(alpha: 0.1),
                                     child: Icon(
-                                      _getIconData(tool.icon),
-                                      color: _getIconColor(tool.iconColor),
+                                      tool.iconData,
+                                      color: tool.iconColorData,
                                       size: isDesktop
                                           ? 20
                                           : 18, // Smaller icon on mobile
                                     ),
                                   ),
                                   title: Text(
-                                    _getLocalizedName(context, tool.nameKey),
+                                    tool.getLocalizedName(context),
                                     style:
                                         theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,

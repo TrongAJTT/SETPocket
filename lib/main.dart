@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:my_multi_tools/models/tool_config.dart';
 import 'package:my_multi_tools/widgets/tool_card.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
@@ -10,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
+import 'screens/converter_tools_screen.dart';
+import 'screens/calculator_tools_screen.dart';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -63,6 +66,10 @@ Widget _getToolScreen(ToolConfig tool) {
       return const TemplateListScreen();
     case 'randomTools':
       return const RandomToolsScreen();
+    case 'converterTools':
+      return const ConverterToolsScreen();
+    case 'calculatorTools':
+      return const CalculatorToolsScreen();
     default:
       return const HomePage(); // Fallback to home
   }
@@ -363,6 +370,13 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
           isEmbedded: widget.isDesktop,
           onToolSelected: widget.onToolSelected,
         );
+      case 'converterTools':
+        return ConverterToolsScreen(
+          isEmbedded: widget.isDesktop,
+          onToolSelected: widget.onToolSelected,
+        );
+      case 'calculatorTools':
+        return const CalculatorToolsScreen();
       default:
         return const SizedBox.shrink();
     }
@@ -374,6 +388,10 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return Icons.description;
       case 'casino':
         return Icons.casino;
+      case 'swap_horiz':
+        return Icons.swap_horiz;
+      case 'calculate':
+        return Icons.calculate;
       default:
         return Icons.extension;
     }
@@ -385,6 +403,10 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return Colors.blue.shade800;
       case 'purple':
         return Colors.purple;
+      case 'green':
+        return Colors.green;
+      case 'orange':
+        return Colors.orange;
       default:
         return Colors.grey;
     }
@@ -397,6 +419,10 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return l10n.textTemplateGen;
       case 'random':
         return l10n.random;
+      case 'converterTools':
+        return l10n.converterTools;
+      case 'calculatorTools':
+        return l10n.calculatorTools;
       default:
         return nameKey;
     }
@@ -409,6 +435,10 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return l10n.textTemplateGenDesc;
       case 'randomDesc':
         return l10n.randomDesc;
+      case 'converterToolsDesc':
+        return l10n.converterToolsDesc;
+      case 'calculatorToolsDesc':
+        return l10n.calculatorToolsDesc;
       default:
         return descKey;
     }

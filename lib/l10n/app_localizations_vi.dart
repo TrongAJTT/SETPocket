@@ -808,4 +808,337 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get clearAll => 'Xóa tất cả';
+
+  @override
+  String get converterTools => 'Công cụ Chuyển đổi';
+
+  @override
+  String get converterToolsDesc => 'Chuyển đổi giữa các đơn vị và hệ thống khác nhau';
+
+  @override
+  String get calculatorTools => 'Công cụ Tính toán';
+
+  @override
+  String get calculatorToolsDesc => 'Máy tính chuyên dụng cho sức khỏe, tài chính và nhiều hơn nữa';
+
+  @override
+  String get lengthConverter => 'Chuyển đổi Chiều dài';
+
+  @override
+  String get weightConverter => 'Chuyển đổi Khối lượng';
+
+  @override
+  String get temperatureConverter => 'Chuyển đổi Nhiệt độ';
+
+  @override
+  String get volumeConverter => 'Chuyển đổi Thể tích';
+
+  @override
+  String get areaConverter => 'Chuyển đổi Diện tích';
+
+  @override
+  String get speedConverter => 'Chuyển đổi Tốc độ';
+
+  @override
+  String get timeConverter => 'Chuyển đổi Thời gian';
+
+  @override
+  String get dataConverter => 'Chuyển đổi Dung lượng';
+
+  @override
+  String get numberSystemConverter => 'Chuyển đổi Hệ số';
+
+  @override
+  String get currencyConverter => 'Chuyển đổi Tiền tệ';
+
+  @override
+  String get tableView => 'Chế độ bảng';
+
+  @override
+  String get listView => 'Chế độ danh sách';
+
+  @override
+  String get customizeUnits => 'Tùy chỉnh Đơn vị';
+
+  @override
+  String get visibleUnits => 'Đơn vị hiển thị';
+
+  @override
+  String get selectUnitsToShow => 'Chọn đơn vị để hiển thị';
+
+  @override
+  String get enterValue => 'Nhập giá trị';
+
+  @override
+  String get conversionResults => 'Kết quả chuyển đổi';
+
+  @override
+  String get meters => 'Mét';
+
+  @override
+  String get kilometers => 'Kilômét';
+
+  @override
+  String get centimeters => 'Xentimét';
+
+  @override
+  String get millimeters => 'Milimét';
+
+  @override
+  String get inches => 'Inch';
+
+  @override
+  String get feet => 'Feet';
+
+  @override
+  String get yards => 'Yard';
+
+  @override
+  String get miles => 'Dặm';
+
+  @override
+  String get grams => 'Gram';
+
+  @override
+  String get kilograms => 'Kilogram';
+
+  @override
+  String get pounds => 'Pound';
+
+  @override
+  String get ounces => 'Ounce';
+
+  @override
+  String get tons => 'Tấn';
+
+  @override
+  String get celsius => 'Độ C';
+
+  @override
+  String get fahrenheit => 'Độ F';
+
+  @override
+  String get kelvin => 'Kelvin';
+
+  @override
+  String get liters => 'Lít';
+
+  @override
+  String get milliliters => 'Mililít';
+
+  @override
+  String get gallons => 'Gallon';
+
+  @override
+  String get quarts => 'Quart';
+
+  @override
+  String get pints => 'Pint';
+
+  @override
+  String get cups => 'Cốc';
+
+  @override
+  String get squareMeters => 'Mét vuông';
+
+  @override
+  String get squareKilometers => 'Kilômét vuông';
+
+  @override
+  String get squareFeet => 'Feet vuông';
+
+  @override
+  String get squareInches => 'Inch vuông';
+
+  @override
+  String get acres => 'Acre';
+
+  @override
+  String get hectares => 'Hecta';
+
+  @override
+  String get metersPerSecond => 'Mét/giây';
+
+  @override
+  String get kilometersPerHour => 'Kilômét/giờ';
+
+  @override
+  String get milesPerHour => 'Dặm/giờ';
+
+  @override
+  String get knots => 'Hải lý/giờ';
+
+  @override
+  String get seconds => 'Giây';
+
+  @override
+  String get minutes => 'Phút';
+
+  @override
+  String get hours => 'Giờ';
+
+  @override
+  String get days => 'Ngày';
+
+  @override
+  String get weeks => 'Tuần';
+
+  @override
+  String get months => 'Tháng';
+
+  @override
+  String get years => 'Năm';
+
+  @override
+  String get bytes => 'Byte';
+
+  @override
+  String get kilobytes => 'Kilobyte';
+
+  @override
+  String get megabytes => 'Megabyte';
+
+  @override
+  String get gigabytes => 'Gigabyte';
+
+  @override
+  String get terabytes => 'Terabyte';
+
+  @override
+  String get bits => 'Bit';
+
+  @override
+  String get decimal => 'Thập phân';
+
+  @override
+  String get binary => 'Nhị phân';
+
+  @override
+  String get octal => 'Bát phân';
+
+  @override
+  String get hexadecimal => 'Thập lục phân';
+
+  @override
+  String get usd => 'Đô la Mỹ';
+
+  @override
+  String get eur => 'Euro';
+
+  @override
+  String get gbp => 'Bảng Anh';
+
+  @override
+  String get jpy => 'Yên Nhật';
+
+  @override
+  String get cad => 'Đô la Canada';
+
+  @override
+  String get aud => 'Đô la Úc';
+
+  @override
+  String get vnd => 'Đồng Việt Nam';
+
+  @override
+  String get currencyConverterDesc => 'Chuyển đổi giữa các loại tiền tệ khác nhau';
+
+  @override
+  String get lengthConverterDesc => 'Chuyển đổi giữa các đơn vị chiều dài khác nhau';
+
+  @override
+  String get weightConverterDesc => 'Chuyển đổi giữa các đơn vị trọng lượng khác nhau';
+
+  @override
+  String get temperatureConverterDesc => 'Chuyển đổi giữa các thang đo nhiệt độ khác nhau';
+
+  @override
+  String get volumeConverterDesc => 'Chuyển đổi giữa các đơn vị thể tích khác nhau';
+
+  @override
+  String get areaConverterDesc => 'Chuyển đổi giữa các đơn vị diện tích khác nhau';
+
+  @override
+  String get speedConverterDesc => 'Chuyển đổi giữa các đơn vị tốc độ khác nhau';
+
+  @override
+  String get timeConverterDesc => 'Chuyển đổi giữa các đơn vị thời gian khác nhau';
+
+  @override
+  String get dataConverterDesc => 'Chuyển đổi giữa các đơn vị lưu trữ dữ liệu khác nhau';
+
+  @override
+  String get numberSystemConverterDesc => 'Chuyển đổi giữa các hệ đếm khác nhau';
+
+  @override
+  String get fromUnit => 'Từ đơn vị';
+
+  @override
+  String get unit => 'Đơn vị';
+
+  @override
+  String get value => 'Giá trị';
+
+  @override
+  String get showAll => 'Hiển thị tất cả';
+
+  @override
+  String get apply => 'Áp dụng';
+
+  @override
+  String get bmiCalculator => 'Máy tính BMI';
+
+  @override
+  String get bmiCalculatorDesc => 'Tính chỉ số khối cơ thể và phân loại sức khỏe';
+
+  @override
+  String get scientificCalculator => 'Máy tính Khoa học';
+
+  @override
+  String get scientificCalculatorDesc => 'Máy tính nâng cao với các hàm lượng giác, logarit';
+
+  @override
+  String get graphingCalculator => 'Máy tính Vẽ đồ thị';
+
+  @override
+  String get graphingCalculatorDesc => 'Vẽ và hiển thị các hàm toán học';
+
+  @override
+  String get metric => 'Hệ mét';
+
+  @override
+  String get imperial => 'Hệ Anh';
+
+  @override
+  String get enterMeasurements => 'Nhập số đo của bạn';
+
+  @override
+  String get heightCm => 'Chiều cao (cm)';
+
+  @override
+  String get heightInches => 'Chiều cao (inches)';
+
+  @override
+  String get weightKg => 'Cân nặng (kg)';
+
+  @override
+  String get weightPounds => 'Cân nặng (pounds)';
+
+  @override
+  String get yourBMI => 'BMI của bạn';
+
+  @override
+  String get bmiScale => 'Thang đo BMI';
+
+  @override
+  String get underweight => 'Thiếu cân';
+
+  @override
+  String get normalWeight => 'Bình thường';
+
+  @override
+  String get overweight => 'Thừa cân';
+
+  @override
+  String get obese => 'Béo phì';
 }

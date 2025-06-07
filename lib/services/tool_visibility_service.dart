@@ -1,13 +1,13 @@
+import 'package:my_multi_tools/models/tool_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ToolVisibilityService {
   static const String _visibilityKey = 'tool_visibility';
-  static const String _orderKey = 'tool_order';
-
-  // Default tool configuration
+  static const String _orderKey = 'tool_order'; // Default tool configuration
   static const Map<String, ToolConfig> _defaultTools = {
     'textTemplate': ToolConfig(
       id: 'textTemplate',
+      fixName: 'Text Template Generator',
       nameKey: 'textTemplateGen',
       descKey: 'textTemplateGenDesc',
       icon: 'description',
@@ -17,12 +17,33 @@ class ToolVisibilityService {
     ),
     'randomTools': ToolConfig(
       id: 'randomTools',
+      fixName: 'Random Tools',
       nameKey: 'random',
       descKey: 'randomDesc',
       icon: 'casino',
       iconColor: 'purple',
       isVisible: true,
       order: 1,
+    ),
+    'converterTools': ToolConfig(
+      id: 'converterTools',
+      fixName: 'Converter Tools',
+      nameKey: 'converterTools',
+      descKey: 'converterToolsDesc',
+      icon: 'swap_horiz',
+      iconColor: 'green',
+      isVisible: true,
+      order: 2,
+    ),
+    'calculatorTools': ToolConfig(
+      id: 'calculatorTools',
+      fixName: 'Calculator Tools',
+      nameKey: 'calculatorTools',
+      descKey: 'calculatorToolsDesc',
+      icon: 'calculate',
+      iconColor: 'orange',
+      isVisible: true,
+      order: 3,
     ),
   };
 
@@ -115,44 +136,4 @@ class ToolVisibilityService {
   }
 
   static Map<String, ToolConfig> get defaultTools => _defaultTools;
-}
-
-class ToolConfig {
-  final String id;
-  final String nameKey;
-  final String descKey;
-  final String icon;
-  final String iconColor;
-  final bool isVisible;
-  final int order;
-
-  const ToolConfig({
-    required this.id,
-    required this.nameKey,
-    required this.descKey,
-    required this.icon,
-    required this.iconColor,
-    required this.isVisible,
-    required this.order,
-  });
-
-  ToolConfig copyWith({
-    String? id,
-    String? nameKey,
-    String? descKey,
-    String? icon,
-    String? iconColor,
-    bool? isVisible,
-    int? order,
-  }) {
-    return ToolConfig(
-      id: id ?? this.id,
-      nameKey: nameKey ?? this.nameKey,
-      descKey: descKey ?? this.descKey,
-      icon: icon ?? this.icon,
-      iconColor: iconColor ?? this.iconColor,
-      isVisible: isVisible ?? this.isVisible,
-      order: order ?? this.order,
-    );
-  }
 }

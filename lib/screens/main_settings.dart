@@ -627,6 +627,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       ],
     );
   }
+
   Widget _buildCacheActions(AppLocalizations loc) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 600;
@@ -652,7 +653,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           horizontal: isDesktop ? 20 : 16,
           vertical: isDesktop ? 14 : 12,
         ),
-        minimumSize: isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
+        minimumSize:
+            isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
       ),
       onPressed: _clearing ? null : _clearCache,
     );
@@ -666,7 +668,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           horizontal: isDesktop ? 20 : 16,
           vertical: isDesktop ? 14 : 12,
         ),
-        minimumSize: isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
+        minimumSize:
+            isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
       ),
       onPressed: _showCacheDetails,
     );

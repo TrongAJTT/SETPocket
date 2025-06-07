@@ -107,13 +107,14 @@ class QuickActionsService {
   /// Get appropriate icon name for platform quick actions
   static String _getIconForTool(ToolConfig tool) {
     // For Android, we need to use drawable resources
+    // TODO: Replace with actual icons after icon files are added
     switch (tool.id) {
       case 'textTemplate':
-        return 'ic_shortcut_text_template';
+        return 'ic_shortcut_text_template_todo'; // TODO: rename to ic_shortcut_text_template
       case 'randomTools':
-        return 'ic_random_generator';
+        return 'ic_random_generator_todo'; // TODO: rename to ic_random_generator
       default:
-        return 'ic_shortcut_text_template'; // Default fallback
+        return 'ic_shortcut_text_template_todo'; // Default fallback
     }
   }
 

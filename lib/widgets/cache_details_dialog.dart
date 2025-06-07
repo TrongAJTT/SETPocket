@@ -231,7 +231,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                   ),
               ],
             ),
-            const SizedBox(height: 12),            IntrinsicHeight(
+            const SizedBox(height: 12),
+            IntrinsicHeight(
               child: Row(
                 children: [
                   Expanded(
@@ -255,10 +256,13 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
           ],
         ),
       ),
-    );  }
+    );
+  }
+
   Widget _buildInfoChip(String label, String value, IconData icon) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 64), // Use minHeight instead of fixed height
+      constraints: const BoxConstraints(
+          minHeight: 64), // Use minHeight instead of fixed height
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -277,7 +281,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min, // Allow column to shrink if needed
+              mainAxisSize:
+                  MainAxisSize.min, // Allow column to shrink if needed
               children: [
                 Text(
                   label,
@@ -329,6 +334,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Colors.grey;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -336,15 +342,14 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         _cacheInfo.values.fold(0, (sum, info) => sum + info.sizeBytes);
     final totalItems =
         _cacheInfo.values.fold(0, (sum, info) => sum + info.itemCount);
-    
+
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = screenSize.width >= 600;
-    
+
     // Responsive sizing for dialog
-    final dialogWidth = isDesktop 
-        ? 600.0 
-        : screenSize.width * 0.95;
-    final dialogMaxHeight = screenSize.height * 0.85; // Increase from 0.8 to 0.85
+    final dialogWidth = isDesktop ? 600.0 : screenSize.width * 0.95;
+    final dialogMaxHeight =
+        screenSize.height * 0.85; // Increase from 0.8 to 0.85
 
     return Dialog(
       child: Container(
@@ -434,21 +439,26 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                             children: [
                               ..._cacheInfo.entries.map(
                                 (entry) => Padding(
-                                  padding: EdgeInsets.only(bottom: isDesktop ? 8 : 6),
-                                  child: _buildCacheSection(entry.key, entry.value),
+                                  padding: EdgeInsets.only(
+                                      bottom: isDesktop ? 8 : 6),
+                                  child: _buildCacheSection(
+                                      entry.key, entry.value),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        
+
                         // Fixed bottom button area
                         Container(
                           padding: EdgeInsets.all(isDesktop ? 16 : 12),
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withValues(alpha: 0.2),
                               ),
                             ),
                           ),

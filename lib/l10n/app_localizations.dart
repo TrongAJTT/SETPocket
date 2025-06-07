@@ -119,6 +119,12 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @userInterface.
+  ///
+  /// In en, this message translates to:
+  /// **'User Interface'**
+  String get userInterface;
+
   /// No description provided for @system.
   ///
   /// In en, this message translates to:

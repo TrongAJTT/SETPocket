@@ -15,10 +15,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settings => 'Cài đặt';
 
   @override
-  String get theme => 'Giao diện';
+  String get theme => 'Chủ đề';
 
   @override
   String get language => 'Ngôn ngữ';
+
+  @override
+  String get userInterface => 'Giao diện người dùng';
 
   @override
   String get system => 'Theo hệ thống';
@@ -634,7 +637,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get playingCards => 'Bài tây';
 
   @override
-  String get includeJokers => 'Include Jokers';
+  String get includeJokers => 'Bao gồm lá Joker';
 
   @override
   String get cardCount => 'Số lượng lá bài';

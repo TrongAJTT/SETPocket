@@ -2,8 +2,9 @@
     "@@locale": "vi",
     "title": "Nhiều Công Cụ",
     "settings": "Cài đặt",
-    "theme": "Giao diện",
+    "theme": "Chủ đề",
     "language": "Ngôn ngữ",
+    "userInterface": "Giao diện người dùng",
     "system": "Theo hệ thống",
     "light": "Sáng",
     "dark": "Tối",
@@ -181,7 +182,7 @@
     "units": "Đơn vị",
     
     "playingCards": "Bài tây",
-    "iincludeJokers": "Bao gồm lá Joker",
+    "includeJokers": "Bao gồm lá Joker",
     "cardCount": "Số lượng lá bài",
     
     "dateGenerator": "Tạo ngày ngẫu nhiên",

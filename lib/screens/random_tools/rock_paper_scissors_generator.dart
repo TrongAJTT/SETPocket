@@ -60,6 +60,7 @@ class _RockPaperScissorsGeneratorScreenState
       _result = RandomGenerator.generateRockPaperScissors();
     }); // Save to history if enabled
     if (_historyEnabled && _result != null) {
+      if (!mounted) return;
       final loc = AppLocalizations.of(context)!;
       String resultText = _getResultText(loc);
       GenerationHistoryService.addHistoryItem(

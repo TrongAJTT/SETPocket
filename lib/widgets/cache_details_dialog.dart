@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import '../services/cache_service.dart';
 import '../l10n/app_localizations.dart';
 
@@ -45,7 +46,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         _loading = false;
       });
     } catch (e) {
-      print('Error loading cache info: $e');
+      Logger().e('Error loading cache info: $e');
       setState(() => _loading = false);
     }
   }

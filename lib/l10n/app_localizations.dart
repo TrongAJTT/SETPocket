@@ -1217,6 +1217,12 @@ abstract class AppLocalizations {
   /// **'Playing Cards'**
   String get playingCards;
 
+  /// No description provided for @includeJokers.
+  ///
+  /// In en, this message translates to:
+  /// **'Include Jokers'**
+  String get includeJokers;
+
   /// No description provided for @cardCount.
   ///
   /// In en, this message translates to:

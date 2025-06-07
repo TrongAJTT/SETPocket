@@ -634,6 +634,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get playingCards => 'Bài tây';
 
   @override
+  String get includeJokers => 'Include Jokers';
+
+  @override
   String get cardCount => 'Số lượng lá bài';
 
   @override
@@ -673,7 +676,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get rock => 'Búa';
 
   @override
-  String get paper => 'Giấy';
+  String get paper => 'Bao';
 
   @override
   String get scissors => 'Kéo';

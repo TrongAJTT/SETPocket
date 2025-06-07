@@ -237,7 +237,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
             ),
             const SizedBox(height: 16),
             SwitchListTile(
-              title: Text('Include Jokers'),
+              title: Text(AppLocalizations.of(context)!.includeJokers),
               value: _includeJokers,
               onChanged: (value) {
                 setState(() {

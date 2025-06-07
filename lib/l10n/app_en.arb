@@ -195,6 +195,7 @@
     "units": "Units",
     
     "playingCards": "Playing Cards",
+    "includeJokers": "Include Jokers",
     "cardCount": "Number of cards",
     
     "dateGenerator": "Date Generator",

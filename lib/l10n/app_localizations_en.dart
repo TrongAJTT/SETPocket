@@ -634,6 +634,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playingCards => 'Playing Cards';
 
   @override
+  String get includeJokers => 'Include Jokers';
+
+  @override
   String get cardCount => 'Number of cards';
 
   @override

@@ -109,6 +109,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       _currentSide = result; // Set final side
     }); // Save to history if enabled
     if (_historyEnabled && _finalResult != null) {
+      if (!mounted) return;
       final loc = AppLocalizations.of(context)!;
       String resultText = _finalResult! ? loc.heads : loc.tails;
       GenerationHistoryService.addHistoryItem(

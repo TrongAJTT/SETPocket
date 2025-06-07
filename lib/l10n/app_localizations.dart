@@ -1408,6 +1408,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type \"confirm\" to proceed:'**
   String get typeConfirmToProceed;
+
+  /// No description provided for @toolsShortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools & Shortcuts'**
+  String get toolsShortcuts;
+
+  /// No description provided for @displayArrangeTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Display and arrange tools'**
+  String get displayArrangeTools;
+
+  /// No description provided for @displayArrangeToolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Control which tools are visible and their order'**
+  String get displayArrangeToolsDesc;
+
+  /// No description provided for @manageToolVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Tool Visibility and Order'**
+  String get manageToolVisibility;
+
+  /// No description provided for @dragToReorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder tools'**
+  String get dragToReorder;
+
+  /// No description provided for @allToolsHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'All tools are hidden'**
+  String get allToolsHidden;
+
+  /// No description provided for @allToolsHiddenDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enable at least one tool to continue using the application'**
+  String get allToolsHiddenDesc;
+
+  /// No description provided for @enableAtLeastOneTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enable at least one tool'**
+  String get enableAtLeastOneTool;
+
+  /// No description provided for @toolVisibilityChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Tool visibility has been updated'**
+  String get toolVisibilityChanged;
+
+  /// No description provided for @resetToDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Default'**
+  String get resetToDefault;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -728,4 +728,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get typeConfirmToProceed => 'Type \"confirm\" to proceed:';
+
+  @override
+  String get toolsShortcuts => 'Tools & Shortcuts';
+
+  @override
+  String get displayArrangeTools => 'Display and arrange tools';
+
+  @override
+  String get displayArrangeToolsDesc => 'Control which tools are visible and their order';
+
+  @override
+  String get manageToolVisibility => 'Manage Tool Visibility and Order';
+
+  @override
+  String get dragToReorder => 'Drag to reorder tools';
+
+  @override
+  String get allToolsHidden => 'All tools are hidden';
+
+  @override
+  String get allToolsHiddenDesc => 'Please enable at least one tool to continue using the application';
+
+  @override
+  String get enableAtLeastOneTool => 'Please enable at least one tool';
+
+  @override
+  String get toolVisibilityChanged => 'Tool visibility has been updated';
+
+  @override
+  String get resetToDefault => 'Reset to Default';
 }

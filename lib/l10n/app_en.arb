@@ -217,8 +217,7 @@
     "flipping": "Flipping...",
       "cacheTypeTextTemplates": "Text Templates",
     "cacheTypeTextTemplatesDesc": "Saved text templates and content",
-    "cacheTypeAppSettings": "App Settings",
-    "cacheTypeAppSettingsDesc": "Theme, language, and user preferences",    "cacheTypeRandomGenerators": "Random Generators",
+    "cacheTypeAppSettings": "App Settings",    "cacheTypeAppSettingsDesc": "Theme, language, and user preferences",    "cacheTypeRandomGenerators": "Random Generators",
     "cacheTypeRandomGeneratorsDesc": "Generation history and settings",
       "saveGenerationHistory": "Save Generation History",
     "saveGenerationHistoryDesc": "Remember and display history of generated items",
@@ -226,5 +225,15 @@
     "generatedAt": "Generated at",
     "noHistoryYet": "No history yet",
     "clearHistory": "Clear History",
-    "typeConfirmToProceed": "Type \"confirm\" to proceed:"
+    "typeConfirmToProceed": "Type \"confirm\" to proceed:",
+    "toolsShortcuts": "Tools & Shortcuts",
+    "displayArrangeTools": "Display and arrange tools",
+    "displayArrangeToolsDesc": "Control which tools are visible and their order",
+    "manageToolVisibility": "Manage Tool Visibility and Order",
+    "dragToReorder": "Drag to reorder tools",
+    "allToolsHidden": "All tools are hidden",
+    "allToolsHiddenDesc": "Please enable at least one tool to continue using the application",
+    "enableAtLeastOneTool": "Please enable at least one tool",
+    "toolVisibilityChanged": "Tool visibility has been updated",
+    "resetToDefault": "Reset to Default"
 }

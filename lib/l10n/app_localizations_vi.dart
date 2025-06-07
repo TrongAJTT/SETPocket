@@ -728,4 +728,34 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get typeConfirmToProceed => 'Nhập \"confirm\" để tiếp tục:';
+
+  @override
+  String get toolsShortcuts => 'Công cụ & Phím tắt';
+
+  @override
+  String get displayArrangeTools => 'Hiển thị và sắp xếp công cụ';
+
+  @override
+  String get displayArrangeToolsDesc => 'Điều khiển công cụ nào hiển thị và thứ tự của chúng';
+
+  @override
+  String get manageToolVisibility => 'Quản lý Hiển thị và Thứ tự Công cụ';
+
+  @override
+  String get dragToReorder => 'Kéo để sắp xếp lại công cụ';
+
+  @override
+  String get allToolsHidden => 'Tất cả công cụ đã ẩn';
+
+  @override
+  String get allToolsHiddenDesc => 'Vui lòng bật ít nhất một công cụ để tiếp tục sử dụng ứng dụng';
+
+  @override
+  String get enableAtLeastOneTool => 'Vui lòng bật ít nhất một công cụ';
+
+  @override
+  String get toolVisibilityChanged => 'Hiển thị công cụ đã được cập nhật';
+
+  @override
+  String get resetToDefault => 'Đặt lại mặc định';
 }

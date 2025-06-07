@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
+import 'package:my_multi_tools/widgets/tool_visibility_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
+import 'package:my_multi_tools/services/tool_visibility_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
 class MainSettingsScreen extends StatefulWidget {
   final bool isEmbedded;
+  final VoidCallback? onToolVisibilityChanged;
 
-  const MainSettingsScreen({super.key, this.isEmbedded = false});
+  const MainSettingsScreen({
+    super.key,
+    this.isEmbedded = false,
+    this.onToolVisibilityChanged,
+  });
 
   @override
   State<MainSettingsScreen> createState() => _MainSettingsScreenState();
@@ -129,6 +136,20 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     await GenerationHistoryService.setHistoryEnabled(enabled);
   }
 
+  void _showToolVisibilityDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => ToolVisibilityDialog(
+        onChanged: () {
+          // Refresh parent if needed
+          if (widget.isEmbedded && widget.onToolVisibilityChanged != null) {
+            widget.onToolVisibilityChanged!();
+          }
+        },
+      ),
+    );
+  }
+
   Future<bool?> _showConfirmDialog() async {
     final loc = AppLocalizations.of(context)!;
     final textController = TextEditingController();
@@ -241,6 +262,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             if (!widget.isEmbedded) _buildHeader(loc),
             _buildUserInterfaceSection(loc),
             const SizedBox(height: 32),
+            _buildToolsShortcutsSection(loc),
+            const SizedBox(height: 32),
             _buildRandomToolsSection(loc),
             const SizedBox(height: 32),
             _buildDataSection(loc),
@@ -290,6 +313,16 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         _buildThemeSettings(loc),
         const SizedBox(height: 20),
         _buildLanguageSettings(loc),
+      ],
+    );
+  }
+
+  Widget _buildToolsShortcutsSection(AppLocalizations loc) {
+    return _buildSection(
+      title: loc.toolsShortcuts,
+      icon: Icons.tune,
+      children: [
+        _buildToolVisibilitySettings(loc),
       ],
     );
   }
@@ -460,6 +493,58 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           onChanged: _onHistoryEnabledChanged,
         ),
       ],
+    );
+  }
+
+  Widget _buildToolVisibilitySettings(AppLocalizations loc) {
+    return InkWell(
+      onTap: _showToolVisibilityDialog,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.tune,
+              size: 20,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.displayArrangeTools,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    loc.displayArrangeToolsDesc,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

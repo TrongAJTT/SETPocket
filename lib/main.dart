@@ -4,6 +4,7 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/widgets/tool_card.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
+import 'package:my_multi_tools/services/tool_visibility_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
@@ -142,6 +143,17 @@ class _DesktopLayoutState extends State<DesktopLayout> {
   Widget? currentTool;
   String? selectedToolType;
   String? currentToolTitle;
+  GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
+  void _refreshToolSelection() {
+    // Refresh the tool list first
+    _toolSelectionKey.currentState?.refreshTools();
+    // Reset the current selection
+    setState(() {
+      currentTool = null;
+      selectedToolType = null;
+      currentToolTitle = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,8 +185,10 @@ class _DesktopLayoutState extends State<DesktopLayout> {
               SizedBox(
                 width: sidebarWidth,
                 child: ToolSelectionScreen(
+                  key: _toolSelectionKey,
                   isDesktop: true,
                   selectedToolType: selectedToolType,
+                  onToolVisibilityChanged: _refreshToolSelection,
                   onToolSelected: (Widget tool, String title) {
                     setState(() {
                       currentTool = tool;
@@ -241,80 +255,218 @@ class _DesktopLayoutState extends State<DesktopLayout> {
   }
 }
 
-class ToolSelectionScreen extends StatelessWidget {
+class ToolSelectionScreen extends StatefulWidget {
   final bool isDesktop;
   final Function(Widget, String)? onToolSelected;
   final String? selectedToolType;
+  final VoidCallback? onToolVisibilityChanged;
 
   const ToolSelectionScreen({
     super.key,
     this.isDesktop = false,
     this.onToolSelected,
     this.selectedToolType,
+    this.onToolVisibilityChanged,
   });
+
+  @override
+  State<ToolSelectionScreen> createState() => _ToolSelectionScreenState();
+}
+
+class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
+  List<ToolConfig> _visibleTools = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVisibleTools();
+  }
+
+  Future<void> _loadVisibleTools() async {
+    final tools = await ToolVisibilityService.getVisibleToolsInOrder();
+    setState(() {
+      _visibleTools = tools;
+      _loading = false;
+    });
+  }
+
+  // Public method to refresh tools when called from outside
+  void refreshTools() {
+    setState(() {
+      _loading = true;
+    });
+    _loadVisibleTools();
+  }
+
+  Widget _getToolWidget(ToolConfig config, AppLocalizations loc) {
+    switch (config.id) {
+      case 'textTemplate':
+        return TemplateListScreen(
+          isEmbedded: widget.isDesktop,
+          onToolSelected: widget.onToolSelected,
+        );
+      case 'randomTools':
+        return RandomToolsScreen(
+          isEmbedded: widget.isDesktop,
+          onToolSelected: widget.onToolSelected,
+        );
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'description':
+        return Icons.description;
+      case 'casino':
+        return Icons.casino;
+      default:
+        return Icons.extension;
+    }
+  }
+
+  Color _getIconColor(String colorName) {
+    switch (colorName) {
+      case 'blue800':
+        return Colors.blue.shade800;
+      case 'purple':
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getLocalizedName(BuildContext context, String nameKey) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (nameKey) {
+      case 'textTemplateGen':
+        return l10n.textTemplateGen;
+      case 'random':
+        return l10n.random;
+      default:
+        return nameKey;
+    }
+  }
+
+  String _getLocalizedDesc(BuildContext context, String descKey) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (descKey) {
+      case 'textTemplateGenDesc':
+        return l10n.textTemplateGenDesc;
+      case 'randomDesc':
+        return l10n.randomDesc;
+      default:
+        return descKey;
+    }
+  }
+
+  String _getSelectedToolType(ToolConfig config) {
+    switch (config.id) {
+      case 'textTemplate':
+        return 'TemplateListScreen';
+      case 'randomTools':
+        return 'RandomToolsScreen';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Check if no tools are visible
+    if (_visibleTools.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.visibility_off,
+                size: 64,
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.5),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                loc.allToolsHidden,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                loc.allToolsHiddenDesc,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.5),
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        ToolCard(
-          title: loc.textTemplateGen,
-          description: loc.textTemplateGenDesc,
-          icon: Icons.description,
-          iconColor: Colors.blue.shade800,
-          isSelected: selectedToolType == 'TemplateListScreen',
-          onTap: () {
-            final tool = TemplateListScreen(
-              isEmbedded: isDesktop,
-              onToolSelected:
-                  onToolSelected, // Truyền callback để xử lý sub-navigation
-            );
-            if (isDesktop) {
-              onToolSelected?.call(tool, loc.textTemplateGen);
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => tool,
-                ),
-              );
-            }
-          },
-        ),
-        ToolCard(
-          title: loc.random,
-          description: loc.randomDesc,
-          icon: Icons.casino,
-          iconColor: Colors.purple,
-          isSelected: selectedToolType == 'RandomToolsScreen',
-          onTap: () {
-            final tool = RandomToolsScreen(
-              isEmbedded: isDesktop,
-              onToolSelected:
-                  onToolSelected, // Truyền callback để xử lý sub-navigation
-            );
-            if (isDesktop) {
-              onToolSelected?.call(tool, loc.random);
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => tool,
-                ),
-              );
-            }
-          },
-        ),
+        // Show visible tools
+        ..._visibleTools.map((config) {
+          return ToolCard(
+            title: _getLocalizedName(context, config.nameKey),
+            description: _getLocalizedDesc(context, config.descKey),
+            icon: _getIconData(config.icon),
+            iconColor: _getIconColor(config.iconColor),
+            isSelected: widget.selectedToolType == _getSelectedToolType(config),
+            onTap: () {
+              final tool = _getToolWidget(config, loc);
+              if (widget.isDesktop) {
+                widget.onToolSelected
+                    ?.call(tool, _getLocalizedName(context, config.nameKey));
+              } else {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => tool,
+                  ),
+                );
+              }
+            },
+          );
+        }).toList(),
+
+        // Settings tool - always visible
         const SizedBox(height: 32),
         ToolCard(
           title: loc.settings,
           description: loc.settings,
           icon: Icons.settings,
           iconColor: Colors.grey,
-          isSelected: selectedToolType == 'MainSettingsScreen',
+          isSelected: widget.selectedToolType == 'MainSettingsScreen',
           onTap: () {
-            final tool = MainSettingsScreen(isEmbedded: isDesktop);
-            if (isDesktop) {
-              onToolSelected?.call(tool, loc.settings);
+            final tool = MainSettingsScreen(
+              isEmbedded: widget.isDesktop,
+              onToolVisibilityChanged: widget.onToolVisibilityChanged,
+            );
+            if (widget.isDesktop) {
+              widget.onToolSelected?.call(tool, loc.settings);
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(

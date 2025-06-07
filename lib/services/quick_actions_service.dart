@@ -18,7 +18,7 @@ class QuickActionsService {
     if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
-    
+
     try {
       const quickActions = QuickActions();
       final enabledActions = await getEnabledQuickActions();
@@ -64,7 +64,9 @@ class QuickActionsService {
       // Return empty list if parsing fails
       return [];
     }
-  }  /// Save list of tools that should have quick actions enabled
+  }
+
+  /// Save list of tools that should have quick actions enabled
   /// Maximum 4 tools allowed
   static Future<void> saveEnabledQuickActions(List<ToolConfig> tools) async {
     // Enforce maximum limit
@@ -113,14 +115,16 @@ class QuickActionsService {
       default:
         return 'ic_shortcut_text_template'; // Default fallback
     }
-  }  /// Set up quick action handler to navigate to specific tools
+  }
+
+  /// Set up quick action handler to navigate to specific tools
   static void setQuickActionHandler(
       Function(String toolId) onQuickActionSelected) {
     // Only set up handler on supported platforms
     if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
-    
+
     try {
       const quickActions = QuickActions();
       quickActions.initialize(onQuickActionSelected);

@@ -133,10 +133,10 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = screenSize.width >= 600;
 
-    // Responsive dialog sizing
+    // Responsive dialog sizing with better mobile handling
     final dialogWidth = isDesktop
         ? (screenSize.width * 0.4).clamp(450.0, 600.0)
-        : screenSize.width * 0.9;
+        : screenSize.width * 0.95; // Increased from 0.9 to 0.95 for more space
     final dialogMaxHeight = screenSize.height * 0.8;
 
     return Dialog(
@@ -148,7 +148,8 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(
+                  isDesktop ? 24 : 16), // Smaller padding on mobile
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.only(
@@ -160,10 +161,10 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                 children: [
                   Icon(
                     Icons.flash_on,
-                    size: 28,
+                    size: isDesktop ? 28 : 24, // Smaller icon on mobile
                     color: theme.colorScheme.primary,
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: isDesktop ? 12 : 8), // Less spacing on mobile
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,17 +173,30 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                           l10n.manageQuickActions,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
+                            fontSize: isDesktop
+                                ? null
+                                : 18, // Smaller title on mobile
                           ),
-                        ),                        const SizedBox(height: 4),
+                          maxLines:
+                              isDesktop ? 1 : 2, // Allow wrapping on mobile
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
                         Text(
                           // Show appropriate description based on platform
-                          (Platform.isAndroid || Platform.isIOS) 
-                            ? l10n.quickActionsEnableDescMobile
-                            : l10n.quickActionsDialogDesc,
+                          (Platform.isAndroid || Platform.isIOS)
+                              ? l10n.quickActionsEnableDescMobile
+                              : l10n.quickActionsDialogDesc,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.7),
+                            fontSize: isDesktop
+                                ? null
+                                : 12, // Smaller description on mobile
                           ),
+                          maxLines:
+                              isDesktop ? 2 : 3, // More lines allowed on mobile
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -190,6 +204,8 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
+                    iconSize:
+                        isDesktop ? 24 : 20, // Smaller close button on mobile
                     tooltip: l10n.close,
                   ),
                 ],
@@ -210,8 +226,10 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                         // Info section
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.all(16),
-                          padding: const EdgeInsets.all(16),
+                          margin: EdgeInsets.all(
+                              isDesktop ? 16 : 12), // Smaller margin on mobile
+                          padding: EdgeInsets.all(
+                              isDesktop ? 16 : 12), // Smaller padding on mobile
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             border: Border.all(
@@ -227,14 +245,23 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                                 children: [
                                   Icon(
                                     Icons.info_outline,
-                                    size: 20,
+                                    size: isDesktop
+                                        ? 20
+                                        : 18, // Smaller icon on mobile
                                     color: theme.colorScheme.primary,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    l10n.quickActionsInfo,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
+                                  Expanded(
+                                    // Add Expanded to prevent overflow
+                                    child: Text(
+                                      l10n.quickActionsInfo,
+                                      style:
+                                          theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: isDesktop
+                                            ? null
+                                            : 13, // Smaller text on mobile
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -257,43 +284,61 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                               ),
                             ],
                           ),
-                        ),
-
-                        // Selected count
+                        ), // Selected count
                         Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: isDesktop
+                                  ? 16
+                                  : 12), // Smaller margin on mobile
                           child: Row(
                             children: [
                               Icon(
                                 Icons.flash_on,
-                                size: 16,
+                                size: isDesktop
+                                    ? 16
+                                    : 14, // Smaller icon on mobile
                                 color: theme.colorScheme.primary,
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                l10n.selectedCount(_enabledQuickActions.length,
-                                    QuickActionsService.maxQuickActions),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
+                              Expanded(
+                                // Add Expanded to prevent overflow
+                                child: Text(
+                                  l10n.selectedCount(
+                                      _enabledQuickActions.length,
+                                      QuickActionsService.maxQuickActions),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: isDesktop
+                                        ? null
+                                        : 13, // Smaller text on mobile
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        SizedBox(
+                            height: isDesktop
+                                ? 16
+                                : 12), // Smaller spacing on mobile
 
                         // Tool list
                         Expanded(
                           child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: isDesktop
+                                    ? 16
+                                    : 12), // Smaller padding on mobile
                             itemCount: _allTools.length,
                             itemBuilder: (context, index) {
                               final tool = _allTools[index];
                               final isEnabled = _isQuickActionEnabled(tool.id);
-
                               return Container(
-                                margin: const EdgeInsets.only(bottom: 8),
+                                margin: EdgeInsets.only(
+                                    bottom: isDesktop
+                                        ? 8
+                                        : 6), // Smaller margin on mobile
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.surface,
                                   border: Border.all(
@@ -306,18 +351,27 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isDesktop
+                                        ? 16
+                                        : 12, // Smaller padding on mobile
+                                    vertical: isDesktop
+                                        ? 8
+                                        : 4, // Smaller padding on mobile
                                   ),
                                   leading: CircleAvatar(
+                                    radius: isDesktop
+                                        ? 20
+                                        : 18, // Smaller avatar on mobile
                                     backgroundColor:
                                         _getIconColor(tool.iconColor)
                                             .withValues(alpha: 0.1),
                                     child: Icon(
                                       _getIconData(tool.icon),
                                       color: _getIconColor(tool.iconColor),
-                                      size: 20,
+                                      size: isDesktop
+                                          ? 20
+                                          : 18, // Smaller icon on mobile
                                     ),
                                   ),
                                   title: Text(
@@ -325,19 +379,36 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                                     style:
                                         theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
+                                      fontSize: isDesktop
+                                          ? null
+                                          : 14, // Smaller title on mobile
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Text(
                                     _getLocalizedDesc(context, tool.descKey),
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: theme.colorScheme.onSurface
                                           .withValues(alpha: 0.7),
+                                      fontSize: isDesktop
+                                          ? null
+                                          : 11, // Smaller subtitle on mobile
                                     ),
+                                    maxLines: isDesktop
+                                        ? 2
+                                        : 1, // Less lines on mobile
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  trailing: Switch(
-                                    value: isEnabled,
-                                    onChanged: (value) =>
-                                        _toggleQuickAction(tool),
+                                  trailing: Transform.scale(
+                                    scale: isDesktop
+                                        ? 1.0
+                                        : 0.8, // Smaller switch on mobile
+                                    child: Switch(
+                                      value: isEnabled,
+                                      onChanged: (value) =>
+                                          _toggleQuickAction(tool),
+                                    ),
                                   ),
                                 ),
                               );
@@ -346,11 +417,10 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                         ),
                       ],
                     ),
-            ),
-
-            // Bottom actions
+            ), // Bottom actions
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(
+                  isDesktop ? 16 : 12), // Smaller padding on mobile
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
@@ -369,9 +439,10 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
   Widget _buildResponsiveActions(
       BuildContext context, AppLocalizations l10n, ThemeData theme) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth >= 600;
+    // Lower breakpoint for better mobile experience
+    final isWideEnough = screenWidth >= 480;
 
-    if (isDesktop) {
+    if (isWideEnough) {
       // Horizontal layout for wider screens
       return Row(
         children: [
@@ -386,7 +457,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                   }
                 : null,
             icon: const Icon(Icons.clear_all),
-            label: Text(l10n.clearAll),
+            label: Text(l10n.clearAllQuickActions),
           ),
           const Spacer(),
           // Cancel button
@@ -403,7 +474,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
 
                     if (!mounted) return;
 
-                    if (isDesktop) {
+                    if (isWideEnough) {
                       // ignore: use_build_context_synchronously
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -429,22 +500,21 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Clear all button on its own row
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: _enabledQuickActions.isNotEmpty
-                  ? () {
-                      setState(() {
-                        _enabledQuickActions.clear();
-                        _hasChanges = true;
-                      });
-                    }
-                  : null,
-              icon: const Icon(Icons.clear_all),
-              label: Text(l10n.clearAll),
+          if (_enabledQuickActions.isNotEmpty)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _enabledQuickActions.clear();
+                    _hasChanges = true;
+                  });
+                },
+                icon: const Icon(Icons.clear_all),
+                label: Text(l10n.clearAllQuickActions),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
+          if (_enabledQuickActions.isNotEmpty) const SizedBox(height: 8),
           // Cancel and Save buttons in a row
           Row(
             children: [

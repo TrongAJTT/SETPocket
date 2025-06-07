@@ -121,21 +121,109 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
     return _tools.any((tool) => tool.isVisible);
   }
 
+  Widget _buildResponsiveActions(BuildContext context, AppLocalizations l10n,
+      ThemeData theme, bool isDesktop) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Lower breakpoint for better mobile experience
+    final isWideEnough = screenWidth >= 480;
+
+    if (isWideEnough) {
+      // Horizontal layout for wider screens
+      return Row(
+        children: [
+          TextButton.icon(
+            onPressed: _resetToDefault,
+            icon: const Icon(Icons.refresh),
+            label: Text(l10n.resetToDefault),
+          ),
+          const Spacer(),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+          const SizedBox(width: 8),
+          FilledButton(
+            onPressed: _hasChanges && _hasVisibleTools()
+                ? () async {
+                    await _saveChanges();
+                    if (!mounted) return;
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  }
+                : null,
+            child: Text(l10n.save),
+          ),
+        ],
+      );
+    } else {
+      // Vertical layout for narrower screens
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Reset button on its own row
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: _resetToDefault,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.resetToDefault),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Cancel and Save buttons in a row
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.cancel),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton(
+                  onPressed: _hasChanges && _hasVisibleTools()
+                      ? () async {
+                          await _saveChanges();
+                          if (!mounted) return;
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      : null,
+                  child: Text(l10n.save),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isDesktop = screenSize.width >= 600;
+
+    // Responsive dialog sizing with better mobile handling
+    final dialogWidth = isDesktop
+        ? 500.0
+        : screenSize.width * 0.95; // Increased from fixed width for mobile
+    final dialogMaxHeight = screenSize.height * 0.8;
 
     return Dialog(
       child: Container(
-        width: 500,
-        constraints: const BoxConstraints(maxHeight: 600),
+        width: dialogWidth,
+        constraints: BoxConstraints(maxHeight: dialogMaxHeight),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(
+                  isDesktop ? 24 : 16), // Smaller padding on mobile
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.only(
@@ -147,10 +235,10 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                 children: [
                   Icon(
                     Icons.tune,
-                    size: 28,
+                    size: isDesktop ? 28 : 24, // Smaller icon on mobile
                     color: theme.colorScheme.primary,
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: isDesktop ? 12 : 8), // Less spacing on mobile
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +247,13 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                           l10n.manageToolVisibility,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
+                            fontSize: isDesktop
+                                ? null
+                                : 18, // Smaller title on mobile
                           ),
+                          maxLines:
+                              isDesktop ? 1 : 2, // Allow wrapping on mobile
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -167,7 +261,13 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.7),
+                            fontSize: isDesktop
+                                ? null
+                                : 12, // Smaller description on mobile
                           ),
+                          maxLines:
+                              isDesktop ? 1 : 2, // More lines allowed on mobile
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -175,6 +275,8 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
+                    iconSize:
+                        isDesktop ? 24 : 20, // Smaller close button on mobile
                     tooltip: l10n.close,
                   ),
                 ],
@@ -195,7 +297,9 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                         // Tool list
                         Expanded(
                           child: ReorderableListView.builder(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(isDesktop
+                                ? 16
+                                : 12), // Smaller padding on mobile
                             itemCount: _tools.length,
                             onReorder: _reorderTools,
                             proxyDecorator: (child, index, animation) {
@@ -236,7 +340,10 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                               final tool = _tools[index];
                               return Container(
                                 key: ValueKey(tool.id),
-                                margin: const EdgeInsets.only(bottom: 8),
+                                margin: EdgeInsets.only(
+                                    bottom: isDesktop
+                                        ? 8
+                                        : 6), // Smaller margin on mobile
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.surface,
                                   border: Border.all(
@@ -246,18 +353,27 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isDesktop
+                                        ? 16
+                                        : 12, // Smaller padding on mobile
+                                    vertical: isDesktop
+                                        ? 8
+                                        : 4, // Smaller padding on mobile
                                   ),
                                   leading: CircleAvatar(
+                                    radius: isDesktop
+                                        ? 20
+                                        : 18, // Smaller avatar on mobile
                                     backgroundColor:
                                         _getIconColor(tool.iconColor)
                                             .withValues(alpha: 0.1),
                                     child: Icon(
                                       _getIconData(tool.icon),
                                       color: _getIconColor(tool.iconColor),
-                                      size: 20,
+                                      size: isDesktop
+                                          ? 20
+                                          : 18, // Smaller icon on mobile
                                     ),
                                   ),
                                   title: Text(
@@ -265,21 +381,37 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                                     style:
                                         theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
+                                      fontSize: isDesktop
+                                          ? null
+                                          : 14, // Smaller title on mobile
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Switch(
-                                        value: tool.isVisible,
-                                        onChanged: (_) =>
-                                            _toggleVisibility(index),
+                                      Transform.scale(
+                                        scale: isDesktop
+                                            ? 1.0
+                                            : 0.8, // Smaller switch on mobile
+                                        child: Switch(
+                                          value: tool.isVisible,
+                                          onChanged: (_) =>
+                                              _toggleVisibility(index),
+                                        ),
                                       ),
-                                      const SizedBox(width: 8),
+                                      SizedBox(
+                                          width: isDesktop
+                                              ? 8
+                                              : 4), // Less spacing on mobile
                                       Icon(
                                         Icons.drag_handle,
                                         color: theme.colorScheme.onSurface
                                             .withValues(alpha: 0.4),
+                                        size: isDesktop
+                                            ? 24
+                                            : 20, // Smaller drag handle on mobile
                                       ),
                                     ],
                                   ),
@@ -292,8 +424,13 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                         // Warning if no tools visible
                         if (!_hasVisibleTools())
                           Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            padding: const EdgeInsets.all(16),
+                            margin: EdgeInsets.symmetric(
+                                horizontal: isDesktop
+                                    ? 16
+                                    : 12), // Smaller margin on mobile
+                            padding: EdgeInsets.all(isDesktop
+                                ? 16
+                                : 12), // Smaller padding on mobile
                             decoration: BoxDecoration(
                               color: theme.colorScheme.error
                                   .withValues(alpha: 0.1),
@@ -308,14 +445,22 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                                 Icon(
                                   Icons.warning,
                                   color: theme.colorScheme.error,
-                                  size: 20,
+                                  size: isDesktop
+                                      ? 20
+                                      : 18, // Smaller icon on mobile
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(
+                                    width: isDesktop
+                                        ? 12
+                                        : 8), // Less spacing on mobile
                                 Expanded(
                                   child: Text(
                                     l10n.enableAtLeastOneTool,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: theme.colorScheme.error,
+                                      fontSize: isDesktop
+                                          ? null
+                                          : 13, // Smaller text on mobile
                                     ),
                                   ),
                                 ),
@@ -328,7 +473,8 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
 
             // Bottom actions
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(
+                  isDesktop ? 16 : 12), // Smaller padding on mobile
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
@@ -336,32 +482,7 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                   ),
                 ),
               ),
-              child: Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: _resetToDefault,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(l10n.resetToDefault),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(l10n.cancel),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: _hasChanges && _hasVisibleTools()
-                        ? () async {
-                            await _saveChanges();
-                            if (!mounted) return;
-                            // ignore: use_build_context_synchronously
-                            Navigator.of(context).pop();
-                          }
-                        : null,
-                    child: Text(l10n.save),
-                  ),
-                ],
-              ),
+              child: _buildResponsiveActions(context, l10n, theme, isDesktop),
             ),
           ],
         ),

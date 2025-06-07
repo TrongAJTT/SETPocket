@@ -232,8 +232,32 @@
     "manageToolVisibility": "Manage Tool Visibility and Order",
     "dragToReorder": "Drag to reorder tools",
     "allToolsHidden": "All tools are hidden",
-    "allToolsHiddenDesc": "Please enable at least one tool to continue using the application",
-    "enableAtLeastOneTool": "Please enable at least one tool",
+    "allToolsHiddenDesc": "Please enable at least one tool to continue using the application",    "enableAtLeastOneTool": "Please enable at least one tool",
     "toolVisibilityChanged": "Tool visibility has been updated",
-    "resetToDefault": "Reset to Default"
+    "resetToDefault": "Reset to Default",
+    "manageQuickActions": "Manage Quick Actions",
+    "manageQuickActionsDesc": "Configure shortcuts for quick access to tools",
+    "quickActionsDialogTitle": "Quick Actions",
+    "quickActionsDialogDesc": "Select up to 4 tools for quick access via app icon or taskbar",
+    "quickActionsLimit": "Maximum 4 quick actions allowed",
+    "quickActionsLimitReached": "You can only select up to 4 tools for quick actions",
+    "clearAllQuickActions": "Clear All",
+    "quickActionsCleared": "Quick actions cleared",
+    "quickActionsUpdated": "Quick actions updated",
+    "quickActionsInfo": "Quick Actions",    "selectUpTo4Tools": "Select up to 4 tools for quick access.",
+    "quickActionsEnableDesc": "Quick actions will appear when you long-press the app icon on Android or right-click the taskbar icon on Windows.",
+    "quickActionsEnableDescMobile": "Quick actions will appear when you long-press the app icon (Android/iOS only).",
+    "selectedCount": "Selected: {current} of {max}",
+    "@selectedCount": {
+        "placeholders": {
+            "current": {
+                "type": "int"
+            },
+            "max": {
+                "type": "int"
+            }
+        }
+    },
+    "maxQuickActionsReached": "Maximum 4 quick actions reached",
+    "clearAll": "Clear All"
 }

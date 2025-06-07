@@ -758,4 +758,54 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get resetToDefault => 'Đặt lại mặc định';
+
+  @override
+  String get manageQuickActions => 'Quản lý Thao tác nhanh';
+
+  @override
+  String get manageQuickActionsDesc => 'Cấu hình phím tắt để truy cập nhanh các công cụ';
+
+  @override
+  String get quickActionsDialogTitle => 'Thao tác nhanh';
+
+  @override
+  String get quickActionsDialogDesc => 'Chọn tối đa 4 công cụ để truy cập nhanh qua biểu tượng ứng dụng hoặc thanh tác vụ';
+
+  @override
+  String get quickActionsLimit => 'Tối đa 4 thao tác nhanh được phép';
+
+  @override
+  String get quickActionsLimitReached => 'Bạn chỉ có thể chọn tối đa 4 công cụ cho thao tác nhanh';
+
+  @override
+  String get clearAllQuickActions => 'Xóa tất cả';
+
+  @override
+  String get quickActionsCleared => 'Đã xóa thao tác nhanh';
+
+  @override
+  String get quickActionsUpdated => 'Đã cập nhật thao tác nhanh';
+
+  @override
+  String get quickActionsInfo => 'Thao tác nhanh';
+
+  @override
+  String get selectUpTo4Tools => 'Chọn tối đa 4 công cụ để truy cập nhanh.';
+
+  @override
+  String get quickActionsEnableDesc => 'Thao tác nhanh sẽ xuất hiện khi bạn nhấn giữ biểu tượng ứng dụng trên Android hoặc nhấp chuột phải vào biểu tượng thanh tác vụ trên Windows.';
+
+  @override
+  String get quickActionsEnableDescMobile => 'Thao tác nhanh sẽ xuất hiện khi bạn nhấn giữ biểu tượng ứng dụng (chỉ Android/iOS).';
+
+  @override
+  String selectedCount(int current, int max) {
+    return 'Đã chọn: $current trong $max';
+  }
+
+  @override
+  String get maxQuickActionsReached => 'Đã đạt tối đa 4 thao tác nhanh';
+
+  @override
+  String get clearAll => 'Xóa tất cả';
 }

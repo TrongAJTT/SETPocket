@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/widgets/tool_visibility_dialog.dart';
+import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
-import 'package:my_multi_tools/services/tool_visibility_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
@@ -323,6 +323,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       icon: Icons.tune,
       children: [
         _buildToolVisibilitySettings(loc),
+        const SizedBox(height: 16),
+        _buildQuickActionsSettings(loc),
       ],
     );
   }
@@ -545,6 +547,65 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildQuickActionsSettings(AppLocalizations loc) {
+    return InkWell(
+      onTap: _showQuickActionsDialog,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.flash_on,
+              size: 20,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.manageQuickActions,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    loc.manageQuickActionsDesc,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showQuickActionsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const QuickActionsDialog(),
     );
   }
 

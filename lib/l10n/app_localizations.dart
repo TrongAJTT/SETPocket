@@ -1468,6 +1468,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset to Default'**
   String get resetToDefault;
+
+  /// No description provided for @manageQuickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Quick Actions'**
+  String get manageQuickActions;
+
+  /// No description provided for @manageQuickActionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure shortcuts for quick access to tools'**
+  String get manageQuickActionsDesc;
+
+  /// No description provided for @quickActionsDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActionsDialogTitle;
+
+  /// No description provided for @quickActionsDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Select up to 4 tools for quick access via app icon or taskbar'**
+  String get quickActionsDialogDesc;
+
+  /// No description provided for @quickActionsLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 4 quick actions allowed'**
+  String get quickActionsLimit;
+
+  /// No description provided for @quickActionsLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only select up to 4 tools for quick actions'**
+  String get quickActionsLimitReached;
+
+  /// No description provided for @clearAllQuickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAllQuickActions;
+
+  /// No description provided for @quickActionsCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions cleared'**
+  String get quickActionsCleared;
+
+  /// No description provided for @quickActionsUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions updated'**
+  String get quickActionsUpdated;
+
+  /// No description provided for @quickActionsInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActionsInfo;
+
+  /// No description provided for @selectUpTo4Tools.
+  ///
+  /// In en, this message translates to:
+  /// **'Select up to 4 tools for quick access.'**
+  String get selectUpTo4Tools;
+
+  /// No description provided for @quickActionsEnableDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions will appear when you long-press the app icon on Android or right-click the taskbar icon on Windows.'**
+  String get quickActionsEnableDesc;
+
+  /// No description provided for @quickActionsEnableDescMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions will appear when you long-press the app icon (Android/iOS only).'**
+  String get quickActionsEnableDescMobile;
+
+  /// No description provided for @selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: {current} of {max}'**
+  String selectedCount(int current, int max);
+
+  /// No description provided for @maxQuickActionsReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 4 quick actions reached'**
+  String get maxQuickActionsReached;
+
+  /// No description provided for @clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAll;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

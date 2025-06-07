@@ -5,16 +5,67 @@ import 'package:my_multi_tools/widgets/tool_card.dart';
 import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/tool_visibility_service.dart';
+import 'package:my_multi_tools/services/quick_actions_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
 
+// Global navigation key for deep linking
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize settings controller and load saved settings
   await settingsController.loadSettings();
+
+  // Initialize quick actions
+  await _initializeQuickActions();
+
   runApp(const MainApp());
+}
+
+Future<void> _initializeQuickActions() async {
+  await QuickActionsService.initialize();
+
+  // Set up quick action handler
+  QuickActionsService.setQuickActionHandler((toolId) {
+    // Navigate to the selected tool when quick action is triggered
+    _navigateToTool(toolId);
+  });
+}
+
+void _navigateToTool(String toolId) {
+  final context = navigatorKey.currentContext;
+  if (context == null) return;
+
+  // Find the tool configuration
+  ToolVisibilityService.getVisibleToolsInOrder().then((tools) {
+    final tool = tools.firstWhere(
+      (t) => t.id == toolId,
+      orElse: () => tools.first, // Fallback to first tool
+    );
+
+    // Navigate to the tool
+    // Use navigatorKey.currentState instead of context to avoid using BuildContext across async gaps
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => _getToolScreen(tool),
+      ),
+      (route) => false, // Clear all previous routes
+    );
+  });
+}
+
+Widget _getToolScreen(ToolConfig tool) {
+  switch (tool.id) {
+    case 'textTemplate':
+      return const TemplateListScreen();
+    case 'randomTools':
+      return const RandomToolsScreen();
+    default:
+      return const HomePage(); // Fallback to home
+  }
 }
 
 class SettingsController extends ChangeNotifier {
@@ -66,6 +117,7 @@ class MainApp extends StatelessWidget {
         return MaterialApp(
           title: 'Multi Tools',
           debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.blueAccent,
@@ -142,20 +194,17 @@ class DesktopLayout extends StatefulWidget {
 class _DesktopLayoutState extends State<DesktopLayout> {
   Widget? currentTool;
   String? selectedToolType;
-  String? currentToolTitle;  GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
+  String? currentToolTitle;
+  final GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
   void _refreshToolSelection() {
     // Refresh the tool list first
     _toolSelectionKey.currentState?.refreshTools();
-    
-    // Only reset current selection if it's not Settings screen
-    // This allows users to stay in Settings after saving changes
-    if (selectedToolType != 'MainSettingsScreen') {
-      setState(() {
-        currentTool = null;
-        selectedToolType = null;
-        currentToolTitle = null;
-      });
-    }
+    // Reset the current selection
+    setState(() {
+      currentTool = null;
+      selectedToolType = null;
+      currentToolTitle = null;
+    });
   }
 
   @override

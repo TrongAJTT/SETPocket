@@ -231,7 +231,31 @@
     "dragToReorder": "Kéo để sắp xếp lại công cụ",
     "allToolsHidden": "Tất cả công cụ đã ẩn",
     "allToolsHiddenDesc": "Vui lòng bật ít nhất một công cụ để tiếp tục sử dụng ứng dụng",
-    "enableAtLeastOneTool": "Vui lòng bật ít nhất một công cụ",
-    "toolVisibilityChanged": "Hiển thị công cụ đã được cập nhật",
-    "resetToDefault": "Đặt lại mặc định"
+    "enableAtLeastOneTool": "Vui lòng bật ít nhất một công cụ",    "toolVisibilityChanged": "Hiển thị công cụ đã được cập nhật",
+    "resetToDefault": "Đặt lại mặc định",    "manageQuickActions": "Quản lý Thao tác nhanh",
+    "manageQuickActionsDesc": "Cấu hình phím tắt để truy cập nhanh các công cụ",
+    "quickActionsDialogTitle": "Thao tác nhanh",
+    "quickActionsDialogDesc": "Chọn tối đa 4 công cụ để truy cập nhanh qua biểu tượng ứng dụng hoặc thanh tác vụ",
+    "quickActionsLimit": "Tối đa 4 thao tác nhanh được phép",
+    "quickActionsLimitReached": "Bạn chỉ có thể chọn tối đa 4 công cụ cho thao tác nhanh",
+    "clearAllQuickActions": "Xóa tất cả",
+    "quickActionsCleared": "Đã xóa thao tác nhanh",
+    "quickActionsUpdated": "Đã cập nhật thao tác nhanh",
+    "quickActionsInfo": "Thao tác nhanh",
+    "selectUpTo4Tools": "Chọn tối đa 4 công cụ để truy cập nhanh.",
+    "quickActionsEnableDesc": "Thao tác nhanh sẽ xuất hiện khi bạn nhấn giữ biểu tượng ứng dụng trên Android hoặc nhấp chuột phải vào biểu tượng thanh tác vụ trên Windows.",
+    "quickActionsEnableDescMobile": "Thao tác nhanh sẽ xuất hiện khi bạn nhấn giữ biểu tượng ứng dụng (chỉ Android/iOS).",
+    "selectedCount": "Đã chọn: {current} trong {max}",
+    "@selectedCount": {
+        "placeholders": {
+            "current": {
+                "type": "int"
+            },
+            "max": {
+                "type": "int"
+            }
+        }
+    },
+    "maxQuickActionsReached": "Đã đạt tối đa 4 thao tác nhanh",
+    "clearAll": "Xóa tất cả"
 }

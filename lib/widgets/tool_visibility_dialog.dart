@@ -29,6 +29,7 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
       _loading = false;
     });
   }
+
   Future<void> _saveChanges() async {
     final visibility = Map.fromEntries(
       _tools.map((tool) => MapEntry(tool.id, tool.isVisible)),
@@ -44,7 +45,14 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
 
     widget.onChanged?.call();
 
-    // Note: No longer showing SnackBar here as it's handled in the UI action
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.toolVisibilityChanged),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   Future<void> _resetToDefault() async {
@@ -89,7 +97,7 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
   Color _getIconColor(String colorName) {
     switch (colorName) {
       case 'blue800':
-        return Colors.blue.shade800;
+        return const Color.fromARGB(255, 21, 101, 192);
       case 'purple':
         return Colors.purple;
       default:
@@ -113,123 +121,15 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
     return _tools.any((tool) => tool.isVisible);
   }
 
-  Widget _buildResponsiveActions(BuildContext context, AppLocalizations l10n, ThemeData theme) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth >= 600;
-    
-    // Check if we have enough space for horizontal layout
-    final hasEnoughWidth = screenWidth >= 500;
-    
-    if (hasEnoughWidth) {
-      // Horizontal layout for wider screens
-      return Row(
-        children: [
-          TextButton.icon(
-            onPressed: _resetToDefault,
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.resetToDefault),
-          ),
-          const Spacer(),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.cancel),
-          ),
-          const SizedBox(width: 8),
-          FilledButton(
-            onPressed: _hasChanges && _hasVisibleTools()
-                ? () async {
-                    await _saveChanges();
-                    // For desktop mode, don't close dialog immediately
-                    // Show a success message instead
-                    if (isDesktop && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.toolVisibilityChanged),
-                          backgroundColor: theme.colorScheme.primary,
-                          duration: const Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    } else if (mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  }
-                : null,
-            child: Text(l10n.save),
-          ),
-        ],
-      );
-    } else {
-      // Vertical layout for narrower screens
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Reset button on its own row
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: _resetToDefault,
-              icon: const Icon(Icons.refresh),
-              label: Text(l10n.resetToDefault),
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Cancel and Save buttons in a row
-          Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.cancel),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _hasChanges && _hasVisibleTools()
-                      ? () async {
-                          await _saveChanges();
-                          // For desktop mode, don't close dialog immediately
-                          if (isDesktop && mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(l10n.toolVisibilityChanged),
-                                backgroundColor: theme.colorScheme.primary,
-                                duration: const Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          } else if (mounted) {
-                            Navigator.of(context).pop();
-                          }
-                        }
-                      : null,
-                  child: Text(l10n.save),
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-    }
-  }
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final screenSize = MediaQuery.of(context).size;
-    final isDesktop = screenSize.width >= 600;
-    
-    // Responsive dialog sizing
-    final dialogWidth = isDesktop ? 
-        (screenSize.width * 0.4).clamp(450.0, 600.0) : 
-        screenSize.width * 0.9;
-    final dialogMaxHeight = screenSize.height * 0.8;
 
     return Dialog(
       child: Container(
-        width: dialogWidth,
-        constraints: BoxConstraints(maxHeight: dialogMaxHeight),
+        width: 500,
+        constraints: const BoxConstraints(maxHeight: 600),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -424,7 +324,9 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                           ),
                       ],
                     ),
-            ),            // Bottom actions
+            ),
+
+            // Bottom actions
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -434,7 +336,32 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
                   ),
                 ),
               ),
-              child: _buildResponsiveActions(context, l10n, theme),
+              child: Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: _resetToDefault,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(l10n.resetToDefault),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(l10n.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _hasChanges && _hasVisibleTools()
+                        ? () async {
+                            await _saveChanges();
+                            if (!mounted) return;
+                            // ignore: use_build_context_synchronously
+                            Navigator.of(context).pop();
+                          }
+                        : null,
+                    child: Text(l10n.save),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

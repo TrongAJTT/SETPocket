@@ -758,4 +758,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetToDefault => 'Reset to Default';
+
+  @override
+  String get manageQuickActions => 'Manage Quick Actions';
+
+  @override
+  String get manageQuickActionsDesc => 'Configure shortcuts for quick access to tools';
+
+  @override
+  String get quickActionsDialogTitle => 'Quick Actions';
+
+  @override
+  String get quickActionsDialogDesc => 'Select up to 4 tools for quick access via app icon or taskbar';
+
+  @override
+  String get quickActionsLimit => 'Maximum 4 quick actions allowed';
+
+  @override
+  String get quickActionsLimitReached => 'You can only select up to 4 tools for quick actions';
+
+  @override
+  String get clearAllQuickActions => 'Clear All';
+
+  @override
+  String get quickActionsCleared => 'Quick actions cleared';
+
+  @override
+  String get quickActionsUpdated => 'Quick actions updated';
+
+  @override
+  String get quickActionsInfo => 'Quick Actions';
+
+  @override
+  String get selectUpTo4Tools => 'Select up to 4 tools for quick access.';
+
+  @override
+  String get quickActionsEnableDesc => 'Quick actions will appear when you long-press the app icon on Android or right-click the taskbar icon on Windows.';
+
+  @override
+  String get quickActionsEnableDescMobile => 'Quick actions will appear when you long-press the app icon (Android/iOS only).';
+
+  @override
+  String selectedCount(int current, int max) {
+    return 'Selected: $current of $max';
+  }
+
+  @override
+  String get maxQuickActionsReached => 'Maximum 4 quick actions reached';
+
+  @override
+  String get clearAll => 'Clear All';
 }

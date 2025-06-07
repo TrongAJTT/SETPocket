@@ -1,4 +1,4 @@
-package com.example.my_multi_tools
+package com.multitools.app
 
 import io.flutter.embedding.android.FlutterActivity
 

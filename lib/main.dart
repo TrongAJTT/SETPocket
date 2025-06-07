@@ -142,17 +142,20 @@ class DesktopLayout extends StatefulWidget {
 class _DesktopLayoutState extends State<DesktopLayout> {
   Widget? currentTool;
   String? selectedToolType;
-  String? currentToolTitle;
-  GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
+  String? currentToolTitle;  GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
   void _refreshToolSelection() {
     // Refresh the tool list first
     _toolSelectionKey.currentState?.refreshTools();
-    // Reset the current selection
-    setState(() {
-      currentTool = null;
-      selectedToolType = null;
-      currentToolTitle = null;
-    });
+    
+    // Only reset current selection if it's not Settings screen
+    // This allows users to stay in Settings after saving changes
+    if (selectedToolType != 'MainSettingsScreen') {
+      setState(() {
+        currentTool = null;
+        selectedToolType = null;
+        currentToolTitle = null;
+      });
+    }
   }
 
   @override

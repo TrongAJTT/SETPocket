@@ -231,34 +231,34 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                   ),
               ],
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildInfoChip(
-                    AppLocalizations.of(context)!.cacheItems,
-                    info.itemCount.toString(),
-                    Icons.inventory_2_outlined,
+            const SizedBox(height: 12),            IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildInfoChip(
+                      AppLocalizations.of(context)!.cacheItems,
+                      info.itemCount.toString(),
+                      Icons.inventory_2_outlined,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildInfoChip(
-                    AppLocalizations.of(context)!.cacheSize,
-                    info.formattedSize,
-                    Icons.storage_outlined,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildInfoChip(
+                      AppLocalizations.of(context)!.cacheSize,
+                      info.formattedSize,
+                      Icons.storage_outlined,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
       ),
-    );
-  }
-
+    );  }
   Widget _buildInfoChip(String label, String value, IconData icon) {
     return Container(
+      constraints: const BoxConstraints(minHeight: 64), // Use minHeight instead of fixed height
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -272,22 +272,29 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
             size: 16,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min, // Allow column to shrink if needed
               children: [
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
                 Text(
                   value,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -322,7 +329,6 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Colors.grey;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -330,17 +336,26 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         _cacheInfo.values.fold(0, (sum, info) => sum + info.sizeBytes);
     final totalItems =
         _cacheInfo.values.fold(0, (sum, info) => sum + info.itemCount);
+    
+    final screenSize = MediaQuery.of(context).size;
+    final isDesktop = screenSize.width >= 600;
+    
+    // Responsive sizing for dialog
+    final dialogWidth = isDesktop 
+        ? 600.0 
+        : screenSize.width * 0.95;
+    final dialogMaxHeight = screenSize.height * 0.85; // Increase from 0.8 to 0.85
 
     return Dialog(
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
+        width: dialogWidth,
+        constraints: BoxConstraints(maxHeight: dialogMaxHeight),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(isDesktop ? 20 : 16),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: const BorderRadius.only(
@@ -352,9 +367,10 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                 children: [
                   Icon(
                     Icons.storage,
+                    size: isDesktop ? 24 : 20,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: isDesktop ? 12 : 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,8 +383,12 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                                         .colorScheme
                                         .onPrimaryContainer,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: isDesktop ? null : 18,
                                   ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        SizedBox(height: isDesktop ? 4 : 2),
                         Text(
                           '${loc.total}: $totalItems ${loc.cacheItems}, ${CacheService.formatCacheSize(totalSize)}',
                           style:
@@ -376,7 +396,10 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onPrimaryContainer,
+                                    fontSize: isDesktop ? null : 12,
                                   ),
+                          maxLines: isDesktop ? 1 : 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -385,6 +408,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(
                       Icons.close,
+                      size: isDesktop ? 24 : 20,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                   ),
@@ -392,8 +416,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
               ),
             ),
 
-            // Content
-            Flexible(
+            // Content - Use Expanded instead of Flexible to take remaining space
+            Expanded(
               child: _loading
                   ? const Center(
                       child: Padding(
@@ -401,24 +425,47 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                         child: CircularProgressIndicator(),
                       ),
                     )
-                  : ListView(
-                      padding: const EdgeInsets.all(16),
+                  : Column(
                       children: [
-                        ..._cacheInfo.entries.map(
-                          (entry) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: _buildCacheSection(entry.key, entry.value),
+                        // Scrollable content
+                        Expanded(
+                          child: ListView(
+                            padding: EdgeInsets.all(isDesktop ? 16 : 12),
+                            children: [
+                              ..._cacheInfo.entries.map(
+                                (entry) => Padding(
+                                  padding: EdgeInsets.only(bottom: isDesktop ? 8 : 6),
+                                  child: _buildCacheSection(entry.key, entry.value),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 16), // Clear All Button
-                        FilledButton.icon(
-                          onPressed: totalItems > 0 ? _clearAllCache : null,
-                          icon: const Icon(Icons.delete_sweep),
-                          label: Text(loc.clearAllCache),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Colors.red.shade700,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                        
+                        // Fixed bottom button area
+                        Container(
+                          padding: EdgeInsets.all(isDesktop ? 16 : 12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                              ),
+                            ),
+                          ),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: FilledButton.icon(
+                              onPressed: totalItems > 0 ? _clearAllCache : null,
+                              icon: const Icon(Icons.delete_sweep),
+                              label: Text(loc.clearAllCache),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.red.shade700,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isDesktop ? 16 : 14,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],

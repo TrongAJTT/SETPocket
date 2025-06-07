@@ -627,52 +627,70 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       ],
     );
   }
-
   Widget _buildCacheActions(AppLocalizations loc) {
-    final isDesktop = MediaQuery.of(context).size.width >= 600;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 600;
+    final isMobile = screenWidth < 480;
 
-    final clearButton = Expanded(
-      child: FilledButton.icon(
-        icon: _clearing
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(Icons.delete_outline),
-        label: Text(loc.clearCache),
-        style: FilledButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.error,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    final clearButton = FilledButton.icon(
+      icon: _clearing
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : const Icon(Icons.delete_outline),
+      label: Text(loc.clearCache),
+      style: FilledButton.styleFrom(
+        backgroundColor: Theme.of(context).colorScheme.error,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 20 : 16,
+          vertical: isDesktop ? 14 : 12,
         ),
-        onPressed: _clearing ? null : _clearCache,
+        minimumSize: isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
       ),
+      onPressed: _clearing ? null : _clearCache,
     );
 
-    final detailsButton = Expanded(
-      child: OutlinedButton.icon(
-        icon: const Icon(Icons.visibility_outlined),
-        label: Text(loc.viewCacheDetails),
-        style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    final detailsButton = OutlinedButton.icon(
+      icon: const Icon(Icons.visibility_outlined),
+      label: Text(loc.viewCacheDetails),
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 20 : 16,
+          vertical: isDesktop ? 14 : 12,
         ),
-        onPressed: _showCacheDetails,
+        minimumSize: isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
       ),
+      onPressed: _showCacheDetails,
     );
 
-    return Row(
-      children: [
-        clearButton,
-        SizedBox(width: isDesktop ? 16 : 12),
-        detailsButton,
-      ],
-    );
+    // Use Column layout on mobile, Row layout on desktop
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          clearButton,
+          const SizedBox(height: 12),
+          detailsButton,
+        ],
+      );
+    } else {
+      // Desktop and tablet: use Row layout with proper expansion
+      return Row(
+        children: [
+          Expanded(child: clearButton),
+          SizedBox(width: isDesktop ? 16 : 12),
+          Expanded(child: detailsButton),
+        ],
+      );
+    }
   }
 
   Widget _buildThemeOptions(AppLocalizations loc) {

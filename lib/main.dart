@@ -373,14 +373,16 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return RandomToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: widget.onToolSelected,
-        );
-      case 'converterTools':
+        );      case 'converterTools':
         return ConverterToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: widget.onToolSelected,
         );
       case 'calculatorTools':
-        return const CalculatorToolsScreen();
+        return CalculatorToolsScreen(
+          isEmbedded: widget.isDesktop,
+          onToolSelected: widget.onToolSelected,
+        );
       default:
         return const SizedBox.shrink();
     }

@@ -8,7 +8,15 @@ import 'calculators/scientific_calculator_screen.dart';
 import 'calculators/graphing_calculator_screen.dart';
 
 class CalculatorToolsScreen extends StatelessWidget {
-  const CalculatorToolsScreen({super.key});
+  final bool isEmbedded;
+  final Function(Widget, String)? onToolSelected;
+
+  const CalculatorToolsScreen({
+    super.key,
+    this.isEmbedded = false,
+    this.onToolSelected,
+  });
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -68,64 +76,74 @@ class CalculatorToolsScreen extends StatelessWidget {
         'icon': Icons.local_offer,
         'color': Colors.purple,
         'screen': const DiscountCalculatorScreen(),
+      },    ];
+
+    final gridView = GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        mainAxisExtent: 120,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+      ),
+      itemCount: calculators.length,
+      itemBuilder: (context, index) {
+        final calculator = calculators[index];
+        return _buildCalculatorTile(
+          context,
+          title: calculator['title'] as String,
+          description: calculator['description'] as String,
+          icon: calculator['icon'] as IconData,
+          color: calculator['color'] as Color,
+          calculator: calculator,
+        );
       },
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations.calculatorTools),
-      ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          mainAxisExtent: 120,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-        ),
-        itemCount: calculators.length,
-        itemBuilder: (context, index) {
-          final calculator = calculators[index];
-          return _buildCalculatorTile(
-            context,
-            title: calculator['title'] as String,
-            description: calculator['description'] as String,
-            icon: calculator['icon'] as IconData,
-            color: calculator['color'] as Color,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => calculator['screen'] as Widget,
-              ),
-            ),
-          );
-        },
-      ),
     );
-  }
 
+    if (isEmbedded) {
+      return gridView;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(localizations.calculatorTools),
+        ),
+        body: gridView,
+      );
+    }
+  }
   Widget _buildCalculatorTile(
     BuildContext context, {
     required String title,
     required String description,
     required IconData icon,
     required Color color,
-    required VoidCallback onTap,
+    required Map<String, dynamic> calculator,
   }) {
     return Card(
       elevation: 2,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          final screen = calculator['screen'] as Widget;
+          if (isEmbedded && onToolSelected != null) {
+            onToolSelected!(screen, title);
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => screen,
+              ),
+            );
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
               // Icon container
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                padding: const EdgeInsets.all(12),                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -152,13 +170,12 @@ class CalculatorToolsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      description,
-                      style: TextStyle(
+                      description,                      style: TextStyle(
                         color: Theme.of(context)
                             .textTheme
                             .bodyMedium
                             ?.color
-                            ?.withOpacity(0.7),
+                            ?.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                       maxLines: 2,

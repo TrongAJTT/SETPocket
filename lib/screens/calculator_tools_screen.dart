@@ -28,6 +28,20 @@ class CalculatorToolsScreen extends StatelessWidget {
 
     final calculators = [
       {
+        'title': localizations.scientificCalculator,
+        'description': localizations.scientificCalculatorDesc,
+        'icon': Icons.calculate,
+        'color': Colors.teal,
+        'screen': const ScientificCalculatorScreen(),
+      },
+      {
+        'title': localizations.graphingCalculator,
+        'description': localizations.graphingCalculatorDesc,
+        'icon': Icons.show_chart,
+        'color': Colors.indigo,
+        'screen': const GraphingCalculatorScreen(),
+      },
+      {
         'title': localizations.bmiCalculator,
         'description': localizations.bmiCalculatorDesc,
         'icon': Icons.monitor_weight,
@@ -54,20 +68,6 @@ class CalculatorToolsScreen extends StatelessWidget {
         'icon': Icons.local_offer,
         'color': Colors.purple,
         'screen': const DiscountCalculatorScreen(),
-      },
-      {
-        'title': localizations.scientificCalculator,
-        'description': localizations.scientificCalculatorDesc,
-        'icon': Icons.calculate,
-        'color': Colors.teal,
-        'screen': const ScientificCalculatorScreen(),
-      },
-      {
-        'title': localizations.graphingCalculator,
-        'description': localizations.graphingCalculatorDesc,
-        'icon': Icons.show_chart,
-        'color': Colors.indigo,
-        'screen': const GraphingCalculatorScreen(),
       },
     ];
 

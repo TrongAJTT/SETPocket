@@ -447,13 +447,16 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return descKey;
     }
   }
-
   String _getSelectedToolType(ToolConfig config) {
     switch (config.id) {
       case 'textTemplate':
         return 'TemplateListScreen';
       case 'randomTools':
         return 'RandomToolsScreen';
+      case 'converterTools':
+        return 'ConverterToolsScreen';
+      case 'calculatorTools':
+        return 'CalculatorToolsScreen';
       default:
         return '';
     }

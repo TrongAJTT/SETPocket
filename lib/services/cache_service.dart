@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
+import 'hive_service.dart';
 
 class CacheInfo {
   final String name;
@@ -55,12 +56,10 @@ class CacheService {
     String? randomGeneratorsDesc,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    final Map<String, CacheInfo> cacheInfoMap = {};
-
-    // Text Templates Cache
+    final Map<String, CacheInfo> cacheInfoMap =
+        {}; // Text Templates Cache - Now using Hive
     final templates = await TemplateService.getTemplates();
-    final templatesJson = prefs.getStringList(_templatesKey) ?? [];
-    final templatesSize = _calculateStringListSize(templatesJson);
+    final templatesSize = HiveService.getBoxSize(HiveService.templatesBoxName);
 
     cacheInfoMap['text_templates'] = CacheInfo(
       name: textTemplatesName ?? 'Text Templates',
@@ -87,14 +86,15 @@ class CacheService {
         }
       }
     }
-
     cacheInfoMap['settings'] = CacheInfo(
       name: appSettingsName ?? 'App Settings',
       description: appSettingsDesc ?? 'Theme, language, and user preferences',
       itemCount: settingsCount,
       sizeBytes: settingsSize,
       keys: settingsKeys,
-    ); // Random Generators Cache - Get actual history data
+    );
+
+    // Random Generators Cache - Get actual history data (now using Hive)
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
     final historyCount = await GenerationHistoryService.getTotalHistoryCount();
     final historySize = await GenerationHistoryService.getHistoryDataSize();
@@ -113,12 +113,14 @@ class CacheService {
 
   static Future<void> clearCache(String cacheType) async {
     final prefs = await SharedPreferences.getInstance();
-
     if (cacheType == 'random_generators') {
       // Clear all generation history through the service
       await GenerationHistoryService.clearAllHistory();
       // Also clear the history enabled setting
       await prefs.remove('generation_history_enabled');
+    } else if (cacheType == 'text_templates') {
+      // Clear templates cache from Hive
+      await HiveService.clearBox(HiveService.templatesBoxName);
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -130,7 +132,13 @@ class CacheService {
   static Future<void> clearAllCache() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Get all cache keys
+    // Clear templates cache from Hive
+    await HiveService.clearBox(HiveService.templatesBoxName);
+
+    // Clear history cache from Hive
+    await GenerationHistoryService.clearAllHistory();
+
+    // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
     for (final keyList in _cacheKeys.values) {
       allKeys.addAll(keyList);
@@ -156,11 +164,6 @@ class CacheService {
     } else {
       return '${(bytes / 1024).toStringAsFixed(1)} KB';
     }
-  }
-
-  static int _calculateStringListSize(List<String> list) {
-    return list.fold(
-        0, (sum, str) => sum + (str.length * 2)); // UTF-16 encoding
   }
 
   // Method to add cache tracking for other features in the future

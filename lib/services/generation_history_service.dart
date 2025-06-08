@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'hive_service.dart';
 
 class GenerationHistoryItem {
   final String value;
@@ -89,29 +90,33 @@ class GenerationHistoryService {
     final enabled = await isHistoryEnabled();
     if (!enabled) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final history = await getHistory(type);
+    try {
+      final box = HiveService.historyBox;
+      final history = await getHistory(type);
 
-    // Add new item at the beginning
-    final newItem = GenerationHistoryItem(
-      value: value,
-      timestamp: DateTime.now(),
-      type: type,
-    );
+      // Add new item at the beginning
+      final newItem = GenerationHistoryItem(
+        value: value,
+        timestamp: DateTime.now(),
+        type: type,
+      );
 
-    history.insert(0, newItem);
+      history.insert(0, newItem);
 
-    // Keep only the latest items
-    if (history.length > maxHistoryItems) {
-      history.removeRange(maxHistoryItems, history.length);
+      // Keep only the latest items
+      if (history.length > maxHistoryItems) {
+        history.removeRange(maxHistoryItems, history.length);
+      }
+
+      // Encrypt and save to Hive
+      final jsonList = history.map((item) => item.toJson()).toList();
+      final jsonString = json.encode(jsonList);
+      final encryptedData = _encrypt(jsonString);
+
+      await box.put('${_historyKey}_$type', encryptedData);
+    } catch (e) {
+      // Silently fail to avoid breaking the app
     }
-
-    // Encrypt and save
-    final jsonList = history.map((item) => item.toJson()).toList();
-    final jsonString = json.encode(jsonList);
-    final encryptedData = _encrypt(jsonString);
-
-    await prefs.setString('${_historyKey}_$type', encryptedData);
   }
 
   /// Get history for a specific type
@@ -119,14 +124,14 @@ class GenerationHistoryService {
     final enabled = await isHistoryEnabled();
     if (!enabled) return [];
 
-    final prefs = await SharedPreferences.getInstance();
-    final encryptedData = prefs.getString('${_historyKey}_$type');
-
-    if (encryptedData == null || encryptedData.isEmpty) {
-      return [];
-    }
-
     try {
+      final box = HiveService.historyBox;
+      final encryptedData = box.get('${_historyKey}_$type');
+
+      if (encryptedData == null || encryptedData.isEmpty) {
+        return [];
+      }
+
       final decryptedData = _decrypt(encryptedData);
       if (decryptedData.isEmpty) return [];
 
@@ -142,18 +147,29 @@ class GenerationHistoryService {
 
   /// Clear history for a specific type
   static Future<void> clearHistory(String type) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('${_historyKey}_$type');
+    try {
+      final box = HiveService.historyBox;
+      await box.delete('${_historyKey}_$type');
+    } catch (e) {
+      // Silently fail to avoid breaking the app
+    }
   }
 
   /// Clear all history
   static Future<void> clearAllHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final keys =
-        prefs.getKeys().where((key) => key.startsWith(_historyKey)).toList();
+    try {
+      final box = HiveService.historyBox;
 
-    for (final key in keys) {
-      await prefs.remove(key);
+      // Get all keys that start with history key prefix
+      final keysToDelete = box.keys
+          .where((key) => key.toString().startsWith(_historyKey))
+          .toList();
+
+      for (final key in keysToDelete) {
+        await box.delete(key);
+      }
+    } catch (e) {
+      // Silently fail to avoid breaking the app
     }
   }
 
@@ -162,21 +178,25 @@ class GenerationHistoryService {
     final enabled = await isHistoryEnabled();
     if (!enabled) return 0;
 
-    final prefs = await SharedPreferences.getInstance();
-    final keys = prefs
-        .getKeys()
-        .where(
-            (key) => key.startsWith(_historyKey) && key != _historyEnabledKey)
-        .toList();
+    try {
+      final box = HiveService.historyBox;
+      final keys = box.keys
+          .where((key) =>
+              key.toString().startsWith(_historyKey) &&
+              key.toString() != _historyEnabledKey)
+          .toList();
 
-    int totalCount = 0;
-    for (final key in keys) {
-      final type = key.replaceFirst('${_historyKey}_', '');
-      final history = await getHistory(type);
-      totalCount += history.length;
+      int totalCount = 0;
+      for (final key in keys) {
+        final typeKey = key.toString().replaceFirst('${_historyKey}_', '');
+        final history = await getHistory(typeKey);
+        totalCount += history.length;
+      }
+
+      return totalCount;
+    } catch (e) {
+      return 0;
     }
-
-    return totalCount;
   }
 
   /// Get size of history data in bytes (estimated)
@@ -184,19 +204,25 @@ class GenerationHistoryService {
     final enabled = await isHistoryEnabled();
     if (!enabled) return 0;
 
-    final prefs = await SharedPreferences.getInstance();
-    final keys = prefs
-        .getKeys()
-        .where(
-            (key) => key.startsWith(_historyKey) && key != _historyEnabledKey)
-        .toList();
+    try {
+      final box = HiveService.historyBox;
+      final keys = box.keys
+          .where((key) =>
+              key.toString().startsWith(_historyKey) &&
+              key.toString() != _historyEnabledKey)
+          .toList();
 
-    int totalSize = 0;
-    for (final key in keys) {
-      final data = prefs.getString(key) ?? '';
-      totalSize += data.length * 2; // UTF-16 encoding estimate
+      int totalSize = 0;
+      for (final key in keys) {
+        final data = box.get(key, defaultValue: '');
+        if (data is String) {
+          totalSize += data.length * 2; // UTF-16 encoding estimate
+        }
+      }
+
+      return totalSize;
+    } catch (e) {
+      return 0;
     }
-
-    return totalSize;
   }
 }

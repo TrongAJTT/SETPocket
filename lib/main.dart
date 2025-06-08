@@ -7,6 +7,7 @@ import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/tool_visibility_service.dart';
 import 'package:my_multi_tools/services/quick_actions_service.dart';
+import 'package:my_multi_tools/services/hive_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
@@ -19,6 +20,9 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Hive database
+  await HiveService.initialize();
+
   // Initialize settings controller and load saved settings
   await settingsController.loadSettings();
 
@@ -532,9 +536,7 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               }
             },
           );
-        }).toList(),
-
-        // Settings tool - always visible
+        }).toList(), // Settings tool - always visible
         const SizedBox(height: 32),
         ToolCard(
           title: loc.settings,
@@ -559,6 +561,7 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
           },
           showActions: false,
         ),
+        // Development tools removed for production
       ],
     );
   }

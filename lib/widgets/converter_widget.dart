@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/converter_models.dart';
+import 'package:my_multi_tools/services/currency_service.dart';
+import 'package:my_multi_tools/services/currency_cache_service.dart';
 
 enum ConverterViewMode { table, list }
 
@@ -32,11 +34,15 @@ class _ConverterWidgetState extends State<ConverterWidget> {
   Map<ConversionUnit, bool> _unitVisibility = {};
   double _inputValue = 0.0;
   Map<ConversionUnit, double> _conversions = {};
+  bool _isLoadingRates = false;
+  DateTime? _lastUpdated;
+  bool _isUsingLiveRates = false;
 
   @override
   void initState() {
     super.initState();
     _initializeDefaults();
+    _initializeCurrencyRates();
   }
 
   void _initializeDefaults() {
@@ -53,6 +59,101 @@ class _ConverterWidgetState extends State<ConverterWidget> {
     _controller.text = '1';
     _inputValue = 1.0;
     _updateConversions();
+  }
+
+  Future<void> _initializeCurrencyRates() async {
+    // Only initialize live rates for currency converter
+    if (widget.converter is CurrencyConverter) {
+      setState(() {
+        _isLoadingRates = true;
+      });
+      try {
+        // Use CurrencyCacheService.getRates() which handles all logic internally
+        // This respects the user's fetch mode settings
+        await CurrencyCacheService.getRates();
+
+        // Get cache info for display
+        final cacheInfo = await CurrencyCacheService.getCacheInfo();
+
+        if (mounted) {
+          setState(() {
+            _lastUpdated = cacheInfo?.lastUpdated;
+            _isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+          });
+        }
+
+        _updateConversions();
+      } catch (e) {
+        print('Failed to initialize currency rates: $e');
+        // Set fallback state
+        if (mounted) {
+          setState(() {
+            _lastUpdated = null;
+            _isUsingLiveRates = false;
+          });
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoadingRates = false;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _refreshCurrencyRates() async {
+    if (mounted) {
+      setState(() {
+        _isLoadingRates = true;
+      });
+    }
+
+    try {
+      // Force refresh using cache service
+      await CurrencyCacheService.forceRefresh();
+
+      // Get updated cache info
+      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+
+      if (mounted) {
+        setState(() {
+          _lastUpdated = cacheInfo?.lastUpdated;
+          _isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+        });
+      }
+
+      _updateConversions();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isUsingLiveRates
+                  ? 'Live rates updated successfully'
+                  : 'Using static rates (live data unavailable)',
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Failed to refresh currency rates: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to update rates'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingRates = false;
+        });
+      }
+    }
   }
 
   void _updateConversions() {
@@ -93,6 +194,166 @@ class _ConverterWidgetState extends State<ConverterWidget> {
     );
   }
 
+  Widget _buildLiveRateIndicator() {
+    return Row(
+      children: [
+        if (_isUsingLiveRates) ...[
+          Icon(
+            Icons.wifi,
+            size: 16,
+            color: Colors.green,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'Live',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ] else ...[
+          Icon(
+            Icons.wifi_off,
+            size: 16,
+            color: Colors.orange,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'Static',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.orange,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
+        if (_lastUpdated != null) ...[
+          const SizedBox(width: 8),
+          Text(
+            '• ${_formatLastUpdated()}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+        const SizedBox(width: 8),
+        InkWell(
+          onTap: _isLoadingRates ? null : _refreshCurrencyRates,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Icon(
+              Icons.refresh,
+              size: 16,
+              color: _isLoadingRates
+                  ? Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant
+                      .withOpacity(0.5)
+                  : Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatLastUpdated() {
+    if (_lastUpdated == null) return '';
+
+    final now = DateTime.now();
+    final difference = now.difference(_lastUpdated!);
+
+    if (difference.inMinutes < 1) {
+      return 'just now';
+    } else if (difference.inHours < 1) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inDays < 1) {
+      return '${difference.inHours}h ago';
+    } else {
+      return '${difference.inDays}d ago';
+    }
+  }
+
+  Widget _buildCurrencyStatusRow() {
+    return Row(
+      children: [
+        // Status indicator
+        if (_isUsingLiveRates) ...[
+          const Icon(
+            Icons.wifi,
+            size: 16,
+            color: Colors.green,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'Live Rates',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ] else ...[
+          const Icon(
+            Icons.wifi_off,
+            size: 16,
+            color: Colors.orange,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'Static Rates',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.orange,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
+
+        // Last updated info
+        if (_lastUpdated != null) ...[
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Updated ${_formatLastUpdated()}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ] else ...[
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'No update information',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ),
+        ],
+
+        // Refresh button
+        InkWell(
+          onTap: _isLoadingRates ? null : _refreshCurrencyRates,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(6),
+            child: Icon(
+              Icons.refresh,
+              size: 18,
+              color: _isLoadingRates
+                  ? Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant
+                      .withOpacity(0.5)
+                  : Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -119,8 +380,68 @@ class _ConverterWidgetState extends State<ConverterWidget> {
                               fontWeight: FontWeight.w600,
                             ),
                       ),
+                    const Spacer(),
+                    if (widget.converter is CurrencyConverter) ...[
+                      if (_isLoadingRates)
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Loading rates...',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        )
+                      else
+                        _buildLiveRateIndicator(),
+                    ],
                   ],
                 ),
+                // Currency status indicator section
+                if (widget.converter is CurrencyConverter) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceVariant
+                          .withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .outline
+                            .withOpacity(0.2),
+                      ),
+                    ),
+                    child: _isLoadingRates
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Loading currency rates...',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          )
+                        : _buildCurrencyStatusRow(),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -171,6 +492,30 @@ class _ConverterWidgetState extends State<ConverterWidget> {
                     ),
                   ],
                 ),
+                if (widget.converter is CurrencyConverter) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Last updated: ${CurrencyService.getLastUpdated()}',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.refresh),
+                        onPressed:
+                            _isLoadingRates ? null : _refreshCurrencyRates,
+                        tooltip: 'Refresh rates',
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

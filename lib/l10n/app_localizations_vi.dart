@@ -1141,4 +1141,28 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get obese => 'Béo phì';
+
+  @override
+  String get currencyFetchMode => 'Tải tỷ giá Tiền tệ';
+
+  @override
+  String get currencyFetchModeDesc => 'Chọn cách cập nhật tỷ giá hối đoái';
+
+  @override
+  String get fetchModeManual => 'Thủ công';
+
+  @override
+  String get fetchModeManualDesc => 'Chỉ sử dụng tỷ giá đã lưu, cập nhật thủ công bằng nút làm mới';
+
+  @override
+  String get fetchModeOnceADay => 'Một lần mỗi ngày';
+
+  @override
+  String get fetchModeOnceADayDesc => 'Tự động tải tỷ giá một lần mỗi ngày';
+
+  @override
+  String get fetchModeEverytime => 'Mỗi lần mở';
+
+  @override
+  String get fetchModeEverytimeDesc => 'Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi';
 }

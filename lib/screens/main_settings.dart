@@ -5,6 +5,8 @@ import 'package:my_multi_tools/widgets/tool_visibility_dialog.dart';
 import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
+import 'package:my_multi_tools/services/settings_service.dart';
+import 'package:my_multi_tools/models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
@@ -29,6 +31,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _clearing = false;
   bool _loading = true;
   bool _historyEnabled = false;
+  CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
 
   @override
   void initState() {
@@ -42,12 +45,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final themeIndex = prefs.getInt('themeMode');
     final lang = prefs.getString('language');
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
+    final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
     setState(() {
       _themeMode = themeIndex != null
           ? ThemeMode.values[themeIndex]
           : settingsController.themeMode;
       _language = lang ?? settingsController.locale.languageCode;
       _historyEnabled = historyEnabled;
+      _currencyFetchMode = currencyFetchMode;
       _loading = false;
     });
   }
@@ -134,6 +139,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   void _onHistoryEnabledChanged(bool enabled) async {
     setState(() => _historyEnabled = enabled);
     await GenerationHistoryService.setHistoryEnabled(enabled);
+  }
+
+  void _onCurrencyFetchModeChanged(CurrencyFetchMode mode) async {
+    setState(() => _currencyFetchMode = mode);
+    await SettingsService.updateCurrencyFetchMode(mode);
   }
 
   void _showToolVisibilityDialog() async {
@@ -264,6 +274,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             const SizedBox(height: 32),
             _buildToolsShortcutsSection(loc),
             const SizedBox(height: 32),
+            _buildConverterToolsSection(loc),
+            const SizedBox(height: 32),
             _buildRandomToolsSection(loc),
             const SizedBox(height: 32),
             _buildDataSection(loc),
@@ -325,6 +337,16 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         _buildToolVisibilitySettings(loc),
         const SizedBox(height: 16),
         _buildQuickActionsSettings(loc),
+      ],
+    );
+  }
+
+  Widget _buildConverterToolsSection(AppLocalizations loc) {
+    return _buildSection(
+      title: loc.converterTools,
+      icon: Icons.swap_horiz,
+      children: [
+        _buildCurrencyFetchModeSettings(loc),
       ],
     );
   }
@@ -494,6 +516,101 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           value: _historyEnabled,
           onChanged: _onHistoryEnabledChanged,
         ),
+      ],
+    );
+  }
+
+  Widget _buildCurrencyFetchModeSettings(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.currencyFetchMode,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          loc.currencyFetchModeDesc,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 16),
+        ...CurrencyFetchMode.values.map((mode) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: InkWell(
+                onTap: () => _onCurrencyFetchModeChanged(mode),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _currencyFetchMode == mode
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withValues(alpha: 0.2),
+                      width: _currencyFetchMode == mode ? 2 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    color: _currencyFetchMode == mode
+                        ? Theme.of(context)
+                            .colorScheme
+                            .primaryContainer
+                            .withValues(alpha: 0.1)
+                        : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _currencyFetchMode == mode
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color: _currencyFetchMode == mode
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              mode.displayName(loc),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: _currencyFetchMode == mode
+                                        ? Theme.of(context).colorScheme.primary
+                                        : null,
+                                  ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              mode.description(loc),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )),
       ],
     );
   }

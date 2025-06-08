@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:live_currency_rate/live_currency_rate.dart';
 
 class CurrencyService {
   // For demo purposes, using static rates. In production, this would connect to a real API
@@ -21,7 +20,14 @@ class CurrencyService {
     'PHP': 50.0,
   };
 
-  static const String _lastUpdated = '2025-06-07 15:30:00';
+  // Get static rates for fallback
+  static Map<String, double> getStaticRates() {
+    return Map.from(_staticRates);
+  }
+
+  static DateTime? _lastUpdated;
+  static bool _isUsingLiveRates = false;
+  static Map<String, double> _currentRates = _staticRates;
 
   // Get available currencies
   static List<Currency> getSupportedCurrencies() {
@@ -48,8 +54,8 @@ class CurrencyService {
   static double convert(double amount, String fromCurrency, String toCurrency) {
     if (fromCurrency == toCurrency) return amount;
 
-    final fromRate = _staticRates[fromCurrency] ?? 1.0;
-    final toRate = _staticRates[toCurrency] ?? 1.0;
+    final fromRate = _currentRates[fromCurrency] ?? 1.0;
+    final toRate = _currentRates[toCurrency] ?? 1.0;
 
     // Convert to USD first, then to target currency
     final usdAmount = amount / fromRate;
@@ -63,25 +69,83 @@ class CurrencyService {
 
   // Get last updated time
   static String getLastUpdated() {
-    return _lastUpdated;
+    if (_lastUpdated != null) {
+      return _lastUpdated!
+          .toString()
+          .substring(0, 19); // Format: YYYY-MM-DD HH:MM:SS
+    }
+    return 'Static rates (no live data)';
   }
 
-  // Future method for real API integration
-  static Future<Map<String, double>> fetchLiveRates() async {
-    // This would connect to a real currency API like:
-    // - exchangerate-api.com
-    // - openexchangerates.org
-    // - currencylayer.com
+  // Check if using live rates
+  static bool get isUsingLiveRates => _isUsingLiveRates;
 
-    // For now, return static rates
-    await Future.delayed(
-        const Duration(milliseconds: 500)); // Simulate network delay
-    return _staticRates;
+  // Initialize or refresh rates
+  static Future<void> refreshRates() async {
+    try {
+      final newRates = await fetchLiveRates();
+      _currentRates = newRates;
+    } catch (e) {
+      print('Failed to refresh rates: $e');
+      _currentRates = _staticRates;
+      _isUsingLiveRates = false;
+    }
+  } // Future method for real API integration
+
+  static Future<Map<String, double>> fetchLiveRates() async {
+    try {
+      // Try to use the live_currency_rate package
+      var rates = <String, double>{};
+      bool hasLiveData = false;
+
+      // Add USD as base
+      rates['USD'] = 1.0;
+
+      // Try to get rates for each currency
+      for (final currency in getSupportedCurrencies()) {
+        if (currency.code != 'USD') {
+          try {
+            // Try to get live rate from the API
+            final result = await LiveCurrencyRate.convertCurrency(
+                'USD', currency.code, 1.0);
+            if (result.result > 0) {
+              rates[currency.code] = result.result;
+              hasLiveData = true;
+            } else {
+              // Fall back to static rate
+              rates[currency.code] = _staticRates[currency.code] ?? 1.0;
+            }
+          } catch (e) {
+            print('Failed to get live rate for ${currency.code}: $e');
+            // Fall back to static rate
+            rates[currency.code] = _staticRates[currency.code] ?? 1.0;
+          }
+        }
+      }
+
+      // Update tracking variables
+      if (hasLiveData) {
+        _lastUpdated = DateTime.now();
+        _isUsingLiveRates = true;
+        print('Successfully fetched live currency rates');
+      } else {
+        _isUsingLiveRates = false;
+        print('Using static currency rates (live data unavailable)');
+      }
+
+      return rates;
+    } catch (e) {
+      print('Error fetching live rates: $e');
+      // Fall back to static rates
+      _isUsingLiveRates = false;
+      await Future.delayed(const Duration(milliseconds: 500));
+      return _staticRates;
+    }
   }
 
   // Check if API is available
   static bool get isLiveDataAvailable =>
-      false; // Set to true when real API is integrated
+      true; // Set to true now that we have real API integration
 }
 
 class Currency {

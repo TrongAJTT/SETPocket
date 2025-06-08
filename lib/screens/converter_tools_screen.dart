@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'converters/unit_converter_screen.dart';
+import 'converters/currency_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -41,8 +42,7 @@ class ConverterToolsScreen extends StatelessWidget {
         Color iconColor;
         switch (index) {
           case 0:
-            screen = UnitConverterScreen(
-                categoryId: 'currency', categoryName: loc.currencyConverter);
+            screen = const CurrencyConverterScreen();
             title = loc.currencyConverter;
             icon = Icons.attach_money;
             iconColor = Colors.green;

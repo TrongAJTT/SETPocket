@@ -1141,4 +1141,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obese => 'Obese';
+
+  @override
+  String get currencyFetchMode => 'Currency Rate Fetching';
+
+  @override
+  String get currencyFetchModeDesc => 'Choose how currency exchange rates are updated';
+
+  @override
+  String get fetchModeManual => 'Manual';
+
+  @override
+  String get fetchModeManualDesc => 'Only use cached rates, update manually by tapping refresh';
+
+  @override
+  String get fetchModeOnceADay => 'Once a day';
+
+  @override
+  String get fetchModeOnceADayDesc => 'Automatically fetch rates once per day';
+
+  @override
+  String get fetchModeEverytime => 'Every time';
+
+  @override
+  String get fetchModeEverytimeDesc => 'Fetch fresh rates every time the converter is opened';
 }

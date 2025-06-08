@@ -372,12 +372,20 @@
     "enterMeasurements": "Enter your measurements",
     "heightCm": "Height (cm)",
     "heightInches": "Height (inches)",
-    "weightKg": "Weight (kg)",
-    "weightPounds": "Weight (pounds)",
+    "weightKg": "Weight (kg)",    "weightPounds": "Weight (pounds)",
     "yourBMI": "Your BMI",
     "bmiScale": "BMI Scale",
     "underweight": "Underweight",
     "normalWeight": "Normal Weight",
     "overweight": "Overweight",
-    "obese": "Obese"
+    "obese": "Obese",
+    
+    "currencyFetchMode": "Currency Rate Fetching",
+    "currencyFetchModeDesc": "Choose how currency exchange rates are updated",
+    "fetchModeManual": "Manual",
+    "fetchModeManualDesc": "Only use cached rates, update manually by tapping refresh",
+    "fetchModeOnceADay": "Once a day",
+    "fetchModeOnceADayDesc": "Automatically fetch rates once per day",
+    "fetchModeEverytime": "Every time",
+    "fetchModeEverytimeDesc": "Fetch fresh rates every time the converter is opened"
 }

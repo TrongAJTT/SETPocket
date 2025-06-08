@@ -76,7 +76,8 @@ class CalculatorToolsScreen extends StatelessWidget {
         'icon': Icons.local_offer,
         'color': Colors.purple,
         'screen': const DiscountCalculatorScreen(),
-      },    ];
+      },
+    ];
 
     final gridView = GridView.builder(
       padding: const EdgeInsets.all(16),
@@ -111,6 +112,7 @@ class CalculatorToolsScreen extends StatelessWidget {
       );
     }
   }
+
   Widget _buildCalculatorTile(
     BuildContext context, {
     required String title,
@@ -142,7 +144,8 @@ class CalculatorToolsScreen extends StatelessWidget {
             children: [
               // Icon container
               Container(
-                padding: const EdgeInsets.all(12),                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -170,7 +173,8 @@ class CalculatorToolsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      description,                      style: TextStyle(
+                      description,
+                      style: TextStyle(
                         color: Theme.of(context)
                             .textTheme
                             .bodyMedium

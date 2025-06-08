@@ -373,9 +373,17 @@
     "underweight": "Thiếu cân",
     "normalWeight": "Bình thường",
     "overweight": "Thừa cân",
-    "obese": "Béo phì",
-    "scientificCalculator": "Máy tính Khoa học",
+    "obese": "Béo phì",    "scientificCalculator": "Máy tính Khoa học",
     "scientificCalculatorDesc": "Máy tính nâng cao với các hàm lượng giác, logarit",
     "graphingCalculator": "Máy tính Vẽ đồ thị",
-    "graphingCalculatorDesc": "Vẽ và hiển thị các hàm toán học"
+    "graphingCalculatorDesc": "Vẽ và hiển thị các hàm toán học",
+    
+    "currencyFetchMode": "Tải tỷ giá Tiền tệ",
+    "currencyFetchModeDesc": "Chọn cách cập nhật tỷ giá hối đoái",
+    "fetchModeManual": "Thủ công",
+    "fetchModeManualDesc": "Chỉ sử dụng tỷ giá đã lưu, cập nhật thủ công bằng nút làm mới",
+    "fetchModeOnceADay": "Một lần mỗi ngày",
+    "fetchModeOnceADayDesc": "Tự động tải tỷ giá một lần mỗi ngày",
+    "fetchModeEverytime": "Mỗi lần mở",
+    "fetchModeEverytimeDesc": "Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi"
 }

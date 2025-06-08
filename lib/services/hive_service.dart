@@ -1,5 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
+import '../models/currency_cache_model.dart';
+import '../models/settings_model.dart';
 
 class HiveService {
   static final Logger _logger = Logger();
@@ -7,6 +9,8 @@ class HiveService {
   // Box names
   static const String templatesBoxName = 'templates';
   static const String historyBoxName = 'history';
+  static const String currencyCacheBoxName = 'currency_cache';
+  static const String settingsBoxName = 'settings';
 
   // Box instances
   static Box? _templatesBox;
@@ -16,6 +20,17 @@ class HiveService {
   static Future<void> initialize() async {
     try {
       await Hive.initFlutter();
+
+      // Register type adapters
+      if (!Hive.isAdapterRegistered(10)) {
+        Hive.registerAdapter(CurrencyCacheModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(11)) {
+        Hive.registerAdapter(CurrencyFetchModeAdapter());
+      }
+      if (!Hive.isAdapterRegistered(12)) {
+        Hive.registerAdapter(SettingsModelAdapter());
+      }
 
       // Open boxes
       _templatesBox = await Hive.openBox(templatesBoxName);

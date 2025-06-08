@@ -2230,6 +2230,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Obese'**
   String get obese;
+
+  /// No description provided for @currencyFetchMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Rate Fetching'**
+  String get currencyFetchMode;
+
+  /// No description provided for @currencyFetchModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how currency exchange rates are updated'**
+  String get currencyFetchModeDesc;
+
+  /// No description provided for @fetchModeManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get fetchModeManual;
+
+  /// No description provided for @fetchModeManualDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Only use cached rates, update manually by tapping refresh'**
+  String get fetchModeManualDesc;
+
+  /// No description provided for @fetchModeOnceADay.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a day'**
+  String get fetchModeOnceADay;
+
+  /// No description provided for @fetchModeOnceADayDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically fetch rates once per day'**
+  String get fetchModeOnceADayDesc;
+
+  /// No description provided for @fetchModeEverytime.
+  ///
+  /// In en, this message translates to:
+  /// **'Every time'**
+  String get fetchModeEverytime;
+
+  /// No description provided for @fetchModeEverytimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch fresh rates every time the converter is opened'**
+  String get fetchModeEverytimeDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

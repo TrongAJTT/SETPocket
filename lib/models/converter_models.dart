@@ -833,54 +833,72 @@ class CurrencyConverter extends BaseConverter {
 
   @override
   CurrencyUnit get baseUnit => usd;
-
   static const usd = CurrencyUnit(
-    id: 'usd',
+    id: 'USD',
     name: 'US Dollar',
     symbol: '\$',
     countryCode: 'US',
   );
 
   static const eur = CurrencyUnit(
-    id: 'eur',
+    id: 'EUR',
     name: 'Euro',
     symbol: '€',
     countryCode: 'EU',
   );
 
   static const gbp = CurrencyUnit(
-    id: 'gbp',
+    id: 'GBP',
     name: 'British Pound',
     symbol: '£',
     countryCode: 'GB',
   );
 
   static const jpy = CurrencyUnit(
-    id: 'jpy',
+    id: 'JPY',
     name: 'Japanese Yen',
     symbol: '¥',
     countryCode: 'JP',
   );
 
   static const cad = CurrencyUnit(
-    id: 'cad',
+    id: 'CAD',
     name: 'Canadian Dollar',
     symbol: 'C\$',
     countryCode: 'CA',
   );
 
   static const aud = CurrencyUnit(
-    id: 'aud',
+    id: 'AUD',
     name: 'Australian Dollar',
     symbol: 'A\$',
     countryCode: 'AU',
   );
-
   static const vnd = CurrencyUnit(
-    id: 'vnd',
+    id: 'VND',
     name: 'Vietnamese Dong',
     symbol: '₫',
     countryCode: 'VN',
+  );
+
+  static const cny = CurrencyUnit(
+    id: 'CNY',
+    name: 'Chinese Yuan',
+    symbol: '¥',
+    countryCode: 'CN',
+  );
+
+  static const thb = CurrencyUnit(
+    id: 'THB',
+    name: 'Thai Baht',
+    symbol: '฿',
+    countryCode: 'TH',
+  );
+  static const sgd = CurrencyUnit(
+    id: 'SGD',
+    name: 'Singapore Dollar',
+    symbol: 'S\$',
+    countryCode: 'SG',
   );
 
   @override
@@ -892,6 +910,9 @@ class CurrencyConverter extends BaseConverter {
         cad,
         aud,
         vnd,
+        cny,
+        thb,
+        sgd,
       ];
   @override
   double convert(double value, String fromUnit, String toUnit) {

@@ -8,6 +8,7 @@ import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/tool_visibility_service.dart';
 import 'package:my_multi_tools/services/quick_actions_service.dart';
 import 'package:my_multi_tools/services/hive_service.dart';
+import 'package:my_multi_tools/services/settings_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
@@ -22,6 +23,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Hive database
   await HiveService.initialize();
+
+  // Initialize settings service
+  await SettingsService.initialize();
 
   // Initialize settings controller and load saved settings
   await settingsController.loadSettings();
@@ -373,7 +377,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return RandomToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: widget.onToolSelected,
-        );      case 'converterTools':
+        );
+      case 'converterTools':
         return ConverterToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: widget.onToolSelected,
@@ -449,6 +454,7 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return descKey;
     }
   }
+
   String _getSelectedToolType(ToolConfig config) {
     switch (config.id) {
       case 'textTemplate':

@@ -269,6 +269,18 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get searchHint;
+
   /// No description provided for @total.
   ///
   /// In en, this message translates to:
@@ -2834,20 +2846,74 @@ abstract class AppLocalizations {
   /// No description provided for @cacheTypeConverterToolsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Currency presets and exchange rates cache'**
+  /// **'Currency/length states, presets and exchange rates cache'**
   String get cacheTypeConverterToolsDesc;
 
-  /// No description provided for @cacheTypeFeatureStates.
+  /// No description provided for @unitSelectedStatus.
   ///
   /// In en, this message translates to:
-  /// **'Feature States'**
-  String get cacheTypeFeatureStates;
+  /// **'Selected {count} of {max}'**
+  String unitSelectedStatus(Object count, Object max);
 
-  /// No description provided for @cacheTypeFeatureStatesDesc.
+  /// No description provided for @lengthUnits.
   ///
   /// In en, this message translates to:
-  /// **'Saved feature states and preferences'**
-  String get cacheTypeFeatureStatesDesc;
+  /// **'Length Units'**
+  String get lengthUnits;
+
+  /// No description provided for @angstroms.
+  ///
+  /// In en, this message translates to:
+  /// **'Angstroms'**
+  String get angstroms;
+
+  /// No description provided for @nanometers.
+  ///
+  /// In en, this message translates to:
+  /// **'Nanometers'**
+  String get nanometers;
+
+  /// No description provided for @microns.
+  ///
+  /// In en, this message translates to:
+  /// **'Microns'**
+  String get microns;
+
+  /// No description provided for @nauticalMiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Nautical Miles'**
+  String get nauticalMiles;
+
+  /// No description provided for @customizeLengthUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Length Units'**
+  String get customizeLengthUnits;
+
+  /// No description provided for @selectLengthUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Select length units to display'**
+  String get selectLengthUnits;
+
+  /// No description provided for @lengthConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Length Converter Information'**
+  String get lengthConverterInfo;
+
+  /// No description provided for @availableUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Units'**
+  String get availableUnits;
+
+  /// No description provided for @scientificNotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific notation supported for extreme values'**
+  String get scientificNotation;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

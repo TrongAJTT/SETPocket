@@ -51,6 +51,41 @@ class LengthConverter extends BaseConverter {
   @override
   LengthUnit get baseUnit => meters;
 
+  static const angstroms = LengthUnit(
+    id: 'angstroms',
+    name: 'Angstroms',
+    symbol: 'Å',
+    toMeters: 1e-10,
+  );
+
+  static const nanometers = LengthUnit(
+    id: 'nanometers',
+    name: 'Nanometers',
+    symbol: 'nm',
+    toMeters: 1e-9,
+  );
+
+  static const microns = LengthUnit(
+    id: 'microns',
+    name: 'Microns',
+    symbol: 'μm',
+    toMeters: 1e-6,
+  );
+
+  static const millimeters = LengthUnit(
+    id: 'millimeters',
+    name: 'Millimeters',
+    symbol: 'mm',
+    toMeters: 0.001,
+  );
+
+  static const centimeters = LengthUnit(
+    id: 'centimeters',
+    name: 'Centimeters',
+    symbol: 'cm',
+    toMeters: 0.01,
+  );
+
   static const meters = LengthUnit(
     id: 'meters',
     name: 'Meters',
@@ -63,20 +98,6 @@ class LengthConverter extends BaseConverter {
     name: 'Kilometers',
     symbol: 'km',
     toMeters: 1000.0,
-  );
-
-  static const centimeters = LengthUnit(
-    id: 'centimeters',
-    name: 'Centimeters',
-    symbol: 'cm',
-    toMeters: 0.01,
-  );
-
-  static const millimeters = LengthUnit(
-    id: 'millimeters',
-    name: 'Millimeters',
-    symbol: 'mm',
-    toMeters: 0.001,
   );
 
   static const inches = LengthUnit(
@@ -107,16 +128,27 @@ class LengthConverter extends BaseConverter {
     toMeters: 1609.344,
   );
 
+  static const nauticalMiles = LengthUnit(
+    id: 'nautical_miles',
+    name: 'Nautical Miles',
+    symbol: 'nmi',
+    toMeters: 1852.0,
+  );
+
   @override
   List<LengthUnit> get units => [
+        angstroms,
+        nanometers,
+        microns,
+        millimeters,
+        centimeters,
         meters,
         kilometers,
-        centimeters,
-        millimeters,
         inches,
         feet,
         yards,
         miles,
+        nauticalMiles,
       ];
 
   @override
@@ -916,27 +948,97 @@ class CurrencyConverter extends BaseConverter {
 
   static String _getCountryCode(String currencyCode) {
     const Map<String, String> currencyToCountry = {
-      'USD': 'US', 'EUR': 'EU', 'GBP': 'GB', 'JPY': 'JP', 'CAD': 'CA',
-      'AUD': 'AU', 'CHF': 'CH', 'VND': 'VN', 'CNY': 'CN', 'HKD': 'HK',
-      'TWD': 'TW', 'SGD': 'SG', 'MYR': 'MY', 'THB': 'TH', 'IDR': 'ID',
-      'PHP': 'PH', 'INR': 'IN', 'KRW': 'KR', 'BND': 'BN', 'LAK': 'LA',
-      'KHR': 'KH', 'MMK': 'MM', 'MOP': 'MO', 'SEK': 'SE', 'NOK': 'NO',
-      'DKK': 'DK', 'PLN': 'PL', 'CZK': 'CZ', 'HUF': 'HU', 'RON': 'RO',
-      'BGN': 'BG', 'HRK': 'HR', 'RUB': 'RU', 'TRY': 'TR', 'UAH': 'UA',
-      'BYN': 'BY', 'MDL': 'MD', 'GEL': 'GE', 'AMD': 'AM', 'AZN': 'AZ',
-      'ILS': 'IL', 'SAR': 'SA', 'AED': 'AE', 'QAR': 'QA', 'KWD': 'KW',
-      'BHD': 'BH', 'OMR': 'OM', 'JOD': 'JO', 'LBP': 'LB', 'EGP': 'EG',
-      'MAD': 'MA', 'ZAR': 'ZA', 'NGN': 'NG', 'KES': 'KE', 'GHS': 'GH',
-      'UGX': 'UG', 'TZS': 'TZ', 'ETB': 'ET', 'XOF': 'BF', 'XAF': 'CM',
-      'BRL': 'BR', 'MXN': 'MX', 'ARS': 'AR', 'CLP': 'CL', 'COP': 'CO',
-      'PEN': 'PE', 'UYU': 'UY', 'KZT': 'KZ', 'UZS': 'UZ', 'KGS': 'KG',
-      'TJS': 'TJ', 'TMT': 'TM', 'AFN': 'AF', 'PKR': 'PK', 'BDT': 'BD',
-      'LKR': 'LK', 'NPR': 'NP', 'BTN': 'BT', 'MVR': 'MV', 'NZD': 'NZ',
-      'FJD': 'FJ', 'PGK': 'PG', 'SBD': 'SB', 'TOP': 'TO', 'VUV': 'VU',
-      'WST': 'WS', 'XPF': 'PF',
+      'USD': 'US',
+      'EUR': 'EU',
+      'GBP': 'GB',
+      'JPY': 'JP',
+      'CAD': 'CA',
+      'AUD': 'AU',
+      'CHF': 'CH',
+      'VND': 'VN',
+      'CNY': 'CN',
+      'HKD': 'HK',
+      'TWD': 'TW',
+      'SGD': 'SG',
+      'MYR': 'MY',
+      'THB': 'TH',
+      'IDR': 'ID',
+      'PHP': 'PH',
+      'INR': 'IN',
+      'KRW': 'KR',
+      'BND': 'BN',
+      'LAK': 'LA',
+      'KHR': 'KH',
+      'MMK': 'MM',
+      'MOP': 'MO',
+      'SEK': 'SE',
+      'NOK': 'NO',
+      'DKK': 'DK',
+      'PLN': 'PL',
+      'CZK': 'CZ',
+      'HUF': 'HU',
+      'RON': 'RO',
+      'BGN': 'BG',
+      'HRK': 'HR',
+      'RUB': 'RU',
+      'TRY': 'TR',
+      'UAH': 'UA',
+      'BYN': 'BY',
+      'MDL': 'MD',
+      'GEL': 'GE',
+      'AMD': 'AM',
+      'AZN': 'AZ',
+      'ILS': 'IL',
+      'SAR': 'SA',
+      'AED': 'AE',
+      'QAR': 'QA',
+      'KWD': 'KW',
+      'BHD': 'BH',
+      'OMR': 'OM',
+      'JOD': 'JO',
+      'LBP': 'LB',
+      'EGP': 'EG',
+      'MAD': 'MA',
+      'ZAR': 'ZA',
+      'NGN': 'NG',
+      'KES': 'KE',
+      'GHS': 'GH',
+      'UGX': 'UG',
+      'TZS': 'TZ',
+      'ETB': 'ET',
+      'XOF': 'BF',
+      'XAF': 'CM',
+      'BRL': 'BR',
+      'MXN': 'MX',
+      'ARS': 'AR',
+      'CLP': 'CL',
+      'COP': 'CO',
+      'PEN': 'PE',
+      'UYU': 'UY',
+      'KZT': 'KZ',
+      'UZS': 'UZ',
+      'KGS': 'KG',
+      'TJS': 'TJ',
+      'TMT': 'TM',
+      'AFN': 'AF',
+      'PKR': 'PK',
+      'BDT': 'BD',
+      'LKR': 'LK',
+      'NPR': 'NP',
+      'BTN': 'BT',
+      'MVR': 'MV',
+      'NZD': 'NZ',
+      'FJD': 'FJ',
+      'PGK': 'PG',
+      'SBD': 'SB',
+      'TOP': 'TO',
+      'VUV': 'VU',
+      'WST': 'WS',
+      'XPF': 'PF',
     };
     return currencyToCountry[currencyCode] ?? currencyCode.substring(0, 2);
   }
+
   @override
   double convert(double value, String fromUnit, String toUnit) {
     // Use the CurrencyService for conversion

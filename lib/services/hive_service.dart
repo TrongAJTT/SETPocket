@@ -4,6 +4,8 @@ import '../models/currency_cache_model.dart';
 import '../models/currency_preset_model.dart';
 import '../models/currency_state_model.dart';
 import '../models/settings_model.dart';
+import '../models/unit_template_model.dart';
+import '../models/length_state_model.dart';
 
 class HiveService {
   static final Logger _logger = Logger();
@@ -41,6 +43,18 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(6)) {
         Hive.registerAdapter(CurrencyCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(15)) {
+        Hive.registerAdapter(UnitTemplateModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(16)) {
+        Hive.registerAdapter(TemplateSortOrderAdapter());
+      }
+      if (!Hive.isAdapterRegistered(17)) {
+        Hive.registerAdapter(LengthCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(18)) {
+        Hive.registerAdapter(LengthStateModelAdapter());
       }
 
       // Open boxes
@@ -158,6 +172,19 @@ class HiveService {
     } catch (e) {
       _logger.e('Error getting item count for $boxName: $e');
       return 0;
+    }
+  }
+
+  /// Get a generic box for typed models
+  static Future<Box<T>> getBox<T>(String boxName) async {
+    try {
+      if (!Hive.isBoxOpen(boxName)) {
+        return await Hive.openBox<T>(boxName);
+      }
+      return Hive.box<T>(boxName);
+    } catch (e) {
+      _logger.e('Error opening box $boxName: $e');
+      rethrow;
     }
   }
 

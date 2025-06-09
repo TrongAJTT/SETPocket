@@ -19,6 +19,8 @@
     "edit": "Chỉnh sửa",
     "copy": "Sao chép",
     "cancel": "Hủy",    
+    "search": "Tìm kiếm",
+    "searchHint": "Tìm kiếm...",
     "total": "Tổng cộng",
     "selectTool": "Chọn một chức năng ở thanh bên",
     "selectToolDesc": "Chọn một công cụ từ thanh bên trái để bắt đầu",
@@ -490,7 +492,18 @@
     "viewFetchStatus": "Xem trạng thái tải",
     
     "cacheTypeConverterTools": "Công cụ chuyển đổi",
-    "cacheTypeConverterToolsDesc": "Bộ nhớ đệm tỷ giá tiền tệ và cài đặt sẵn",
-    "cacheTypeFeatureStates": "Trạng thái tính năng", 
-    "cacheTypeFeatureStatesDesc": "Trạng thái tính năng và tùy chọn đã lưu"
+    "cacheTypeConverterToolsDesc": "Trạng thái tiền tệ/chiều dài, cài đặt sẵn và bộ nhớ đệm tỷ giá",
+
+    "unitSelectedStatus": "Đã chọn {count} trong {max}",
+    
+    "lengthUnits": "Đơn vị chiều dài",
+    "angstroms": "Angstrom",
+    "nanometers": "Nanometer",
+    "microns": "Micron",
+    "nauticalMiles": "Hải lý",
+    "customizeLengthUnits": "Tùy chỉnh đơn vị chiều dài",
+    "selectLengthUnits": "Chọn đơn vị chiều dài để hiển thị",
+    "lengthConverterInfo": "Thông tin bộ chuyển đổi chiều dài",
+    "availableUnits": "Đơn vị có sẵn",
+    "scientificNotation": "Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ"
 }

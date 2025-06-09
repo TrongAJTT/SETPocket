@@ -5,6 +5,7 @@ import 'hive_service.dart';
 import 'currency_state_service.dart';
 import 'currency_preset_service.dart';
 import 'currency_cache_service.dart';
+import 'length_state_service.dart';
 
 class CacheInfo {
   final String name;
@@ -50,7 +51,6 @@ class CacheService {
       'generation_history_rock_paper_scissors',
     ],
     'converter_tools': [],
-    'feature_states': [],
   };
   static Future<Map<String, CacheInfo>> getAllCacheInfo({
     String? textTemplatesName,
@@ -61,8 +61,6 @@ class CacheService {
     String? randomGeneratorsDesc,
     String? converterToolsName,
     String? converterToolsDesc,
-    String? featureStatesName,
-    String? featureStatesDesc,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, CacheInfo> cacheInfoMap =
@@ -117,10 +115,15 @@ class CacheService {
       keys: _cacheKeys['random_generators'] ?? [],
     );
 
-    // Converter Tools Cache
+    // Converter Tools Cache (includes currency and length states)
     try {
       final presets = await CurrencyPresetService.loadPresets();
       final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      final hasState = await CurrencyStateService.hasState();
+      final stateSize = await CurrencyStateService.getStateSize();
+      final hasLengthState = await LengthStateService.hasState();
+      final lengthStateSize = await LengthStateService.getStateSize();
+
       int converterSize = 0;
       int converterCount = 0;
 
@@ -138,10 +141,22 @@ class CacheService {
         converterCount++;
       }
 
+      // Add currency state size
+      if (hasState) {
+        converterSize += stateSize;
+        converterCount++;
+      }
+
+      // Add length state size
+      if (hasLengthState) {
+        converterSize += lengthStateSize;
+        converterCount++;
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
-        description:
-            converterToolsDesc ?? 'Currency presets and exchange rates cache',
+        description: converterToolsDesc ??
+            'Currency/length states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -150,36 +165,11 @@ class CacheService {
       print('CacheService: Error getting converter tools cache info: $e');
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
-        description:
-            converterToolsDesc ?? 'Currency presets and exchange rates cache',
+        description: converterToolsDesc ??
+            'Currency/length states, presets and exchange rates cache',
         itemCount: 0,
         sizeBytes: 0,
         keys: _cacheKeys['converter_tools'] ?? [],
-      );
-    }
-
-    // Feature States Cache
-    try {
-      final hasState = await CurrencyStateService.hasState();
-      final stateSize = await CurrencyStateService.getStateSize();
-
-      cacheInfoMap['feature_states'] = CacheInfo(
-        name: featureStatesName ?? 'Feature States',
-        description:
-            featureStatesDesc ?? 'Saved feature states and preferences',
-        itemCount: hasState ? 1 : 0,
-        sizeBytes: stateSize,
-        keys: _cacheKeys['feature_states'] ?? [],
-      );
-    } catch (e) {
-      print('CacheService: Error getting feature states cache info: $e');
-      cacheInfoMap['feature_states'] = CacheInfo(
-        name: featureStatesName ?? 'Feature States',
-        description:
-            featureStatesDesc ?? 'Saved feature states and preferences',
-        itemCount: 0,
-        sizeBytes: 0,
-        keys: _cacheKeys['feature_states'] ?? [],
       );
     }
 
@@ -197,12 +187,11 @@ class CacheService {
       // Clear templates cache from Hive
       await HiveService.clearBox(HiveService.templatesBoxName);
     } else if (cacheType == 'converter_tools') {
-      // Clear currency presets and exchange rates cache
+      // Clear currency presets, exchange rates cache, and converter states
       await CurrencyPresetService.clearAllPresets();
       await CurrencyCacheService.clearCache();
-    } else if (cacheType == 'feature_states') {
-      // Clear feature states
       await CurrencyStateService.clearState();
+      await LengthStateService.clearState();
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -220,12 +209,11 @@ class CacheService {
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
 
-    // Clear converter tools cache
+    // Clear converter tools cache (includes states)
     await CurrencyPresetService.clearAllPresets();
     await CurrencyCacheService.clearCache();
-
-    // Clear feature states cache
     await CurrencyStateService.clearState();
+    await LengthStateService.clearState();
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};

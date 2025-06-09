@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'converters/unit_converter_screen.dart';
 import 'converters/currency_converter_screen.dart';
+import 'converters/length_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -48,8 +49,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.green;
             break;
           case 1:
-            screen = UnitConverterScreen(
-                categoryId: 'length', categoryName: loc.lengthConverter);
+            screen = const LengthConverterScreen();
             title = loc.lengthConverter;
             icon = Icons.straighten;
             iconColor = Colors.blue;

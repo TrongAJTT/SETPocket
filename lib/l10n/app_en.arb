@@ -29,6 +29,8 @@
     "edit": "Edit",
     "copy": "Copy",
     "cancel": "Cancel",
+    "search": "Search",
+    "searchHint": "Search...",
     "total": "Total",
     "selectTool": "Select a tool from the sidebar",
     "selectToolDesc": "Choose a tool from the left sidebar to get started",
@@ -492,7 +494,18 @@
     "viewFetchStatus": "View Fetch Status",
     
     "cacheTypeConverterTools": "Converter Tools",
-    "cacheTypeConverterToolsDesc": "Currency presets and exchange rates cache",
-    "cacheTypeFeatureStates": "Feature States", 
-    "cacheTypeFeatureStatesDesc": "Saved feature states and preferences"
+    "cacheTypeConverterToolsDesc": "Currency/length states, presets and exchange rates cache",
+
+    "unitSelectedStatus": "Selected {count} of {max}",
+    
+    "lengthUnits": "Length Units",
+    "angstroms": "Angstroms",
+    "nanometers": "Nanometers",
+    "microns": "Microns",
+    "nauticalMiles": "Nautical Miles",
+    "customizeLengthUnits": "Customize Length Units",
+    "selectLengthUnits": "Select length units to display",
+    "lengthConverterInfo": "Length Converter Information",
+    "availableUnits": "Available Units",
+    "scientificNotation": "Scientific notation supported for extreme values"
 }

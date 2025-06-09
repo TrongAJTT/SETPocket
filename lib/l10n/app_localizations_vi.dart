@@ -102,6 +102,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cancel => 'Hủy';
 
   @override
+  String get search => 'Tìm kiếm';
+
+  @override
+  String get searchHint => 'Tìm kiếm...';
+
+  @override
   String get total => 'Tổng cộng';
 
   @override
@@ -1459,11 +1465,40 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cacheTypeConverterTools => 'Công cụ chuyển đổi';
 
   @override
-  String get cacheTypeConverterToolsDesc => 'Bộ nhớ đệm tỷ giá tiền tệ và cài đặt sẵn';
+  String get cacheTypeConverterToolsDesc => 'Trạng thái tiền tệ/chiều dài, cài đặt sẵn và bộ nhớ đệm tỷ giá';
 
   @override
-  String get cacheTypeFeatureStates => 'Trạng thái tính năng';
+  String unitSelectedStatus(Object count, Object max) {
+    return 'Đã chọn $count trong $max';
+  }
 
   @override
-  String get cacheTypeFeatureStatesDesc => 'Trạng thái tính năng và tùy chọn đã lưu';
+  String get lengthUnits => 'Đơn vị chiều dài';
+
+  @override
+  String get angstroms => 'Angstrom';
+
+  @override
+  String get nanometers => 'Nanometer';
+
+  @override
+  String get microns => 'Micron';
+
+  @override
+  String get nauticalMiles => 'Hải lý';
+
+  @override
+  String get customizeLengthUnits => 'Tùy chỉnh đơn vị chiều dài';
+
+  @override
+  String get selectLengthUnits => 'Chọn đơn vị chiều dài để hiển thị';
+
+  @override
+  String get lengthConverterInfo => 'Thông tin bộ chuyển đổi chiều dài';
+
+  @override
+  String get availableUnits => 'Đơn vị có sẵn';
+
+  @override
+  String get scientificNotation => 'Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ';
 }

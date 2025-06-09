@@ -102,6 +102,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String get search => 'Search';
+
+  @override
+  String get searchHint => 'Search...';
+
+  @override
   String get total => 'Total';
 
   @override
@@ -1459,11 +1465,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cacheTypeConverterTools => 'Converter Tools';
 
   @override
-  String get cacheTypeConverterToolsDesc => 'Currency presets and exchange rates cache';
+  String get cacheTypeConverterToolsDesc => 'Currency/length states, presets and exchange rates cache';
 
   @override
-  String get cacheTypeFeatureStates => 'Feature States';
+  String unitSelectedStatus(Object count, Object max) {
+    return 'Selected $count of $max';
+  }
 
   @override
-  String get cacheTypeFeatureStatesDesc => 'Saved feature states and preferences';
+  String get lengthUnits => 'Length Units';
+
+  @override
+  String get angstroms => 'Angstroms';
+
+  @override
+  String get nanometers => 'Nanometers';
+
+  @override
+  String get microns => 'Microns';
+
+  @override
+  String get nauticalMiles => 'Nautical Miles';
+
+  @override
+  String get customizeLengthUnits => 'Customize Length Units';
+
+  @override
+  String get selectLengthUnits => 'Select length units to display';
+
+  @override
+  String get lengthConverterInfo => 'Length Converter Information';
+
+  @override
+  String get availableUnits => 'Available Units';
+
+  @override
+  String get scientificNotation => 'Scientific notation supported for extreme values';
 }

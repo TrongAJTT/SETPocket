@@ -18,6 +18,7 @@ dependencies:
   live_currency_rate: ^1.0.5
   fl_chart: ^0.65.0
   math_expressions: ^2.6.0
+  decimal: ^3.2.1
   flutter_localizations:
     sdk: flutter  
   flutter_gen: 5.10.0

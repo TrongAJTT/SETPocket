@@ -1096,7 +1096,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get lengthConverter => 'Chuyển đổi Chiều dài';
 
   @override
-  String get weightConverter => 'Chuyển đổi Khối lượng';
+  String get weightConverter => 'Bộ chuyển đổi trọng lượng';
 
   @override
   String get temperatureConverter => 'Chuyển đổi Nhiệt độ';
@@ -1500,6 +1500,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get lengthConverterInfo => 'Thông tin bộ chuyển đổi chiều dài';
+
+  @override
+  String get weightConverterInfo => 'Thông tin bộ chuyển đổi trọng lượng';
+
+  @override
+  String get customizeWeightUnits => 'Tùy chỉnh đơn vị trọng lượng';
 
   @override
   String get availableUnits => 'Đơn vị có sẵn';

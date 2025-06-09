@@ -2909,6 +2909,18 @@ abstract class AppLocalizations {
   /// **'Length Converter Information'**
   String get lengthConverterInfo;
 
+  /// No description provided for @weightConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Converter Information'**
+  String get weightConverterInfo;
+
+  /// No description provided for @customizeWeightUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Weight Units'**
+  String get customizeWeightUnits;
+
   /// No description provided for @availableUnits.
   ///
   /// In en, this message translates to:

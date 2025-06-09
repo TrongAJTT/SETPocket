@@ -505,6 +505,9 @@
     "customizeLengthUnits": "Tùy chỉnh đơn vị chiều dài",
     "selectLengthUnits": "Chọn đơn vị chiều dài để hiển thị",
     "lengthConverterInfo": "Thông tin bộ chuyển đổi chiều dài",
+    "weightConverter": "Bộ chuyển đổi trọng lượng",
+    "weightConverterInfo": "Thông tin bộ chuyển đổi trọng lượng",
+    "customizeWeightUnits": "Tùy chỉnh đơn vị trọng lượng",
     "availableUnits": "Đơn vị có sẵn",
     "scientificNotation": "Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ"
 }

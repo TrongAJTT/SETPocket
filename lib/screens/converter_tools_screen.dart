@@ -3,6 +3,7 @@ import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'converters/unit_converter_screen.dart';
 import 'converters/currency_converter_screen.dart';
 import 'converters/length_converter_screen.dart';
+import 'converters/weight_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -55,10 +56,9 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.blue;
             break;
           case 2:
-            screen = UnitConverterScreen(
-                categoryId: 'weight', categoryName: loc.weightConverter);
+            screen = const WeightConverterScreen();
             title = loc.weightConverter;
-            icon = Icons.fitness_center;
+            icon = Icons.monitor_weight;
             iconColor = Colors.orange;
             break;
           case 3:

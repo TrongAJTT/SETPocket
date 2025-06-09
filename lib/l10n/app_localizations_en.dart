@@ -1502,6 +1502,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lengthConverterInfo => 'Length Converter Information';
 
   @override
+  String get weightConverterInfo => 'Weight Converter Information';
+
+  @override
+  String get customizeWeightUnits => 'Customize Weight Units';
+
+  @override
   String get availableUnits => 'Available Units';
 
   @override

@@ -6,6 +6,7 @@ import 'currency_state_service.dart';
 import 'currency_preset_service.dart';
 import 'currency_cache_service.dart';
 import 'length_state_service.dart';
+import 'weight_state_service.dart';
 
 class CacheInfo {
   final String name;
@@ -192,6 +193,7 @@ class CacheService {
       await CurrencyCacheService.clearCache();
       await CurrencyStateService.clearState();
       await LengthStateService.clearState();
+      await WeightStateService.clearState();
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -214,6 +216,7 @@ class CacheService {
     await CurrencyCacheService.clearCache();
     await CurrencyStateService.clearState();
     await LengthStateService.clearState();
+    await WeightStateService.clearState();
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};

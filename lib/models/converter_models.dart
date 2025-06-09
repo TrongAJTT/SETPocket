@@ -1,4 +1,5 @@
 import '../services/currency_service.dart';
+import 'package:decimal/decimal.dart';
 
 /// Base class for all conversion units
 abstract class ConversionUnit {
@@ -30,7 +31,7 @@ abstract class BaseConverter {
 
 /// Length units and converter
 class LengthUnit extends ConversionUnit {
-  final double toMeters;
+  final Decimal toMeters;
 
   const LengthUnit({
     required super.id,
@@ -51,88 +52,88 @@ class LengthConverter extends BaseConverter {
   @override
   LengthUnit get baseUnit => meters;
 
-  static const angstroms = LengthUnit(
+  static final angstroms = LengthUnit(
     id: 'angstroms',
     name: 'Angstroms',
     symbol: 'Å',
-    toMeters: 1e-10,
+    toMeters: Decimal.parse('0.0000000001'),
   );
 
-  static const nanometers = LengthUnit(
+  static final nanometers = LengthUnit(
     id: 'nanometers',
     name: 'Nanometers',
     symbol: 'nm',
-    toMeters: 1e-9,
+    toMeters: Decimal.parse('0.000000001'),
   );
 
-  static const microns = LengthUnit(
+  static final microns = LengthUnit(
     id: 'microns',
     name: 'Microns',
     symbol: 'μm',
-    toMeters: 1e-6,
+    toMeters: Decimal.parse('0.000001'),
   );
 
-  static const millimeters = LengthUnit(
+  static final millimeters = LengthUnit(
     id: 'millimeters',
     name: 'Millimeters',
     symbol: 'mm',
-    toMeters: 0.001,
+    toMeters: Decimal.parse('0.001'),
   );
 
-  static const centimeters = LengthUnit(
+  static final centimeters = LengthUnit(
     id: 'centimeters',
     name: 'Centimeters',
     symbol: 'cm',
-    toMeters: 0.01,
+    toMeters: Decimal.parse('0.01'),
   );
 
-  static const meters = LengthUnit(
+  static final meters = LengthUnit(
     id: 'meters',
     name: 'Meters',
     symbol: 'm',
-    toMeters: 1.0,
+    toMeters: Decimal.parse('1.0'),
   );
 
-  static const kilometers = LengthUnit(
+  static final kilometers = LengthUnit(
     id: 'kilometers',
     name: 'Kilometers',
     symbol: 'km',
-    toMeters: 1000.0,
+    toMeters: Decimal.parse('1000.0'),
   );
 
-  static const inches = LengthUnit(
+  static final inches = LengthUnit(
     id: 'inches',
     name: 'Inches',
     symbol: 'in',
-    toMeters: 0.0254,
+    toMeters: Decimal.parse('0.0254'),
   );
 
-  static const feet = LengthUnit(
+  static final feet = LengthUnit(
     id: 'feet',
     name: 'Feet',
     symbol: 'ft',
-    toMeters: 0.3048,
+    toMeters: Decimal.parse('0.3048'),
   );
 
-  static const yards = LengthUnit(
+  static final yards = LengthUnit(
     id: 'yards',
     name: 'Yards',
     symbol: 'yd',
-    toMeters: 0.9144,
+    toMeters: Decimal.parse('0.9144'),
   );
 
-  static const miles = LengthUnit(
+  static final miles = LengthUnit(
     id: 'miles',
     name: 'Miles',
     symbol: 'mi',
-    toMeters: 1609.344,
+    toMeters: Decimal.parse('1609.344'),
   );
 
-  static const nauticalMiles = LengthUnit(
+  static final nauticalMiles = LengthUnit(
     id: 'nautical_miles',
     name: 'Nautical Miles',
     symbol: 'nmi',
-    toMeters: 1852.0,
+    toMeters: Decimal.parse('1852.0'),
   );
 
   @override
@@ -158,15 +159,18 @@ class LengthConverter extends BaseConverter {
     final from = units.firstWhere((unit) => unit.id == fromUnit);
     final to = units.firstWhere((unit) => unit.id == toUnit);
 
-    // Convert to base unit (meters) then to target unit
-    final inMeters = value * from.toMeters;
-    return inMeters / to.toMeters;
+    // Use Decimal for precise calculations
+    final decimalValue = Decimal.parse(value.toString());
+    final inMeters = decimalValue * from.toMeters;
+    final result = inMeters / to.toMeters;
+
+    return result.toDouble();
   }
 }
 
 /// Weight units and converter
 class WeightUnit extends ConversionUnit {
-  final double toGrams;
+  final Decimal toGrams;
 
   const WeightUnit({
     required super.id,
@@ -185,50 +189,240 @@ class WeightConverter extends BaseConverter {
   String get description => 'Convert between different weight units';
 
   @override
-  WeightUnit get baseUnit => grams;
+  WeightUnit get baseUnit => kilograms;
 
-  static const grams = WeightUnit(
+  // SI/Metric Units with highest precision decimal values
+  static final nanograms = WeightUnit(
+    id: 'nanograms',
+    name: 'Nanograms',
+    symbol: 'ng',
+    toGrams: Decimal.parse('0.000000001'),
+  );
+
+  static final micrograms = WeightUnit(
+    id: 'micrograms',
+    name: 'Micrograms',
+    symbol: 'µg',
+    toGrams: Decimal.parse('0.000001'),
+  );
+
+  static final milligrams = WeightUnit(
+    id: 'milligrams',
+    name: 'Milligrams',
+    symbol: 'mg',
+    toGrams: Decimal.parse('0.001'),
+  );
+
+  static final grams = WeightUnit(
     id: 'grams',
     name: 'Grams',
     symbol: 'g',
-    toGrams: 1.0,
+    toGrams: Decimal.parse('1.0'),
   );
 
-  static const kilograms = WeightUnit(
+  static final kilograms = WeightUnit(
     id: 'kilograms',
     name: 'Kilograms',
     symbol: 'kg',
-    toGrams: 1000.0,
+    toGrams: Decimal.parse('1000.0'),
   );
 
-  static const pounds = WeightUnit(
-    id: 'pounds',
-    name: 'Pounds',
-    symbol: 'lb',
-    toGrams: 453.592,
+  static final tonnes = WeightUnit(
+    id: 'tonnes',
+    name: 'Tonnes',
+    symbol: 't',
+    toGrams: Decimal.parse('1000000.0'),
   );
 
-  static const ounces = WeightUnit(
+  // Imperial/US Avoirdupois System with precise conversion factors
+  static final grains = WeightUnit(
+    id: 'grains',
+    name: 'Grains',
+    symbol: 'gr',
+    toGrams: Decimal.parse('0.06479891'),
+  );
+
+  static final drams = WeightUnit(
+    id: 'drams',
+    name: 'Drams',
+    symbol: 'dr',
+    toGrams: Decimal.parse('1.7718451953125'),
+  );
+
+  static final ounces = WeightUnit(
     id: 'ounces',
     name: 'Ounces',
     symbol: 'oz',
-    toGrams: 28.3495,
+    toGrams: Decimal.parse('28.349523125'),
   );
 
-  static const tons = WeightUnit(
-    id: 'tons',
-    name: 'Tons',
-    symbol: 't',
-    toGrams: 1000000.0,
+  static final pounds = WeightUnit(
+    id: 'pounds',
+    name: 'Pounds',
+    symbol: 'lb',
+    toGrams: Decimal.parse('453.59237'),
+  );
+
+  static final stones = WeightUnit(
+    id: 'stones',
+    name: 'Stones',
+    symbol: 'st',
+    toGrams: Decimal.parse('6350.29318'),
+  );
+
+  static final quarters = WeightUnit(
+    id: 'quarters',
+    name: 'Quarters',
+    symbol: 'qr',
+    toGrams: Decimal.parse('12700.58636'),
+  );
+
+  static final shortHundredweight = WeightUnit(
+    id: 'short_hundredweight',
+    name: 'Short Hundredweight',
+    symbol: 'cwt (US)',
+    toGrams: Decimal.parse('45359.237'),
+  );
+
+  static final longHundredweight = WeightUnit(
+    id: 'long_hundredweight',
+    name: 'Long Hundredweight',
+    symbol: 'cwt (UK)',
+    toGrams: Decimal.parse('50802.34544'),
+  );
+
+  static final shortTons = WeightUnit(
+    id: 'short_tons',
+    name: 'Short Tons',
+    symbol: 'ton (US)',
+    toGrams: Decimal.parse('907184.74'),
+  );
+
+  static final longTons = WeightUnit(
+    id: 'long_tons',
+    name: 'Long Tons',
+    symbol: 'ton (UK)',
+    toGrams: Decimal.parse('1016046.9088'),
+  );
+
+  // Troy System with precise values
+  static final troyGrains = WeightUnit(
+    id: 'troy_grains',
+    name: 'Troy Grains',
+    symbol: 'gr t',
+    toGrams: Decimal.parse('0.06479891'),
+  );
+
+  static final pennyweights = WeightUnit(
+    id: 'pennyweights',
+    name: 'Pennyweights',
+    symbol: 'dwt',
+    toGrams: Decimal.parse('1.55517384'),
+  );
+
+  static final troyOunces = WeightUnit(
+    id: 'troy_ounces',
+    name: 'Troy Ounces',
+    symbol: 'oz t',
+    toGrams: Decimal.parse('31.1034768'),
+  );
+
+  static final troyPounds = WeightUnit(
+    id: 'troy_pounds',
+    name: 'Troy Pounds',
+    symbol: 'lb t',
+    toGrams: Decimal.parse('373.2417216'),
+  );
+
+  // Apothecaries System with precise values
+  static final scruples = WeightUnit(
+    id: 'scruples',
+    name: 'Scruples',
+    symbol: 's ap',
+    toGrams: Decimal.parse('1.2959782'),
+  );
+
+  static final apothecariesDrams = WeightUnit(
+    id: 'apothecaries_drams',
+    name: 'Apothecaries Drams',
+    symbol: 'dr ap',
+    toGrams: Decimal.parse('3.8879346'),
+  );
+
+  static final apothecariesOunces = WeightUnit(
+    id: 'apothecaries_ounces',
+    name: 'Apothecaries Ounces',
+    symbol: 'oz ap',
+    toGrams: Decimal.parse('31.1034768'),
+  );
+
+  static final apothecariesPounds = WeightUnit(
+    id: 'apothecaries_pounds',
+    name: 'Apothecaries Pounds',
+    symbol: 'lb ap',
+    toGrams: Decimal.parse('373.2417216'),
+  );
+
+  // Other Units with precise values
+  static final carats = WeightUnit(
+    id: 'carats',
+    name: 'Carats',
+    symbol: 'ct',
+    toGrams: Decimal.parse('0.2'),
+  );
+
+  static final slugs = WeightUnit(
+    id: 'slugs',
+    name: 'Slugs',
+    symbol: 'slug',
+    toGrams: Decimal.parse('14593.903'),
+  );
+
+  static final atomicMassUnits = WeightUnit(
+    id: 'atomic_mass_units',
+    name: 'Atomic Mass Units',
+    symbol: 'u',
+    toGrams: Decimal.parse('0.00000000000000000000001660539066'),
   );
 
   @override
   List<WeightUnit> get units => [
-        grams,
+        // SI/Metric - most common first
         kilograms,
+        grams,
+        milligrams,
+        tonnes,
+        micrograms,
+        nanograms,
+
+        // Imperial/US - most common first
         pounds,
         ounces,
-        tons,
+        stones,
+        grains,
+        drams,
+        quarters,
+        shortHundredweight,
+        longHundredweight,
+        shortTons,
+        longTons,
+
+        // Troy System
+        troyOunces,
+        pennyweights,
+        troyPounds,
+        troyGrains,
+
+        // Apothecaries System
+        apothecariesOunces,
+        apothecariesDrams,
+        scruples,
+        apothecariesPounds,
+
+        // Other
+        carats,
+        slugs,
+        atomicMassUnits,
       ];
 
   @override
@@ -238,8 +432,12 @@ class WeightConverter extends BaseConverter {
     final from = units.firstWhere((unit) => unit.id == fromUnit);
     final to = units.firstWhere((unit) => unit.id == toUnit);
 
-    final inGrams = value * from.toGrams;
-    return inGrams / to.toGrams;
+    // Use Decimal for precise calculations
+    final decimalValue = Decimal.parse(value.toString());
+    final inGrams = decimalValue * from.toGrams;
+    final result = inGrams / to.toGrams;
+
+    return result.toDouble();
   }
 }
 

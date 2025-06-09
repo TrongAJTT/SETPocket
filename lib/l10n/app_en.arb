@@ -507,6 +507,9 @@
     "customizeLengthUnits": "Customize Length Units",
     "selectLengthUnits": "Select length units to display",
     "lengthConverterInfo": "Length Converter Information",
+    "weightConverter": "Weight Converter",
+    "weightConverterInfo": "Weight Converter Information",
+    "customizeWeightUnits": "Customize Weight Units",
     "availableUnits": "Available Units",
     "scientificNotation": "Scientific notation supported for extreme values"
 }

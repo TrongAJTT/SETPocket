@@ -1,35 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'weight_state_model.dart';
+part of 'mass_state_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class WeightCardStateAdapter extends TypeAdapter<WeightCardState> {
+class MassCardStateAdapter extends TypeAdapter<MassCardState> {
   @override
   final int typeId = 8;
 
   @override
-  WeightCardState read(BinaryReader reader) {
+  MassCardState read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return WeightCardState(
+    return MassCardState(
       unitCode: fields[0] as String,
       amount: fields[1] as double,
+      createdAt: fields[2] as DateTime?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, WeightCardState obj) {
+  void write(BinaryWriter writer, MassCardState obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.unitCode)
       ..writeByte(1)
-      ..write(obj.amount);
+      ..write(obj.amount)
+      ..writeByte(2)
+      ..write(obj.createdAt);
   }
 
   @override
@@ -38,30 +41,30 @@ class WeightCardStateAdapter extends TypeAdapter<WeightCardState> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WeightCardStateAdapter &&
+      other is MassCardStateAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class WeightStateModelAdapter extends TypeAdapter<WeightStateModel> {
+class MassStateModelAdapter extends TypeAdapter<MassStateModel> {
   @override
   final int typeId = 9;
 
   @override
-  WeightStateModel read(BinaryReader reader) {
+  MassStateModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return WeightStateModel(
-      cards: (fields[0] as List).cast<WeightCardState>(),
+    return MassStateModel(
+      cards: (fields[0] as List).cast<MassCardState>(),
       visibleUnits: (fields[1] as List).cast<String>(),
       lastUpdated: fields[2] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, WeightStateModel obj) {
+  void write(BinaryWriter writer, MassStateModel obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
@@ -78,7 +81,7 @@ class WeightStateModelAdapter extends TypeAdapter<WeightStateModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WeightStateModelAdapter &&
+      other is MassStateModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -168,11 +168,11 @@ class LengthConverter extends BaseConverter {
   }
 }
 
-/// Weight units and converter
-class WeightUnit extends ConversionUnit {
+/// Mass units and converter
+class MassUnit extends ConversionUnit {
   final Decimal toGrams;
 
-  const WeightUnit({
+  const MassUnit({
     required super.id,
     required super.name,
     required super.symbol,
@@ -181,53 +181,53 @@ class WeightUnit extends ConversionUnit {
   });
 }
 
-class WeightConverter extends BaseConverter {
+class MassConverter extends BaseConverter {
   @override
-  String get name => 'Weight';
+  String get name => 'Mass';
 
   @override
-  String get description => 'Convert between different weight units';
+  String get description => 'Convert between different mass units';
 
   @override
-  WeightUnit get baseUnit => kilograms;
+  MassUnit get baseUnit => kilograms;
 
   // SI/Metric Units with highest precision decimal values
-  static final nanograms = WeightUnit(
+  static final nanograms = MassUnit(
     id: 'nanograms',
     name: 'Nanograms',
     symbol: 'ng',
     toGrams: Decimal.parse('0.000000001'),
   );
 
-  static final micrograms = WeightUnit(
+  static final micrograms = MassUnit(
     id: 'micrograms',
     name: 'Micrograms',
     symbol: 'µg',
     toGrams: Decimal.parse('0.000001'),
   );
 
-  static final milligrams = WeightUnit(
+  static final milligrams = MassUnit(
     id: 'milligrams',
     name: 'Milligrams',
     symbol: 'mg',
     toGrams: Decimal.parse('0.001'),
   );
 
-  static final grams = WeightUnit(
+  static final grams = MassUnit(
     id: 'grams',
     name: 'Grams',
     symbol: 'g',
     toGrams: Decimal.parse('1.0'),
   );
 
-  static final kilograms = WeightUnit(
+  static final kilograms = MassUnit(
     id: 'kilograms',
     name: 'Kilograms',
     symbol: 'kg',
     toGrams: Decimal.parse('1000.0'),
   );
 
-  static final tonnes = WeightUnit(
+  static final tonnes = MassUnit(
     id: 'tonnes',
     name: 'Tonnes',
     symbol: 't',
@@ -235,70 +235,70 @@ class WeightConverter extends BaseConverter {
   );
 
   // Imperial/US Avoirdupois System with precise conversion factors
-  static final grains = WeightUnit(
+  static final grains = MassUnit(
     id: 'grains',
     name: 'Grains',
     symbol: 'gr',
     toGrams: Decimal.parse('0.06479891'),
   );
 
-  static final drams = WeightUnit(
+  static final drams = MassUnit(
     id: 'drams',
     name: 'Drams',
     symbol: 'dr',
     toGrams: Decimal.parse('1.7718451953125'),
   );
 
-  static final ounces = WeightUnit(
+  static final ounces = MassUnit(
     id: 'ounces',
     name: 'Ounces',
     symbol: 'oz',
     toGrams: Decimal.parse('28.349523125'),
   );
 
-  static final pounds = WeightUnit(
+  static final pounds = MassUnit(
     id: 'pounds',
     name: 'Pounds',
     symbol: 'lb',
     toGrams: Decimal.parse('453.59237'),
   );
 
-  static final stones = WeightUnit(
+  static final stones = MassUnit(
     id: 'stones',
     name: 'Stones',
     symbol: 'st',
     toGrams: Decimal.parse('6350.29318'),
   );
 
-  static final quarters = WeightUnit(
+  static final quarters = MassUnit(
     id: 'quarters',
     name: 'Quarters',
     symbol: 'qr',
     toGrams: Decimal.parse('12700.58636'),
   );
 
-  static final shortHundredweight = WeightUnit(
+  static final shortHundredweight = MassUnit(
     id: 'short_hundredweight',
     name: 'Short Hundredweight',
     symbol: 'cwt (US)',
     toGrams: Decimal.parse('45359.237'),
   );
 
-  static final longHundredweight = WeightUnit(
+  static final longHundredweight = MassUnit(
     id: 'long_hundredweight',
     name: 'Long Hundredweight',
     symbol: 'cwt (UK)',
     toGrams: Decimal.parse('50802.34544'),
   );
 
-  static final shortTons = WeightUnit(
+  static final shortTons = MassUnit(
     id: 'short_tons',
     name: 'Short Tons',
     symbol: 'ton (US)',
     toGrams: Decimal.parse('907184.74'),
   );
 
-  static final longTons = WeightUnit(
+  static final longTons = MassUnit(
     id: 'long_tons',
     name: 'Long Tons',
     symbol: 'ton (UK)',
@@ -306,28 +306,28 @@ class WeightConverter extends BaseConverter {
   );
 
   // Troy System with precise values
-  static final troyGrains = WeightUnit(
+  static final troyGrains = MassUnit(
     id: 'troy_grains',
     name: 'Troy Grains',
     symbol: 'gr t',
     toGrams: Decimal.parse('0.06479891'),
   );
 
-  static final pennyweights = WeightUnit(
+  static final pennyweights = MassUnit(
     id: 'pennyweights',
     name: 'Pennyweights',
     symbol: 'dwt',
     toGrams: Decimal.parse('1.55517384'),
   );
 
-  static final troyOunces = WeightUnit(
+  static final troyOunces = MassUnit(
     id: 'troy_ounces',
     name: 'Troy Ounces',
     symbol: 'oz t',
     toGrams: Decimal.parse('31.1034768'),
   );
 
-  static final troyPounds = WeightUnit(
+  static final troyPounds = MassUnit(
     id: 'troy_pounds',
     name: 'Troy Pounds',
     symbol: 'lb t',
@@ -335,28 +335,28 @@ class WeightConverter extends BaseConverter {
   );
 
   // Apothecaries System with precise values
-  static final scruples = WeightUnit(
+  static final scruples = MassUnit(
     id: 'scruples',
     name: 'Scruples',
     symbol: 's ap',
     toGrams: Decimal.parse('1.2959782'),
   );
 
-  static final apothecariesDrams = WeightUnit(
+  static final apothecariesDrams = MassUnit(
     id: 'apothecaries_drams',
     name: 'Apothecaries Drams',
     symbol: 'dr ap',
     toGrams: Decimal.parse('3.8879346'),
   );
 
-  static final apothecariesOunces = WeightUnit(
+  static final apothecariesOunces = MassUnit(
     id: 'apothecaries_ounces',
     name: 'Apothecaries Ounces',
     symbol: 'oz ap',
     toGrams: Decimal.parse('31.1034768'),
   );
 
-  static final apothecariesPounds = WeightUnit(
+  static final apothecariesPounds = MassUnit(
     id: 'apothecaries_pounds',
     name: 'Apothecaries Pounds',
     symbol: 'lb ap',
@@ -364,21 +364,21 @@ class WeightConverter extends BaseConverter {
   );
 
   // Other Units with precise values
-  static final carats = WeightUnit(
+  static final carats = MassUnit(
     id: 'carats',
     name: 'Carats',
     symbol: 'ct',
     toGrams: Decimal.parse('0.2'),
   );
 
-  static final slugs = WeightUnit(
+  static final slugs = MassUnit(
     id: 'slugs',
     name: 'Slugs',
     symbol: 'slug',
     toGrams: Decimal.parse('14593.903'),
   );
 
-  static final atomicMassUnits = WeightUnit(
+  static final atomicMassUnits = MassUnit(
     id: 'atomic_mass_units',
     name: 'Atomic Mass Units',
     symbol: 'u',
@@ -386,7 +386,7 @@ class WeightConverter extends BaseConverter {
   );
 
   @override
-  List<WeightUnit> get units => [
+  List<MassUnit> get units => [
         // SI/Metric - most common first
         kilograms,
         grams,

@@ -351,7 +351,34 @@
     "converterTools": "Công cụ Chuyển đổi",
     "converterToolsDesc": "Chuyển đổi giữa các đơn vị và hệ thống khác nhau",
     "lengthConverter": "Chuyển đổi Chiều dài",
-    "weightConverter": "Chuyển đổi Khối lượng", 
+    "weightConverter": "Chuyển đổi Trọng lượng",
+    "@weightConverter": {
+        "description": "Tiêu đề cho công cụ chuyển đổi trọng lượng"
+    },
+    "weightConverterInfo": "Thông tin Chuyển đổi Trọng lượng",
+    "@weightConverterInfo": {
+        "description": "Tiêu đề cho hộp thoại thông tin chuyển đổi trọng lượng"
+    },
+    "customizeWeightUnits": "Tùy chỉnh đơn vị Trọng lượng",
+    "@customizeWeightUnits": {
+        "description": "Tiêu đề cho hộp thoại tùy chỉnh đơn vị trọng lượng"
+    },
+    "massConverter": "Chuyển đổi Khối lượng",
+    "@massConverter": {
+        "description": "Tiêu đề cho công cụ chuyển đổi khối lượng"
+    },
+    "massConverterInfo": "Thông tin Chuyển đổi Khối lượng",
+    "@massConverterInfo": {
+        "description": "Tiêu đề cho hộp thoại thông tin chuyển đổi khối lượng"
+    },
+    "massConverterDesc": "Chuyển đổi giữa các đơn vị khối lượng (kg, lb, oz)",
+    "@massConverterDesc": {
+        "description": "Mô tả cho công cụ chuyển đổi khối lượng"
+    },
+    "customizeMassUnits": "Tùy chỉnh đơn vị Khối lượng",
+    "@customizeMassUnits": {
+        "description": "Tiêu đề cho hộp thoại tùy chỉnh đơn vị khối lượng"
+    },
     "temperatureConverter": "Chuyển đổi Nhiệt độ",
     "volumeConverter": "Chuyển đổi Thể tích",
     "areaConverter": "Chuyển đổi Diện tích",

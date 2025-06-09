@@ -1502,10 +1502,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lengthConverterInfo => 'Length Converter Information';
 
   @override
-  String get weightConverterInfo => 'Weight Converter Information';
+  String get weightConverterInfo => 'Weight Converter Info';
 
   @override
   String get customizeWeightUnits => 'Customize Weight Units';
+
+  @override
+  String get massConverter => 'Mass Converter';
+
+  @override
+  String get massConverterInfo => 'Mass Converter Info';
+
+  @override
+  String get massConverterDesc => 'Convert between mass units (kg, lb, oz)';
+
+  @override
+  String get customizeMassUnits => 'Customize Mass Units';
 
   @override
   String get availableUnits => 'Available Units';

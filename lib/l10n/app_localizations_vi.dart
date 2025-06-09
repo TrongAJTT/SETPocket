@@ -1508,6 +1508,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customizeWeightUnits => 'Tùy chỉnh đơn vị trọng lượng';
 
   @override
+  String get massConverter => 'Chuyển đổi Khối lượng';
+
+  @override
+  String get massConverterInfo => 'Thông tin Chuyển đổi Khối lượng';
+
+  @override
+  String get massConverterDesc => 'Chuyển đổi giữa các đơn vị khối lượng (kg, lb, oz)';
+
+  @override
+  String get customizeMassUnits => 'Tùy chỉnh đơn vị Khối lượng';
+
+  @override
   String get availableUnits => 'Đơn vị có sẵn';
 
   @override

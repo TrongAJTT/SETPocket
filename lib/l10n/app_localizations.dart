@@ -2105,7 +2105,7 @@ abstract class AppLocalizations {
   /// **'Length Converter'**
   String get lengthConverter;
 
-  /// No description provided for @weightConverter.
+  /// Title for weight converter tool
   ///
   /// In en, this message translates to:
   /// **'Weight Converter'**
@@ -2909,17 +2909,41 @@ abstract class AppLocalizations {
   /// **'Length Converter Information'**
   String get lengthConverterInfo;
 
-  /// No description provided for @weightConverterInfo.
+  /// Title for weight converter info dialog
   ///
   /// In en, this message translates to:
-  /// **'Weight Converter Information'**
+  /// **'Weight Converter Info'**
   String get weightConverterInfo;
 
-  /// No description provided for @customizeWeightUnits.
+  /// Title for weight unit customization dialog
   ///
   /// In en, this message translates to:
   /// **'Customize Weight Units'**
   String get customizeWeightUnits;
+
+  /// Title for mass converter tool
+  ///
+  /// In en, this message translates to:
+  /// **'Mass Converter'**
+  String get massConverter;
+
+  /// Title for mass converter info dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Mass Converter Info'**
+  String get massConverterInfo;
+
+  /// Description for mass converter tool
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between mass units (kg, lb, oz)'**
+  String get massConverterDesc;
+
+  /// Title for mass unit customization dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Mass Units'**
+  String get customizeMassUnits;
 
   /// No description provided for @availableUnits.
   ///

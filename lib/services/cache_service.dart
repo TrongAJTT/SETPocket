@@ -6,7 +6,7 @@ import 'currency_state_service.dart';
 import 'currency_preset_service.dart';
 import 'currency_cache_service.dart';
 import 'length_state_service.dart';
-import 'weight_state_service.dart';
+import 'mass_state_service.dart';
 
 class CacheInfo {
   final String name;
@@ -154,6 +154,14 @@ class CacheService {
         converterCount++;
       }
 
+      // Add mass state size
+      final hasMassState = await MassStateService.hasState();
+      final massStateSize = await MassStateService.getStateSize();
+      if (hasMassState) {
+        converterSize += massStateSize;
+        converterCount++;
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
@@ -193,7 +201,7 @@ class CacheService {
       await CurrencyCacheService.clearCache();
       await CurrencyStateService.clearState();
       await LengthStateService.clearState();
-      await WeightStateService.clearState();
+      await MassStateService.clearState();
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -216,7 +224,7 @@ class CacheService {
     await CurrencyCacheService.clearCache();
     await CurrencyStateService.clearState();
     await LengthStateService.clearState();
-    await WeightStateService.clearState();
+    await MassStateService.clearState();
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};

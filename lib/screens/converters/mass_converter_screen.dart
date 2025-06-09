@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../models/converter_models.dart';
-import '../../services/weight_state_service.dart';
-import '../../models/weight_state_model.dart';
+import '../../services/mass_state_service.dart';
+import '../../models/mass_state_model.dart';
 import '../../widgets/unit_customization_dialog.dart';
 import '../../l10n/app_localizations.dart';
 
-enum WeightViewMode { cards, table }
+enum MassViewMode { cards, table }
 
-class WeightConverterScreen extends StatefulWidget {
+class MassConverterScreen extends StatefulWidget {
   final bool isEmbedded;
 
-  const WeightConverterScreen({super.key, this.isEmbedded = false});
+  const MassConverterScreen({super.key, this.isEmbedded = false});
 
   @override
-  State<WeightConverterScreen> createState() => _WeightConverterScreenState();
+  State<MassConverterScreen> createState() => _MassConverterScreenState();
 }
 
-class _WeightConverterScreenState extends State<WeightConverterScreen> {
-  WeightViewMode _viewMode = WeightViewMode.cards;
-  final WeightConverter _converter = WeightConverter();
+class _MassConverterScreenState extends State<MassConverterScreen> {
+  MassViewMode _viewMode = MassViewMode.cards;
+  final MassConverter _converter = MassConverter();
 
   // Unit visibility
   final Set<String> _visibleUnits = {'kilograms', 'pounds', 'ounces'};
@@ -50,7 +50,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
   // Load saved state
   Future<void> _loadState() async {
     try {
-      final state = await WeightStateService.loadState();
+      final state = await MassStateService.loadState();
 
       // Clear existing data
       for (var rowControllers in _rowControllers) {
@@ -85,10 +85,9 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
         _rowBaseUnits.add(cardState.unitCode);
       }
 
-      print(
-          'WeightConverter: Loaded state with ${_rowControllers.length} cards');
+      print('MassConverter: Loaded state with ${_rowControllers.length} cards');
     } catch (e) {
-      print('WeightConverter: Error loading state: $e');
+      print('MassConverter: Error loading state: $e');
       // Fallback to default
       _addRow();
     }
@@ -97,28 +96,28 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
   // Save current state
   Future<void> _saveState() async {
     try {
-      final cards = <WeightCardState>[];
+      final cards = <MassCardState>[];
 
       for (int i = 0; i < _rowControllers.length; i++) {
         final baseUnit = _rowBaseUnits[i];
         final amount = _rowValues[i][baseUnit] ?? 1.0;
 
-        cards.add(WeightCardState(
+        cards.add(MassCardState(
           unitCode: baseUnit,
           amount: amount,
         ));
       }
 
-      final state = WeightStateModel(
+      final state = MassStateModel(
         cards: cards,
         visibleUnits: _visibleUnits.toList(),
         lastUpdated: DateTime.now(),
       );
 
-      await WeightStateService.saveState(state);
-      print('WeightConverter: Saved state with ${cards.length} cards');
+      await MassStateService.saveState(state);
+      print('MassConverter: Saved state with ${cards.length} cards');
     } catch (e) {
-      print('WeightConverter: Error saving state: $e');
+      print('MassConverter: Error saving state: $e');
     }
   }
 
@@ -267,7 +266,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
     showDialog(
       context: context,
       builder: (context) => UnitCustomizationDialog(
-        title: AppLocalizations.of(context)!.customizeWeightUnits,
+        title: AppLocalizations.of(context)!.customizeMassUnits,
         availableUnits: availableUnits,
         visibleUnits: Set.from(_visibleUnits),
         onChanged: _updateUnitVisibility,
@@ -281,7 +280,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
   void _showInfoDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => _WeightInfoDialog(),
+      builder: (context) => _MassInfoDialog(),
     );
   }
 
@@ -313,12 +312,12 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.weightConverter),
+        title: Text(l10n.massConverter),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
             onPressed: () => _showInfoDialog(context),
-            tooltip: l10n.weightConverterInfo,
+            tooltip: l10n.massConverterInfo,
           ),
           IconButton(
             icon: const Icon(Icons.restart_alt),
@@ -344,7 +343,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
           _buildViewModeToggle(),
           const SizedBox(height: 16),
           Expanded(
-            child: _viewMode == WeightViewMode.cards
+            child: _viewMode == MassViewMode.cards
                 ? _buildCardsView()
                 : _buildTableView(),
           ),
@@ -374,14 +373,14 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                 Row(
                   children: [
                     Icon(
-                      Icons.monitor_weight,
+                      Icons.balance,
                       size: 20,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        l10n.weightConverter,
+                        l10n.massConverter,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -401,21 +400,21 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: SegmentedButton<WeightViewMode>(
+                      child: SegmentedButton<MassViewMode>(
                         segments: [
-                          ButtonSegment<WeightViewMode>(
-                            value: WeightViewMode.cards,
+                          ButtonSegment<MassViewMode>(
+                            value: MassViewMode.cards,
                             icon: const Icon(Icons.view_agenda, size: 16),
                             label: Text(l10n.cardView),
                           ),
-                          ButtonSegment<WeightViewMode>(
-                            value: WeightViewMode.table,
+                          ButtonSegment<MassViewMode>(
+                            value: MassViewMode.table,
                             icon: const Icon(Icons.table_chart, size: 16),
                             label: Text(l10n.tableView),
                           ),
                         ],
                         selected: {_viewMode},
-                        onSelectionChanged: (Set<WeightViewMode> newSelection) {
+                        onSelectionChanged: (Set<MassViewMode> newSelection) {
                           setState(() {
                             _viewMode = newSelection.first;
                           });
@@ -436,13 +435,13 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
             return Row(
               children: [
                 Icon(
-                  Icons.monitor_weight,
+                  Icons.balance,
                   size: 20,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  l10n.weightConverter,
+                  l10n.massConverter,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w600,
@@ -456,21 +455,21 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),
-                SegmentedButton<WeightViewMode>(
+                SegmentedButton<MassViewMode>(
                   segments: [
-                    ButtonSegment<WeightViewMode>(
-                      value: WeightViewMode.cards,
+                    ButtonSegment<MassViewMode>(
+                      value: MassViewMode.cards,
                       icon: const Icon(Icons.view_agenda, size: 16),
                       label: Text(l10n.cardView),
                     ),
-                    ButtonSegment<WeightViewMode>(
-                      value: WeightViewMode.table,
+                    ButtonSegment<MassViewMode>(
+                      value: MassViewMode.table,
                       icon: const Icon(Icons.table_chart, size: 16),
                       label: Text(l10n.tableView),
                     ),
                   ],
                   selected: {_viewMode},
-                  onSelectionChanged: (Set<WeightViewMode> newSelection) {
+                  onSelectionChanged: (Set<MassViewMode> newSelection) {
                     setState(() {
                       _viewMode = newSelection.first;
                     });
@@ -1095,8 +1094,8 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
   }
 }
 
-class _WeightInfoDialog extends StatelessWidget {
-  const _WeightInfoDialog();
+class _MassInfoDialog extends StatelessWidget {
+  const _MassInfoDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -1149,14 +1148,14 @@ class _WeightInfoDialog extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    Icons.monitor_weight,
+                    Icons.balance,
                     color: theme.colorScheme.onPrimary,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.weightConverterInfo,
+                      AppLocalizations.of(context)!.massConverterInfo,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: theme.colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,
@@ -1186,8 +1185,8 @@ class _WeightInfoDialog extends StatelessWidget {
                       context,
                       title: 'About This Feature',
                       content:
-                          'Convert between 30+ weight units from metric system, imperial system, troy system, apothecaries system and other special units like carats and atomic mass units.',
-                      icon: Icons.monitor_weight,
+                          'Convert between 30+ mass units from metric system, imperial system, troy system, apothecaries system and other special units like carats and atomic mass units.',
+                      icon: Icons.balance,
                     ),
                     const SizedBox(height: 24),
                     _buildSection(

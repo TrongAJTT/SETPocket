@@ -6,7 +6,7 @@ import '../models/currency_state_model.dart';
 import '../models/settings_model.dart';
 import '../models/unit_template_model.dart';
 import '../models/length_state_model.dart';
-import '../models/weight_state_model.dart';
+import '../models/mass_state_model.dart';
 
 class HiveService {
   static final Logger _logger = Logger();
@@ -58,10 +58,10 @@ class HiveService {
         Hive.registerAdapter(LengthStateModelAdapter());
       }
       if (!Hive.isAdapterRegistered(8)) {
-        Hive.registerAdapter(WeightCardStateAdapter());
+        Hive.registerAdapter(MassCardStateAdapter());
       }
       if (!Hive.isAdapterRegistered(9)) {
-        Hive.registerAdapter(WeightStateModelAdapter());
+        Hive.registerAdapter(MassStateModelAdapter());
       }
 
       // Open boxes

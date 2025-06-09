@@ -354,7 +354,7 @@
     "calculatorTools": "Calculator Tools",
     "calculatorToolsDesc": "Specialized calculators for health, finance, and more",
     "lengthConverter": "Length Converter",
-    "weightConverter": "Weight Converter", 
+    "weightConverter": "Weight Converter",
     "temperatureConverter": "Temperature Converter",
     "volumeConverter": "Volume Converter",
     "areaConverter": "Area Converter",
@@ -508,8 +508,33 @@
     "selectLengthUnits": "Select length units to display",
     "lengthConverterInfo": "Length Converter Information",
     "weightConverter": "Weight Converter",
-    "weightConverterInfo": "Weight Converter Information",
+    "@weightConverter": {
+        "description": "Title for weight converter tool"
+    },
+    "weightConverterInfo": "Weight Converter Info",
+    "@weightConverterInfo": {
+        "description": "Title for weight converter info dialog"
+    },
     "customizeWeightUnits": "Customize Weight Units",
+    "@customizeWeightUnits": {
+        "description": "Title for weight unit customization dialog"
+    },
+    "massConverter": "Mass Converter",
+    "@massConverter": {
+        "description": "Title for mass converter tool"
+    },
+    "massConverterInfo": "Mass Converter Info",
+    "@massConverterInfo": {
+        "description": "Title for mass converter info dialog"
+    },
+    "massConverterDesc": "Convert between mass units (kg, lb, oz)",
+    "@massConverterDesc": {
+        "description": "Description for mass converter tool"
+    },
+    "customizeMassUnits": "Customize Mass Units",
+    "@customizeMassUnits": {
+        "description": "Title for mass unit customization dialog"
+    },
     "availableUnits": "Available Units",
     "scientificNotation": "Scientific notation supported for extreme values"
 }

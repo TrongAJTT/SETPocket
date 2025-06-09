@@ -876,6 +876,37 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String currenciesCount(Object count) {
+    return '$count loại tiền';
+  }
+
+  @override
+  String createdDate(Object date) {
+    return 'Tạo: $date';
+  }
+
+  @override
+  String get sortByLabel => 'Sắp xếp theo:';
+
+  @override
+  String get selectPreset => 'Chọn';
+
+  @override
+  String get deletePresetAction => 'Xóa';
+
+  @override
+  String get deletePresetTitle => 'Xóa Cấu Hình';
+
+  @override
+  String get deletePresetConfirm => 'Bạn có chắc chắn muốn xóa cấu hình này không?';
+
+  @override
+  String get presetDeletedSuccess => 'Đã xóa cấu hình';
+
+  @override
+  String get errorLabel => 'Lỗi:';
+
+  @override
   String get fetchTimeout => 'Thời Gian Chờ Fetch';
 
   @override

@@ -26,6 +26,8 @@ class CurrencyStateModel extends HiveObject {
         CurrencyCardState(
           currencyCode: 'USD',
           amount: 1.0,
+          name: 'Converter 1',
+          currencies: ['USD', 'EUR', 'JPY', 'AUD', 'CNY', 'VND'],
         ),
       ],
       visibleCurrencies: ['USD', 'EUR', 'JPY', 'AUD', 'CNY', 'VND'],
@@ -60,15 +62,25 @@ class CurrencyCardState extends HiveObject {
   @HiveField(1)
   double amount;
 
+  @HiveField(2)
+  String? name;
+
+  @HiveField(3)
+  List<String>? currencies;
+
   CurrencyCardState({
     required this.currencyCode,
     required this.amount,
+    this.name,
+    this.currencies,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'currencyCode': currencyCode,
       'amount': amount,
+      'name': name ?? 'Converter 1',
+      'currencies': currencies ?? ['USD', 'EUR', 'JPY'],
     };
   }
 
@@ -76,6 +88,10 @@ class CurrencyCardState extends HiveObject {
     return CurrencyCardState(
       currencyCode: json['currencyCode'],
       amount: json['amount'],
+      name: json['name'],
+      currencies: json['currencies'] != null
+          ? List<String>.from(json['currencies'])
+          : null,
     );
   }
 }

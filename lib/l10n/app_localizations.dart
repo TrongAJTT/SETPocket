@@ -1685,6 +1685,60 @@ abstract class AppLocalizations {
   /// **'{count} currencies'**
   String currencies(Object count);
 
+  /// No description provided for @currenciesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} currencies'**
+  String currenciesCount(Object count);
+
+  /// No description provided for @createdDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Created: {date}'**
+  String createdDate(Object date);
+
+  /// No description provided for @sortByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by:'**
+  String get sortByLabel;
+
+  /// No description provided for @selectPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get selectPreset;
+
+  /// No description provided for @deletePresetAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deletePresetAction;
+
+  /// No description provided for @deletePresetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Preset'**
+  String get deletePresetTitle;
+
+  /// No description provided for @deletePresetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this preset?'**
+  String get deletePresetConfirm;
+
+  /// No description provided for @presetDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset deleted'**
+  String get presetDeletedSuccess;
+
+  /// No description provided for @errorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Error:'**
+  String get errorLabel;
+
   /// No description provided for @fetchTimeout.
   ///
   /// In en, this message translates to:

@@ -876,6 +876,37 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String currenciesCount(Object count) {
+    return '$count currencies';
+  }
+
+  @override
+  String createdDate(Object date) {
+    return 'Created: $date';
+  }
+
+  @override
+  String get sortByLabel => 'Sort by:';
+
+  @override
+  String get selectPreset => 'Select';
+
+  @override
+  String get deletePresetAction => 'Delete';
+
+  @override
+  String get deletePresetTitle => 'Delete Preset';
+
+  @override
+  String get deletePresetConfirm => 'Are you sure you want to delete this preset?';
+
+  @override
+  String get presetDeletedSuccess => 'Preset deleted';
+
+  @override
+  String get errorLabel => 'Error:';
+
+  @override
   String get fetchTimeout => 'Fetch Timeout';
 
   @override

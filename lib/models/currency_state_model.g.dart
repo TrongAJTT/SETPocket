@@ -59,17 +59,23 @@ class CurrencyCardStateAdapter extends TypeAdapter<CurrencyCardState> {
     return CurrencyCardState(
       currencyCode: fields[0] as String,
       amount: fields[1] as double,
+      name: fields[2] as String?,
+      currencies: (fields[3] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, CurrencyCardState obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.currencyCode)
       ..writeByte(1)
-      ..write(obj.amount);
+      ..write(obj.amount)
+      ..writeByte(2)
+      ..write(obj.name)
+      ..writeByte(3)
+      ..write(obj.currencies);
   }
 
   @override

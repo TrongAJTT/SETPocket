@@ -259,58 +259,242 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Widget _buildSettingsContent(AppLocalizations loc) {
-    final isDesktop = MediaQuery.of(context).size.width >= 600;
-    final maxWidth = isDesktop ? 720.0 : 480.0;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 900;
+    final isTablet = screenWidth >= 600 && screenWidth < 900;
+    final maxWidth = isDesktop ? 1200.0 : (isTablet ? 800.0 : 480.0);
 
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
-        child: ListView(
-          padding: EdgeInsets.symmetric(
-              horizontal: isDesktop ? 32 : 24, vertical: isDesktop ? 24 : 32),
-          children: [
-            if (!widget.isEmbedded) _buildHeader(loc),
-            _buildUserInterfaceSection(loc),
-            const SizedBox(height: 32),
-            _buildToolsShortcutsSection(loc),
-            const SizedBox(height: 32),
-            _buildConverterToolsSection(loc),
-            const SizedBox(height: 32),
-            _buildRandomToolsSection(loc),
-            const SizedBox(height: 32),
-            _buildDataSection(loc),
-          ],
-        ),
+        child: isDesktop ? _buildDesktopLayout(loc) : _buildMobileLayout(loc),
       ),
     );
   }
 
-  Widget _buildHeader(AppLocalizations loc) {
+  Widget _buildDesktopLayout(AppLocalizations loc) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 32),
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!widget.isEmbedded) _buildHeader(loc),
+          Expanded(
+            child: SingleChildScrollView(
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildUserInterfaceSection(loc),
+                          const SizedBox(height: 24),
+                          _buildToolsShortcutsSection(loc),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 32),
+                    // Right Column
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildConverterToolsSection(loc),
+                          const SizedBox(height: 24),
+                          _buildRandomToolsSection(loc),
+                          const SizedBox(height: 24),
+                          _buildDataSection(loc),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(AppLocalizations loc) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+    
+    return ListView(
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 32 : 20,
+        vertical: isTablet ? 24 : 20,
+      ),
+      children: [
+        if (!widget.isEmbedded) _buildHeader(loc),
+        _buildUserInterfaceSection(loc),
+        const SizedBox(height: 24),
+        _buildToolsShortcutsSection(loc),
+        const SizedBox(height: 24),
+        _buildConverterToolsSection(loc),
+        const SizedBox(height: 24),
+        _buildRandomToolsSection(loc),
+        const SizedBox(height: 24),
+        _buildDataSection(loc),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+
+  Widget _buildHeader(AppLocalizations loc) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    
+    return Padding(
+      padding: EdgeInsets.only(bottom: isDesktop ? 40 : 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.settings_outlined,
-                  size: 32, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(width: 12),
-              Text(
-                loc.settings,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.w600),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  Icons.settings_outlined,
+                  size: isDesktop ? 32 : 28,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.settings,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      loc.settingsDesc,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            loc.settingsDesc,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+          if (isDesktop) ...[
+            const SizedBox(height: 24),
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.outline.withValues(alpha: 0.0),
+                    Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.outline.withValues(alpha: 0.0),
+                  ],
                 ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+    Color? iconColor,
+  }) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(isDesktop ? 20 : 16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.04),
+            blurRadius: isDesktop ? 12 : 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Header
+          Container(
+            padding: EdgeInsets.all(isDesktop ? 24 : 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.05),
+                  (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.02),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(isDesktop ? 20 : 16),
+                topRight: Radius.circular(isDesktop ? 20 : 16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(isDesktop ? 10 : 8),
+                  decoration: BoxDecoration(
+                    color: (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: isDesktop ? 24 : 22,
+                    color: iconColor ?? Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                SizedBox(width: isDesktop ? 16 : 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: isDesktop ? 20 : (isTablet ? 18 : 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Section Content
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              isDesktop ? 24 : 20,
+              isDesktop ? 8 : 4,
+              isDesktop ? 24 : 20,
+              isDesktop ? 24 : 20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
           ),
         ],
       ),
@@ -321,9 +505,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     return _buildSection(
       title: loc.userInterface,
       icon: Icons.palette_outlined,
+      iconColor: Colors.purple.shade600,
       children: [
         _buildThemeSettings(loc),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
         _buildLanguageSettings(loc),
       ],
     );
@@ -333,6 +518,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     return _buildSection(
       title: loc.toolsShortcuts,
       icon: Icons.tune,
+      iconColor: Colors.blue.shade600,
       children: [
         _buildToolVisibilitySettings(loc),
         const SizedBox(height: 16),
@@ -345,6 +531,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     return _buildSection(
       title: loc.converterTools,
       icon: Icons.swap_horiz,
+      iconColor: Colors.green.shade600,
       children: [
         _buildCurrencyFetchModeSettings(loc),
       ],
@@ -355,6 +542,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     return _buildSection(
       title: loc.random,
       icon: Icons.casino_outlined,
+      iconColor: Colors.orange.shade600,
       children: [
         _buildHistorySettings(loc),
       ],
@@ -365,55 +553,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     return _buildSection(
       title: loc.cache,
       icon: Icons.storage_outlined,
+      iconColor: Colors.red.shade600,
       children: [
         _buildCacheInfo(loc),
         const SizedBox(height: 16),
         _buildCacheActions(loc),
-      ],
-    );
-  }
-
-  Widget _buildSection({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              icon,
-              size: 24,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: children,
-          ),
-        ),
       ],
     );
   }
@@ -445,47 +589,117 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               ),
         ),
         const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _language,
-              isExpanded: true,
-              items: [
-                DropdownMenuItem(
-                  value: 'en',
-                  child: Row(
-                    children: [
-                      const Text('🇺🇸', style: TextStyle(fontSize: 20)),
-                      const SizedBox(width: 12),
-                      Text(loc.english),
-                    ],
+        _buildLanguageOptions(loc),
+      ],
+    );
+  }
+
+  Widget _buildLanguageOptions(AppLocalizations loc) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth >= 700;
+
+    final languageOptions = [
+      _buildLanguageOption(
+        'en',
+        _language,
+        _onLanguageChanged,
+        '🇺🇸',
+        Colors.blue.shade600,
+        loc.english,
+      ),
+      _buildLanguageOption(
+        'vi',
+        _language,
+        _onLanguageChanged,
+        '🇻🇳',
+        Colors.red.shade600,
+        loc.vietnamese,
+      ),
+    ];
+
+    if (isLargeScreen) {
+      return Row(
+        children: languageOptions
+            .map((option) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: option,
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'vi',
-                  child: Row(
-                    children: [
-                      const Text('🇻🇳', style: TextStyle(fontSize: 20)),
-                      const SizedBox(width: 12),
-                      Text(loc.vietnamese),
-                    ],
-                  ),
-                ),
-              ],
-              onChanged: _onLanguageChanged,
-            ),
+                ))
+            .toList(),
+      );
+    } else {
+      return Column(
+        children: languageOptions
+            .map((option) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: option,
+                ))
+            .toList(),
+      );
+    }
+  }
+
+  Widget _buildLanguageOption(
+      String value,
+      String groupValue,
+      Function(String?) onChanged,
+      String flag,
+      Color color,
+      String label) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth >= 700;
+    final isSelected = value == groupValue;
+
+    return InkWell(
+      onTap: () => onChanged(value),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: isLargeScreen ? null : double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withValues(alpha: 0.3)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
-      ],
+        child: Row(
+          mainAxisSize: isLargeScreen ? MainAxisSize.min : MainAxisSize.max,
+          children: [
+            Text(
+              flag,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                      fontWeight: isSelected ? FontWeight.w500 : null,
+                    ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                color: Theme.of(context).colorScheme.primary,
+                size: 18,
+              ),
+          ],
+        ),
+      ),
     );
   }
 

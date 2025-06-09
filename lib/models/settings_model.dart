@@ -11,18 +11,25 @@ class SettingsModel extends HiveObject {
   @HiveField(1)
   int fetchTimeoutSeconds;
 
+  @HiveField(2)
+  bool featureStateSavingEnabled;
+
   SettingsModel({
     this.currencyFetchMode = CurrencyFetchMode.onceADay,
     this.fetchTimeoutSeconds = 10,
+    this.featureStateSavingEnabled = true,
   });
 
   SettingsModel copyWith({
     CurrencyFetchMode? currencyFetchMode,
     int? fetchTimeoutSeconds,
+    bool? featureStateSavingEnabled,
   }) {
     return SettingsModel(
       currencyFetchMode: currencyFetchMode ?? this.currencyFetchMode,
       fetchTimeoutSeconds: fetchTimeoutSeconds ?? this.fetchTimeoutSeconds,
+      featureStateSavingEnabled:
+          featureStateSavingEnabled ?? this.featureStateSavingEnabled,
     );
   }
 
@@ -30,6 +37,7 @@ class SettingsModel extends HiveObject {
     return {
       'currencyFetchMode': currencyFetchMode.index,
       'fetchTimeoutSeconds': fetchTimeoutSeconds,
+      'featureStateSavingEnabled': featureStateSavingEnabled,
     };
   }
 
@@ -38,6 +46,7 @@ class SettingsModel extends HiveObject {
       currencyFetchMode:
           CurrencyFetchMode.values[json['currencyFetchMode'] ?? 1],
       fetchTimeoutSeconds: json['fetchTimeoutSeconds'] ?? 10,
+      featureStateSavingEnabled: json['featureStateSavingEnabled'] ?? true,
     );
   }
 }

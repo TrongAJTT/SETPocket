@@ -475,5 +475,24 @@
     "fetchModeOnceADay": "Once a day",
     "fetchModeOnceADayDesc": "Automatically fetch rates once per day",
     "fetchModeEverytime": "Every time",
-    "fetchModeEverytimeDesc": "Fetch fresh rates every time the converter is opened"
+    "fetchModeEverytimeDesc": "Fetch fresh rates every time the converter is opened",
+
+    "currencyFetchStatus": "Currency Fetch Status",
+    "fetchStatusSummary": "Fetch Status Summary",
+    "success": "Success",
+    "failed": "Failed", 
+    "timeout": "Timeout",
+    "static": "Static",
+    "noCurrenciesInThisCategory": "No currencies in this category",
+    
+    "saveFeatureState": "Save Feature State",
+    "saveFeatureStateDesc": "Remember the state of features between app sessions",
+    "testCache": "Test Cache",
+    
+    "viewFetchStatus": "View Fetch Status",
+    
+    "cacheTypeConverterTools": "Converter Tools",
+    "cacheTypeConverterToolsDesc": "Currency presets and exchange rates cache",
+    "cacheTypeFeatureStates": "Feature States", 
+    "cacheTypeFeatureStatesDesc": "Saved feature states and preferences"
 }

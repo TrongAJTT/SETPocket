@@ -1421,4 +1421,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fetchModeEverytimeDesc => 'Fetch fresh rates every time the converter is opened';
+
+  @override
+  String get currencyFetchStatus => 'Currency Fetch Status';
+
+  @override
+  String get fetchStatusSummary => 'Fetch Status Summary';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get failed => 'Failed';
+
+  @override
+  String get timeout => 'Timeout';
+
+  @override
+  String get static => 'Static';
+
+  @override
+  String get noCurrenciesInThisCategory => 'No currencies in this category';
+
+  @override
+  String get saveFeatureState => 'Save Feature State';
+
+  @override
+  String get saveFeatureStateDesc => 'Remember the state of features between app sessions';
+
+  @override
+  String get testCache => 'Test Cache';
+
+  @override
+  String get viewFetchStatus => 'View Fetch Status';
+
+  @override
+  String get cacheTypeConverterTools => 'Converter Tools';
+
+  @override
+  String get cacheTypeConverterToolsDesc => 'Currency presets and exchange rates cache';
+
+  @override
+  String get cacheTypeFeatureStates => 'Feature States';
+
+  @override
+  String get cacheTypeFeatureStatesDesc => 'Saved feature states and preferences';
 }

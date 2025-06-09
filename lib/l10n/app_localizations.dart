@@ -2758,6 +2758,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fetch fresh rates every time the converter is opened'**
   String get fetchModeEverytimeDesc;
+
+  /// No description provided for @currencyFetchStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Fetch Status'**
+  String get currencyFetchStatus;
+
+  /// No description provided for @fetchStatusSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Status Summary'**
+  String get fetchStatusSummary;
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failed;
+
+  /// No description provided for @timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout'**
+  String get timeout;
+
+  /// No description provided for @static.
+  ///
+  /// In en, this message translates to:
+  /// **'Static'**
+  String get static;
+
+  /// No description provided for @noCurrenciesInThisCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No currencies in this category'**
+  String get noCurrenciesInThisCategory;
+
+  /// No description provided for @saveFeatureState.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Feature State'**
+  String get saveFeatureState;
+
+  /// No description provided for @saveFeatureStateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember the state of features between app sessions'**
+  String get saveFeatureStateDesc;
+
+  /// No description provided for @testCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Cache'**
+  String get testCache;
+
+  /// No description provided for @viewFetchStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'View Fetch Status'**
+  String get viewFetchStatus;
+
+  /// No description provided for @cacheTypeConverterTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Converter Tools'**
+  String get cacheTypeConverterTools;
+
+  /// No description provided for @cacheTypeConverterToolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency presets and exchange rates cache'**
+  String get cacheTypeConverterToolsDesc;
+
+  /// No description provided for @cacheTypeFeatureStates.
+  ///
+  /// In en, this message translates to:
+  /// **'Feature States'**
+  String get cacheTypeFeatureStates;
+
+  /// No description provided for @cacheTypeFeatureStatesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved feature states and preferences'**
+  String get cacheTypeFeatureStatesDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

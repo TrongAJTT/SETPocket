@@ -40,6 +40,10 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         appSettingsDesc: loc.cacheTypeAppSettingsDesc,
         randomGeneratorsName: loc.cacheTypeRandomGenerators,
         randomGeneratorsDesc: loc.cacheTypeRandomGeneratorsDesc,
+        converterToolsName: loc.cacheTypeConverterTools,
+        converterToolsDesc: loc.cacheTypeConverterToolsDesc,
+        featureStatesName: loc.cacheTypeFeatureStates,
+        featureStatesDesc: loc.cacheTypeFeatureStatesDesc,
       );
       setState(() {
         _cacheInfo = cacheInfo;
@@ -317,6 +321,10 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Icons.settings;
       case 'random_generators':
         return Icons.casino;
+      case 'converter_tools':
+        return Icons.swap_horiz;
+      case 'feature_states':
+        return Icons.save_alt;
       default:
         return Icons.storage;
     }
@@ -330,6 +338,10 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Colors.grey;
       case 'random_generators':
         return Colors.purple;
+      case 'converter_tools':
+        return Colors.green;
+      case 'feature_states':
+        return Colors.orange;
       default:
         return Colors.grey;
     }

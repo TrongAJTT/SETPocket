@@ -2,6 +2,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
 import 'hive_service.dart';
+import 'currency_state_service.dart';
+import 'currency_preset_service.dart';
+import 'currency_cache_service.dart';
 
 class CacheInfo {
   final String name;
@@ -46,6 +49,8 @@ class CacheService {
       'generation_history_dice_roll',
       'generation_history_rock_paper_scissors',
     ],
+    'converter_tools': [],
+    'feature_states': [],
   };
   static Future<Map<String, CacheInfo>> getAllCacheInfo({
     String? textTemplatesName,
@@ -54,6 +59,10 @@ class CacheService {
     String? appSettingsDesc,
     String? randomGeneratorsName,
     String? randomGeneratorsDesc,
+    String? converterToolsName,
+    String? converterToolsDesc,
+    String? featureStatesName,
+    String? featureStatesDesc,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, CacheInfo> cacheInfoMap =
@@ -108,6 +117,72 @@ class CacheService {
       keys: _cacheKeys['random_generators'] ?? [],
     );
 
+    // Converter Tools Cache
+    try {
+      final presets = await CurrencyPresetService.loadPresets();
+      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      int converterSize = 0;
+      int converterCount = 0;
+
+      // Calculate preset size
+      for (final preset in presets) {
+        converterSize +=
+            preset.name.length * 2 + (preset.currencies.length * 6);
+        converterCount++;
+      }
+
+      // Add currency cache size
+      if (cacheInfo != null) {
+        converterSize +=
+            cacheInfo.rates.length * 12; // Approximate size per rate
+        converterCount++;
+      }
+
+      cacheInfoMap['converter_tools'] = CacheInfo(
+        name: converterToolsName ?? 'Converter Tools',
+        description:
+            converterToolsDesc ?? 'Currency presets and exchange rates cache',
+        itemCount: converterCount,
+        sizeBytes: converterSize,
+        keys: _cacheKeys['converter_tools'] ?? [],
+      );
+    } catch (e) {
+      print('CacheService: Error getting converter tools cache info: $e');
+      cacheInfoMap['converter_tools'] = CacheInfo(
+        name: converterToolsName ?? 'Converter Tools',
+        description:
+            converterToolsDesc ?? 'Currency presets and exchange rates cache',
+        itemCount: 0,
+        sizeBytes: 0,
+        keys: _cacheKeys['converter_tools'] ?? [],
+      );
+    }
+
+    // Feature States Cache
+    try {
+      final hasState = await CurrencyStateService.hasState();
+      final stateSize = await CurrencyStateService.getStateSize();
+
+      cacheInfoMap['feature_states'] = CacheInfo(
+        name: featureStatesName ?? 'Feature States',
+        description:
+            featureStatesDesc ?? 'Saved feature states and preferences',
+        itemCount: hasState ? 1 : 0,
+        sizeBytes: stateSize,
+        keys: _cacheKeys['feature_states'] ?? [],
+      );
+    } catch (e) {
+      print('CacheService: Error getting feature states cache info: $e');
+      cacheInfoMap['feature_states'] = CacheInfo(
+        name: featureStatesName ?? 'Feature States',
+        description:
+            featureStatesDesc ?? 'Saved feature states and preferences',
+        itemCount: 0,
+        sizeBytes: 0,
+        keys: _cacheKeys['feature_states'] ?? [],
+      );
+    }
+
     return cacheInfoMap;
   }
 
@@ -121,6 +196,13 @@ class CacheService {
     } else if (cacheType == 'text_templates') {
       // Clear templates cache from Hive
       await HiveService.clearBox(HiveService.templatesBoxName);
+    } else if (cacheType == 'converter_tools') {
+      // Clear currency presets and exchange rates cache
+      await CurrencyPresetService.clearAllPresets();
+      await CurrencyCacheService.clearCache();
+    } else if (cacheType == 'feature_states') {
+      // Clear feature states
+      await CurrencyStateService.clearState();
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -137,6 +219,13 @@ class CacheService {
 
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
+
+    // Clear converter tools cache
+    await CurrencyPresetService.clearAllPresets();
+    await CurrencyCacheService.clearCache();
+
+    // Clear feature states cache
+    await CurrencyStateService.clearState();
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};

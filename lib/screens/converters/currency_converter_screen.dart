@@ -8,6 +8,9 @@ import '../../services/currency_service.dart';
 import '../../services/currency_preset_service.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/currency_fetch_progress_dialog.dart';
+import '../../widgets/currency_fetch_status_dialog.dart';
+import '../../services/currency_state_service.dart';
+import '../../models/currency_state_model.dart';
 import '../../l10n/app_localizations.dart';
 
 enum CurrencyViewMode { cards, table }
@@ -51,12 +54,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   @override
   void initState() {
     super.initState();
-    _addRow(); // Start with one row
+    _loadState(); // Load saved state first
     _initializeCurrencyRates();
   }
 
   @override
   void dispose() {
+    _saveState(); // Save state before disposing
     // Dispose all row controllers
     for (var rowControllers in _rowControllers) {
       for (var controller in rowControllers.values) {
@@ -66,10 +70,86 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     super.dispose();
   }
 
+  // Load saved state
+  Future<void> _loadState() async {
+    try {
+      final state = await CurrencyStateService.loadState();
+
+      // Clear existing data
+      for (var rowControllers in _rowControllers) {
+        for (var controller in rowControllers.values) {
+          controller.dispose();
+        }
+      }
+      _rowControllers.clear();
+      _rowValues.clear();
+      _rowBaseCurrencies.clear();
+
+      // Update visible currencies
+      setState(() {
+        _visibleCurrencies.clear();
+        _visibleCurrencies.addAll(state.visibleCurrencies);
+      });
+
+      // Restore cards
+      for (final cardState in state.cards) {
+        final newRowControllers = <String, TextEditingController>{};
+        final newRowValues = <String, double>{};
+
+        for (var currency in _visibleCurrencies) {
+          final amount =
+              currency == cardState.currencyCode ? cardState.amount : 0.0;
+          newRowControllers[currency] =
+              TextEditingController(text: amount.toStringAsFixed(2));
+          newRowValues[currency] = amount;
+        }
+
+        _rowControllers.add(newRowControllers);
+        _rowValues.add(newRowValues);
+        _rowBaseCurrencies.add(cardState.currencyCode);
+      }
+
+      print(
+          'CurrencyConverter: Loaded state with ${_rowControllers.length} cards');
+    } catch (e) {
+      print('CurrencyConverter: Error loading state: $e');
+      // Fallback to default
+      _addRow();
+    }
+  }
+
+  // Save current state
+  Future<void> _saveState() async {
+    try {
+      final cards = <CurrencyCardState>[];
+
+      for (int i = 0; i < _rowControllers.length; i++) {
+        final baseCurrency = _rowBaseCurrencies[i];
+        final amount = _rowValues[i][baseCurrency] ?? 1.0;
+
+        cards.add(CurrencyCardState(
+          currencyCode: baseCurrency,
+          amount: amount,
+        ));
+      }
+
+      final state = CurrencyStateModel(
+        cards: cards,
+        visibleCurrencies: _visibleCurrencies.toList(),
+        lastUpdated: DateTime.now(),
+      );
+
+      await CurrencyStateService.saveState(state);
+      print('CurrencyConverter: Saved state with ${cards.length} cards');
+    } catch (e) {
+      print('CurrencyConverter: Error saving state: $e');
+    }
+  }
+
   void _addRow() {
     final newRowControllers = <String, TextEditingController>{};
     final newRowValues = <String, double>{};
-    
+
     // Use first visible currency as default instead of hardcoded USD
     final defaultCurrency = _visibleCurrencies.first;
 
@@ -88,6 +168,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     if (_rowControllers.isNotEmpty) {
       _updateRowConversions(_rowControllers.length - 1, defaultCurrency, 1.0);
     }
+
+    // Save state after adding row
+    _saveState();
   }
 
   void _removeRow(int index) {
@@ -102,6 +185,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         _rowValues.removeAt(index);
         _rowBaseCurrencies.removeAt(index);
       });
+
+      // Save state after removing row
+      _saveState();
     }
   }
 
@@ -179,12 +265,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   Future<void> _updateCurrencyServiceRates(Map<String, double> rates) async {
     // Update CurrencyService with cached rates
     CurrencyService.updateCurrentRates(rates);
-    print('Currency Converter: Updated CurrencyService with ${rates.length} rates');
+    print(
+        'Currency Converter: Updated CurrencyService with ${rates.length} rates');
   }
 
   Future<void> _refreshCurrencyRates() async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     setState(() {
       _isLoadingRates = true;
     });
@@ -192,10 +279,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     try {
       // Get timeout from settings
       final fetchTimeout = await SettingsService.getFetchTimeout();
-      
+
       // Show progress dialog
-      final currencies = CurrencyService.getSupportedCurrencies().map((c) => c.code).toList();
-      
+      final currencies =
+          CurrencyService.getSupportedCurrencies().map((c) => c.code).toList();
+
       // Show dialog and wait for completion
       showDialog(
         context: context,
@@ -229,9 +317,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _isUsingLiveRates
-                  ? l10n.liveRatesUpdated
-                  : l10n.staticRatesUsed,
+              _isUsingLiveRates ? l10n.liveRatesUpdated : l10n.staticRatesUsed,
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -246,11 +332,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       }
     } catch (e) {
       print('Failed to refresh currency rates: $e');
-      
+
       // Close progress dialog if still open
       if (mounted) {
         Navigator.of(context).pop();
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.failedToUpdateRates),
@@ -312,6 +398,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       final baseValue = _rowValues[i][baseCurrency] ?? 1.0;
       _updateRowConversions(i, baseCurrency, baseValue);
     }
+
+    // Save state after updating visibility
+    _saveState();
   }
 
   void _showCurrencyCustomization() {
@@ -332,15 +421,22 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     );
   }
 
+  void _showFetchStatusDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const CurrencyFetchStatusDialog(),
+    );
+  }
+
   String _formatLastUpdated(AppLocalizations l10n) {
     if (_lastUpdated == null) return '';
 
     final dateFormat = DateFormat('MM/dd/yyyy');
     final timeFormat = DateFormat('HH:mm:ss');
-    
+
     final date = dateFormat.format(_lastUpdated!);
     final time = timeFormat.format(_lastUpdated!);
-    
+
     return l10n.lastUpdatedAt(date, time);
   }
 
@@ -414,7 +510,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   Widget _buildStatusRow() {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -466,21 +562,41 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
             ] else
               const Spacer(),
           ],
-          IconButton(
-            onPressed: _isLoadingRates ? null : _refreshCurrencyRates,
-            icon: Icon(
-              Icons.refresh,
-              color: _isLoadingRates
-                  ? Theme.of(context).disabledColor
-                  : Theme.of(context).colorScheme.primary,
-              size: 20,
-            ),
-            tooltip: l10n.refreshRates,
-            padding: const EdgeInsets.all(4),
-            constraints: const BoxConstraints(
-              minWidth: 32,
-              minHeight: 32,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () => _showFetchStatusDialog(context),
+                icon: Icon(
+                  Icons.assessment,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+                tooltip: l10n.viewFetchStatus,
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                onPressed: _isLoadingRates ? null : _refreshCurrencyRates,
+                icon: Icon(
+                  Icons.refresh,
+                  color: _isLoadingRates
+                      ? Theme.of(context).disabledColor
+                      : Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+                tooltip: l10n.refreshRates,
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -489,7 +605,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   Widget _buildCardsView() {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Column(
       children: [
         // Add card button and view mode toggle
@@ -687,7 +803,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       // Currency dropdown
                       Expanded(
                         flex: 3,
-                        child:                         DropdownButtonFormField<String>(
+                        child: DropdownButtonFormField<String>(
                           value: baseCurrency,
                           decoration: InputDecoration(
                             labelText: l10n.from,
@@ -708,7 +824,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             );
@@ -810,19 +927,29 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       final unit =
                           _converter.units.firstWhere((u) => u.id == currency);
                       final value = _rowValues[index][currency] ?? 0.0;
-                      final currencyStatus = CurrencyService.getCurrencyStatus(currency);
-                      final hasError = currencyStatus == CurrencyStatus.failed || 
-                                      currencyStatus == CurrencyStatus.timeout;
-                      
+                      final currencyStatus =
+                          CurrencyService.getCurrencyStatus(currency);
+                      final hasError =
+                          currencyStatus == CurrencyStatus.failed ||
+                              currencyStatus == CurrencyStatus.timeout;
+
                       // Improved error colors for dark mode compatibility
-                      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+                      final isDarkMode =
+                          Theme.of(context).brightness == Brightness.dark;
                       final errorBackgroundColor = hasError
-                          ? (isDarkMode ? Colors.red.shade900.withOpacity(0.3) : Colors.red.shade50)
-                          : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3);
+                          ? (isDarkMode
+                              ? Colors.red.shade900.withOpacity(0.3)
+                              : Colors.red.shade50)
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceVariant
+                              .withOpacity(0.3);
                       final errorBorderColor = hasError
-                          ? (isDarkMode ? Colors.red.shade400 : Colors.red.shade300)
+                          ? (isDarkMode
+                              ? Colors.red.shade400
+                              : Colors.red.shade300)
                           : null;
-                      
+
                       return SizedBox(
                         // Optimized width calculation for proper 2-item display with generous spacing
                         width: constraints.maxWidth > 500
@@ -832,19 +959,19 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                 20, // 1 column with minimal padding
                         height: 52, // Increased height for better proportions
                         child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 12), // Enhanced padding
-                            decoration: BoxDecoration(
-                              color: errorBackgroundColor,
-                              borderRadius: BorderRadius.circular(
-                                  8), // Slightly larger radius
-                              border: hasError
-                                  ? Border.all(
-                                      color: errorBorderColor!,
-                                      width: 1,
-                                    )
-                                  : null,
-                            ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 12), // Enhanced padding
+                          decoration: BoxDecoration(
+                            color: errorBackgroundColor,
+                            borderRadius: BorderRadius.circular(
+                                8), // Slightly larger radius
+                            border: hasError
+                                ? Border.all(
+                                    color: errorBorderColor!,
+                                    width: 1,
+                                  )
+                                : null,
+                          ),
                           child: Row(
                             children: [
                               // Currency symbol with status indicator
@@ -859,10 +986,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14, // Improved font size
-                                        color: hasError 
-                                            ? (Theme.of(context).brightness == Brightness.dark 
-                                                ? Colors.red.shade300 
-                                                : Colors.red.shade700) 
+                                        color: hasError
+                                            ? (Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.red.shade300
+                                                : Colors.red.shade700)
                                             : null,
                                       ),
                                     ),
@@ -874,7 +1002,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                           width: 8,
                                           height: 8,
                                           decoration: BoxDecoration(
-                                            color: currencyStatus == CurrencyStatus.timeout
+                                            color: currencyStatus ==
+                                                    CurrencyStatus.timeout
                                                 ? Colors.orange.shade600
                                                 : Colors.red.shade600,
                                             shape: BoxShape.circle,
@@ -917,69 +1046,81 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                     final unit =
                         _converter.units.firstWhere((u) => u.id == currency);
                     final value = _rowValues[index][currency] ?? 0.0;
-                    final currencyStatus = CurrencyService.getCurrencyStatus(currency);
-                    final hasError = currencyStatus == CurrencyStatus.failed || 
-                                    currencyStatus == CurrencyStatus.timeout;
-                    
-                    // Improved error colors for dark mode compatibility  
-                    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+                    final currencyStatus =
+                        CurrencyService.getCurrencyStatus(currency);
+                    final hasError = currencyStatus == CurrencyStatus.failed ||
+                        currencyStatus == CurrencyStatus.timeout;
+
+                    // Improved error colors for dark mode compatibility
+                    final isDarkMode =
+                        Theme.of(context).brightness == Brightness.dark;
                     final errorBackgroundColor = hasError
-                        ? (isDarkMode ? Colors.red.shade900.withOpacity(0.3) : Colors.red.shade50)
-                        : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3);
+                        ? (isDarkMode
+                            ? Colors.red.shade900.withOpacity(0.3)
+                            : Colors.red.shade50)
+                        : Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withOpacity(0.3);
                     final errorBorderColor = hasError
-                        ? (isDarkMode ? Colors.red.shade400 : Colors.red.shade300)
+                        ? (isDarkMode
+                            ? Colors.red.shade400
+                            : Colors.red.shade300)
                         : null;
-                        
+
                     return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 2),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: errorBackgroundColor,
-                          borderRadius: BorderRadius.circular(6),
-                          border: hasError
-                              ? Border.all(
-                                  color: errorBorderColor!,
-                                  width: 1,
-                                )
-                              : null,
-                        ),
-                                              child: Row(
-                          children: [
-                            // Currency symbol with status indicator
-                            SizedBox(
-                              width: 40,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Text(
-                                    unit.symbol,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: hasError 
-                                          ? (isDarkMode ? Colors.red.shade300 : Colors.red.shade700) 
-                                          : null,
-                                    ),
+                      margin: const EdgeInsets.symmetric(vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: errorBackgroundColor,
+                        borderRadius: BorderRadius.circular(6),
+                        border: hasError
+                            ? Border.all(
+                                color: errorBorderColor!,
+                                width: 1,
+                              )
+                            : null,
+                      ),
+                      child: Row(
+                        children: [
+                          // Currency symbol with status indicator
+                          SizedBox(
+                            width: 40,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Text(
+                                  unit.symbol,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: hasError
+                                        ? (isDarkMode
+                                            ? Colors.red.shade300
+                                            : Colors.red.shade700)
+                                        : null,
                                   ),
-                                  if (hasError)
-                                    Positioned(
-                                      top: -2,
-                                      right: 0,
-                                      child: Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color: currencyStatus == CurrencyStatus.timeout
-                                              ? Colors.orange.shade600
-                                              : Colors.red.shade600,
-                                          shape: BoxShape.circle,
-                                        ),
+                                ),
+                                if (hasError)
+                                  Positioned(
+                                    top: -2,
+                                    right: 0,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: currencyStatus ==
+                                                CurrencyStatus.timeout
+                                            ? Colors.orange.shade600
+                                            : Colors.red.shade600,
+                                        shape: BoxShape.circle,
                                       ),
                                     ),
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
+                          ),
                           const SizedBox(width: 8),
                           // Currency name
                           Expanded(
@@ -1087,24 +1228,34 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                     ...currencies.map((currency) {
                       final unit =
                           _converter.units.firstWhere((u) => u.id == currency);
-                      final currencyStatus = CurrencyService.getCurrencyStatus(currency);
-                      final hasError = currencyStatus == CurrencyStatus.failed || 
-                                      currencyStatus == CurrencyStatus.timeout;
-                      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-                      
+                      final currencyStatus =
+                          CurrencyService.getCurrencyStatus(currency);
+                      final hasError =
+                          currencyStatus == CurrencyStatus.failed ||
+                              currencyStatus == CurrencyStatus.timeout;
+                      final isDarkMode =
+                          Theme.of(context).brightness == Brightness.dark;
+
                       return DataColumn(
                         label: SizedBox(
                           width: 120,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                            decoration: hasError ? BoxDecoration(
-                              color: isDarkMode ? Colors.red.shade900.withOpacity(0.3) : Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: isDarkMode ? Colors.red.shade400 : Colors.red.shade300,
-                                width: 1,
-                              ),
-                            ) : null,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 8),
+                            decoration: hasError
+                                ? BoxDecoration(
+                                    color: isDarkMode
+                                        ? Colors.red.shade900.withOpacity(0.3)
+                                        : Colors.red.shade50,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: isDarkMode
+                                          ? Colors.red.shade400
+                                          : Colors.red.shade300,
+                                      width: 1,
+                                    ),
+                                  )
+                                : null,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -1116,8 +1267,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
-                                        color: hasError 
-                                            ? (isDarkMode ? Colors.red.shade300 : Colors.red.shade700) 
+                                        color: hasError
+                                            ? (isDarkMode
+                                                ? Colors.red.shade300
+                                                : Colors.red.shade700)
                                             : null,
                                       ),
                                     ),
@@ -1127,7 +1280,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                         width: 8,
                                         height: 8,
                                         decoration: BoxDecoration(
-                                          color: currencyStatus == CurrencyStatus.timeout
+                                          color: currencyStatus ==
+                                                  CurrencyStatus.timeout
                                               ? Colors.orange.shade600
                                               : Colors.red.shade600,
                                           shape: BoxShape.circle,
@@ -1140,8 +1294,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                   unit.name,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: hasError 
-                                        ? (isDarkMode ? Colors.red.shade400 : Colors.red.shade600) 
+                                    color: hasError
+                                        ? (isDarkMode
+                                            ? Colors.red.shade400
+                                            : Colors.red.shade600)
                                         : null,
                                   ),
                                   textAlign: TextAlign.center,
@@ -1355,9 +1511,9 @@ class _CurrencyInfoDialog extends StatelessWidget {
                       content: l10n.aboutThisFeatureDesc,
                       icon: Icons.currency_exchange,
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // How to use
                     _buildSection(
                       context,
@@ -1365,9 +1521,9 @@ class _CurrencyInfoDialog extends StatelessWidget {
                       content: l10n.howToUseDesc,
                       icon: Icons.help_outline,
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Static rates info
                     _buildSection(
                       context,
@@ -1378,14 +1534,15 @@ class _CurrencyInfoDialog extends StatelessWidget {
                       buttonText: l10n.viewStaticRates,
                       onButtonPressed: () => _showStaticRatesDialog(context),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Last update info
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                        color:
+                            theme.colorScheme.surfaceVariant.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -1427,7 +1584,7 @@ class _CurrencyInfoDialog extends StatelessWidget {
     VoidCallback? onButtonPressed,
   }) {
     final theme = Theme.of(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1603,19 +1760,20 @@ class _StaticRatesDialog extends StatelessWidget {
                   final entry = staticRates.entries.elementAt(index);
                   final currencyCode = entry.key;
                   final rate = entry.value;
-                  
+
                   // Get currency info
                   final currencies = CurrencyService.getSupportedCurrencies();
                   final currency = currencies.firstWhere(
                     (c) => c.code == currencyCode,
-                    orElse: () => Currency(currencyCode, currencyCode, currencyCode),
+                    orElse: () =>
+                        Currency(currencyCode, currencyCode, currencyCode),
                   );
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: currencyCode == 'USD' 
+                      color: currencyCode == 'USD'
                           ? theme.colorScheme.primaryContainer.withOpacity(0.3)
                           : theme.colorScheme.surface,
                       border: Border.all(
@@ -1651,7 +1809,7 @@ class _StaticRatesDialog extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        
+
                         // Currency info
                         Expanded(
                           flex: 2,
@@ -1674,11 +1832,13 @@ class _StaticRatesDialog extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         // Rate
                         Expanded(
                           child: Text(
-                            currencyCode == 'USD' ? '1.0' : rate.toStringAsFixed(rate >= 1 ? 2 : 4),
+                            currencyCode == 'USD'
+                                ? '1.0'
+                                : rate.toStringAsFixed(rate >= 1 ? 2 : 4),
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: currencyCode == 'USD'
@@ -1766,7 +1926,7 @@ class _CurrencyCustomizationDialogState
     if (_tempVisible.isEmpty || _tempVisible.length > 10) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_tempVisible.isEmpty 
+          content: Text(_tempVisible.isEmpty
               ? AppLocalizations.of(context)!.currenciesSelected(0)
               : AppLocalizations.of(context)!.maxCurrenciesSelected),
           backgroundColor: Colors.red,
@@ -1786,7 +1946,7 @@ class _CurrencyCustomizationDialogState
           name: result,
           currencies: _tempVisible.toList(),
         );
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -1820,7 +1980,7 @@ class _CurrencyCustomizationDialogState
         _tempVisible.clear();
         _tempVisible.addAll(result);
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1899,7 +2059,8 @@ class _CurrencyCustomizationDialogState
                       const SizedBox(width: 10), // Reduced spacing
                       Expanded(
                         child: Text(
-                          AppLocalizations.of(context)!.customizeCurrenciesDialog,
+                          AppLocalizations.of(context)!
+                              .customizeCurrenciesDialog,
                           style: theme.textTheme.titleLarge?.copyWith(
                             // Changed from headlineSmall to titleLarge
                             color: theme.colorScheme.onPrimary,
@@ -1909,25 +2070,25 @@ class _CurrencyCustomizationDialogState
                           ),
                         ),
                       ),
-                                              Container(
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onPrimary.withOpacity(0.1),
-                            borderRadius:
-                                BorderRadius.circular(6), // Smaller radius
-                          ),
-                          child: IconButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: Icon(
-                              Icons.close,
-                              color: theme.colorScheme.onPrimary,
-                              size: 20, // Smaller close icon
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 36,
-                              minHeight: 36,
-                            ), // Smaller button constraints
-                          ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.onPrimary.withOpacity(0.1),
+                          borderRadius:
+                              BorderRadius.circular(6), // Smaller radius
                         ),
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: Icon(
+                            Icons.close,
+                            color: theme.colorScheme.onPrimary,
+                            size: 20, // Smaller close icon
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ), // Smaller button constraints
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1935,72 +2096,75 @@ class _CurrencyCustomizationDialogState
                 // Search bar đẹp
                 Container(
                   padding: const EdgeInsets.all(20),
-                  child:                 Column(
-                  children: [
-                    TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.searchCurrencies,
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
-                              )
-                            : null,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText:
+                              AppLocalizations.of(context)!.searchCurrencies,
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() => _searchQuery = '');
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor:
+                              theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
-                        filled: true,
-                        fillColor:
-                            theme.colorScheme.surfaceVariant.withOpacity(0.5),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        onChanged: (value) {
+                          setState(() => _searchQuery = value);
+                        },
                       ),
-                      onChanged: (value) {
-                        setState(() => _searchQuery = value);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => _showSavePresetDialog(),
-                            icon: const Icon(Icons.save, size: 18),
-                            label: Text(AppLocalizations.of(context)!.savePreset),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _showSavePresetDialog(),
+                              icon: const Icon(Icons.save, size: 18),
+                              label: Text(
+                                  AppLocalizations.of(context)!.savePreset),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => _showLoadPresetDialog(),
-                            icon: const Icon(Icons.folder_open, size: 18),
-                            label: Text(AppLocalizations.of(context)!.loadPreset),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _showLoadPresetDialog(),
+                              icon: const Icon(Icons.folder_open, size: 18),
+                              label: Text(
+                                  AppLocalizations.of(context)!.loadPreset),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ), // Currency selection với card đẹp - Fixed height area
                 Expanded(
                   child: Container(
@@ -2027,7 +2191,8 @@ class _CurrencyCustomizationDialogState
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  AppLocalizations.of(context)!.noCurrenciesFound,
+                                  AppLocalizations.of(context)!
+                                      .noCurrenciesFound,
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
@@ -2052,30 +2217,40 @@ class _CurrencyCustomizationDialogState
                             final isSelected = _tempVisible.contains(currency);
                             final canUnselect =
                                 _tempVisible.length > 1 || !isSelected;
-                            final canSelect = !isSelected && _tempVisible.length < 10;
-                            final currencyStatus = CurrencyService.getCurrencyStatus(currency);
-                            final hasError = currencyStatus == CurrencyStatus.failed || 
-                                            currencyStatus == CurrencyStatus.timeout;
+                            final canSelect =
+                                !isSelected && _tempVisible.length < 10;
+                            final currencyStatus =
+                                CurrencyService.getCurrencyStatus(currency);
+                            final hasError =
+                                currencyStatus == CurrencyStatus.failed ||
+                                    currencyStatus == CurrencyStatus.timeout;
 
                             return AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? (hasError ? Colors.red.shade50 : theme.colorScheme.primaryContainer)
-                                    : (hasError ? Colors.red.shade50 : theme.colorScheme.surface),
+                                    ? (hasError
+                                        ? Colors.red.shade50
+                                        : theme.colorScheme.primaryContainer)
+                                    : (hasError
+                                        ? Colors.red.shade50
+                                        : theme.colorScheme.surface),
                                 border: Border.all(
                                   color: hasError
                                       ? Colors.red.shade400
                                       : (isSelected
                                           ? theme.colorScheme.primary
-                                          : theme.colorScheme.outline.withOpacity(0.3)),
+                                          : theme.colorScheme.outline
+                                              .withOpacity(0.3)),
                                   width: hasError ? 2 : (isSelected ? 2 : 1),
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: isSelected
                                     ? [
                                         BoxShadow(
-                                          color: (hasError ? Colors.red.shade200 : theme.colorScheme.primary)
+                                          color: (hasError
+                                                  ? Colors.red.shade200
+                                                  : theme.colorScheme.primary)
                                               .withOpacity(0.2),
                                           blurRadius: 8,
                                           offset: const Offset(0, 2),
@@ -2112,8 +2287,10 @@ class _CurrencyCustomizationDialogState
                                                 color: hasError
                                                     ? Colors.red.shade100
                                                     : (isSelected
-                                                        ? theme.colorScheme.primary
-                                                        : theme.colorScheme.surfaceVariant),
+                                                        ? theme
+                                                            .colorScheme.primary
+                                                        : theme.colorScheme
+                                                            .surfaceVariant),
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                               ),
@@ -2124,8 +2301,10 @@ class _CurrencyCustomizationDialogState
                                                     color: hasError
                                                         ? Colors.red.shade700
                                                         : (isSelected
-                                                            ? theme.colorScheme.onPrimary
-                                                            : theme.colorScheme.onSurfaceVariant),
+                                                            ? theme.colorScheme
+                                                                .onPrimary
+                                                            : theme.colorScheme
+                                                                .onSurfaceVariant),
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 16,
                                                   ),
@@ -2144,7 +2323,9 @@ class _CurrencyCustomizationDialogState
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: Icon(
-                                                    currencyStatus == CurrencyStatus.timeout
+                                                    currencyStatus ==
+                                                            CurrencyStatus
+                                                                .timeout
                                                         ? Icons.access_time
                                                         : Icons.error,
                                                     color: Colors.white,
@@ -2171,24 +2352,35 @@ class _CurrencyCustomizationDialogState
                                                       style: theme
                                                           .textTheme.titleSmall
                                                           ?.copyWith(
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         color: hasError
-                                                            ? Colors.red.shade700
+                                                            ? Colors
+                                                                .red.shade700
                                                             : (isSelected
-                                                                ? theme.colorScheme.onPrimaryContainer
-                                                                : theme.colorScheme.onSurface),
+                                                                ? theme
+                                                                    .colorScheme
+                                                                    .onPrimaryContainer
+                                                                : theme
+                                                                    .colorScheme
+                                                                    .onSurface),
                                                       ),
                                                     ),
                                                   ),
-                                                                                                     if (hasError)
-                                                     Tooltip(
-                                                       message: CurrencyService.getLocalizedStatusDescription(currency, AppLocalizations.of(context)),
-                                                       child: Icon(
-                                                         Icons.info_outline,
-                                                         size: 14,
-                                                         color: Colors.red.shade600,
-                                                       ),
-                                                     ),
+                                                  if (hasError)
+                                                    Tooltip(
+                                                      message: CurrencyService
+                                                          .getLocalizedStatusDescription(
+                                                              currency,
+                                                              AppLocalizations
+                                                                  .of(context)),
+                                                      child: Icon(
+                                                        Icons.info_outline,
+                                                        size: 14,
+                                                        color:
+                                                            Colors.red.shade600,
+                                                      ),
+                                                    ),
                                                 ],
                                               ),
                                               Text(
@@ -2198,8 +2390,11 @@ class _CurrencyCustomizationDialogState
                                                   color: hasError
                                                       ? Colors.red.shade600
                                                       : (isSelected
-                                                          ? theme.colorScheme.onPrimaryContainer.withOpacity(0.8)
-                                                          : theme.colorScheme.onSurfaceVariant),
+                                                          ? theme.colorScheme
+                                                              .onPrimaryContainer
+                                                              .withOpacity(0.8)
+                                                          : theme.colorScheme
+                                                              .onSurfaceVariant),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -2253,22 +2448,29 @@ class _CurrencyCustomizationDialogState
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: (_tempVisible.length > 10 ? Colors.red : theme.colorScheme.primary).withOpacity(0.1),
+                          color: (_tempVisible.length > 10
+                                  ? Colors.red
+                                  : theme.colorScheme.primary)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
                           children: [
                             Text(
-                              AppLocalizations.of(context)!.currenciesSelected(_tempVisible.length),
+                              AppLocalizations.of(context)!
+                                  .currenciesSelected(_tempVisible.length),
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: _tempVisible.length > 10 ? Colors.red : theme.colorScheme.primary,
+                                color: _tempVisible.length > 10
+                                    ? Colors.red
+                                    : theme.colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             if (_tempVisible.length > 10) ...[
                               const SizedBox(height: 4),
                               Text(
-                                AppLocalizations.of(context)!.maxCurrenciesSelected,
+                                AppLocalizations.of(context)!
+                                    .maxCurrenciesSelected,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: Colors.red,
                                   fontSize: 11,
@@ -2297,11 +2499,13 @@ class _CurrencyCustomizationDialogState
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child:                             ElevatedButton(
-                              onPressed: _tempVisible.isNotEmpty ? () {
-                                widget.onChanged(_tempVisible);
-                                Navigator.of(context).pop();
-                              } : null,
+                            child: ElevatedButton(
+                              onPressed: _tempVisible.isNotEmpty
+                                  ? () {
+                                      widget.onChanged(_tempVisible);
+                                      Navigator.of(context).pop();
+                                    }
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12),
@@ -2309,7 +2513,8 @@ class _CurrencyCustomizationDialogState
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: Text(AppLocalizations.of(context)!.applyChanges),
+                              child: Text(
+                                  AppLocalizations.of(context)!.applyChanges),
                             ),
                           ),
                         ],
@@ -2345,7 +2550,7 @@ class _SavePresetDialogState extends State<_SavePresetDialog> {
 
   Future<void> _savePreset() async {
     final name = _nameController.text.trim();
-    
+
     if (name.isEmpty) {
       setState(() {
         _errorMessage = AppLocalizations.of(context)!.presetNameRequired;
@@ -2406,7 +2611,7 @@ class _SavePresetDialogState extends State<_SavePresetDialog> {
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _savePreset,
-          child: _isLoading 
+          child: _isLoading
               ? const SizedBox(
                   width: 16,
                   height: 16,
@@ -2439,7 +2644,8 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
   Future<void> _loadPresets() async {
     setState(() => _isLoading = true);
     try {
-      final presets = await CurrencyPresetService.loadPresets(sortOrder: _sortOrder);
+      final presets =
+          await CurrencyPresetService.loadPresets(sortOrder: _sortOrder);
       setState(() {
         _presets = presets;
         _isLoading = false;
@@ -2597,17 +2803,19 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                               margin: const EdgeInsets.only(bottom: 8),
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  child: Text(preset.name.substring(0, 1).toUpperCase()),
+                                  child: Text(preset.name
+                                      .substring(0, 1)
+                                      .toUpperCase()),
                                 ),
                                 title: Text(preset.name),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(l10n.currencies(preset.currencies.length)),
+                                    Text(l10n
+                                        .currencies(preset.currencies.length)),
                                     Text(
-                                      l10n.createdOn(
-                                        DateFormat('MM/dd/yyyy').format(preset.createdAt)
-                                      ),
+                                      l10n.createdOn(DateFormat('MM/dd/yyyy')
+                                          .format(preset.createdAt)),
                                       style: theme.textTheme.bodySmall,
                                     ),
                                   ],
@@ -2616,13 +2824,15 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     ElevatedButton(
-                                      onPressed: () => Navigator.of(context).pop(preset.currencies),
+                                      onPressed: () => Navigator.of(context)
+                                          .pop(preset.currencies),
                                       child: Text(l10n.select),
                                     ),
                                     const SizedBox(width: 8),
                                     IconButton(
                                       onPressed: () => _deletePreset(preset),
-                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
                                     ),
                                   ],
                                 ),

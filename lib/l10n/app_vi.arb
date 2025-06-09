@@ -473,5 +473,24 @@
     "fetchModeOnceADay": "Một lần mỗi ngày",
     "fetchModeOnceADayDesc": "Tự động tải tỷ giá một lần mỗi ngày",
     "fetchModeEverytime": "Mỗi lần mở",
-    "fetchModeEverytimeDesc": "Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi"
+    "fetchModeEverytimeDesc": "Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi",
+
+    "currencyFetchStatus": "Trạng thái tải tiền tệ",
+    "fetchStatusSummary": "Tóm tắt trạng thái tải",
+    "success": "Thành công",
+    "failed": "Thất bại", 
+    "timeout": "Hết thời gian",
+    "static": "Tĩnh",
+    "noCurrenciesInThisCategory": "Không có tiền tệ nào trong danh mục này",
+    
+    "saveFeatureState": "Lưu trạng thái tính năng",
+    "saveFeatureStateDesc": "Ghi nhớ trạng thái của các tính năng giữa các phiên sử dụng",
+    "testCache": "Kiểm tra bộ nhớ đệm",
+    
+    "viewFetchStatus": "Xem trạng thái tải",
+    
+    "cacheTypeConverterTools": "Công cụ chuyển đổi",
+    "cacheTypeConverterToolsDesc": "Bộ nhớ đệm tỷ giá tiền tệ và cài đặt sẵn",
+    "cacheTypeFeatureStates": "Trạng thái tính năng", 
+    "cacheTypeFeatureStatesDesc": "Trạng thái tính năng và tùy chọn đã lưu"
 }

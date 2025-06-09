@@ -19,17 +19,20 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
     return SettingsModel(
       currencyFetchMode: fields[0] as CurrencyFetchMode,
       fetchTimeoutSeconds: fields[1] as int,
+      featureStateSavingEnabled: fields[2] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SettingsModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.currencyFetchMode)
       ..writeByte(1)
-      ..write(obj.fetchTimeoutSeconds);
+      ..write(obj.fetchTimeoutSeconds)
+      ..writeByte(2)
+      ..write(obj.featureStateSavingEnabled);
   }
 
   @override

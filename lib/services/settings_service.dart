@@ -20,7 +20,8 @@ class SettingsService {
         try {
           await Hive.deleteBoxFromDisk(_settingsBoxName);
           _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
-          print('SettingsService: Reset settings box due to compatibility issue');
+          print(
+              'SettingsService: Reset settings box due to compatibility issue');
         } catch (resetError) {
           print('SettingsService: Failed to reset settings box: $resetError');
           rethrow;
@@ -83,7 +84,8 @@ class SettingsService {
   // Update fetch timeout
   static Future<void> updateFetchTimeout(int timeoutSeconds) async {
     final currentSettings = await getSettings();
-    final updatedSettings = currentSettings.copyWith(fetchTimeoutSeconds: timeoutSeconds);
+    final updatedSettings =
+        currentSettings.copyWith(fetchTimeoutSeconds: timeoutSeconds);
     await saveSettings(updatedSettings);
   }
 
@@ -91,6 +93,20 @@ class SettingsService {
   static Future<int> getFetchTimeout() async {
     final settings = await getSettings();
     return settings.fetchTimeoutSeconds;
+  }
+
+  // Update feature state saving enabled
+  static Future<void> updateFeatureStateSaving(bool enabled) async {
+    final currentSettings = await getSettings();
+    final updatedSettings =
+        currentSettings.copyWith(featureStateSavingEnabled: enabled);
+    await saveSettings(updatedSettings);
+  }
+
+  // Get feature state saving enabled
+  static Future<bool> getFeatureStateSaving() async {
+    final settings = await getSettings();
+    return settings.featureStateSavingEnabled;
   }
 
   // Clear settings (for testing or reset)

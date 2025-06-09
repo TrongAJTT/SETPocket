@@ -1421,4 +1421,49 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get fetchModeEverytimeDesc => 'Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi';
+
+  @override
+  String get currencyFetchStatus => 'Trạng thái tải tiền tệ';
+
+  @override
+  String get fetchStatusSummary => 'Tóm tắt trạng thái tải';
+
+  @override
+  String get success => 'Thành công';
+
+  @override
+  String get failed => 'Thất bại';
+
+  @override
+  String get timeout => 'Hết thời gian';
+
+  @override
+  String get static => 'Tĩnh';
+
+  @override
+  String get noCurrenciesInThisCategory => 'Không có tiền tệ nào trong danh mục này';
+
+  @override
+  String get saveFeatureState => 'Lưu trạng thái tính năng';
+
+  @override
+  String get saveFeatureStateDesc => 'Ghi nhớ trạng thái của các tính năng giữa các phiên sử dụng';
+
+  @override
+  String get testCache => 'Kiểm tra bộ nhớ đệm';
+
+  @override
+  String get viewFetchStatus => 'Xem trạng thái tải';
+
+  @override
+  String get cacheTypeConverterTools => 'Công cụ chuyển đổi';
+
+  @override
+  String get cacheTypeConverterToolsDesc => 'Bộ nhớ đệm tỷ giá tiền tệ và cài đặt sẵn';
+
+  @override
+  String get cacheTypeFeatureStates => 'Trạng thái tính năng';
+
+  @override
+  String get cacheTypeFeatureStatesDesc => 'Trạng thái tính năng và tùy chọn đã lưu';
 }

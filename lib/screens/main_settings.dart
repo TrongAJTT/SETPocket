@@ -6,6 +6,8 @@ import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
 import 'package:my_multi_tools/services/settings_service.dart';
+import 'package:my_multi_tools/services/currency_cache_service.dart';
+import 'package:my_multi_tools/services/currency_state_service.dart';
 
 import 'package:my_multi_tools/models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +34,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _clearing = false;
   bool _loading = true;
   bool _historyEnabled = false;
+  bool _featureStateSavingEnabled = true;
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
   int _fetchTimeoutSeconds = 10;
 
@@ -47,6 +50,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final themeIndex = prefs.getInt('themeMode');
     final lang = prefs.getString('language');
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
+    final featureStateSavingEnabled =
+        await SettingsService.getFeatureStateSaving();
     final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
     final fetchTimeout = await SettingsService.getFetchTimeout();
     setState(() {
@@ -55,6 +60,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           : settingsController.themeMode;
       _language = lang ?? settingsController.locale.languageCode;
       _historyEnabled = historyEnabled;
+      _featureStateSavingEnabled = featureStateSavingEnabled;
       _currencyFetchMode = currencyFetchMode;
       _fetchTimeoutSeconds = fetchTimeout;
       _loading = false;
@@ -143,6 +149,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   void _onHistoryEnabledChanged(bool enabled) async {
     setState(() => _historyEnabled = enabled);
     await GenerationHistoryService.setHistoryEnabled(enabled);
+  }
+
+  void _onFeatureStateSavingChanged(bool enabled) async {
+    setState(() => _featureStateSavingEnabled = enabled);
+    await SettingsService.updateFeatureStateSaving(enabled);
   }
 
   void _onCurrencyFetchModeChanged(CurrencyFetchMode mode) async {
@@ -331,7 +342,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
   Widget _buildMobileLayout(AppLocalizations loc) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
-    
+
     return ListView(
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 32 : 20,
@@ -355,7 +366,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
   Widget _buildHeader(AppLocalizations loc) {
     final isDesktop = MediaQuery.of(context).size.width >= 900;
-    
+
     return Padding(
       padding: EdgeInsets.only(bottom: isDesktop ? 40 : 32),
       child: Column(
@@ -366,7 +377,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -382,17 +396,19 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                   children: [
                     Text(
                       loc.settings,
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+                      style:
+                          Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       loc.settingsDesc,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
                   ],
                 ),
@@ -406,9 +422,18 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.outline.withValues(alpha: 0.0),
-                    Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                    Theme.of(context).colorScheme.outline.withValues(alpha: 0.0),
+                    Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.0),
+                    Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.3),
+                    Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -427,7 +452,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }) {
     final isDesktop = MediaQuery.of(context).size.width >= 900;
     final isTablet = MediaQuery.of(context).size.width >= 600;
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -455,8 +480,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.05),
-                  (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.02),
+                  (iconColor ?? Theme.of(context).colorScheme.primary)
+                      .withValues(alpha: 0.05),
+                  (iconColor ?? Theme.of(context).colorScheme.primary)
+                      .withValues(alpha: 0.02),
                 ],
               ),
               borderRadius: BorderRadius.only(
@@ -469,7 +496,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                 Container(
                   padding: EdgeInsets.all(isDesktop ? 10 : 8),
                   decoration: BoxDecoration(
-                    color: (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.1),
+                    color: (iconColor ?? Theme.of(context).colorScheme.primary)
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -483,10 +511,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                   child: Text(
                     title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: isDesktop ? 20 : (isTablet ? 18 : 16),
-                    ),
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: isDesktop ? 20 : (isTablet ? 18 : 16),
+                        ),
                   ),
                 ),
               ],
@@ -556,6 +584,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       iconColor: Colors.orange.shade600,
       children: [
         _buildHistorySettings(loc),
+        const SizedBox(height: 24),
+        _buildFeatureStateSavingSettings(loc),
       ],
     );
   }
@@ -651,13 +681,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     }
   }
 
-  Widget _buildLanguageOption(
-      String value,
-      String groupValue,
-      Function(String?) onChanged,
-      String flag,
-      Color color,
-      String label) {
+  Widget _buildLanguageOption(String value, String groupValue,
+      Function(String?) onChanged, String flag, Color color, String label) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isLargeScreen = screenWidth >= 700;
     final isSelected = value == groupValue;
@@ -740,6 +765,37 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         Switch(
           value: _historyEnabled,
           onChanged: _onHistoryEnabledChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeatureStateSavingSettings(AppLocalizations loc) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                loc.saveFeatureState,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                loc.saveFeatureStateDesc,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        Switch(
+          value: _featureStateSavingEnabled,
+          onChanged: _onFeatureStateSavingChanged,
         ),
       ],
     );
@@ -951,6 +1007,31 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     );
   }
 
+  void _testCache() async {
+    try {
+      await CurrencyCacheService.debugCache();
+      await CurrencyStateService.debugState();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Debug information printed to console'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Debug error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildFetchTimeoutSettings(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -976,7 +1057,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                 value: _fetchTimeoutSeconds.toDouble(),
                 min: 10,
                 max: 90,
-                divisions: 16, // (90-10)/5 = 16 divisions for 5-second increments
+                divisions:
+                    16, // (90-10)/5 = 16 divisions for 5-second increments
                 onChanged: (value) => _onFetchTimeoutChanged(value.round()),
                 label: loc.fetchTimeoutSeconds(_fetchTimeoutSeconds),
               ),
@@ -985,7 +1067,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withOpacity(0.3),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1001,8 +1086,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       ],
     );
   }
-
-
 
   Widget _buildCacheInfo(AppLocalizations loc) {
     return Row(
@@ -1081,11 +1164,32 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       );
     } else {
       // Desktop and tablet: use Row layout with proper expansion
-      return Row(
+      return Column(
         children: [
-          Expanded(child: clearButton),
-          SizedBox(width: isDesktop ? 16 : 12),
-          Expanded(child: detailsButton),
+          Row(
+            children: [
+              Expanded(child: clearButton),
+              SizedBox(width: isDesktop ? 16 : 12),
+              Expanded(child: detailsButton),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.bug_report_outlined),
+              label: Text(loc.testCache),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 20 : 16,
+                  vertical: isDesktop ? 14 : 12,
+                ),
+              ),
+              onPressed: _testCache,
+            ),
+          ),
         ],
       );
     }

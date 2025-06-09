@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import '../services/currency_service.dart';
 
 part 'currency_cache_model.g.dart';
 
@@ -13,11 +14,29 @@ class CurrencyCacheModel extends HiveObject {
   @HiveField(2)
   bool isValid;
 
+  @HiveField(3)
+  Map<String, int>? currencyStatuses; // Store status as int (enum index)
+
   CurrencyCacheModel({
     required this.rates,
     required this.lastUpdated,
     this.isValid = true,
+    this.currencyStatuses,
   });
+
+  // Helper to get currency status
+  CurrencyStatus getCurrencyStatus(String currencyCode) {
+    final statusIndex = currencyStatuses?[currencyCode];
+    if (statusIndex != null) {
+      return CurrencyStatus.values[statusIndex];
+    }
+    return CurrencyStatus.staticRate;
+  }
+
+  // Helper to set currency statuses
+  void setCurrencyStatuses(Map<String, CurrencyStatus> statuses) {
+    currencyStatuses = statuses.map((key, value) => MapEntry(key, value.index));
+  }
 
   // Check if cache is expired (older than 24 hours)
   bool get isExpired {

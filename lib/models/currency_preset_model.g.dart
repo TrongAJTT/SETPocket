@@ -1,35 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'settings_model.dart';
+part of 'currency_preset_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
+class CurrencyPresetModelAdapter extends TypeAdapter<CurrencyPresetModel> {
   @override
-  final int typeId = 12;
+  final int typeId = 3;
 
   @override
-  SettingsModel read(BinaryReader reader) {
+  CurrencyPresetModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SettingsModel(
-      currencyFetchMode: fields[0] as CurrencyFetchMode,
-      fetchTimeoutSeconds: fields[1] as int,
+    return CurrencyPresetModel(
+      id: fields[0] as String,
+      name: fields[1] as String,
+      currencies: (fields[2] as List).cast<String>(),
+      createdAt: fields[3] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, SettingsModel obj) {
+  void write(BinaryWriter writer, CurrencyPresetModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
-      ..write(obj.currencyFetchMode)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.fetchTimeoutSeconds);
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.currencies)
+      ..writeByte(3)
+      ..write(obj.createdAt);
   }
 
   @override
@@ -38,7 +44,7 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SettingsModelAdapter &&
+      other is CurrencyPresetModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

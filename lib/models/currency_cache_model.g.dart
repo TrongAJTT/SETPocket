@@ -20,19 +20,22 @@ class CurrencyCacheModelAdapter extends TypeAdapter<CurrencyCacheModel> {
       rates: (fields[0] as Map).cast<String, double>(),
       lastUpdated: fields[1] as DateTime,
       isValid: fields[2] as bool,
+      currencyStatuses: (fields[3] as Map?)?.cast<String, int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, CurrencyCacheModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.rates)
       ..writeByte(1)
       ..write(obj.lastUpdated)
       ..writeByte(2)
-      ..write(obj.isValid);
+      ..write(obj.isValid)
+      ..writeByte(3)
+      ..write(obj.currencyStatuses);
   }
 
   @override

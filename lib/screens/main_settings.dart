@@ -6,6 +6,7 @@ import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
 import 'package:my_multi_tools/services/settings_service.dart';
+
 import 'package:my_multi_tools/models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
@@ -32,6 +33,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _loading = true;
   bool _historyEnabled = false;
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
+  int _fetchTimeoutSeconds = 10;
 
   @override
   void initState() {
@@ -46,6 +48,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final lang = prefs.getString('language');
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
     final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
+    final fetchTimeout = await SettingsService.getFetchTimeout();
     setState(() {
       _themeMode = themeIndex != null
           ? ThemeMode.values[themeIndex]
@@ -53,6 +56,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       _language = lang ?? settingsController.locale.languageCode;
       _historyEnabled = historyEnabled;
       _currencyFetchMode = currencyFetchMode;
+      _fetchTimeoutSeconds = fetchTimeout;
       _loading = false;
     });
   }
@@ -144,6 +148,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   void _onCurrencyFetchModeChanged(CurrencyFetchMode mode) async {
     setState(() => _currencyFetchMode = mode);
     await SettingsService.updateCurrencyFetchMode(mode);
+  }
+
+  void _onFetchTimeoutChanged(int timeoutSeconds) async {
+    setState(() => _fetchTimeoutSeconds = timeoutSeconds);
+    await SettingsService.updateFetchTimeout(timeoutSeconds);
   }
 
   void _showToolVisibilityDialog() async {
@@ -534,6 +543,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       iconColor: Colors.green.shade600,
       children: [
         _buildCurrencyFetchModeSettings(loc),
+        const SizedBox(height: 24),
+        _buildFetchTimeoutSettings(loc),
       ],
     );
   }
@@ -939,6 +950,59 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       builder: (context) => const QuickActionsDialog(),
     );
   }
+
+  Widget _buildFetchTimeoutSettings(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.fetchTimeout,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          loc.fetchTimeoutDesc,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _fetchTimeoutSeconds.toDouble(),
+                min: 10,
+                max: 90,
+                divisions: 16, // (90-10)/5 = 16 divisions for 5-second increments
+                onChanged: (value) => _onFetchTimeoutChanged(value.round()),
+                label: loc.fetchTimeoutSeconds(_fetchTimeoutSeconds),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                loc.fetchTimeoutSeconds(_fetchTimeoutSeconds),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+
 
   Widget _buildCacheInfo(AppLocalizations loc) {
     return Row(

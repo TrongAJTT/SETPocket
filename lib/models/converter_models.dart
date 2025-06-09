@@ -902,18 +902,41 @@ class CurrencyConverter extends BaseConverter {
   );
 
   @override
-  List<CurrencyUnit> get units => [
-        usd,
-        eur,
-        gbp,
-        jpy,
-        cad,
-        aud,
-        vnd,
-        cny,
-        thb,
-        sgd,
-      ];
+  List<CurrencyUnit> get units {
+    // Use CurrencyService to get all supported currencies
+    return CurrencyService.getSupportedCurrencies()
+        .map((currency) => CurrencyUnit(
+              id: currency.code,
+              name: currency.name,
+              symbol: currency.symbol,
+              countryCode: _getCountryCode(currency.code),
+            ))
+        .toList();
+  }
+
+  static String _getCountryCode(String currencyCode) {
+    const Map<String, String> currencyToCountry = {
+      'USD': 'US', 'EUR': 'EU', 'GBP': 'GB', 'JPY': 'JP', 'CAD': 'CA',
+      'AUD': 'AU', 'CHF': 'CH', 'VND': 'VN', 'CNY': 'CN', 'HKD': 'HK',
+      'TWD': 'TW', 'SGD': 'SG', 'MYR': 'MY', 'THB': 'TH', 'IDR': 'ID',
+      'PHP': 'PH', 'INR': 'IN', 'KRW': 'KR', 'BND': 'BN', 'LAK': 'LA',
+      'KHR': 'KH', 'MMK': 'MM', 'MOP': 'MO', 'SEK': 'SE', 'NOK': 'NO',
+      'DKK': 'DK', 'PLN': 'PL', 'CZK': 'CZ', 'HUF': 'HU', 'RON': 'RO',
+      'BGN': 'BG', 'HRK': 'HR', 'RUB': 'RU', 'TRY': 'TR', 'UAH': 'UA',
+      'BYN': 'BY', 'MDL': 'MD', 'GEL': 'GE', 'AMD': 'AM', 'AZN': 'AZ',
+      'ILS': 'IL', 'SAR': 'SA', 'AED': 'AE', 'QAR': 'QA', 'KWD': 'KW',
+      'BHD': 'BH', 'OMR': 'OM', 'JOD': 'JO', 'LBP': 'LB', 'EGP': 'EG',
+      'MAD': 'MA', 'ZAR': 'ZA', 'NGN': 'NG', 'KES': 'KE', 'GHS': 'GH',
+      'UGX': 'UG', 'TZS': 'TZ', 'ETB': 'ET', 'XOF': 'BF', 'XAF': 'CM',
+      'BRL': 'BR', 'MXN': 'MX', 'ARS': 'AR', 'CLP': 'CL', 'COP': 'CO',
+      'PEN': 'PE', 'UYU': 'UY', 'KZT': 'KZ', 'UZS': 'UZ', 'KGS': 'KG',
+      'TJS': 'TJ', 'TMT': 'TM', 'AFN': 'AF', 'PKR': 'PK', 'BDT': 'BD',
+      'LKR': 'LK', 'NPR': 'NP', 'BTN': 'BT', 'MVR': 'MV', 'NZD': 'NZ',
+      'FJD': 'FJ', 'PGK': 'PG', 'SBD': 'SB', 'TOP': 'TO', 'VUV': 'VU',
+      'WST': 'WS', 'XPF': 'PF',
+    };
+    return currencyToCountry[currencyCode] ?? currencyCode.substring(0, 2);
+  }
   @override
   double convert(double value, String fromUnit, String toUnit) {
     // Use the CurrencyService for conversion

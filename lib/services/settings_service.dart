@@ -10,8 +10,24 @@ class SettingsService {
 
   // Initialize the settings service
   static Future<void> initialize() async {
-    if (_settingsBox == null || !_settingsBox!.isOpen) {
-      _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
+    try {
+      if (_settingsBox == null || !_settingsBox!.isOpen) {
+        _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
+      }
+    } catch (e) {
+      // If there's a type error (backward compatibility issue), clear the box and recreate
+      if (e.toString().contains('type') && e.toString().contains('subtype')) {
+        try {
+          await Hive.deleteBoxFromDisk(_settingsBoxName);
+          _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
+          print('SettingsService: Reset settings box due to compatibility issue');
+        } catch (resetError) {
+          print('SettingsService: Failed to reset settings box: $resetError');
+          rethrow;
+        }
+      } else {
+        rethrow;
+      }
     }
   }
 
@@ -19,15 +35,30 @@ class SettingsService {
   static Future<SettingsModel> getSettings() async {
     await initialize();
 
-    final settings = _settingsBox!.get(_settingsKey);
-    if (settings == null) {
-      // Return default settings
-      final defaultSettings = SettingsModel();
-      await saveSettings(defaultSettings);
-      return defaultSettings;
+    try {
+      final settings = _settingsBox!.get(_settingsKey);
+      if (settings == null) {
+        // Return default settings
+        final defaultSettings = SettingsModel();
+        await saveSettings(defaultSettings);
+        return defaultSettings;
+      }
+      return settings;
+    } catch (e) {
+      // If reading fails due to compatibility, return default and save it
+      if (e.toString().contains('type') && e.toString().contains('subtype')) {
+        print('SettingsService: Settings read failed, using defaults: $e');
+        final defaultSettings = SettingsModel();
+        try {
+          await _settingsBox!.clear();
+          await saveSettings(defaultSettings);
+        } catch (clearError) {
+          print('SettingsService: Failed to clear settings: $clearError');
+        }
+        return defaultSettings;
+      }
+      rethrow;
     }
-
-    return settings;
   }
 
   // Save settings
@@ -47,6 +78,19 @@ class SettingsService {
   static Future<CurrencyFetchMode> getCurrencyFetchMode() async {
     final settings = await getSettings();
     return settings.currencyFetchMode;
+  }
+
+  // Update fetch timeout
+  static Future<void> updateFetchTimeout(int timeoutSeconds) async {
+    final currentSettings = await getSettings();
+    final updatedSettings = currentSettings.copyWith(fetchTimeoutSeconds: timeoutSeconds);
+    await saveSettings(updatedSettings);
+  }
+
+  // Get fetch timeout
+  static Future<int> getFetchTimeout() async {
+    final settings = await getSettings();
+    return settings.fetchTimeoutSeconds;
   }
 
   // Clear settings (for testing or reset)

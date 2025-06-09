@@ -643,6 +643,271 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cardCount => 'Number of cards';
 
   @override
+  String get currencyConverter => 'Currency Converter';
+
+  @override
+  String get currencyConverterDesc => 'Convert between different currencies';
+
+  @override
+  String get updatingRates => 'Updating exchange rates...';
+
+  @override
+  String lastUpdatedAt(Object date, Object time) {
+    return 'Last updated: $date at $time';
+  }
+
+  @override
+  String get noRatesAvailable => 'No exchange rate information available, fetching rates...';
+
+  @override
+  String get liveRates => 'Live';
+
+  @override
+  String get staticRates => 'Static';
+
+  @override
+  String get refreshRates => 'Refresh rates';
+
+  @override
+  String get resetLayout => 'Reset Layout';
+
+  @override
+  String get customizeCurrencies => 'Customize currencies';
+
+  @override
+  String get addCard => 'Add Card';
+
+  @override
+  String get addRow => 'Add Row';
+
+  @override
+  String get tableView => 'Table View';
+
+  @override
+  String get cardView => 'Card View';
+
+  @override
+  String get cards => 'Cards';
+
+  @override
+  String get rows => 'Rows';
+
+  @override
+  String get converter => 'Converter';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get from => 'From';
+
+  @override
+  String get fromCurrency => 'From Currency';
+
+  @override
+  String get convertedTo => 'Converted to';
+
+  @override
+  String get removeCard => 'Remove card';
+
+  @override
+  String get removeRow => 'Remove row';
+
+  @override
+  String get liveRatesUpdated => 'Live rates updated successfully';
+
+  @override
+  String get staticRatesUsed => 'Using static rates (live data unavailable)';
+
+  @override
+  String get failedToUpdateRates => 'Failed to update rates';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get customizeCurrenciesDialog => 'Customize Currencies';
+
+  @override
+  String get searchCurrencies => 'Search currencies...';
+
+  @override
+  String get noCurrenciesFound => 'No currencies found';
+
+  @override
+  String currenciesSelected(Object count) {
+    return '$count currencies selected';
+  }
+
+  @override
+  String get applyChanges => 'Apply Changes';
+
+  @override
+  String get currencyStatusSuccess => 'Live rate';
+
+  @override
+  String get currencyStatusFailed => 'Failed to fetch';
+
+  @override
+  String get currencyStatusTimeout => 'Timeout';
+
+  @override
+  String get currencyStatusNotSupported => 'Not supported';
+
+  @override
+  String get currencyStatusStatic => 'Static rate';
+
+  @override
+  String get currencyStatusSuccessDesc => 'Successfully fetched live rate';
+
+  @override
+  String get currencyStatusFailedDesc => 'Failed to fetch live rate, using static fallback';
+
+  @override
+  String get currencyStatusTimeoutDesc => 'Request timed out, using static fallback';
+
+  @override
+  String get currencyStatusNotSupportedDesc => 'Currency not supported by API';
+
+  @override
+  String get currencyStatusStaticDesc => 'Using static exchange rate';
+
+  @override
+  String get currencyConverterInfo => 'Currency Converter Info';
+
+  @override
+  String get aboutThisFeature => 'About This Feature';
+
+  @override
+  String get aboutThisFeatureDesc => 'The Currency Converter allows you to convert between different currencies using live or static exchange rates. It supports over 80 currencies worldwide.';
+
+  @override
+  String get howToUse => 'How to Use';
+
+  @override
+  String get howToUseDesc => '• Add or remove cards/rows for multiple conversions\n• Customize visible currencies\n• Switch between card and table view\n• Rates update automatically based on your settings';
+
+  @override
+  String get staticRatesInfo => 'Static Exchange Rates';
+
+  @override
+  String get staticRatesInfoDesc => 'Static rates are fallback values used when live rates cannot be fetched. These rates are updated periodically and may not reflect real-time market prices.';
+
+  @override
+  String get viewStaticRates => 'View Static Rates';
+
+  @override
+  String get lastStaticUpdate => 'Last static rates update: December 2024';
+
+  @override
+  String get staticRatesList => 'Static Exchange Rates List';
+
+  @override
+  String get rateBasedOnUSD => 'All rates are based on 1 USD';
+
+  @override
+  String get maxCurrenciesSelected => 'Maximum 10 currencies can be selected';
+
+  @override
+  String get savePreset => 'Save Preset';
+
+  @override
+  String get loadPreset => 'Load Preset';
+
+  @override
+  String get savePresetDialog => 'Save Currency Preset';
+
+  @override
+  String get loadPresetDialog => 'Load Currency Preset';
+
+  @override
+  String get presetName => 'Preset Name';
+
+  @override
+  String get enterPresetName => 'Enter preset name';
+
+  @override
+  String get presetNameRequired => 'Preset name is required';
+
+  @override
+  String get presetSaved => 'Preset saved successfully';
+
+  @override
+  String get presetLoaded => 'Preset loaded successfully';
+
+  @override
+  String get presetDeleted => 'Preset deleted successfully';
+
+  @override
+  String get deletePreset => 'Delete Preset';
+
+  @override
+  String get confirmDeletePreset => 'Are you sure you want to delete this preset?';
+
+  @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get sortByName => 'Name';
+
+  @override
+  String get sortByDate => 'Date';
+
+  @override
+  String get noPresetsFound => 'No presets found';
+
+  @override
+  String get select => 'Select';
+
+  @override
+  String createdOn(Object date) {
+    return 'Created on $date';
+  }
+
+  @override
+  String currencies(Object count) {
+    return '$count currencies';
+  }
+
+  @override
+  String get fetchTimeout => 'Fetch Timeout';
+
+  @override
+  String get fetchTimeoutDesc => 'Set timeout for currency rate fetching (10-90 seconds)';
+
+  @override
+  String fetchTimeoutSeconds(Object seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String get fetchingRates => 'Fetching Currency Rates';
+
+  @override
+  String fetchingProgress(Object completed, Object total) {
+    return 'Fetching progress: $completed/$total';
+  }
+
+  @override
+  String timeRemaining(Object seconds) {
+    return 'Time remaining: ${seconds}s';
+  }
+
+  @override
+  String get fetchingStatus => 'Status';
+
+  @override
+  String fetchingCurrency(Object currency) {
+    return 'Fetching $currency...';
+  }
+
+  @override
+  String get fetchComplete => 'Fetch Complete';
+
+  @override
+  String get fetchCancelled => 'Fetch Cancelled';
+
+  @override
   String get dateGenerator => 'Date Generator';
 
   @override
@@ -849,12 +1114,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get numberSystemConverter => 'Number System Converter';
 
   @override
-  String get currencyConverter => 'Currency Converter';
-
-  @override
-  String get tableView => 'Table View';
-
-  @override
   String get listView => 'List View';
 
   @override
@@ -1039,9 +1298,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vnd => 'Vietnamese Dong';
-
-  @override
-  String get currencyConverterDesc => 'Convert between different currencies';
 
   @override
   String get lengthConverterDesc => 'Convert between different units of length';

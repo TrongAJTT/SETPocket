@@ -643,6 +643,271 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cardCount => 'Số lượng lá bài';
 
   @override
+  String get currencyConverter => 'Chuyển đổi Tiền tệ';
+
+  @override
+  String get currencyConverterDesc => 'Chuyển đổi giữa các loại tiền tệ khác nhau';
+
+  @override
+  String get updatingRates => 'Đang cập nhật tỷ giá tiền tệ...';
+
+  @override
+  String lastUpdatedAt(Object date, Object time) {
+    return 'Cập nhật lần cuối: $date lúc $time';
+  }
+
+  @override
+  String get noRatesAvailable => 'Chưa có thông tin tỷ giá tiền tệ, đang lấy tỷ giá...';
+
+  @override
+  String get liveRates => 'Trực tiếp';
+
+  @override
+  String get staticRates => 'Tĩnh';
+
+  @override
+  String get refreshRates => 'Làm mới tỷ giá';
+
+  @override
+  String get resetLayout => 'Đặt lại bố cục';
+
+  @override
+  String get customizeCurrencies => 'Tùy chỉnh loại tiền';
+
+  @override
+  String get addCard => 'Thêm thẻ';
+
+  @override
+  String get addRow => 'Thêm dòng';
+
+  @override
+  String get tableView => 'Chế độ bảng';
+
+  @override
+  String get cardView => 'Chế độ thẻ';
+
+  @override
+  String get cards => 'Thẻ';
+
+  @override
+  String get rows => 'Dòng';
+
+  @override
+  String get converter => 'Bộ chuyển đổi';
+
+  @override
+  String get amount => 'Số tiền';
+
+  @override
+  String get from => 'Từ';
+
+  @override
+  String get fromCurrency => 'Từ loại tiền';
+
+  @override
+  String get convertedTo => 'Chuyển đổi thành';
+
+  @override
+  String get removeCard => 'Xóa thẻ';
+
+  @override
+  String get removeRow => 'Xóa dòng';
+
+  @override
+  String get liveRatesUpdated => 'Đã cập nhật tỷ giá trực tiếp thành công';
+
+  @override
+  String get staticRatesUsed => 'Đang sử dụng tỷ giá tĩnh (không có dữ liệu trực tiếp)';
+
+  @override
+  String get failedToUpdateRates => 'Không thể cập nhật tỷ giá';
+
+  @override
+  String get actions => 'Hành động';
+
+  @override
+  String get customizeCurrenciesDialog => 'Tùy chỉnh tiền tệ';
+
+  @override
+  String get searchCurrencies => 'Tìm kiếm tiền tệ...';
+
+  @override
+  String get noCurrenciesFound => 'Không tìm thấy tiền tệ';
+
+  @override
+  String currenciesSelected(Object count) {
+    return 'Đã chọn $count loại tiền';
+  }
+
+  @override
+  String get applyChanges => 'Áp dụng thay đổi';
+
+  @override
+  String get currencyStatusSuccess => 'Tỷ giá trực tiếp';
+
+  @override
+  String get currencyStatusFailed => 'Lỗi lấy dữ liệu';
+
+  @override
+  String get currencyStatusTimeout => 'Hết thời gian';
+
+  @override
+  String get currencyStatusNotSupported => 'Không hỗ trợ';
+
+  @override
+  String get currencyStatusStatic => 'Tỷ giá tĩnh';
+
+  @override
+  String get currencyStatusSuccessDesc => 'Đã lấy tỷ giá trực tiếp thành công';
+
+  @override
+  String get currencyStatusFailedDesc => 'Không thể lấy tỷ giá trực tiếp, sử dụng tỷ giá tĩnh';
+
+  @override
+  String get currencyStatusTimeoutDesc => 'Hết thời gian chờ, sử dụng tỷ giá tĩnh';
+
+  @override
+  String get currencyStatusNotSupportedDesc => 'API không hỗ trợ loại tiền này';
+
+  @override
+  String get currencyStatusStaticDesc => 'Đang sử dụng tỷ giá tĩnh';
+
+  @override
+  String get currencyConverterInfo => 'Thông tin chuyển đổi tiền tệ';
+
+  @override
+  String get aboutThisFeature => 'Về chức năng này';
+
+  @override
+  String get aboutThisFeatureDesc => 'Chuyển đổi tiền tệ cho phép bạn quy đổi giữa các loại tiền khác nhau bằng tỷ giá trực tiếp hoặc tỷ giá tĩnh. Hỗ trợ hơn 80 loại tiền tệ trên thế giới.';
+
+  @override
+  String get howToUse => 'Cách sử dụng';
+
+  @override
+  String get howToUseDesc => '• Thêm hoặc xóa thẻ/dòng cho nhiều phép chuyển đổi\n• Tùy chỉnh các loại tiền hiển thị\n• Chuyển đổi giữa chế độ thẻ và bảng\n• Tỷ giá tự động cập nhật theo cài đặt của bạn';
+
+  @override
+  String get staticRatesInfo => 'Tỷ giá tĩnh';
+
+  @override
+  String get staticRatesInfoDesc => 'Tỷ giá tĩnh là giá trị dự phòng được sử dụng khi không thể lấy tỷ giá trực tiếp. Các tỷ giá này được cập nhật định kỳ và có thể không phản ánh giá thị trường thời gian thực.';
+
+  @override
+  String get viewStaticRates => 'Xem tỷ giá tĩnh';
+
+  @override
+  String get lastStaticUpdate => 'Lần cập nhật tỷ giá tĩnh cuối: Tháng 12/2024';
+
+  @override
+  String get staticRatesList => 'Danh sách tỷ giá tĩnh';
+
+  @override
+  String get rateBasedOnUSD => 'Tất cả tỷ giá dựa trên 1 USD';
+
+  @override
+  String get maxCurrenciesSelected => 'Tối đa 10 loại tiền có thể được chọn';
+
+  @override
+  String get savePreset => 'Lưu Cấu Hình';
+
+  @override
+  String get loadPreset => 'Lấy Cấu Hình';
+
+  @override
+  String get savePresetDialog => 'Lưu Cấu Hình Tiền Tệ';
+
+  @override
+  String get loadPresetDialog => 'Lấy Cấu Hình Tiền Tệ';
+
+  @override
+  String get presetName => 'Tên Cấu Hình';
+
+  @override
+  String get enterPresetName => 'Nhập tên cấu hình';
+
+  @override
+  String get presetNameRequired => 'Tên cấu hình là bắt buộc';
+
+  @override
+  String get presetSaved => 'Cấu hình đã được lưu thành công';
+
+  @override
+  String get presetLoaded => 'Cấu hình đã được tải thành công';
+
+  @override
+  String get presetDeleted => 'Cấu hình đã được xóa thành công';
+
+  @override
+  String get deletePreset => 'Xóa Cấu Hình';
+
+  @override
+  String get confirmDeletePreset => 'Bạn có chắc chắn muốn xóa cấu hình này không?';
+
+  @override
+  String get sortBy => 'Sắp xếp theo';
+
+  @override
+  String get sortByName => 'Tên';
+
+  @override
+  String get sortByDate => 'Ngày tạo';
+
+  @override
+  String get noPresetsFound => 'Không tìm thấy cấu hình nào';
+
+  @override
+  String get select => 'Chọn';
+
+  @override
+  String createdOn(Object date) {
+    return 'Tạo vào $date';
+  }
+
+  @override
+  String currencies(Object count) {
+    return '$count loại tiền';
+  }
+
+  @override
+  String get fetchTimeout => 'Thời Gian Chờ Fetch';
+
+  @override
+  String get fetchTimeoutDesc => 'Thiết lập thời gian chờ khi lấy tỷ giá (10-90 giây)';
+
+  @override
+  String fetchTimeoutSeconds(Object seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String get fetchingRates => 'Đang Lấy Tỷ Giá';
+
+  @override
+  String fetchingProgress(Object completed, Object total) {
+    return 'Tiến độ: $completed/$total';
+  }
+
+  @override
+  String timeRemaining(Object seconds) {
+    return 'Thời gian còn lại: ${seconds}s';
+  }
+
+  @override
+  String get fetchingStatus => 'Tình Trạng';
+
+  @override
+  String fetchingCurrency(Object currency) {
+    return 'Đang lấy $currency...';
+  }
+
+  @override
+  String get fetchComplete => 'Hoàn Thành';
+
+  @override
+  String get fetchCancelled => 'Đã Hủy';
+
+  @override
   String get dateGenerator => 'Tạo ngày ngẫu nhiên';
 
   @override
@@ -849,12 +1114,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get numberSystemConverter => 'Chuyển đổi Hệ số';
 
   @override
-  String get currencyConverter => 'Chuyển đổi Tiền tệ';
-
-  @override
-  String get tableView => 'Chế độ bảng';
-
-  @override
   String get listView => 'Chế độ danh sách';
 
   @override
@@ -1039,9 +1298,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get vnd => 'Đồng Việt Nam';
-
-  @override
-  String get currencyConverterDesc => 'Chuyển đổi giữa các loại tiền tệ khác nhau';
 
   @override
   String get lengthConverterDesc => 'Chuyển đổi giữa các đơn vị chiều dài khác nhau';

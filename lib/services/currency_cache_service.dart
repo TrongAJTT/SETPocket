@@ -12,57 +12,56 @@ class CurrencyCacheService {
 
   // Initialize the cache service
   static Future<void> initialize() async {
-    if (_cacheBox == null || !_cacheBox!.isOpen) {
-      _cacheBox = await Hive.openBox<CurrencyCacheModel>(_cacheBoxName);
+    try {
+      if (_cacheBox == null || !_cacheBox!.isOpen) {
+        _cacheBox = await Hive.openBox<CurrencyCacheModel>(_cacheBoxName);
+        print('CurrencyCacheService: Box opened successfully');
+      }
+    } catch (e) {
+      print('CurrencyCacheService: Error opening box: $e');
+      rethrow;
     }
-  } // Get cached rates or fetch new ones based on settings
+  }
 
-  static Future<Map<String, double>> getRates(
-      {bool forceRefresh = false}) async {
+  // Get cached rates or fetch new ones based on settings
+  static Future<Map<String, double>> getRates({bool forceRefresh = false}) async {
     await initialize();
 
     final settings = await SettingsService.getSettings();
     final fetchMode = settings.currencyFetchMode;
 
-    print(
-        'CurrencyCacheService: getRates called with fetchMode: $fetchMode, forceRefresh: $forceRefresh');
-
     // Get cached data
     final cachedData = _cacheBox!.get(_cacheKey);
-    print('CurrencyCacheService: cachedData exists: ${cachedData != null}');
-    if (cachedData != null) {
-      print(
-          'CurrencyCacheService: cache lastUpdated: ${cachedData.lastUpdated}, isValid: ${cachedData.isValid}, isExpired: ${cachedData.isExpired}');
-    }
 
     // Determine if we need to fetch new rates based on mode
     bool shouldFetch = forceRefresh;
 
     if (!shouldFetch && cachedData == null) {
-      // No cache at all, we need to fetch
       shouldFetch = true;
-      print('CurrencyCacheService: No cache found, will fetch');
     } else if (!shouldFetch && cachedData != null) {
-      // We have cache, check if we should refresh based on mode
       shouldFetch = cachedData.shouldRefresh(fetchMode);
-      print('CurrencyCacheService: shouldRefresh for $fetchMode: $shouldFetch');
     }
-
-    print(
-        'CurrencyCacheService: Final shouldFetch decision: $shouldFetch, _isFetching: $_isFetching');
 
     if (shouldFetch && !_isFetching) {
       print('CurrencyCacheService: Starting fetch...');
       try {
         _isFetching = true;
         final newRates = await CurrencyService.fetchLiveRates();
+        print('CurrencyCacheService: Fetched ${newRates.length} rates, now saving to cache...');
+        
         await _saveToCache(newRates);
-        print(
-            'CurrencyCacheService: Successfully fetched and cached ${newRates.length} rates');
+        print('CurrencyCacheService: Successfully saved to cache');
+        
+        // Verify the save worked
+        final verifyCache = _cacheBox!.get(_cacheKey);
+        print('CurrencyCacheService: Cache verification - data exists: ${verifyCache != null}');
+        if (verifyCache != null) {
+          print('CurrencyCacheService: Cache verification - rates count: ${verifyCache.rates.length}');
+        }
+        
         return newRates;
       } catch (e) {
         print('CurrencyCacheService: Failed to fetch new rates: $e');
-        // Return cached data if available, otherwise return static rates
         if (cachedData != null && cachedData.isValid) {
           print('CurrencyCacheService: Returning cached data as fallback');
           return cachedData.rates;
@@ -80,28 +79,53 @@ class CurrencyCacheService {
       return cachedData.rates;
     }
 
-    // Fall back to static rates
     print('CurrencyCacheService: Returning static rates (no valid cache)');
     return CurrencyService.getStaticRates();
   }
 
   // Save rates to cache
   static Future<void> _saveToCache(Map<String, double> rates) async {
-    await initialize();
-
-    final cacheModel = CurrencyCacheModel(
-      rates: rates,
-      lastUpdated: DateTime.now(),
-      isValid: true,
-    );
-
-    await _cacheBox!.put(_cacheKey, cacheModel);
+    try {
+      await initialize();
+      
+      print('CurrencyCacheService: Creating cache model with ${rates.length} rates');
+      final cacheModel = CurrencyCacheModel(
+        rates: Map<String, double>.from(rates), // Ensure proper type
+        lastUpdated: DateTime.now(),
+        isValid: true,
+      );
+      
+      // Also save currency statuses
+      final statuses = CurrencyService.currencyStatuses;
+      if (statuses.isNotEmpty) {
+        cacheModel.setCurrencyStatuses(statuses);
+        print('CurrencyCacheService: Saved ${statuses.length} currency statuses');
+      }
+      
+      print('CurrencyCacheService: Saving to cache with key: $_cacheKey');
+      await _cacheBox!.put(_cacheKey, cacheModel);
+      
+      // Force flush to disk
+      await _cacheBox!.flush();
+      print('CurrencyCacheService: Cache saved and flushed to disk');
+      
+    } catch (e) {
+      print('CurrencyCacheService: Error saving to cache: $e');
+      rethrow;
+    }
   }
 
   // Get cached data info
   static Future<CurrencyCacheModel?> getCacheInfo() async {
-    await initialize();
-    return _cacheBox!.get(_cacheKey);
+    try {
+      await initialize();
+      final data = _cacheBox!.get(_cacheKey);
+      print('CurrencyCacheService: getCacheInfo - data exists: ${data != null}');
+      return data;
+    } catch (e) {
+      print('CurrencyCacheService: Error getting cache info: $e');
+      return null;
+    }
   }
 
   // Check if currently fetching
@@ -109,26 +133,65 @@ class CurrencyCacheService {
 
   // Clear cache
   static Future<void> clearCache() async {
-    await initialize();
-    await _cacheBox!.delete(_cacheKey);
+    try {
+      await initialize();
+      await _cacheBox!.delete(_cacheKey);
+      await _cacheBox!.flush();
+      print('CurrencyCacheService: Cache cleared');
+    } catch (e) {
+      print('CurrencyCacheService: Error clearing cache: $e');
+    }
   }
 
   // Get last updated time
   static Future<DateTime?> getLastUpdated() async {
-    await initialize();
-    final cachedData = _cacheBox!.get(_cacheKey);
-    return cachedData?.lastUpdated;
+    try {
+      await initialize();
+      final cachedData = _cacheBox!.get(_cacheKey);
+      return cachedData?.lastUpdated;
+    } catch (e) {
+      print('CurrencyCacheService: Error getting last updated: $e');
+      return null;
+    }
   }
 
   // Check if cache exists and is valid
   static Future<bool> hasCachedData() async {
-    await initialize();
-    final cachedData = _cacheBox!.get(_cacheKey);
-    return cachedData != null && cachedData.isValid;
+    try {
+      await initialize();
+      final cachedData = _cacheBox!.get(_cacheKey);
+      final hasData = cachedData != null && cachedData.isValid;
+      print('CurrencyCacheService: hasCachedData: $hasData');
+      return hasData;
+    } catch (e) {
+      print('CurrencyCacheService: Error checking cached data: $e');
+      return false;
+    }
   }
 
   // Force refresh rates
   static Future<Map<String, double>> forceRefresh() async {
+    print('CurrencyCacheService: Force refresh requested');
     return await getRates(forceRefresh: true);
+  }
+
+  // Debug method to check cache content
+  static Future<void> debugCache() async {
+    try {
+      await initialize();
+      final cachedData = _cacheBox!.get(_cacheKey);
+      print('=== CACHE DEBUG ===');
+      print('Cache exists: ${cachedData != null}');
+      if (cachedData != null) {
+        print('Last updated: ${cachedData.lastUpdated}');
+        print('Is valid: ${cachedData.isValid}');
+        print('Is expired: ${cachedData.isExpired}');
+        print('Rates count: ${cachedData.rates.length}');
+        print('Sample rates: ${cachedData.rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
+      }
+      print('=== END DEBUG ===');
+    } catch (e) {
+      print('CurrencyCacheService: Error in debug: $e');
+    }
   }
 }

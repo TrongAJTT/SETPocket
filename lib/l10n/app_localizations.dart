@@ -1235,6 +1235,504 @@ abstract class AppLocalizations {
   /// **'Number of cards'**
   String get cardCount;
 
+  /// No description provided for @currencyConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Converter'**
+  String get currencyConverter;
+
+  /// No description provided for @currencyConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different currencies'**
+  String get currencyConverterDesc;
+
+  /// No description provided for @updatingRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating exchange rates...'**
+  String get updatingRates;
+
+  /// No description provided for @lastUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {date} at {time}'**
+  String lastUpdatedAt(Object date, Object time);
+
+  /// No description provided for @noRatesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No exchange rate information available, fetching rates...'**
+  String get noRatesAvailable;
+
+  /// No description provided for @liveRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get liveRates;
+
+  /// No description provided for @staticRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Static'**
+  String get staticRates;
+
+  /// No description provided for @refreshRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh rates'**
+  String get refreshRates;
+
+  /// No description provided for @resetLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Layout'**
+  String get resetLayout;
+
+  /// No description provided for @customizeCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize currencies'**
+  String get customizeCurrencies;
+
+  /// No description provided for @addCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Card'**
+  String get addCard;
+
+  /// No description provided for @addRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Row'**
+  String get addRow;
+
+  /// No description provided for @tableView.
+  ///
+  /// In en, this message translates to:
+  /// **'Table View'**
+  String get tableView;
+
+  /// No description provided for @cardView.
+  ///
+  /// In en, this message translates to:
+  /// **'Card View'**
+  String get cardView;
+
+  /// No description provided for @cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get cards;
+
+  /// No description provided for @rows.
+  ///
+  /// In en, this message translates to:
+  /// **'Rows'**
+  String get rows;
+
+  /// No description provided for @converter.
+  ///
+  /// In en, this message translates to:
+  /// **'Converter'**
+  String get converter;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @from.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get from;
+
+  /// No description provided for @fromCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'From Currency'**
+  String get fromCurrency;
+
+  /// No description provided for @convertedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Converted to'**
+  String get convertedTo;
+
+  /// No description provided for @removeCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove card'**
+  String get removeCard;
+
+  /// No description provided for @removeRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove row'**
+  String get removeRow;
+
+  /// No description provided for @liveRatesUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Live rates updated successfully'**
+  String get liveRatesUpdated;
+
+  /// No description provided for @staticRatesUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Using static rates (live data unavailable)'**
+  String get staticRatesUsed;
+
+  /// No description provided for @failedToUpdateRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update rates'**
+  String get failedToUpdateRates;
+
+  /// No description provided for @actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
+
+  /// No description provided for @customizeCurrenciesDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Currencies'**
+  String get customizeCurrenciesDialog;
+
+  /// No description provided for @searchCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Search currencies...'**
+  String get searchCurrencies;
+
+  /// No description provided for @noCurrenciesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No currencies found'**
+  String get noCurrenciesFound;
+
+  /// No description provided for @currenciesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} currencies selected'**
+  String currenciesSelected(Object count);
+
+  /// No description provided for @applyChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Changes'**
+  String get applyChanges;
+
+  /// No description provided for @currencyStatusSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Live rate'**
+  String get currencyStatusSuccess;
+
+  /// No description provided for @currencyStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch'**
+  String get currencyStatusFailed;
+
+  /// No description provided for @currencyStatusTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout'**
+  String get currencyStatusTimeout;
+
+  /// No description provided for @currencyStatusNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Not supported'**
+  String get currencyStatusNotSupported;
+
+  /// No description provided for @currencyStatusStatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Static rate'**
+  String get currencyStatusStatic;
+
+  /// No description provided for @currencyStatusSuccessDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully fetched live rate'**
+  String get currencyStatusSuccessDesc;
+
+  /// No description provided for @currencyStatusFailedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch live rate, using static fallback'**
+  String get currencyStatusFailedDesc;
+
+  /// No description provided for @currencyStatusTimeoutDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Request timed out, using static fallback'**
+  String get currencyStatusTimeoutDesc;
+
+  /// No description provided for @currencyStatusNotSupportedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency not supported by API'**
+  String get currencyStatusNotSupportedDesc;
+
+  /// No description provided for @currencyStatusStaticDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Using static exchange rate'**
+  String get currencyStatusStaticDesc;
+
+  /// No description provided for @currencyConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Converter Info'**
+  String get currencyConverterInfo;
+
+  /// No description provided for @aboutThisFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'About This Feature'**
+  String get aboutThisFeature;
+
+  /// No description provided for @aboutThisFeatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The Currency Converter allows you to convert between different currencies using live or static exchange rates. It supports over 80 currencies worldwide.'**
+  String get aboutThisFeatureDesc;
+
+  /// No description provided for @howToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get howToUse;
+
+  /// No description provided for @howToUseDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'• Add or remove cards/rows for multiple conversions\n• Customize visible currencies\n• Switch between card and table view\n• Rates update automatically based on your settings'**
+  String get howToUseDesc;
+
+  /// No description provided for @staticRatesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Static Exchange Rates'**
+  String get staticRatesInfo;
+
+  /// No description provided for @staticRatesInfoDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Static rates are fallback values used when live rates cannot be fetched. These rates are updated periodically and may not reflect real-time market prices.'**
+  String get staticRatesInfoDesc;
+
+  /// No description provided for @viewStaticRates.
+  ///
+  /// In en, this message translates to:
+  /// **'View Static Rates'**
+  String get viewStaticRates;
+
+  /// No description provided for @lastStaticUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Last static rates update: December 2024'**
+  String get lastStaticUpdate;
+
+  /// No description provided for @staticRatesList.
+  ///
+  /// In en, this message translates to:
+  /// **'Static Exchange Rates List'**
+  String get staticRatesList;
+
+  /// No description provided for @rateBasedOnUSD.
+  ///
+  /// In en, this message translates to:
+  /// **'All rates are based on 1 USD'**
+  String get rateBasedOnUSD;
+
+  /// No description provided for @maxCurrenciesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 10 currencies can be selected'**
+  String get maxCurrenciesSelected;
+
+  /// No description provided for @savePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Preset'**
+  String get savePreset;
+
+  /// No description provided for @loadPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Load Preset'**
+  String get loadPreset;
+
+  /// No description provided for @savePresetDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Currency Preset'**
+  String get savePresetDialog;
+
+  /// No description provided for @loadPresetDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Load Currency Preset'**
+  String get loadPresetDialog;
+
+  /// No description provided for @presetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset Name'**
+  String get presetName;
+
+  /// No description provided for @enterPresetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter preset name'**
+  String get enterPresetName;
+
+  /// No description provided for @presetNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset name is required'**
+  String get presetNameRequired;
+
+  /// No description provided for @presetSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset saved successfully'**
+  String get presetSaved;
+
+  /// No description provided for @presetLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset loaded successfully'**
+  String get presetLoaded;
+
+  /// No description provided for @presetDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset deleted successfully'**
+  String get presetDeleted;
+
+  /// No description provided for @deletePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Preset'**
+  String get deletePreset;
+
+  /// No description provided for @confirmDeletePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this preset?'**
+  String get confirmDeletePreset;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sortBy;
+
+  /// No description provided for @sortByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get sortByName;
+
+  /// No description provided for @sortByDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get sortByDate;
+
+  /// No description provided for @noPresetsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No presets found'**
+  String get noPresetsFound;
+
+  /// No description provided for @select.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get select;
+
+  /// No description provided for @createdOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Created on {date}'**
+  String createdOn(Object date);
+
+  /// No description provided for @currencies.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} currencies'**
+  String currencies(Object count);
+
+  /// No description provided for @fetchTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Timeout'**
+  String get fetchTimeout;
+
+  /// No description provided for @fetchTimeoutDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set timeout for currency rate fetching (10-90 seconds)'**
+  String get fetchTimeoutDesc;
+
+  /// No description provided for @fetchTimeoutSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String fetchTimeoutSeconds(Object seconds);
+
+  /// No description provided for @fetchingRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching Currency Rates'**
+  String get fetchingRates;
+
+  /// No description provided for @fetchingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching progress: {completed}/{total}'**
+  String fetchingProgress(Object completed, Object total);
+
+  /// No description provided for @timeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining: {seconds}s'**
+  String timeRemaining(Object seconds);
+
+  /// No description provided for @fetchingStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get fetchingStatus;
+
+  /// No description provided for @fetchingCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching {currency}...'**
+  String fetchingCurrency(Object currency);
+
+  /// No description provided for @fetchComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Complete'**
+  String get fetchComplete;
+
+  /// No description provided for @fetchCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Cancelled'**
+  String get fetchCancelled;
+
   /// No description provided for @dateGenerator.
   ///
   /// In en, this message translates to:
@@ -1643,18 +2141,6 @@ abstract class AppLocalizations {
   /// **'Number System Converter'**
   String get numberSystemConverter;
 
-  /// No description provided for @currencyConverter.
-  ///
-  /// In en, this message translates to:
-  /// **'Currency Converter'**
-  String get currencyConverter;
-
-  /// No description provided for @tableView.
-  ///
-  /// In en, this message translates to:
-  /// **'Table View'**
-  String get tableView;
-
   /// No description provided for @listView.
   ///
   /// In en, this message translates to:
@@ -2026,12 +2512,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vietnamese Dong'**
   String get vnd;
-
-  /// No description provided for @currencyConverterDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Convert between different currencies'**
-  String get currencyConverterDesc;
 
   /// No description provided for @lengthConverterDesc.
   ///

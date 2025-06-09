@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import '../models/currency_cache_model.dart';
+import '../models/currency_preset_model.dart';
 import '../models/settings_model.dart';
 
 class HiveService {
@@ -30,6 +31,9 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(12)) {
         Hive.registerAdapter(SettingsModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(3)) {
+        Hive.registerAdapter(CurrencyPresetModelAdapter());
       }
 
       // Open boxes

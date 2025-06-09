@@ -43,7 +43,7 @@ class GenerationHistoryService {
   /// Check if history saving is enabled
   static Future<bool> isHistoryEnabled() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_historyEnabledKey) ?? false;
+    return prefs.getBool(_historyEnabledKey) ?? true; // Default to true
   }
 
   /// Enable or disable history saving

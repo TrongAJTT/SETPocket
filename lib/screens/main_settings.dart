@@ -6,8 +6,6 @@ import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
 import 'package:my_multi_tools/services/settings_service.dart';
-import 'package:my_multi_tools/services/currency_cache_service.dart';
-import 'package:my_multi_tools/services/currency_state_service.dart';
 
 import 'package:my_multi_tools/models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -560,6 +558,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         _buildToolVisibilitySettings(loc),
         const SizedBox(height: 16),
         _buildQuickActionsSettings(loc),
+        const SizedBox(height: 16),
+        _buildFeatureStateSavingSettings(loc),
       ],
     );
   }
@@ -584,8 +584,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       iconColor: Colors.orange.shade600,
       children: [
         _buildHistorySettings(loc),
-        const SizedBox(height: 24),
-        _buildFeatureStateSavingSettings(loc),
       ],
     );
   }
@@ -1007,31 +1005,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     );
   }
 
-  void _testCache() async {
-    try {
-      await CurrencyCacheService.debugCache();
-      await CurrencyStateService.debugState();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Debug information printed to console'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Debug error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   Widget _buildFetchTimeoutSettings(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1044,7 +1017,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          loc.fetchTimeoutDesc,
+          "Set timeout for currency rate fetching (5-20 seconds)",
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1055,10 +1028,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             Expanded(
               child: Slider(
                 value: _fetchTimeoutSeconds.toDouble(),
-                min: 10,
-                max: 90,
+                min: 5,
+                max: 20,
                 divisions:
-                    16, // (90-10)/5 = 16 divisions for 5-second increments
+                    15, // (20-5)/1 = 15 divisions for 1-second increments
                 onChanged: (value) => _onFetchTimeoutChanged(value.round()),
                 label: loc.fetchTimeoutSeconds(_fetchTimeoutSeconds),
               ),
@@ -1164,32 +1137,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       );
     } else {
       // Desktop and tablet: use Row layout with proper expansion
-      return Column(
+      return Row(
         children: [
-          Row(
-            children: [
-              Expanded(child: clearButton),
-              SizedBox(width: isDesktop ? 16 : 12),
-              Expanded(child: detailsButton),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.bug_report_outlined),
-              label: Text(loc.testCache),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                padding: EdgeInsets.symmetric(
-                  horizontal: isDesktop ? 20 : 16,
-                  vertical: isDesktop ? 14 : 12,
-                ),
-              ),
-              onPressed: _testCache,
-            ),
-          ),
+          Expanded(child: clearButton),
+          SizedBox(width: isDesktop ? 16 : 12),
+          Expanded(child: detailsButton),
         ],
       );
     }

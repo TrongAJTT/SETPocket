@@ -21,13 +21,14 @@ class CurrencyCacheModelAdapter extends TypeAdapter<CurrencyCacheModel> {
       lastUpdated: fields[1] as DateTime,
       isValid: fields[2] as bool,
       currencyStatuses: (fields[3] as Map?)?.cast<String, int>(),
+      currencyFetchTimes: (fields[4] as Map?)?.cast<String, int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, CurrencyCacheModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.rates)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class CurrencyCacheModelAdapter extends TypeAdapter<CurrencyCacheModel> {
       ..writeByte(2)
       ..write(obj.isValid)
       ..writeByte(3)
-      ..write(obj.currencyStatuses);
+      ..write(obj.currencyStatuses)
+      ..writeByte(4)
+      ..write(obj.currencyFetchTimes);
   }
 
   @override

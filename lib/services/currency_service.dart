@@ -1,18 +1,12 @@
 import 'package:live_currency_rate/live_currency_rate.dart';
 import 'settings_service.dart';
 
-enum CurrencyStatus {
-  success,
-  failed,
-  timeout,
-  notSupported,
-  staticRate
-}
+enum CurrencyStatus { success, failed, timeout, notSupported, staticRate }
 
 class CurrencyFetchResult {
   final double rate;
   final CurrencyStatus status;
-  
+
   CurrencyFetchResult({required this.rate, required this.status});
 }
 
@@ -130,7 +124,7 @@ class CurrencyService {
       Currency('CAD', 'Canadian Dollar', 'C\$'),
       Currency('AUD', 'Australian Dollar', 'A\$'),
       Currency('CHF', 'Swiss Franc', 'CHF'),
-      
+
       // Asian currencies
       Currency('VND', 'Vietnamese Dong', '₫'),
       Currency('CNY', 'Chinese Yuan', '¥'),
@@ -148,7 +142,7 @@ class CurrencyService {
       Currency('KHR', 'Cambodian Riel', '៛'),
       Currency('MMK', 'Myanmar Kyat', 'K'),
       Currency('MOP', 'Macau Pataca', 'MOP'),
-      
+
       // European currencies
       Currency('SEK', 'Swedish Krona', 'kr'),
       Currency('NOK', 'Norwegian Krone', 'kr'),
@@ -167,7 +161,7 @@ class CurrencyService {
       Currency('GEL', 'Georgian Lari', '₾'),
       Currency('AMD', 'Armenian Dram', '֏'),
       Currency('AZN', 'Azerbaijani Manat', '₼'),
-      
+
       // Middle East & Africa
       Currency('ILS', 'Israeli Shekel', '₪'),
       Currency('SAR', 'Saudi Riyal', '﷼'),
@@ -189,7 +183,7 @@ class CurrencyService {
       Currency('ETB', 'Ethiopian Birr', 'Br'),
       Currency('XOF', 'West African CFA Franc', 'CFA'),
       Currency('XAF', 'Central African CFA Franc', 'FCFA'),
-      
+
       // Americas
       Currency('BRL', 'Brazilian Real', 'R\$'),
       Currency('MXN', 'Mexican Peso', '\$'),
@@ -198,7 +192,7 @@ class CurrencyService {
       Currency('COP', 'Colombian Peso', '\$'),
       Currency('PEN', 'Peruvian Sol', 'S/'),
       Currency('UYU', 'Uruguayan Peso', '\$U'),
-      
+
       // Central Asia
       Currency('KZT', 'Kazakhstani Tenge', '₸'),
       Currency('UZS', 'Uzbekistani Som', 'soʻm'),
@@ -206,7 +200,7 @@ class CurrencyService {
       Currency('TJS', 'Tajikistani Somoni', 'ЅМ'),
       Currency('TMT', 'Turkmenistani Manat', 'T'),
       Currency('AFN', 'Afghan Afghani', '؋'),
-      
+
       // South Asia
       Currency('PKR', 'Pakistani Rupee', '₨'),
       Currency('BDT', 'Bangladeshi Taka', '৳'),
@@ -214,7 +208,7 @@ class CurrencyService {
       Currency('NPR', 'Nepalese Rupee', '₨'),
       Currency('BTN', 'Bhutanese Ngultrum', 'Nu.'),
       Currency('MVR', 'Maldivian Rufiyaa', '.ރ'),
-      
+
       // Pacific
       Currency('NZD', 'New Zealand Dollar', 'NZ\$'),
       Currency('FJD', 'Fijian Dollar', 'FJ\$'),
@@ -241,7 +235,8 @@ class CurrencyService {
       cachedRates = _staticRates;
     }
 
-    final fromRate = cachedRates[fromCurrency] ?? _staticRates[fromCurrency] ?? 1.0;
+    final fromRate =
+        cachedRates[fromCurrency] ?? _staticRates[fromCurrency] ?? 1.0;
     final toRate = cachedRates[toCurrency] ?? _staticRates[toCurrency] ?? 1.0;
 
     // Convert to USD first, then to target currency
@@ -277,12 +272,14 @@ class CurrencyService {
       _currentRates = _staticRates;
       _isUsingLiveRates = false;
     }
-  }   // Progress tracking
+  } // Progress tracking
+
   static void Function(String currency, CurrencyStatus status)? _onProgress;
   static bool _isCancelled = false;
 
   // Set progress callback
-  static void setProgressCallback(void Function(String currency, CurrencyStatus status)? callback) {
+  static void setProgressCallback(
+      void Function(String currency, CurrencyStatus status)? callback) {
     _onProgress = callback;
   }
 
@@ -293,65 +290,143 @@ class CurrencyService {
 
   // Future method for real API integration
 
+  // Map to track last fetch time for each currency
+  static Map<String, DateTime> _currencyFetchTimes = {};
+
+  // Get last fetch time for a currency
+  static DateTime? getCurrencyLastFetchTime(String currencyCode) {
+    return _currencyFetchTimes[currencyCode];
+  }
+
+  // Update currency fetch time (used by cache service)
+  static void updateCurrencyFetchTime(String currencyCode, DateTime fetchTime) {
+    _currencyFetchTimes[currencyCode] = fetchTime;
+  }
+
+  // Load status from cache (used by cache service)
+  static void updateCurrencyStatuses(Map<String, CurrencyStatus> statuses) {
+    _currencyStatus.clear();
+    _currencyStatus.addAll(statuses);
+  }
+
+  // Check if currency needs refresh (older than 1 hour)
+  static bool currencyNeedsRefresh(String currencyCode) {
+    final fetchTime = _currencyFetchTimes[currencyCode];
+    if (fetchTime == null) return true;
+
+    final now = DateTime.now();
+    final difference = now.difference(fetchTime);
+    return difference.inHours >= 1;
+  }
+
   static Future<Map<String, double>> fetchLiveRates() async {
     try {
       print('CurrencyService: Starting to fetch live rates...');
       _isCancelled = false; // Reset cancel flag
       var rates = <String, double>{};
-      _currencyStatus.clear(); // Clear previous status
       bool hasLiveData = false;
+
+      // Keep existing statuses for currencies that don't need refresh
+      Map<String, CurrencyStatus> existingStatuses = Map.from(_currencyStatus);
+      _currencyStatus.clear(); // Clear previous status
 
       // Add USD as base
       rates['USD'] = 1.0;
       _currencyStatus['USD'] = CurrencyStatus.success;
+      _currencyFetchTimes['USD'] = DateTime.now();
       _onProgress?.call('USD', CurrencyStatus.success);
       print('CurrencyService: Added USD base rate');
 
       // Try to get rates for each currency - PARALLEL FETCHING for better performance
       final currencies = getSupportedCurrencies();
-      print('CurrencyService: Fetching rates for ${currencies.length} currencies in parallel...');
-      
+      print(
+          'CurrencyService: Fetching rates for ${currencies.length} currencies in parallel...');
+
       // Create futures for all currency fetches (except USD)
       final fetchFutures = <String, Future<CurrencyFetchResult>>{};
       for (final currency in currencies) {
         if (currency.code != 'USD') {
-          fetchFutures[currency.code] = _fetchSingleRateWithStatus(currency.code);
+          // Only fetch if currency needs refresh (older than 1 hour) or had failed/timeout status
+          final needsRefresh = currencyNeedsRefresh(currency.code);
+          final previousStatus = existingStatuses[currency.code];
+          final shouldFetch = needsRefresh ||
+              previousStatus == CurrencyStatus.failed ||
+              previousStatus == CurrencyStatus.timeout;
+
+          if (shouldFetch) {
+            fetchFutures[currency.code] =
+                _fetchSingleRateWithStatus(currency.code);
+            print(
+                'CurrencyService: Will fetch ${currency.code} (needs refresh: $needsRefresh, previous status: $previousStatus)');
+          } else {
+            // Skip fetch and keep existing status and rate
+            print(
+                'CurrencyService: Skipping fetch for ${currency.code} (recently fetched)');
+          }
         }
       }
-      
+
       // Wait for all fetches to complete with timeout
       final results = await Future.wait(
         fetchFutures.entries.map((entry) async {
           if (_isCancelled) {
             _onProgress?.call(entry.key, CurrencyStatus.failed);
-            return MapEntry(entry.key, CurrencyFetchResult(
-              rate: _staticRates[entry.key] ?? 1.0,
-              status: CurrencyStatus.failed
-            ));
+            return MapEntry(
+                entry.key,
+                CurrencyFetchResult(
+                    rate: _staticRates[entry.key] ?? 1.0,
+                    status: CurrencyStatus.failed));
           }
           try {
             // Get timeout from settings service
             final timeoutSeconds = await SettingsService.getFetchTimeout();
-            final result = await entry.value.timeout(Duration(seconds: timeoutSeconds));
+            final result =
+                await entry.value.timeout(Duration(seconds: timeoutSeconds));
+
+            // Update fetch time for this currency
+            _currencyFetchTimes[entry.key] = DateTime.now();
+
             _onProgress?.call(entry.key, result.status);
             return MapEntry(entry.key, result);
           } catch (e) {
             print('CurrencyService: Timeout/Error for ${entry.key}: $e');
             _onProgress?.call(entry.key, CurrencyStatus.timeout);
-            return MapEntry(entry.key, CurrencyFetchResult(
-              rate: _staticRates[entry.key] ?? 1.0,
-              status: CurrencyStatus.timeout
-            ));
+            return MapEntry(
+                entry.key,
+                CurrencyFetchResult(
+                    rate: _staticRates[entry.key] ?? 1.0,
+                    status: CurrencyStatus.timeout));
           }
         }),
       );
-      
-      // Process results
+
+      // Process results for currencies that were fetched
       for (final result in results) {
         rates[result.key] = result.value.rate;
         _currencyStatus[result.key] = result.value.status;
         if (result.value.status == CurrencyStatus.success) {
           hasLiveData = true;
+        }
+      }
+
+      // Add currencies that weren't fetched (using existing values)
+      for (final currency in currencies) {
+        if (currency.code != 'USD' &&
+            !rates.containsKey(currency.code) &&
+            !fetchFutures.containsKey(currency.code)) {
+          // Get rate from current rates
+          final rate = _currentRates[currency.code] ??
+              _staticRates[currency.code] ??
+              1.0;
+          rates[currency.code] = rate;
+
+          // Keep existing status
+          final status =
+              existingStatuses[currency.code] ?? CurrencyStatus.staticRate;
+          _currencyStatus[currency.code] = status;
+
+          // Report progress
+          _onProgress?.call(currency.code, status);
         }
       }
 
@@ -362,16 +437,18 @@ class CurrencyService {
         print('CurrencyService: Successfully fetched live currency rates');
       } else {
         _isUsingLiveRates = false;
-        print('CurrencyService: Using static currency rates (live data unavailable)');
+        print(
+            'CurrencyService: Using static currency rates (live data unavailable)');
       }
 
       print('CurrencyService: Final rates count: ${rates.length}');
-      print('CurrencyService: Sample rates: ${rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
-      
+      print(
+          'CurrencyService: Sample rates: ${rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
+
       // Update current rates for use in convert() method
       _currentRates = Map<String, double>.from(rates);
       print('CurrencyService: Updated _currentRates with new data');
-      
+
       return rates;
     } catch (e) {
       print('CurrencyService: Error fetching live rates: $e');
@@ -387,12 +464,15 @@ class CurrencyService {
   static Future<double> _fetchSingleRate(String currencyCode) async {
     try {
       print('CurrencyService: Fetching rate for $currencyCode...');
-      final result = await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
+      final result =
+          await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
       if (result.result > 0) {
-        print('CurrencyService: Got live rate for $currencyCode: ${result.result}');
+        print(
+            'CurrencyService: Got live rate for $currencyCode: ${result.result}');
         return result.result;
       } else {
-        print('CurrencyService: Invalid result for $currencyCode, using static rate');
+        print(
+            'CurrencyService: Invalid result for $currencyCode, using static rate');
         return _staticRates[currencyCode] ?? 1.0;
       }
     } catch (e) {
@@ -402,29 +482,29 @@ class CurrencyService {
   }
 
   // Enhanced method to fetch rate with status tracking
-  static Future<CurrencyFetchResult> _fetchSingleRateWithStatus(String currencyCode) async {
+  static Future<CurrencyFetchResult> _fetchSingleRateWithStatus(
+      String currencyCode) async {
     try {
       print('CurrencyService: Fetching rate for $currencyCode...');
-      final result = await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
+      final result =
+          await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
       if (result.result > 0) {
-        print('CurrencyService: Got live rate for $currencyCode: ${result.result}');
+        print(
+            'CurrencyService: Got live rate for $currencyCode: ${result.result}');
         return CurrencyFetchResult(
-          rate: result.result,
-          status: CurrencyStatus.success
-        );
+            rate: result.result, status: CurrencyStatus.success);
       } else {
-        print('CurrencyService: Invalid result for $currencyCode, using static rate');
+        print(
+            'CurrencyService: Invalid result for $currencyCode, using static rate');
         return CurrencyFetchResult(
-          rate: _staticRates[currencyCode] ?? 1.0,
-          status: CurrencyStatus.failed
-        );
+            rate: _staticRates[currencyCode] ?? 1.0,
+            status: CurrencyStatus.failed);
       }
     } catch (e) {
       print('CurrencyService: Failed to get live rate for $currencyCode: $e');
       return CurrencyFetchResult(
-        rate: _staticRates[currencyCode] ?? 1.0,
-        status: CurrencyStatus.failed
-      );
+          rate: _staticRates[currencyCode] ?? 1.0,
+          status: CurrencyStatus.failed);
     }
   }
 
@@ -433,7 +513,8 @@ class CurrencyService {
     _currentRates = Map<String, double>.from(newRates);
     _lastUpdated = DateTime.now();
     _isUsingLiveRates = true;
-    print('CurrencyService: Current rates updated with ${newRates.length} currencies');
+    print(
+        'CurrencyService: Current rates updated with ${newRates.length} currencies');
   }
 
   // Check if API is available
@@ -446,7 +527,8 @@ class CurrencyService {
   }
 
   // Get all currency statuses
-  static Map<String, CurrencyStatus> get currencyStatuses => Map.unmodifiable(_currencyStatus);
+  static Map<String, CurrencyStatus> get currencyStatuses =>
+      Map.unmodifiable(_currencyStatus);
 
   // Get localized status text
   static String getLocalizedStatus(String currencyCode, dynamic l10n) {
@@ -466,17 +548,22 @@ class CurrencyService {
   }
 
   // Get localized status description
-  static String getLocalizedStatusDescription(String currencyCode, dynamic l10n) {
+  static String getLocalizedStatusDescription(
+      String currencyCode, dynamic l10n) {
     final status = getCurrencyStatus(currencyCode);
     switch (status) {
       case CurrencyStatus.success:
-        return l10n?.currencyStatusSuccessDesc ?? 'Successfully fetched live rate';
+        return l10n?.currencyStatusSuccessDesc ??
+            'Successfully fetched live rate';
       case CurrencyStatus.failed:
-        return l10n?.currencyStatusFailedDesc ?? 'Failed to fetch live rate, using static fallback';
+        return l10n?.currencyStatusFailedDesc ??
+            'Failed to fetch live rate, using static fallback';
       case CurrencyStatus.timeout:
-        return l10n?.currencyStatusTimeoutDesc ?? 'Request timed out, using static fallback';
+        return l10n?.currencyStatusTimeoutDesc ??
+            'Request timed out, using static fallback';
       case CurrencyStatus.notSupported:
-        return l10n?.currencyStatusNotSupportedDesc ?? 'Currency not supported by API';
+        return l10n?.currencyStatusNotSupportedDesc ??
+            'Currency not supported by API';
       case CurrencyStatus.staticRate:
         return l10n?.currencyStatusStaticDesc ?? 'Using static exchange rate';
     }

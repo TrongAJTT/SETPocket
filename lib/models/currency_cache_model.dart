@@ -17,11 +17,16 @@ class CurrencyCacheModel extends HiveObject {
   @HiveField(3)
   Map<String, int>? currencyStatuses; // Store status as int (enum index)
 
+  @HiveField(4)
+  Map<String, int>?
+      currencyFetchTimes; // Store last fetch timestamp for each currency
+
   CurrencyCacheModel({
     required this.rates,
     required this.lastUpdated,
     this.isValid = true,
     this.currencyStatuses,
+    this.currencyFetchTimes,
   });
 
   // Helper to get currency status
@@ -36,6 +41,40 @@ class CurrencyCacheModel extends HiveObject {
   // Helper to set currency statuses
   void setCurrencyStatuses(Map<String, CurrencyStatus> statuses) {
     currencyStatuses = statuses.map((key, value) => MapEntry(key, value.index));
+  }
+
+  // Helper to get all currency statuses
+  Map<String, CurrencyStatus> getCurrencyStatuses() {
+    if (currencyStatuses == null) return {};
+
+    return currencyStatuses!.map((key, value) {
+      return MapEntry(key, CurrencyStatus.values[value]);
+    });
+  }
+
+  // Helper to set currency fetch times
+  void setCurrencyFetchTimes(Map<String, DateTime> fetchTimes) {
+    currencyFetchTimes = fetchTimes
+        .map((key, value) => MapEntry(key, value.millisecondsSinceEpoch));
+  }
+
+  // Helper to get currency fetch time
+  DateTime? getCurrencyFetchTime(String currencyCode) {
+    final timestamp = currencyFetchTimes?[currencyCode];
+    if (timestamp != null) {
+      return DateTime.fromMillisecondsSinceEpoch(timestamp);
+    }
+    return null;
+  }
+
+  // Check if currency needs refresh (older than 1 hour)
+  bool currencyNeedsRefresh(String currencyCode) {
+    final fetchTime = getCurrencyFetchTime(currencyCode);
+    if (fetchTime == null) return true;
+
+    final now = DateTime.now();
+    final difference = now.difference(fetchTime);
+    return difference.inHours >= 1;
   }
 
   // Check if cache is expired (older than 24 hours)

@@ -24,7 +24,8 @@ class CurrencyCacheService {
   }
 
   // Get cached rates or fetch new ones based on settings
-  static Future<Map<String, double>> getRates({bool forceRefresh = false}) async {
+  static Future<Map<String, double>> getRates(
+      {bool forceRefresh = false}) async {
     await initialize();
 
     final settings = await SettingsService.getSettings();
@@ -32,6 +33,11 @@ class CurrencyCacheService {
 
     // Get cached data
     final cachedData = _cacheBox!.get(_cacheKey);
+
+    // Load fetch times from cache if available
+    if (cachedData != null) {
+      _loadFetchTimesFromCache(cachedData);
+    }
 
     // Determine if we need to fetch new rates based on mode
     bool shouldFetch = forceRefresh;
@@ -47,18 +53,21 @@ class CurrencyCacheService {
       try {
         _isFetching = true;
         final newRates = await CurrencyService.fetchLiveRates();
-        print('CurrencyCacheService: Fetched ${newRates.length} rates, now saving to cache...');
-        
+        print(
+            'CurrencyCacheService: Fetched ${newRates.length} rates, now saving to cache...');
+
         await _saveToCache(newRates);
         print('CurrencyCacheService: Successfully saved to cache');
-        
+
         // Verify the save worked
         final verifyCache = _cacheBox!.get(_cacheKey);
-        print('CurrencyCacheService: Cache verification - data exists: ${verifyCache != null}');
+        print(
+            'CurrencyCacheService: Cache verification - data exists: ${verifyCache != null}');
         if (verifyCache != null) {
-          print('CurrencyCacheService: Cache verification - rates count: ${verifyCache.rates.length}');
+          print(
+              'CurrencyCacheService: Cache verification - rates count: ${verifyCache.rates.length}');
         }
-        
+
         return newRates;
       } catch (e) {
         print('CurrencyCacheService: Failed to fetch new rates: $e');
@@ -83,32 +92,69 @@ class CurrencyCacheService {
     return CurrencyService.getStaticRates();
   }
 
+  // Load fetch times from cache into CurrencyService
+  static void _loadFetchTimesFromCache(CurrencyCacheModel cacheModel) {
+    // Load fetch times
+    if (cacheModel.currencyFetchTimes != null) {
+      for (final entry in cacheModel.currencyFetchTimes!.entries) {
+        final fetchTime = DateTime.fromMillisecondsSinceEpoch(entry.value);
+        CurrencyService.updateCurrencyFetchTime(entry.key, fetchTime);
+      }
+      print(
+          'CurrencyCacheService: Loaded ${cacheModel.currencyFetchTimes!.length} fetch times from cache');
+    }
+
+    // Load currency statuses
+    final statuses = cacheModel.getCurrencyStatuses();
+    if (statuses.isNotEmpty) {
+      CurrencyService.updateCurrencyStatuses(statuses);
+      print(
+          'CurrencyCacheService: Loaded ${statuses.length} currency statuses from cache');
+    }
+  }
+
   // Save rates to cache
   static Future<void> _saveToCache(Map<String, double> rates) async {
     try {
       await initialize();
-      
-      print('CurrencyCacheService: Creating cache model with ${rates.length} rates');
+
+      print(
+          'CurrencyCacheService: Creating cache model with ${rates.length} rates');
       final cacheModel = CurrencyCacheModel(
         rates: Map<String, double>.from(rates), // Ensure proper type
         lastUpdated: DateTime.now(),
         isValid: true,
       );
-      
+
       // Also save currency statuses
       final statuses = CurrencyService.currencyStatuses;
       if (statuses.isNotEmpty) {
         cacheModel.setCurrencyStatuses(statuses);
-        print('CurrencyCacheService: Saved ${statuses.length} currency statuses');
+        print(
+            'CurrencyCacheService: Saved ${statuses.length} currency statuses');
       }
-      
+
+      // Save currency fetch times
+      final fetchTimes = <String, DateTime>{};
+      for (final currency in rates.keys) {
+        final fetchTime = CurrencyService.getCurrencyLastFetchTime(currency);
+        if (fetchTime != null) {
+          fetchTimes[currency] = fetchTime;
+        }
+      }
+
+      if (fetchTimes.isNotEmpty) {
+        cacheModel.setCurrencyFetchTimes(fetchTimes);
+        print(
+            'CurrencyCacheService: Saved ${fetchTimes.length} currency fetch times');
+      }
+
       print('CurrencyCacheService: Saving to cache with key: $_cacheKey');
       await _cacheBox!.put(_cacheKey, cacheModel);
-      
+
       // Force flush to disk
       await _cacheBox!.flush();
       print('CurrencyCacheService: Cache saved and flushed to disk');
-      
     } catch (e) {
       print('CurrencyCacheService: Error saving to cache: $e');
       rethrow;
@@ -120,7 +166,8 @@ class CurrencyCacheService {
     try {
       await initialize();
       final data = _cacheBox!.get(_cacheKey);
-      print('CurrencyCacheService: getCacheInfo - data exists: ${data != null}');
+      print(
+          'CurrencyCacheService: getCacheInfo - data exists: ${data != null}');
       return data;
     } catch (e) {
       print('CurrencyCacheService: Error getting cache info: $e');
@@ -187,7 +234,8 @@ class CurrencyCacheService {
         print('Is valid: ${cachedData.isValid}');
         print('Is expired: ${cachedData.isExpired}');
         print('Rates count: ${cachedData.rates.length}');
-        print('Sample rates: ${cachedData.rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
+        print(
+            'Sample rates: ${cachedData.rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
       }
       print('=== END DEBUG ===');
     } catch (e) {

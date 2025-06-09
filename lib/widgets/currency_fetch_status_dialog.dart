@@ -365,6 +365,18 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
                 ),
               ),
 
+              // Fetch time
+              Text(
+                _getFetchTime(currencyCode),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
               // Status icon
               Icon(
                 _getStatusIcon(status),
@@ -404,5 +416,14 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
       case CurrencyStatus.notSupported:
         return Icons.storage;
     }
+  }
+
+  // Get the formatted fetch time for a currency
+  String _getFetchTime(String currency) {
+    final fetchTime = CurrencyService.getCurrencyLastFetchTime(currency);
+    if (fetchTime != null) {
+      return '${fetchTime.hour.toString().padLeft(2, '0')}:${fetchTime.minute.toString().padLeft(2, '0')}:${fetchTime.second.toString().padLeft(2, '0')}';
+    }
+    return '--:--:--';
   }
 }

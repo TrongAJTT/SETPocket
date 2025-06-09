@@ -17,7 +17,7 @@ class SettingsModel extends HiveObject {
   SettingsModel({
     this.currencyFetchMode = CurrencyFetchMode.onceADay,
     this.fetchTimeoutSeconds = 10,
-    this.featureStateSavingEnabled = true,
+    this.featureStateSavingEnabled = true, // Always enabled by default
   });
 
   SettingsModel copyWith({

@@ -2855,6 +2855,12 @@ abstract class AppLocalizations {
   /// **'Selected {count} of {max}'**
   String unitSelectedStatus(Object count, Object max);
 
+  /// No description provided for @unitVisibleStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} units visible'**
+  String unitVisibleStatus(Object count);
+
   /// No description provided for @lengthUnits.
   ///
   /// In en, this message translates to:

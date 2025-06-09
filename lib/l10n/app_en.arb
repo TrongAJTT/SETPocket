@@ -497,6 +497,7 @@
     "cacheTypeConverterToolsDesc": "Currency/length states, presets and exchange rates cache",
 
     "unitSelectedStatus": "Selected {count} of {max}",
+    "unitVisibleStatus": "{count} units visible",
     
     "lengthUnits": "Length Units",
     "angstroms": "Angstroms",

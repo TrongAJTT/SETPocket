@@ -517,88 +517,190 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        children: [
-          if (_isLoadingRates) ...[
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                _lastUpdated == null
-                    ? l10n.noRatesAvailable
-                    : l10n.updatingRates,
-                style: const TextStyle(fontSize: 12),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ] else ...[
-            Icon(
-              _isUsingLiveRates ? Icons.wifi : Icons.wifi_off,
-              size: 16,
-              color: _isUsingLiveRates ? Colors.green : Colors.orange,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              _isUsingLiveRates ? l10n.liveRates : l10n.staticRates,
-              style: TextStyle(
-                color: _isUsingLiveRates ? Colors.green : Colors.orange,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-            if (_lastUpdated != null) ...[
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  '• ${_formatLastUpdated(l10n)}',
-                  style: const TextStyle(fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 500;
+
+          if (isNarrow) {
+            // Stack layout for narrow screens
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    if (_isLoadingRates) ...[
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _lastUpdated == null
+                              ? l10n.noRatesAvailable
+                              : l10n.updatingRates,
+                          style: const TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ] else ...[
+                      Icon(
+                        _isUsingLiveRates ? Icons.wifi : Icons.wifi_off,
+                        size: 16,
+                        color: _isUsingLiveRates ? Colors.green : Colors.orange,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _isUsingLiveRates ? l10n.liveRates : l10n.staticRates,
+                          style: TextStyle(
+                            color: _isUsingLiveRates
+                                ? Colors.green
+                                : Colors.orange,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => _showFetchStatusDialog(context),
+                          icon: Icon(
+                            Icons.assessment,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                          tooltip: l10n.viewFetchStatus,
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed:
+                              _isLoadingRates ? null : _refreshCurrencyRates,
+                          icon: Icon(
+                            Icons.refresh,
+                            color: _isLoadingRates
+                                ? Theme.of(context).disabledColor
+                                : Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                          tooltip: l10n.refreshRates,
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-            ] else
-              const Spacer(),
-          ],
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                onPressed: () => _showFetchStatusDialog(context),
-                icon: Icon(
-                  Icons.assessment,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
+                if (_lastUpdated != null && !_isLoadingRates)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      _formatLastUpdated(l10n),
+                      style: const TextStyle(fontSize: 11),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+            );
+          } else {
+            // Original horizontal layout for wider screens
+            return Row(
+              children: [
+                if (_isLoadingRates) ...[
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _lastUpdated == null
+                          ? l10n.noRatesAvailable
+                          : l10n.updatingRates,
+                      style: const TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ] else ...[
+                  Icon(
+                    _isUsingLiveRates ? Icons.wifi : Icons.wifi_off,
+                    size: 16,
+                    color: _isUsingLiveRates ? Colors.green : Colors.orange,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _isUsingLiveRates ? l10n.liveRates : l10n.staticRates,
+                    style: TextStyle(
+                      color: _isUsingLiveRates ? Colors.green : Colors.orange,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (_lastUpdated != null) ...[
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '• ${_formatLastUpdated(l10n)}',
+                        style: const TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ] else
+                    const Spacer(),
+                ],
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () => _showFetchStatusDialog(context),
+                      icon: Icon(
+                        Icons.assessment,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
+                      tooltip: l10n.viewFetchStatus,
+                      padding: const EdgeInsets.all(4),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      onPressed: _isLoadingRates ? null : _refreshCurrencyRates,
+                      icon: Icon(
+                        Icons.refresh,
+                        color: _isLoadingRates
+                            ? Theme.of(context).disabledColor
+                            : Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
+                      tooltip: l10n.refreshRates,
+                      padding: const EdgeInsets.all(4),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                    ),
+                  ],
                 ),
-                tooltip: l10n.viewFetchStatus,
-                padding: const EdgeInsets.all(4),
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
-              ),
-              const SizedBox(width: 4),
-              IconButton(
-                onPressed: _isLoadingRates ? null : _refreshCurrencyRates,
-                icon: Icon(
-                  Icons.refresh,
-                  color: _isLoadingRates
-                      ? Theme.of(context).disabledColor
-                      : Theme.of(context).colorScheme.primary,
-                  size: 20,
-                ),
-                tooltip: l10n.refreshRates,
-                padding: const EdgeInsets.all(4),
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            );
+          }
+        },
       ),
     );
   }
@@ -772,136 +874,143 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                 ),
                 SizedBox(height: isDesktop ? 16 : 12), // Restored spacing
 
-                // Base currency input and dropdown - more compact for desktop
-                if (isDesktop) ...[
-                  // Desktop layout - very compact horizontal arrangement
-                  Row(
-                    children: [
-                      // Amount input
-                      Expanded(
-                        flex: 2,
-                        child: TextField(
-                          controller: rowControllers[baseCurrency],
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9.]')),
-                          ],
-                          decoration: const InputDecoration(
-                            labelText: 'Amount',
-                            border: OutlineInputBorder(),
-                            isDense: true,
+                // Base currency input and dropdown - responsive layout
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Use column layout if width is too narrow
+                    final useColumnLayout = constraints.maxWidth < 500;
+
+                    if (useColumnLayout) {
+                      return Column(
+                        children: [
+                          TextField(
+                            controller: rowControllers[baseCurrency],
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.]')),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: l10n.amount,
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                            onChanged: (value) =>
+                                _onRowValueChanged(index, baseCurrency, value),
                           ),
-                          style: const TextStyle(
-                              fontSize: 14), // Restored font size
-                          onChanged: (value) =>
-                              _onRowValueChanged(index, baseCurrency, value),
-                        ),
-                      ),
-                      const SizedBox(width: 12), // Restored spacing
-                      // Currency dropdown
-                      Expanded(
-                        flex: 3,
-                        child: DropdownButtonFormField<String>(
-                          value: baseCurrency,
-                          decoration: InputDecoration(
-                            labelText: l10n.from,
-                            border: const OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          items: currencies.map((currency) {
-                            final unit = _converter.units
-                                .firstWhere((u) => u.id == currency);
-                            return DropdownMenuItem<String>(
-                              value: currency,
-                              child: Text(
-                                '${unit.symbol} - ${unit.name}',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            value: baseCurrency,
+                            decoration: InputDecoration(
+                              labelText: l10n.from,
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            items: currencies.map((currency) {
+                              final unit = _converter.units
+                                  .firstWhere((u) => u.id == currency);
+                              return DropdownMenuItem<String>(
+                                value: currency,
+                                child: Text(
+                                  '${unit.symbol} - ${unit.name}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (newCurrency) {
-                            if (newCurrency != null) {
-                              final currentValue =
-                                  _rowValues[index][baseCurrency] ?? 1.0;
-                              _updateRowConversions(
-                                  index, newCurrency, currentValue);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  // Mobile layout - vertical arrangement
-                  Column(
-                    children: [
-                      // Amount input
-                      TextField(
-                        controller: rowControllers[baseCurrency],
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                              );
+                            }).toList(),
+                            onChanged: (newCurrency) {
+                              if (newCurrency != null) {
+                                final currentValue =
+                                    _rowValues[index][baseCurrency] ?? 1.0;
+                                _updateRowConversions(
+                                    index, newCurrency, currentValue);
+                              }
+                            },
+                          ),
                         ],
-                        decoration: InputDecoration(
-                          labelText: l10n.amount,
-                          border: const OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                        onChanged: (value) =>
-                            _onRowValueChanged(index, baseCurrency, value),
-                      ),
-                      const SizedBox(height: 8), // Reduced spacing
-                      // Currency dropdown
-                      DropdownButtonFormField<String>(
-                        value: baseCurrency,
-                        decoration: InputDecoration(
-                          labelText: l10n.fromCurrency,
-                          border: const OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        items: currencies.map((currency) {
-                          final unit = _converter.units
-                              .firstWhere((u) => u.id == currency);
-                          return DropdownMenuItem<String>(
-                            value: currency,
-                            child: Text(
-                              '${unit.symbol} - ${unit.name}',
-                              overflow: TextOverflow.ellipsis,
+                      );
+                    } else {
+                      return Row(
+                        children: [
+                          // Amount input
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: rowControllers[baseCurrency],
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9.]')),
+                              ],
+                              decoration: InputDecoration(
+                                labelText: l10n.amount,
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                              ),
+                              style: const TextStyle(fontSize: 14),
+                              onChanged: (value) => _onRowValueChanged(
+                                  index, baseCurrency, value),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Currency dropdown
+                          Expanded(
+                            flex: 3,
+                            child: DropdownButtonFormField<String>(
+                              value: baseCurrency,
+                              decoration: InputDecoration(
+                                labelText: l10n.from,
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                              ),
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
+                              items: currencies.map((currency) {
+                                final unit = _converter.units
+                                    .firstWhere((u) => u.id == currency);
+                                return DropdownMenuItem<String>(
+                                  value: currency,
+                                  child: Text(
+                                    '${unit.symbol} - ${unit.name}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (newCurrency) {
+                                if (newCurrency != null) {
+                                  final currentValue =
+                                      _rowValues[index][baseCurrency] ?? 1.0;
+                                  _updateRowConversions(
+                                      index, newCurrency, currentValue);
+                                }
+                              },
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (newCurrency) {
-                          if (newCurrency != null) {
-                            final currentValue =
-                                _rowValues[index][baseCurrency] ?? 1.0;
-                            _updateRowConversions(
-                                index, newCurrency, currentValue);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
                 SizedBox(height: isDesktop ? 12 : 8), // Restored spacing
 
                 // "Converted to" label - restored size

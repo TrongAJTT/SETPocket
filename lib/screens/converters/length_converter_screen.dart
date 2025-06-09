@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import '../../models/converter_models.dart';
 import '../../services/length_state_service.dart';
 import '../../models/length_state_model.dart';
@@ -363,54 +362,129 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
         color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.straighten,
-            size: 20,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            l10n.lengthConverter,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            '${_visibleUnits.length} units visible',
-            style: const TextStyle(fontSize: 12),
-            overflow: TextOverflow.ellipsis,
-          ),
-          const Spacer(),
-          SegmentedButton<LengthViewMode>(
-            segments: [
-              ButtonSegment<LengthViewMode>(
-                value: LengthViewMode.cards,
-                icon: const Icon(Icons.view_agenda, size: 16),
-                label: Text(l10n.cardView),
-              ),
-              ButtonSegment<LengthViewMode>(
-                value: LengthViewMode.table,
-                icon: const Icon(Icons.table_chart, size: 16),
-                label: Text(l10n.tableView),
-              ),
-            ],
-            selected: {_viewMode},
-            onSelectionChanged: (Set<LengthViewMode> newSelection) {
-              setState(() {
-                _viewMode = newSelection.first;
-              });
-            },
-            style: SegmentedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              textStyle: const TextStyle(fontSize: 12),
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 600;
+
+          if (isNarrow) {
+            // Stack layout for narrow screens
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.straighten,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.lengthConverter,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      l10n.unitVisibleStatus(_visibleUnits.length),
+                      style: const TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SegmentedButton<LengthViewMode>(
+                        segments: [
+                          ButtonSegment<LengthViewMode>(
+                            value: LengthViewMode.cards,
+                            icon: const Icon(Icons.view_agenda, size: 16),
+                            label: Text(l10n.cardView),
+                          ),
+                          ButtonSegment<LengthViewMode>(
+                            value: LengthViewMode.table,
+                            icon: const Icon(Icons.table_chart, size: 16),
+                            label: Text(l10n.tableView),
+                          ),
+                        ],
+                        selected: {_viewMode},
+                        onSelectionChanged: (Set<LengthViewMode> newSelection) {
+                          setState(() {
+                            _viewMode = newSelection.first;
+                          });
+                        },
+                        style: SegmentedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else {
+            // Original horizontal layout for wider screens
+            return Row(
+              children: [
+                Icon(
+                  Icons.straighten,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.lengthConverter,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  '${_visibleUnits.length} units visible',
+                  style: const TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+                SegmentedButton<LengthViewMode>(
+                  segments: [
+                    ButtonSegment<LengthViewMode>(
+                      value: LengthViewMode.cards,
+                      icon: const Icon(Icons.view_agenda, size: 16),
+                      label: Text(l10n.cardView),
+                    ),
+                    ButtonSegment<LengthViewMode>(
+                      value: LengthViewMode.table,
+                      icon: const Icon(Icons.table_chart, size: 16),
+                      label: Text(l10n.tableView),
+                    ),
+                  ],
+                  selected: {_viewMode},
+                  onSelectionChanged: (Set<LengthViewMode> newSelection) {
+                    setState(() {
+                      _viewMode = newSelection.first;
+                    });
+                  },
+                  style: SegmentedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    textStyle: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
       ),
     );
   }
@@ -564,128 +638,140 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
                 SizedBox(height: isDesktop ? 16 : 12),
 
                 // Base unit input and dropdown
-                if (isDesktop) ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: TextField(
-                          controller: rowControllers[baseUnit],
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9.eE+-]')),
-                          ],
-                          decoration: InputDecoration(
-                            labelText: l10n.amount,
-                            border: const OutlineInputBorder(),
-                            isDense: true,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Use column layout if width is too narrow
+                    final useColumnLayout = constraints.maxWidth < 500;
+
+                    if (useColumnLayout) {
+                      return Column(
+                        children: [
+                          TextField(
+                            controller: rowControllers[baseUnit],
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.eE+-]')),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: l10n.amount,
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                            onChanged: (value) =>
+                                _onRowValueChanged(index, baseUnit, value),
                           ),
-                          style: const TextStyle(fontSize: 14),
-                          onChanged: (value) =>
-                              _onRowValueChanged(index, baseUnit, value),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 3,
-                        child: DropdownButtonFormField<String>(
-                          value: baseUnit,
-                          decoration: InputDecoration(
-                            labelText: l10n.from,
-                            border: const OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          items: units.map((unit) {
-                            final unitObj = _converter.units
-                                .firstWhere((u) => u.id == unit);
-                            return DropdownMenuItem<String>(
-                              value: unit,
-                              child: Text(
-                                '${unitObj.symbol} - ${unitObj.name}',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            value: baseUnit,
+                            decoration: InputDecoration(
+                              labelText: l10n.from,
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            items: units.map((unit) {
+                              final unitObj = _converter.units
+                                  .firstWhere((u) => u.id == unit);
+                              return DropdownMenuItem<String>(
+                                value: unit,
+                                child: Text(
+                                  '${unitObj.symbol} - ${unitObj.name}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (newUnit) {
-                            if (newUnit != null) {
-                              final currentValue =
-                                  _rowValues[index][baseUnit] ?? 1.0;
-                              _updateRowConversions(
-                                  index, newUnit, currentValue);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  Column(
-                    children: [
-                      TextField(
-                        controller: rowControllers[baseUnit],
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9.eE+-]')),
+                              );
+                            }).toList(),
+                            onChanged: (newUnit) {
+                              if (newUnit != null) {
+                                final currentValue =
+                                    _rowValues[index][baseUnit] ?? 1.0;
+                                _updateRowConversions(
+                                    index, newUnit, currentValue);
+                              }
+                            },
+                          ),
                         ],
-                        decoration: InputDecoration(
-                          labelText: l10n.amount,
-                          border: const OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                        onChanged: (value) =>
-                            _onRowValueChanged(index, baseUnit, value),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: baseUnit,
-                        decoration: InputDecoration(
-                          labelText: l10n.fromCurrency,
-                          border: const OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        items: units.map((unit) {
-                          final unitObj =
-                              _converter.units.firstWhere((u) => u.id == unit);
-                          return DropdownMenuItem<String>(
-                            value: unit,
-                            child: Text(
-                              '${unitObj.symbol} - ${unitObj.name}',
-                              overflow: TextOverflow.ellipsis,
+                      );
+                    } else {
+                      return Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: rowControllers[baseUnit],
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9.eE+-]')),
+                              ],
+                              decoration: InputDecoration(
+                                labelText: l10n.amount,
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                              ),
+                              style: const TextStyle(fontSize: 14),
+                              onChanged: (value) =>
+                                  _onRowValueChanged(index, baseUnit, value),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 3,
+                            child: DropdownButtonFormField<String>(
+                              value: baseUnit,
+                              decoration: InputDecoration(
+                                labelText: l10n.from,
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                              ),
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
+                              items: units.map((unit) {
+                                final unitObj = _converter.units
+                                    .firstWhere((u) => u.id == unit);
+                                return DropdownMenuItem<String>(
+                                  value: unit,
+                                  child: Text(
+                                    '${unitObj.symbol} - ${unitObj.name}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (newUnit) {
+                                if (newUnit != null) {
+                                  final currentValue =
+                                      _rowValues[index][baseUnit] ?? 1.0;
+                                  _updateRowConversions(
+                                      index, newUnit, currentValue);
+                                }
+                              },
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (newUnit) {
-                          if (newUnit != null) {
-                            final currentValue =
-                                _rowValues[index][baseUnit] ?? 1.0;
-                            _updateRowConversions(index, newUnit, currentValue);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
                 SizedBox(height: isDesktop ? 12 : 8),
 
                 Text(

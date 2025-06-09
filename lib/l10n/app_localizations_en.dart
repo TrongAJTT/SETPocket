@@ -1473,6 +1473,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String unitVisibleStatus(Object count) {
+    return '$count units visible';
+  }
+
+  @override
   String get lengthUnits => 'Length Units';
 
   @override

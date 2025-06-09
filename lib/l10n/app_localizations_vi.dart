@@ -1473,6 +1473,11 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String unitVisibleStatus(Object count) {
+    return '$count đơn vị hiển thị';
+  }
+
+  @override
   String get lengthUnits => 'Đơn vị chiều dài';
 
   @override

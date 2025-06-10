@@ -37,6 +37,10 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
         case CurrencyStatus.notSupported:
           staticCurrencies.add(currency.code);
           break;
+        case CurrencyStatus.fetchedRecently:
+          // Treat fetchedRecently as success for status dialog
+          successCurrencies.add(currency.code);
+          break;
       }
     }
 
@@ -401,6 +405,8 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
       case CurrencyStatus.staticRate:
       case CurrencyStatus.notSupported:
         return Colors.grey;
+      case CurrencyStatus.fetchedRecently:
+        return Colors.green; // Same as success
     }
   }
 
@@ -415,6 +421,8 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
       case CurrencyStatus.staticRate:
       case CurrencyStatus.notSupported:
         return Icons.storage;
+      case CurrencyStatus.fetchedRecently:
+        return Icons.check_circle; // Same as success
     }
   }
 

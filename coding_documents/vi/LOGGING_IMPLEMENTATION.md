@@ -208,7 +208,7 @@ await SettingsService.updateLogRetentionDays(days);
 
 **Kiểm Soát Người Dùng**:
 - Có thể cấu hình qua UI Settings
-- Phạm vi: 5-15 ngày
+- Phạm vi: 5-30 ngày, giữ vĩnh viễn
 - Tự động dọn dẹp dựa trên thời gian lưu trữ
 
 ### Đường Dẫn File

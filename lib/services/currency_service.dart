@@ -2,7 +2,14 @@ import 'package:live_currency_rate/live_currency_rate.dart';
 import 'package:logger/logger.dart';
 import 'settings_service.dart';
 
-enum CurrencyStatus { success, failed, timeout, notSupported, staticRate }
+enum CurrencyStatus {
+  success,
+  failed,
+  timeout,
+  notSupported,
+  staticRate,
+  fetchedRecently
+}
 
 class CurrencyFetchResult {
   final double rate;
@@ -327,6 +334,9 @@ class CurrencyService {
       var rates = <String, double>{};
       bool hasLiveData = false;
 
+      // Get retry settings
+      final retryTimes = await SettingsService.getFetchRetryTimes();
+
       // Keep existing statuses for currencies that don't need refresh
       Map<String, CurrencyStatus> existingStatuses = Map.from(_currencyStatus);
       _currencyStatus.clear(); // Clear previous status
@@ -360,49 +370,90 @@ class CurrencyService {
             print(
                 'CurrencyService: Will fetch ${currency.code} (needs refresh: $needsRefresh, previous status: $previousStatus)');
           } else {
-            // Skip fetch and keep existing status and rate
+            // Skip fetch but report as recently fetched for progress dialog
+            _onProgress?.call(currency.code, CurrencyStatus.fetchedRecently);
             print(
                 'CurrencyService: Skipping fetch for ${currency.code} (recently fetched)');
           }
         }
       }
 
-      // Wait for all fetches to complete with timeout
-      final results = await Future.wait(
-        fetchFutures.entries.map((entry) async {
-          if (_isCancelled) {
-            _onProgress?.call(entry.key, CurrencyStatus.failed);
-            return MapEntry(
-                entry.key,
-                CurrencyFetchResult(
-                    rate: _staticRates[entry.key] ?? 1.0,
-                    status: CurrencyStatus.failed));
+      // Initial fetch attempt
+      Map<String, CurrencyFetchResult> allResults = {};
+      Map<String, Future<CurrencyFetchResult>> currentFutures =
+          Map.from(fetchFutures);
+
+      // Retry logic - try up to retryTimes + 1 times (initial + retries)
+      for (int attempt = 0;
+          attempt <= retryTimes && currentFutures.isNotEmpty;
+          attempt++) {
+        if (_isCancelled) break;
+
+        if (attempt > 0) {
+          print(
+              'CurrencyService: Retry attempt $attempt for ${currentFutures.length} currencies');
+        }
+
+        final results = await Future.wait(
+          currentFutures.entries.map((entry) async {
+            if (_isCancelled) {
+              _onProgress?.call(entry.key, CurrencyStatus.failed);
+              return MapEntry(
+                  entry.key,
+                  CurrencyFetchResult(
+                      rate: _staticRates[entry.key] ?? 1.0,
+                      status: CurrencyStatus.failed));
+            }
+            try {
+              // Get timeout from settings service
+              final timeoutSeconds = await SettingsService.getFetchTimeout();
+              final result =
+                  await entry.value.timeout(Duration(seconds: timeoutSeconds));
+
+              // Update fetch time for this currency if successful
+              if (result.status == CurrencyStatus.success) {
+                _currencyFetchTimes[entry.key] = DateTime.now();
+              }
+
+              _onProgress?.call(entry.key, result.status);
+              return MapEntry(entry.key, result);
+            } catch (e) {
+              print('CurrencyService: Timeout/Error for ${entry.key}: $e');
+              _onProgress?.call(entry.key, CurrencyStatus.timeout);
+              return MapEntry(
+                  entry.key,
+                  CurrencyFetchResult(
+                      rate: _staticRates[entry.key] ?? 1.0,
+                      status: CurrencyStatus.timeout));
+            }
+          }),
+        );
+
+        // Process results and collect successful ones
+        Map<String, Future<CurrencyFetchResult>> nextFutures = {};
+        for (final result in results) {
+          allResults[result.key] = result.value;
+
+          // If failed/timeout and not the last attempt, prepare for retry
+          if (attempt < retryTimes &&
+              (result.value.status == CurrencyStatus.failed ||
+                  result.value.status == CurrencyStatus.timeout)) {
+            nextFutures[result.key] = _fetchSingleRateWithStatus(result.key);
+            print(
+                'CurrencyService: Will retry ${result.key} (status: ${result.value.status})');
           }
-          try {
-            // Get timeout from settings service
-            final timeoutSeconds = await SettingsService.getFetchTimeout();
-            final result =
-                await entry.value.timeout(Duration(seconds: timeoutSeconds));
+        }
 
-            // Update fetch time for this currency
-            _currencyFetchTimes[entry.key] = DateTime.now();
+        currentFutures = nextFutures;
 
-            _onProgress?.call(entry.key, result.status);
-            return MapEntry(entry.key, result);
-          } catch (e) {
-            print('CurrencyService: Timeout/Error for ${entry.key}: $e');
-            _onProgress?.call(entry.key, CurrencyStatus.timeout);
-            return MapEntry(
-                entry.key,
-                CurrencyFetchResult(
-                    rate: _staticRates[entry.key] ?? 1.0,
-                    status: CurrencyStatus.timeout));
-          }
-        }),
-      );
+        // Small delay between retries to avoid overwhelming the API
+        if (currentFutures.isNotEmpty && attempt < retryTimes) {
+          await Future.delayed(const Duration(milliseconds: 500));
+        }
+      }
 
-      // Process results for currencies that were fetched
-      for (final result in results) {
+      // Process final results for currencies that were fetched
+      for (final result in allResults.entries) {
         rates[result.key] = result.value.rate;
         _currencyStatus[result.key] = result.value.status;
         if (result.value.status == CurrencyStatus.success) {
@@ -414,20 +465,20 @@ class CurrencyService {
       for (final currency in currencies) {
         if (currency.code != 'USD' &&
             !rates.containsKey(currency.code) &&
-            !fetchFutures.containsKey(currency.code)) {
+            !allResults.containsKey(currency.code)) {
           // Get rate from current rates
           final rate = _currentRates[currency.code] ??
               _staticRates[currency.code] ??
               1.0;
           rates[currency.code] = rate;
 
-          // Keep existing status
-          final status =
-              existingStatuses[currency.code] ?? CurrencyStatus.staticRate;
-          _currencyStatus[currency.code] = status;
-
-          // Report progress
-          _onProgress?.call(currency.code, status);
+          // Keep existing status (but don't overwrite fetchedRecently from progress callback)
+          final currentStatus = _currencyStatus[currency.code];
+          if (currentStatus != CurrencyStatus.fetchedRecently) {
+            final status =
+                existingStatuses[currency.code] ?? CurrencyStatus.staticRate;
+            _currencyStatus[currency.code] = status;
+          }
         }
       }
 
@@ -525,6 +576,8 @@ class CurrencyService {
         return l10n?.currencyStatusNotSupported ?? 'Not supported';
       case CurrencyStatus.staticRate:
         return l10n?.currencyStatusStatic ?? 'Static rate';
+      case CurrencyStatus.fetchedRecently:
+        return l10n?.currencyStatusFetchedRecently ?? 'Recently fetched';
     }
   }
 
@@ -547,6 +600,9 @@ class CurrencyService {
             'Currency not supported by API';
       case CurrencyStatus.staticRate:
         return l10n?.currencyStatusStaticDesc ?? 'Using static exchange rate';
+      case CurrencyStatus.fetchedRecently:
+        return l10n?.currencyStatusFetchedRecentlyDesc ??
+            'Successfully fetched within the last hour';
     }
   }
 }

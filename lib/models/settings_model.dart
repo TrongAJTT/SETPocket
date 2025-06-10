@@ -17,11 +17,15 @@ class SettingsModel extends HiveObject {
   @HiveField(3)
   int logRetentionDays;
 
+  @HiveField(4)
+  int fetchRetryTimes;
+
   SettingsModel({
     this.currencyFetchMode = CurrencyFetchMode.onceADay,
     this.fetchTimeoutSeconds = 10,
     this.featureStateSavingEnabled = true, // Always enabled by default
-    this.logRetentionDays = 7, // Default to 7 days
+    this.logRetentionDays = 5, // Default to 5 days (minimum in new range)
+    this.fetchRetryTimes = 1, // Default to 1 retry
   });
 
   SettingsModel copyWith({
@@ -29,6 +33,7 @@ class SettingsModel extends HiveObject {
     int? fetchTimeoutSeconds,
     bool? featureStateSavingEnabled,
     int? logRetentionDays,
+    int? fetchRetryTimes,
   }) {
     return SettingsModel(
       currencyFetchMode: currencyFetchMode ?? this.currencyFetchMode,
@@ -36,6 +41,7 @@ class SettingsModel extends HiveObject {
       featureStateSavingEnabled:
           featureStateSavingEnabled ?? this.featureStateSavingEnabled,
       logRetentionDays: logRetentionDays ?? this.logRetentionDays,
+      fetchRetryTimes: fetchRetryTimes ?? this.fetchRetryTimes,
     );
   }
 
@@ -45,6 +51,7 @@ class SettingsModel extends HiveObject {
       'fetchTimeoutSeconds': fetchTimeoutSeconds,
       'featureStateSavingEnabled': featureStateSavingEnabled,
       'logRetentionDays': logRetentionDays,
+      'fetchRetryTimes': fetchRetryTimes,
     };
   }
 
@@ -54,7 +61,8 @@ class SettingsModel extends HiveObject {
           CurrencyFetchMode.values[json['currencyFetchMode'] ?? 1],
       fetchTimeoutSeconds: json['fetchTimeoutSeconds'] ?? 10,
       featureStateSavingEnabled: json['featureStateSavingEnabled'] ?? true,
-      logRetentionDays: json['logRetentionDays'] ?? 7,
+      logRetentionDays: json['logRetentionDays'] ?? 5,
+      fetchRetryTimes: json['fetchRetryTimes'] ?? 1,
     );
   }
 }

@@ -36,6 +36,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _featureStateSavingEnabled = true;
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
   int _fetchTimeoutSeconds = 10;
+  int _fetchRetryTimes = 1;
 
   // Add state variables for log section
   bool _logSectionExpanded = false;
@@ -58,6 +59,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         await SettingsService.getFeatureStateSaving();
     final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
     final fetchTimeout = await SettingsService.getFetchTimeout();
+    final fetchRetryTimes = await SettingsService.getFetchRetryTimes();
+    final logRetentionDays = await SettingsService.getLogRetentionDays();
     setState(() {
       _themeMode = themeIndex != null
           ? ThemeMode.values[themeIndex]
@@ -67,6 +70,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       _featureStateSavingEnabled = featureStateSavingEnabled;
       _currencyFetchMode = currencyFetchMode;
       _fetchTimeoutSeconds = fetchTimeout;
+      _fetchRetryTimes = fetchRetryTimes;
+      _logRetentionDays = logRetentionDays;
       _loading = false;
     });
   }
@@ -168,6 +173,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   void _onFetchTimeoutChanged(int timeoutSeconds) async {
     setState(() => _fetchTimeoutSeconds = timeoutSeconds);
     await SettingsService.updateFetchTimeout(timeoutSeconds);
+  }
+
+  void _onFetchRetryTimesChanged(int retryTimes) async {
+    setState(() => _fetchRetryTimes = retryTimes);
+    await SettingsService.updateFetchRetryTimes(retryTimes);
   }
 
   void _showToolVisibilityDialog() async {
@@ -579,6 +589,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         _buildCurrencyFetchModeSettings(loc),
         const SizedBox(height: 24),
         _buildFetchTimeoutSettings(loc),
+        const SizedBox(height: 24),
+        _buildFetchRetrySettings(loc),
       ],
     );
   }
@@ -1025,7 +1037,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          "Set timeout for currency rate fetching (5-20 seconds)",
+          loc.fetchTimeoutDesc,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1056,6 +1068,60 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               ),
               child: Text(
                 loc.fetchTimeoutSeconds(_fetchTimeoutSeconds),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFetchRetrySettings(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.fetchRetryIncomplete,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          loc.fetchRetryIncompleteDesc,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _fetchRetryTimes.toDouble(),
+                min: 0,
+                max: 3,
+                divisions: 3,
+                onChanged: (value) => _onFetchRetryTimesChanged(value.round()),
+                label: loc.fetchRetryTimes(_fetchRetryTimes),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                loc.fetchRetryTimes(_fetchRetryTimes),
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.primary,
@@ -1387,65 +1453,118 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Widget _buildLogRetentionSettings(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.logRetention,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Đặt thời gian lưu trữ log ứng dụng (1-15 ngày)',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: Slider(
-                value: _logRetentionDays.toDouble(),
-                min: 1,
-                max: 15,
-                divisions: 14,
-                onChanged: (value) {
-                  setState(() {
-                    _logRetentionDays = value.round();
-                  });
-                },
-                onChangeEnd: (value) async {
-                  final days = value.round();
-                  await _updateLogRetention(days);
-                },
-                label: '$_logRetentionDays days',
-              ),
+    // Map retention days to slider index
+    int getSliderIndex(int retentionDays) {
+      if (retentionDays == -1) return 6; // Forever
+      switch (retentionDays) {
+        case 5:
+          return 0;
+        case 10:
+          return 1;
+        case 15:
+          return 2;
+        case 20:
+          return 3;
+        case 25:
+          return 4;
+        case 30:
+          return 5;
+        default:
+          return 0; // Default to 5 days
+      }
+    }
+
+    // Map slider index to retention days
+    int getRetentionDays(int index) {
+      switch (index) {
+        case 0:
+          return 5;
+        case 1:
+          return 10;
+        case 2:
+          return 15;
+        case 3:
+          return 20;
+        case 4:
+          return 25;
+        case 5:
+          return 30;
+        case 6:
+          return -1; // Forever
+        default:
+          return 5;
+      }
+    }
+
+    String getDisplayText(int retentionDays) {
+      if (retentionDays == -1) {
+        return loc.logRetentionForever;
+      }
+      return loc.logRetentionDays(retentionDays);
+    }
+
+    final currentSliderIndex = getSliderIndex(_logRetentionDays);
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+        loc.logRetention,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w500,
             ),
-            const SizedBox(width: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer
-                    .withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '$_logRetentionDays days',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        loc.logRetentionDescDetail,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-          ],
-        ),
-      ],
-    );
+      ),
+      const SizedBox(height: 24),
+      Row(
+        children: [
+          Expanded(
+            child: Slider(
+              value: currentSliderIndex.toDouble(),
+              min: 0,
+              max: 6,
+              divisions: 6,
+              onChanged: (value) {
+                final index = value.round();
+                final days = getRetentionDays(index);
+                setState(() {
+                  _logRetentionDays = days;
+                });
+              },
+              onChangeEnd: (value) async {
+                final index = value.round();
+                final days = getRetentionDays(index);
+                await _updateLogRetention(days);
+              },
+              label: getDisplayText(_logRetentionDays),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              getDisplayText(_logRetentionDays),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+    ]);
   }
 
   Widget _buildLogViewer(AppLocalizations loc) {
@@ -1494,9 +1613,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _updateLogRetention(int days) async {
-    // This would update the log retention setting
     setState(() {
       _logRetentionDays = days;
     });
+    await SettingsService.updateLogRetentionDays(days);
   }
 }

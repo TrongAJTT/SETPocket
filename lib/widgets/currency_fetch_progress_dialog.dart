@@ -145,6 +145,8 @@ class _CurrencyFetchProgressDialogState
         return Colors.grey;
       case CurrencyStatus.notSupported:
         return Colors.grey;
+      case CurrencyStatus.fetchedRecently:
+        return Colors.lightBlue;
     }
   }
 
@@ -160,6 +162,8 @@ class _CurrencyFetchProgressDialogState
         return Icons.pending;
       case CurrencyStatus.notSupported:
         return Icons.not_interested;
+      case CurrencyStatus.fetchedRecently:
+        return Icons.schedule;
     }
   }
 
@@ -175,6 +179,8 @@ class _CurrencyFetchProgressDialogState
       case CurrencyStatus.staticRate:
         return l10n.fetchingCurrency(currency);
       case CurrencyStatus.notSupported:
+        return CurrencyService.getLocalizedStatus(currency, l10n);
+      case CurrencyStatus.fetchedRecently:
         return CurrencyService.getLocalizedStatus(currency, l10n);
     }
   }

@@ -116,10 +116,48 @@ class SettingsService {
     await saveSettings(updatedSettings);
   }
 
-  // Get log retention days
+  // Get log retention days with migration support
   static Future<int> getLogRetentionDays() async {
     final settings = await getSettings();
-    return settings.logRetentionDays;
+    int retentionDays = settings.logRetentionDays;
+
+    // Migration: handle old values that don't fit new range
+    if (retentionDays != -1) {
+      // -1 is "forever", keep as is
+      // Valid values: 5, 10, 15, 20, 25, 30
+      List<int> validValues = [5, 10, 15, 20, 25, 30];
+
+      if (retentionDays < 5) {
+        // Migrate values below 5 to 5
+        retentionDays = 5;
+        await updateLogRetentionDays(retentionDays);
+      } else if (retentionDays > 30) {
+        // Migrate values above 30 to 30
+        retentionDays = 30;
+        await updateLogRetentionDays(retentionDays);
+      } else if (!validValues.contains(retentionDays)) {
+        // Find the closest valid value
+        int closest = validValues.reduce((a, b) =>
+            (retentionDays - a).abs() < (retentionDays - b).abs() ? a : b);
+        retentionDays = closest;
+        await updateLogRetentionDays(retentionDays);
+      }
+    }
+
+    return retentionDays;
+  }
+
+  // Update fetch retry times
+  static Future<void> updateFetchRetryTimes(int times) async {
+    final currentSettings = await getSettings();
+    final updatedSettings = currentSettings.copyWith(fetchRetryTimes: times);
+    await saveSettings(updatedSettings);
+  }
+
+  // Get fetch retry times
+  static Future<int> getFetchRetryTimes() async {
+    final settings = await getSettings();
+    return settings.fetchRetryTimes;
   }
 
   // Clear settings (for testing or reset)

@@ -245,6 +245,12 @@ abstract class AppLocalizations {
   /// **'Choose log retention period (5-30 days in 5-day intervals, or forever)'**
   String get logRetentionDescDetail;
 
+  /// No description provided for @logRetentionAutoDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-delete after a period of time'**
+  String get logRetentionAutoDelete;
+
   /// No description provided for @logManagement.
   ///
   /// In en, this message translates to:
@@ -1529,6 +1535,12 @@ abstract class AppLocalizations {
   /// **'Static rate'**
   String get currencyStatusStatic;
 
+  /// No description provided for @currencyStatusFetchedRecently.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently fetched'**
+  String get currencyStatusFetchedRecently;
+
   /// No description provided for @currencyStatusSuccessDesc.
   ///
   /// In en, this message translates to:
@@ -1558,6 +1570,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Using static exchange rate'**
   String get currencyStatusStaticDesc;
+
+  /// No description provided for @currencyStatusFetchedRecentlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully fetched within the last hour'**
+  String get currencyStatusFetchedRecentlyDesc;
 
   /// No description provided for @currencyConverterInfo.
   ///
@@ -1814,7 +1832,7 @@ abstract class AppLocalizations {
   /// No description provided for @fetchTimeoutDesc.
   ///
   /// In en, this message translates to:
-  /// **'Set timeout for currency rate fetching (10-90 seconds)'**
+  /// **'Set timeout for currency rate fetching (5-20 seconds)'**
   String get fetchTimeoutDesc;
 
   /// No description provided for @fetchTimeoutSeconds.
@@ -1822,6 +1840,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{seconds}s'**
   String fetchTimeoutSeconds(Object seconds);
+
+  /// No description provided for @fetchRetryIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry when incomplete'**
+  String get fetchRetryIncomplete;
+
+  /// No description provided for @fetchRetryIncompleteDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically retry failed/timeout currencies during fetch'**
+  String get fetchRetryIncompleteDesc;
+
+  /// No description provided for @fetchRetryTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'{times} retries'**
+  String fetchRetryTimes(int times);
 
   /// No description provided for @fetchingRates.
   ///

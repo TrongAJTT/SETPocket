@@ -269,16 +269,32 @@ class FileLoggerService {
   Future<void> cleanupOldLogs() async {
     try {
       final retentionDays = await SettingsService.getLogRetentionDays();
+
+      // If retention is set to forever (-1), skip cleanup
+      if (retentionDays == -1) {
+        _logger.info('Log retention set to forever, skipping cleanup');
+        return;
+      }
+
       final files = await getLogFiles();
       final cutoffTime = DateTime.now().subtract(Duration(days: retentionDays));
 
+      int deletedCount = 0;
       for (final file in files) {
         final lastModified = await file.lastModified();
         if (lastModified.isBefore(cutoffTime)) {
           await file.delete();
+          deletedCount++;
           _logger.info(
               'Deleted old log file: ${file.path} (${retentionDays}d retention)');
         }
+      }
+
+      if (deletedCount > 0) {
+        _logger.info('Cleanup completed: $deletedCount log files deleted');
+      } else {
+        _logger
+            .info('No old log files to delete (${retentionDays}d retention)');
       }
     } catch (e) {
       _logger.severe('Failed to cleanup old logs', e);

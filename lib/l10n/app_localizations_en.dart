@@ -86,6 +86,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logRetentionDescDetail => 'Choose log retention period (5-30 days in 5-day intervals, or forever)';
 
   @override
+  String get logRetentionAutoDelete => 'Auto-delete after a period of time';
+
+  @override
   String get logManagement => 'Log Management';
 
   @override
@@ -796,6 +799,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyStatusStatic => 'Static rate';
 
   @override
+  String get currencyStatusFetchedRecently => 'Recently fetched';
+
+  @override
   String get currencyStatusSuccessDesc => 'Successfully fetched live rate';
 
   @override
@@ -809,6 +815,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyStatusStaticDesc => 'Using static exchange rate';
+
+  @override
+  String get currencyStatusFetchedRecentlyDesc => 'Successfully fetched within the last hour';
 
   @override
   String get currencyConverterInfo => 'Currency Converter Info';
@@ -945,11 +954,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fetchTimeout => 'Fetch Timeout';
 
   @override
-  String get fetchTimeoutDesc => 'Set timeout for currency rate fetching (10-90 seconds)';
+  String get fetchTimeoutDesc => 'Set timeout for currency rate fetching (5-20 seconds)';
 
   @override
   String fetchTimeoutSeconds(Object seconds) {
     return '${seconds}s';
+  }
+
+  @override
+  String get fetchRetryIncomplete => 'Retry when incomplete';
+
+  @override
+  String get fetchRetryIncompleteDesc => 'Automatically retry failed/timeout currencies during fetch';
+
+  @override
+  String fetchRetryTimes(int times) {
+    return '$times retries';
   }
 
   @override

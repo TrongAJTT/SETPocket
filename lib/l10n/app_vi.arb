@@ -31,7 +31,8 @@
     },
     "logRetentionForever": "Vĩnh viễn",
     "logRetentionDesc": "Tự động xóa các file nhật ký cũ hơn số ngày đã chỉ định",
-    "logRetentionDescDetail": "Nhật ký sẽ được lưu trữ trong bộ nhớ đệm và có thể được xóa tự động sau một khoảng thời gian nhất định. Bạn có thể đặt thời gian lưu giữ nhật ký từ 1 đến 30 ngày hoặc chọn lưu vĩnh viễn.",
+    "logRetentionDescDetail": "Nhật ký sẽ được lưu trữ trong bộ nhớ đệm và có thể được xóa tự động sau một khoảng thời gian nhất định. Bạn có thể đặt thời gian lưu giữ nhật ký từ 5 đến 30 ngày (bước nhảy 5 ngày) hoặc chọn lưu vĩnh viễn.",
+    "logRetentionAutoDelete": "Tự động xóa sau một khoảng thời gian",
     "logManagement": "Quản lý nhật ký",
     "logManagementDesc": "Quản lý các file nhật ký ứng dụng và thông tin debug",
     "logStatus": "Trạng thái nhật ký",
@@ -247,11 +248,13 @@
     "currencyStatusTimeout": "Hết thời gian",
     "currencyStatusNotSupported": "Không hỗ trợ",
     "currencyStatusStatic": "Tỷ giá tĩnh",
+    "currencyStatusFetchedRecently": "Đã fetch gần đây",
     "currencyStatusSuccessDesc": "Đã lấy tỷ giá trực tiếp thành công",
     "currencyStatusFailedDesc": "Không thể lấy tỷ giá trực tiếp, sử dụng tỷ giá tĩnh",
     "currencyStatusTimeoutDesc": "Hết thời gian chờ, sử dụng tỷ giá tĩnh",
     "currencyStatusNotSupportedDesc": "API không hỗ trợ loại tiền này",
     "currencyStatusStaticDesc": "Đang sử dụng tỷ giá tĩnh",
+    "currencyStatusFetchedRecentlyDesc": "Đã fetch thành công trong vòng 1 giờ qua",
     "currencyConverterInfo": "Thông tin chuyển đổi tiền tệ",
     "aboutThisFeature": "Về chức năng này",
     "aboutThisFeatureDesc": "Chuyển đổi tiền tệ cho phép bạn quy đổi giữa các loại tiền khác nhau bằng tỷ giá trực tiếp hoặc tỷ giá tĩnh. Hỗ trợ hơn 80 loại tiền tệ trên thế giới.",
@@ -294,8 +297,18 @@
     "presetDeletedSuccess": "Đã xóa cấu hình",
     "errorLabel": "Lỗi:",
     "fetchTimeout": "Thời Gian Chờ Fetch",
-    "fetchTimeoutDesc": "Thiết lập thời gian chờ khi lấy tỷ giá (10-90 giây)",
+    "fetchTimeoutDesc": "Thiết lập thời gian chờ khi lấy tỷ giá (5-20 giây)",
     "fetchTimeoutSeconds": "{seconds}s",
+    "fetchRetryIncomplete": "Thử lại khi chưa hoàn tất",
+    "fetchRetryIncompleteDesc": "Tự động thử lại các loại tiền bị lỗi/timeout trong quá trình fetch",
+    "fetchRetryTimes": "{times} lần thử",
+    "@fetchRetryTimes": {
+        "placeholders": {
+            "times": {
+                "type": "int"
+            }
+        }
+    },
     "fetchingRates": "Đang Lấy Tỷ Giá",
     "fetchingProgress": "Tiến độ: {completed}/{total}",
     "timeRemaining": "Thời gian còn lại: {seconds}s",

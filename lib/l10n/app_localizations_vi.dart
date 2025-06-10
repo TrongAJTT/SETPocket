@@ -83,7 +83,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get logRetentionDesc => 'Tự động xóa các file nhật ký cũ hơn số ngày đã chỉ định';
 
   @override
-  String get logRetentionDescDetail => 'Nhật ký sẽ được lưu trữ trong bộ nhớ đệm và có thể được xóa tự động sau một khoảng thời gian nhất định. Bạn có thể đặt thời gian lưu giữ nhật ký từ 1 đến 30 ngày hoặc chọn lưu vĩnh viễn.';
+  String get logRetentionDescDetail => 'Nhật ký sẽ được lưu trữ trong bộ nhớ đệm và có thể được xóa tự động sau một khoảng thời gian nhất định. Bạn có thể đặt thời gian lưu giữ nhật ký từ 5 đến 30 ngày (bước nhảy 5 ngày) hoặc chọn lưu vĩnh viễn.';
+
+  @override
+  String get logRetentionAutoDelete => 'Tự động xóa sau một khoảng thời gian';
 
   @override
   String get logManagement => 'Quản lý nhật ký';
@@ -796,6 +799,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get currencyStatusStatic => 'Tỷ giá tĩnh';
 
   @override
+  String get currencyStatusFetchedRecently => 'Đã fetch gần đây';
+
+  @override
   String get currencyStatusSuccessDesc => 'Đã lấy tỷ giá trực tiếp thành công';
 
   @override
@@ -809,6 +815,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get currencyStatusStaticDesc => 'Đang sử dụng tỷ giá tĩnh';
+
+  @override
+  String get currencyStatusFetchedRecentlyDesc => 'Đã fetch thành công trong vòng 1 giờ qua';
 
   @override
   String get currencyConverterInfo => 'Thông tin chuyển đổi tiền tệ';
@@ -945,11 +954,22 @@ class AppLocalizationsVi extends AppLocalizations {
   String get fetchTimeout => 'Thời Gian Chờ Fetch';
 
   @override
-  String get fetchTimeoutDesc => 'Thiết lập thời gian chờ khi lấy tỷ giá (10-90 giây)';
+  String get fetchTimeoutDesc => 'Thiết lập thời gian chờ khi lấy tỷ giá (5-20 giây)';
 
   @override
   String fetchTimeoutSeconds(Object seconds) {
     return '${seconds}s';
+  }
+
+  @override
+  String get fetchRetryIncomplete => 'Thử lại khi chưa hoàn tất';
+
+  @override
+  String get fetchRetryIncompleteDesc => 'Tự động thử lại các loại tiền bị lỗi/timeout trong quá trình fetch';
+
+  @override
+  String fetchRetryTimes(int times) {
+    return '$times lần thử';
   }
 
   @override

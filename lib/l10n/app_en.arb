@@ -31,6 +31,7 @@
     "logRetentionForever": "Keep forever",
     "logRetentionDesc": "Set how long to keep application logs before automatic deletion",
     "logRetentionDescDetail": "Choose log retention period (5-30 days in 5-day intervals, or forever)",
+    "logRetentionAutoDelete": "Auto-delete after a period of time",
     "logManagement": "Log Management",
     "logManagementDesc": "Manage application logs and retention settings",
     "logStatus": "Log Status",
@@ -254,11 +255,13 @@
     "currencyStatusTimeout": "Timeout",
     "currencyStatusNotSupported": "Not supported",
     "currencyStatusStatic": "Static rate",
+    "currencyStatusFetchedRecently": "Recently fetched",
     "currencyStatusSuccessDesc": "Successfully fetched live rate",
     "currencyStatusFailedDesc": "Failed to fetch live rate, using static fallback",
     "currencyStatusTimeoutDesc": "Request timed out, using static fallback",
     "currencyStatusNotSupportedDesc": "Currency not supported by API",
     "currencyStatusStaticDesc": "Using static exchange rate",
+    "currencyStatusFetchedRecentlyDesc": "Successfully fetched within the last hour",
     "currencyConverterInfo": "Currency Converter Info",
     "aboutThisFeature": "About This Feature",
     "aboutThisFeatureDesc": "The Currency Converter allows you to convert between different currencies using live or static exchange rates. It supports over 80 currencies worldwide.",
@@ -301,8 +304,18 @@
     "presetDeletedSuccess": "Preset deleted",
     "errorLabel": "Error:",
     "fetchTimeout": "Fetch Timeout",
-    "fetchTimeoutDesc": "Set timeout for currency rate fetching (10-90 seconds)",
+    "fetchTimeoutDesc": "Set timeout for currency rate fetching (5-20 seconds)",
     "fetchTimeoutSeconds": "{seconds}s",
+    "fetchRetryIncomplete": "Retry when incomplete",
+    "fetchRetryIncompleteDesc": "Automatically retry failed/timeout currencies during fetch",
+    "fetchRetryTimes": "{times} retries",
+    "@fetchRetryTimes": {
+        "placeholders": {
+            "times": {
+                "type": "int"
+            }
+        }
+    },
     "fetchingRates": "Fetching Currency Rates",
     "fetchingProgress": "Fetching progress: {completed}/{total}",
     "timeRemaining": "Time remaining: {seconds}s",

@@ -173,7 +173,7 @@ await SettingsService.updateLogRetentionDays(days);
 
 **User Control**:
 - Configurable through Settings UI
-- Range: 5-15 days
+- Range: 5-30 days, keep forever
 - Automatic cleanup based on retention period
 
 ### File Paths

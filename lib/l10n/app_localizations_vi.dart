@@ -862,12 +862,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loadPreset => 'Lấy Cấu Hình';
 
   @override
-  String get savePresetDialog => 'Lưu Cấu Hình Tiền Tệ';
-
-  @override
-  String get loadPresetDialog => 'Lấy Cấu Hình Tiền Tệ';
-
-  @override
   String get presetName => 'Tên Cấu Hình';
 
   @override

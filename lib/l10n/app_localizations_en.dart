@@ -862,12 +862,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadPreset => 'Load Preset';
 
   @override
-  String get savePresetDialog => 'Save Currency Preset';
-
-  @override
-  String get loadPresetDialog => 'Load Currency Preset';
-
-  @override
   String get presetName => 'Preset Name';
 
   @override

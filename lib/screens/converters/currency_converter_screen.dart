@@ -320,7 +320,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           _updateCardCurrencies(cardIndex, newCurrencies);
         },
         maxSelection: 10,
-        minSelection: 0,
+        minSelection: 2,
         showPresetOptions: true,
         presetKey: 'card_currencies',
       ),
@@ -582,7 +582,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         visibleUnits: Set.from(_visibleCurrencies),
         onChanged: _updateCurrencyVisibility,
         maxSelection: 10,
-        minSelection: 0,
+        minSelection: 2,
         showPresetOptions: true,
         presetKey: 'global_currencies',
       ),

@@ -269,8 +269,6 @@
     "maxCurrenciesSelected": "Tối đa 10 loại tiền có thể được chọn",
     "savePreset": "Lưu Cấu Hình",
     "loadPreset": "Lấy Cấu Hình",
-    "savePresetDialog": "Lưu Cấu Hình Tiền Tệ",
-    "loadPresetDialog": "Lấy Cấu Hình Tiền Tệ",
     "presetName": "Tên Cấu Hình",
     "enterPresetName": "Nhập tên cấu hình",
     "presetNameRequired": "Tên cấu hình là bắt buộc",

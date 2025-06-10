@@ -1661,18 +1661,6 @@ abstract class AppLocalizations {
   /// **'Load Preset'**
   String get loadPreset;
 
-  /// No description provided for @savePresetDialog.
-  ///
-  /// In en, this message translates to:
-  /// **'Save Currency Preset'**
-  String get savePresetDialog;
-
-  /// No description provided for @loadPresetDialog.
-  ///
-  /// In en, this message translates to:
-  /// **'Load Currency Preset'**
-  String get loadPresetDialog;
-
   /// No description provided for @presetName.
   ///
   /// In en, this message translates to:

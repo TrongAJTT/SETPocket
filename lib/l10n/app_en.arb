@@ -276,8 +276,6 @@
     "maxCurrenciesSelected": "Maximum 10 currencies can be selected",
     "savePreset": "Save Preset",
     "loadPreset": "Load Preset",
-    "savePresetDialog": "Save Currency Preset",
-    "loadPresetDialog": "Load Currency Preset",
     "presetName": "Preset Name",
     "enterPresetName": "Enter preset name",
     "presetNameRequired": "Preset name is required",

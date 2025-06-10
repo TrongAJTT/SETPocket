@@ -1,4 +1,5 @@
 import 'package:live_currency_rate/live_currency_rate.dart';
+import 'package:logger/logger.dart';
 import 'settings_service.dart';
 
 enum CurrencyStatus { success, failed, timeout, notSupported, staticRate }
@@ -111,7 +112,7 @@ class CurrencyService {
   static DateTime? _lastUpdated;
   static bool _isUsingLiveRates = false;
   static Map<String, double> _currentRates = _staticRates;
-  static Map<String, CurrencyStatus> _currencyStatus = {};
+  static final Map<String, CurrencyStatus> _currencyStatus = {};
 
   // Get available currencies - extensive list
   static List<Currency> getSupportedCurrencies() {
@@ -434,50 +435,29 @@ class CurrencyService {
       if (hasLiveData) {
         _lastUpdated = DateTime.now();
         _isUsingLiveRates = true;
-        print('CurrencyService: Successfully fetched live currency rates');
+        Logger().i('CurrencyService: Successfully fetched live currency rates');
       } else {
         _isUsingLiveRates = false;
-        print(
+        Logger().i(
             'CurrencyService: Using static currency rates (live data unavailable)');
       }
 
-      print('CurrencyService: Final rates count: ${rates.length}');
-      print(
+      Logger().i('CurrencyService: Final rates count: ${rates.length}');
+      Logger().i(
           'CurrencyService: Sample rates: ${rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
 
       // Update current rates for use in convert() method
       _currentRates = Map<String, double>.from(rates);
-      print('CurrencyService: Updated _currentRates with new data');
+      Logger().i('CurrencyService: Updated _currentRates with new data');
 
       return rates;
     } catch (e) {
-      print('CurrencyService: Error fetching live rates: $e');
+      Logger().e('CurrencyService: Error fetching live rates: $e');
       // Fall back to static rates
       _isUsingLiveRates = false;
       await Future.delayed(const Duration(milliseconds: 500));
-      print('CurrencyService: Returning static rates as fallback');
+      Logger().e('CurrencyService: Returning static rates as fallback');
       return Map<String, double>.from(_staticRates);
-    }
-  }
-
-  // Helper method to fetch a single currency rate
-  static Future<double> _fetchSingleRate(String currencyCode) async {
-    try {
-      print('CurrencyService: Fetching rate for $currencyCode...');
-      final result =
-          await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
-      if (result.result > 0) {
-        print(
-            'CurrencyService: Got live rate for $currencyCode: ${result.result}');
-        return result.result;
-      } else {
-        print(
-            'CurrencyService: Invalid result for $currencyCode, using static rate');
-        return _staticRates[currencyCode] ?? 1.0;
-      }
-    } catch (e) {
-      print('CurrencyService: Failed to get live rate for $currencyCode: $e');
-      return _staticRates[currencyCode] ?? 1.0;
     }
   }
 
@@ -485,23 +465,24 @@ class CurrencyService {
   static Future<CurrencyFetchResult> _fetchSingleRateWithStatus(
       String currencyCode) async {
     try {
-      print('CurrencyService: Fetching rate for $currencyCode...');
+      Logger().i('CurrencyService: Fetching rate for $currencyCode...');
       final result =
           await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
       if (result.result > 0) {
-        print(
+        Logger().i(
             'CurrencyService: Got live rate for $currencyCode: ${result.result}');
         return CurrencyFetchResult(
             rate: result.result, status: CurrencyStatus.success);
       } else {
-        print(
+        Logger().i(
             'CurrencyService: Invalid result for $currencyCode, using static rate');
         return CurrencyFetchResult(
             rate: _staticRates[currencyCode] ?? 1.0,
             status: CurrencyStatus.failed);
       }
     } catch (e) {
-      print('CurrencyService: Failed to get live rate for $currencyCode: $e');
+      Logger()
+          .e('CurrencyService: Failed to get live rate for $currencyCode: $e');
       return CurrencyFetchResult(
           rate: _staticRates[currencyCode] ?? 1.0,
           status: CurrencyStatus.failed);
@@ -513,7 +494,7 @@ class CurrencyService {
     _currentRates = Map<String, double>.from(newRates);
     _lastUpdated = DateTime.now();
     _isUsingLiveRates = true;
-    print(
+    Logger().i(
         'CurrencyService: Current rates updated with ${newRates.length} currencies');
   }
 

@@ -197,6 +197,84 @@ abstract class AppLocalizations {
   /// **'Clear All Cache'**
   String get clearAllCache;
 
+  /// No description provided for @logs.
+  ///
+  /// In en, this message translates to:
+  /// **'Application Logs'**
+  String get logs;
+
+  /// No description provided for @viewLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'View Logs'**
+  String get viewLogs;
+
+  /// No description provided for @clearLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Logs'**
+  String get clearLogs;
+
+  /// No description provided for @logRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Retention'**
+  String get logRetention;
+
+  /// No description provided for @logRetentionDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String logRetentionDays(int days);
+
+  /// No description provided for @logRetentionForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep forever'**
+  String get logRetentionForever;
+
+  /// No description provided for @logRetentionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set how long to keep application logs before automatic deletion'**
+  String get logRetentionDesc;
+
+  /// No description provided for @logRetentionDescDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose log retention period (5-30 days in 5-day intervals, or forever)'**
+  String get logRetentionDescDetail;
+
+  /// No description provided for @logManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Management'**
+  String get logManagement;
+
+  /// No description provided for @logManagementDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage application logs and retention settings'**
+  String get logManagementDesc;
+
+  /// No description provided for @logStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Status'**
+  String get logStatus;
+
+  /// No description provided for @logsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Application log files and debug information'**
+  String get logsDesc;
+
+  /// No description provided for @dataAndStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Data & Storage'**
+  String get dataAndStorage;
+
   /// No description provided for @confirmClearCache.
   ///
   /// In en, this message translates to:
@@ -544,12 +622,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export to JSON'**
   String get exportToJson;
-
-  /// No description provided for @delete.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get delete;
 
   /// No description provided for @confirmDeletion.
   ///
@@ -1253,12 +1325,6 @@ abstract class AppLocalizations {
   /// **'Currency Converter'**
   String get currencyConverter;
 
-  /// No description provided for @currencyConverterDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Convert between different currencies'**
-  String get currencyConverterDesc;
-
   /// No description provided for @updatingRates.
   ///
   /// In en, this message translates to:
@@ -1318,12 +1384,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Row'**
   String get addRow;
-
-  /// No description provided for @tableView.
-  ///
-  /// In en, this message translates to:
-  /// **'Table View'**
-  String get tableView;
 
   /// No description provided for @cardView.
   ///
@@ -1672,6 +1732,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select'**
   String get select;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
 
   /// No description provided for @createdOn.
   ///
@@ -2159,12 +2225,6 @@ abstract class AppLocalizations {
   /// **'Length Converter'**
   String get lengthConverter;
 
-  /// Title for weight converter tool
-  ///
-  /// In en, this message translates to:
-  /// **'Weight Converter'**
-  String get weightConverter;
-
   /// No description provided for @temperatureConverter.
   ///
   /// In en, this message translates to:
@@ -2206,6 +2266,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Number System Converter'**
   String get numberSystemConverter;
+
+  /// No description provided for @tables.
+  ///
+  /// In en, this message translates to:
+  /// **'Tables'**
+  String get tables;
+
+  /// No description provided for @tableView.
+  ///
+  /// In en, this message translates to:
+  /// **'Table View'**
+  String get tableView;
 
   /// No description provided for @listView.
   ///
@@ -2579,6 +2651,12 @@ abstract class AppLocalizations {
   /// **'Vietnamese Dong'**
   String get vnd;
 
+  /// No description provided for @currencyConverterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert between different currencies with live exchange rates'**
+  String get currencyConverterDesc;
+
   /// No description provided for @lengthConverterDesc.
   ///
   /// In en, this message translates to:
@@ -2903,6 +2981,24 @@ abstract class AppLocalizations {
   /// **'Currency/length states, presets and exchange rates cache'**
   String get cacheTypeConverterToolsDesc;
 
+  /// No description provided for @cardName.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Name'**
+  String get cardName;
+
+  /// No description provided for @cardNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter card name (max 20 characters)'**
+  String get cardNameHint;
+
+  /// No description provided for @converterCardNameDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {position}'**
+  String converterCardNameDefault(Object position);
+
   /// No description provided for @unitSelectedStatus.
   ///
   /// In en, this message translates to:
@@ -2914,6 +3010,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} units visible'**
   String unitVisibleStatus(Object count);
+
+  /// No description provided for @moveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move Down'**
+  String get moveDown;
+
+  /// No description provided for @moveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move Up'**
+  String get moveUp;
 
   /// No description provided for @lengthUnits.
   ///
@@ -2962,6 +3070,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Length Converter Information'**
   String get lengthConverterInfo;
+
+  /// Title for weight converter tool
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Converter'**
+  String get weightConverter;
 
   /// Title for weight converter info dialog
   ///

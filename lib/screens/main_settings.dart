@@ -6,6 +6,7 @@ import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
 import 'package:my_multi_tools/services/cache_service.dart';
 import 'package:my_multi_tools/services/generation_history_service.dart';
 import 'package:my_multi_tools/services/settings_service.dart';
+import 'package:my_multi_tools/screens/log_viewer_screen.dart';
 
 import 'package:my_multi_tools/models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +36,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _featureStateSavingEnabled = true;
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
   int _fetchTimeoutSeconds = 10;
+
+  // Add state variables for log section
+  bool _logSectionExpanded = false;
+  int _logRetentionDays = 7;
+  String _logInfo = 'Calculating...';
 
   @override
   void initState() {
@@ -311,6 +317,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                           _buildUserInterfaceSection(loc),
                           const SizedBox(height: 24),
                           _buildToolsShortcutsSection(loc),
+                          const SizedBox(height: 24),
+                          _buildRandomToolsSection(loc),
                         ],
                       ),
                     ),
@@ -321,8 +329,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildConverterToolsSection(loc),
-                          const SizedBox(height: 24),
-                          _buildRandomToolsSection(loc),
                           const SizedBox(height: 24),
                           _buildDataSection(loc),
                         ],
@@ -352,9 +358,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         const SizedBox(height: 24),
         _buildToolsShortcutsSection(loc),
         const SizedBox(height: 24),
-        _buildConverterToolsSection(loc),
-        const SizedBox(height: 24),
         _buildRandomToolsSection(loc),
+        const SizedBox(height: 24),
+        _buildConverterToolsSection(loc),
         const SizedBox(height: 24),
         _buildDataSection(loc),
         const SizedBox(height: 32),
@@ -590,13 +596,15 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
   Widget _buildDataSection(AppLocalizations loc) {
     return _buildSection(
-      title: loc.cache,
+      title: loc.dataAndStorage,
       icon: Icons.storage_outlined,
       iconColor: Colors.red.shade600,
       children: [
         _buildCacheInfo(loc),
         const SizedBox(height: 16),
         _buildCacheActions(loc),
+        const SizedBox(height: 24),
+        _buildExpandableLogSection(loc),
       ],
     );
   }
@@ -661,7 +669,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         children: languageOptions
             .map((option) => Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: option,
                   ),
                 ))
@@ -690,7 +698,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: isLargeScreen ? null : double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        padding: EdgeInsets.symmetric(
+            vertical: 12, horizontal: isLargeScreen ? 6 : 12),
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context)
@@ -706,13 +715,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           ),
         ),
         child: Row(
-          mainAxisSize: isLargeScreen ? MainAxisSize.min : MainAxisSize.max,
           children: [
             Text(
               flag,
-              style: const TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: isLargeScreen ? 16 : 20),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: isLargeScreen ? 4 : 8),
             Expanded(
               child: Text(
                 label,
@@ -1043,7 +1051,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                 color: Theme.of(context)
                     .colorScheme
                     .primaryContainer
-                    .withOpacity(0.3),
+                    .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1183,7 +1191,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         children: themeOptions
             .map((option) => Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: option,
                   ),
                 ))
@@ -1217,7 +1225,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: isLargeScreen ? null : double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        padding: EdgeInsets.symmetric(
+            vertical: 12, horizontal: isLargeScreen ? 6 : 12),
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context)
@@ -1233,14 +1242,13 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           ),
         ),
         child: Row(
-          mainAxisSize: isLargeScreen ? MainAxisSize.min : MainAxisSize.max,
           children: [
             Icon(
               icon,
               color: isSelected ? Theme.of(context).colorScheme.primary : color,
-              size: 20,
+              size: isLargeScreen ? 16 : 20,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: isLargeScreen ? 4 : 8),
             Expanded(
               child: Text(
                 label,
@@ -1249,6 +1257,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                           ? Theme.of(context).colorScheme.primary
                           : null,
                       fontWeight: isSelected ? FontWeight.w500 : null,
+                      fontSize: isLargeScreen ? 12 : null,
                     ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1263,5 +1272,231 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildExpandableLogSection(AppLocalizations loc) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          // Header
+          InkWell(
+            onTap: () {
+              setState(() {
+                _logSectionExpanded = !_logSectionExpanded;
+              });
+              if (_logSectionExpanded) {
+                _loadLogInfo();
+              }
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: _logSectionExpanded
+                    ? Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.1)
+                    : null,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.description_outlined,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.logRetention,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Quản lý log ứng dụng và cài đặt lưu trữ',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    _logSectionExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Expanded content
+          if (_logSectionExpanded) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Log info
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Status: $_logInfo',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildLogRetentionSettings(loc),
+                  const SizedBox(height: 16),
+                  _buildLogViewer(loc),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogRetentionSettings(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.logRetention,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Đặt thời gian lưu trữ log ứng dụng (1-15 ngày)',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _logRetentionDays.toDouble(),
+                min: 1,
+                max: 15,
+                divisions: 14,
+                onChanged: (value) {
+                  setState(() {
+                    _logRetentionDays = value.round();
+                  });
+                },
+                onChangeEnd: (value) async {
+                  final days = value.round();
+                  await _updateLogRetention(days);
+                },
+                label: '$_logRetentionDays days',
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '$_logRetentionDays days',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLogViewer(AppLocalizations loc) {
+    return OutlinedButton.icon(
+      icon: const Icon(Icons.visibility_outlined),
+      label: Text(loc.viewLogs),
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      onPressed: _showLogViewer,
+    );
+  }
+
+  void _showLogViewer() async {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (widget.isEmbedded && screenWidth >= 900) {
+      // If embedded in desktop view, show as dialog
+      await showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: const LogViewerScreen(isEmbedded: true),
+          ),
+        ),
+      );
+    } else {
+      // Mobile or standalone - navigate to full screen
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const LogViewerScreen(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _loadLogInfo() async {
+    // This would load actual log information
+    // For now, just set some placeholder data
+    setState(() {
+      _logInfo = 'Logs available';
+    });
+  }
+
+  Future<void> _updateLogRetention(int days) async {
+    // This would update the log retention setting
+    setState(() {
+      _logRetentionDays = days;
+    });
   }
 }

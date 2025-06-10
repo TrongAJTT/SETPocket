@@ -9,9 +9,34 @@
     "light": "Sáng",
     "dark": "Tối",
     "english": "Tiếng Anh",
-    "vietnamese": "Tiếng Việt",
-    "cache": "Bộ nhớ đệm",
+    "vietnamese": "Tiếng Việt",    "cache": "Bộ nhớ đệm",
     "clearCache": "Xóa bộ nhớ đệm",
+    "cacheDetails": "Chi tiết bộ nhớ đệm",
+    "viewCacheDetails": "Xem chi tiết",
+    "cacheSize": "Kích thước bộ nhớ đệm",
+    "cacheItems": "Mục",
+    "clearAllCache": "Xóa tất cả bộ nhớ đệm",
+    "logs": "Nhật ký ứng dụng",
+    "viewLogs": "Xem nhật ký",
+    "clearLogs": "Xóa nhật ký",
+    
+    "logRetention": "Thời gian lưu nhật ký",
+    "logRetentionDays": "{days} ngày",
+    "@logRetentionDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "logRetentionForever": "Vĩnh viễn",
+    "logRetentionDesc": "Tự động xóa các file nhật ký cũ hơn số ngày đã chỉ định",
+    "logRetentionDescDetail": "Nhật ký sẽ được lưu trữ trong bộ nhớ đệm và có thể được xóa tự động sau một khoảng thời gian nhất định. Bạn có thể đặt thời gian lưu giữ nhật ký từ 1 đến 30 ngày hoặc chọn lưu vĩnh viễn.",
+    "logManagement": "Quản lý nhật ký",
+    "logManagementDesc": "Quản lý các file nhật ký ứng dụng và thông tin debug",
+    "logStatus": "Trạng thái nhật ký",
+    "logsDesc": "Các file nhật ký ứng dụng và thông tin debug",
+    "dataAndStorage": "Dữ liệu & Lưu trữ",
     "close": "Đóng",
     "options": "Tùy chọn",
     "about": "Giới thiệu",
@@ -65,7 +90,6 @@
     "noTemplatesYet": "Chưa có mẫu nào",
     "createTemplatesHint": "Tạo mẫu đầu tiên để bắt đầu.",    "createNewTemplate": "Tạo mẫu mới",
     "exportToJson": "Xuất ra JSON",
-    "delete": "Xóa",
     "confirmDeletion": "Xác nhận xóa",
     "confirmDeleteTemplateMsg": "Bạn có chắc muốn xóa \"{title}\"?",
     "templateDeleted": "Đã xóa mẫu.",
@@ -199,7 +223,6 @@
     "customizeCurrencies": "Tùy chỉnh loại tiền",
     "addCard": "Thêm thẻ",
     "addRow": "Thêm dòng",
-    "tableView": "Chế độ bảng",
     "cardView": "Chế độ thẻ",
     "cards": "Thẻ",
     "rows": "Dòng",
@@ -217,10 +240,7 @@
     "customizeCurrenciesDialog": "Tùy chỉnh tiền tệ",
     "searchCurrencies": "Tìm kiếm tiền tệ...",
     "noCurrenciesFound": "Không tìm thấy tiền tệ",
-    "selectAll": "Chọn tất cả",
-    "deselectAll": "Bỏ chọn tất cả",
     "currenciesSelected": "Đã chọn {count} loại tiền",
-    "cancel": "Hủy",
     "applyChanges": "Áp dụng thay đổi",
     "currencyStatusSuccess": "Tỷ giá trực tiếp",
     "currencyStatusFailed": "Lỗi lấy dữ liệu",
@@ -394,11 +414,12 @@
     "speedConverter": "Chuyển đổi Tốc độ",
     "timeConverter": "Chuyển đổi Thời gian",
     "dataConverter": "Chuyển đổi Dung lượng",
-    "numberSystemConverter": "Chuyển đổi Hệ số",    "currencyConverter": "Chuyển đổi Tiền tệ",
+    "numberSystemConverter": "Chuyển đổi Hệ số",    
     
     "calculatorTools": "Công cụ Tính toán",
     "calculatorToolsDesc": "Máy tính chuyên dụng cho sức khỏe, tài chính và nhiều hơn nữa",
     
+    "tables": "Bảng",
     "tableView": "Chế độ bảng",
     "listView": "Chế độ danh sách",
     "customizeUnits": "Tùy chỉnh Đơn vị",
@@ -472,7 +493,6 @@
     "aud": "Đô la Úc",
     "vnd": "Đồng Việt Nam",
     
-    "currencyConverterDesc": "Chuyển đổi giữa các loại tiền tệ khác nhau",
     "lengthConverterDesc": "Chuyển đổi giữa các đơn vị chiều dài khác nhau",
     "weightConverterDesc": "Chuyển đổi giữa các đơn vị trọng lượng khác nhau",
     "temperatureConverterDesc": "Chuyển đổi giữa các thang đo nhiệt độ khác nhau",
@@ -530,8 +550,13 @@
     "cacheTypeConverterTools": "Công cụ chuyển đổi",
     "cacheTypeConverterToolsDesc": "Trạng thái tiền tệ/chiều dài, cài đặt sẵn và bộ nhớ đệm tỷ giá",
 
+    "cardName": "Tên Thẻ",
+    "cardNameHint": "Nhập tên thẻ (tố đa 20 ký tự)",
+    "converterCardNameDefault": "Thẻ {position}",
     "unitSelectedStatus": "Đã chọn {count} trong {max}",
     "unitVisibleStatus": "{count} đơn vị hiển thị",
+    "moveDown": "Di chuyển xuống",
+    "moveUp": "Di chuyển lên",
     
     "lengthUnits": "Đơn vị chiều dài",
     "angstroms": "Angstrom",
@@ -541,9 +566,6 @@
     "customizeLengthUnits": "Tùy chỉnh đơn vị chiều dài",
     "selectLengthUnits": "Chọn đơn vị chiều dài để hiển thị",
     "lengthConverterInfo": "Thông tin bộ chuyển đổi chiều dài",
-    "weightConverter": "Bộ chuyển đổi trọng lượng",
-    "weightConverterInfo": "Thông tin bộ chuyển đổi trọng lượng",
-    "customizeWeightUnits": "Tùy chỉnh đơn vị trọng lượng",
     "availableUnits": "Đơn vị có sẵn",
     "scientificNotation": "Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ"
 }

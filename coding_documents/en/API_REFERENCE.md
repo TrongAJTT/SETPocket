@@ -66,6 +66,73 @@ class CacheService {
 }
 ```
 
+### FileLoggerService
+High-performance file logging service with buffering and automatic cleanup:
+
+```dart
+class FileLoggerService {
+  static FileLoggerService get instance;
+  
+  // Initialization & Disposal
+  Future<void> initialize();
+  Future<void> dispose();
+  
+  // Logging Methods
+  void debug(String message, [Object? error, StackTrace? stackTrace]);
+  void info(String message, [Object? error, StackTrace? stackTrace]);
+  void warning(String message, [Object? error, StackTrace? stackTrace]);
+  void error(String message, [Object? error, StackTrace? stackTrace]);
+  
+  // Log Management
+  Future<List<File>> getLogFiles();
+  Future<String> readLogFile(File file);
+  Future<void> clearAllLogs();
+  Future<void> cleanupOldLogs();
+  
+  // Performance Features
+  static const int _maxBufferSize = 1024 * 10; // 10KB buffer
+  static const Duration _flushInterval = Duration(seconds: 3);
+  static const int _maxFileSize = 1024 * 1024 * 5; // 5MB per file
+}
+```
+
+### AppLogger
+Application-wide logger wrapper with simplified interface:
+
+```dart
+class AppLogger {
+  static AppLogger get instance;
+  
+  // Initialization
+  Future<void> initialize({String loggerName = 'MyMultiTools'});
+  Future<void> dispose();
+  
+  // Logging Methods
+  void debug(String message, [Object? error, StackTrace? stackTrace]);
+  void info(String message, [Object? error, StackTrace? stackTrace]);
+  void warning(String message, [Object? error, StackTrace? stackTrace]);
+  void error(String message, [Object? error, StackTrace? stackTrace]);
+  
+  // Log File Management
+  Future<List<String>> getLogFileNames();
+  Future<String> readLogContent(String fileName);
+  Future<void> cleanupOldLogs();
+  Future<void> clearLogs();
+}
+```
+
+### AppLogging Extension
+Extension methods for easy object-specific logging:
+
+```dart
+extension AppLogging on Object {
+  void logDebug(String message, [Object? error, StackTrace? stackTrace]);
+  void logInfo(String message, [Object? error, StackTrace? stackTrace]);
+  void logWarning(String message, [Object? error, StackTrace? stackTrace]);
+  void logError(String message, [Object? error, StackTrace? stackTrace]);
+}
+```
+
 ## Widget Components
 
 ### ToolCard

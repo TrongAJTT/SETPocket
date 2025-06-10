@@ -9,6 +9,7 @@ import 'package:my_multi_tools/services/tool_visibility_service.dart';
 import 'package:my_multi_tools/services/quick_actions_service.dart';
 import 'package:my_multi_tools/services/hive_service.dart';
 import 'package:my_multi_tools/services/settings_service.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
@@ -21,11 +22,15 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize Hive database
+
+  // Initialize Hive database first
   await HiveService.initialize();
 
   // Initialize settings service
   await SettingsService.initialize();
+
+  // Initialize AppLogger service (depends on settings)
+  await AppLogger.instance.initialize();
 
   // Initialize settings controller and load saved settings
   await settingsController.loadSettings();

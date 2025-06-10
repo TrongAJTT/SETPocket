@@ -109,6 +109,19 @@ class SettingsService {
     return settings.featureStateSavingEnabled;
   }
 
+  // Update log retention days
+  static Future<void> updateLogRetentionDays(int days) async {
+    final currentSettings = await getSettings();
+    final updatedSettings = currentSettings.copyWith(logRetentionDays: days);
+    await saveSettings(updatedSettings);
+  }
+
+  // Get log retention days
+  static Future<int> getLogRetentionDays() async {
+    final settings = await getSettings();
+    return settings.logRetentionDays;
+  }
+
   // Clear settings (for testing or reset)
   static Future<void> clearSettings() async {
     await initialize();

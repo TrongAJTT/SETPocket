@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import '../services/cache_service.dart';
+import '../services/app_logger.dart';
 import '../l10n/app_localizations.dart';
 
 class CacheDetailsDialog extends StatefulWidget {
@@ -14,6 +15,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
   Map<String, CacheInfo> _cacheInfo = {};
   bool _loading = true;
   bool _hasLoadedOnce = false;
+  String _logInfo = 'Calculating...';
+  bool _clearingLogs = false;
 
   @override
   void initState() {
@@ -26,6 +29,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
     if (!_hasLoadedOnce) {
       _hasLoadedOnce = true;
       _loadCacheInfo();
+      _loadLogInfo();
     }
   }
 
@@ -50,6 +54,21 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
     } catch (e) {
       Logger().e('Error loading cache info: $e');
       setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loadLogInfo() async {
+    try {
+      final totalSize = await AppLogger.instance.getTotalLogSize();
+      final fileCount = await AppLogger.instance.getLogFileNames();
+      setState(() {
+        _logInfo =
+            '${fileCount.length} files • ${AppLogger.formatFileSize(totalSize)}';
+      });
+    } catch (e) {
+      setState(() {
+        _logInfo = 'Unknown';
+      });
     }
   }
 
@@ -177,6 +196,67 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         ),
       ),
     );
+  }
+
+  Future<void> _clearLogs() async {
+    final loc = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(loc.clearLogs),
+        content:
+            Text('${loc.confirmClearAllCache}\n\n${loc.typeConfirmToProceed}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(loc.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(loc.clearLogs),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _clearingLogs = true;
+      });
+
+      try {
+        await AppLogger.instance.clearLogs();
+        await _loadLogInfo(); // Refresh log info
+
+        setState(() {
+          _clearingLogs = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('All logs cleared successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _clearingLogs = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error clearing logs: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   Widget _buildCacheSection(String cacheType, CacheInfo info) {
@@ -341,6 +421,92 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
     }
   }
 
+  Widget _buildLogSection(AppLocalizations loc) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.description_outlined,
+                  color: Colors.orange,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.logs,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                      Text(
+                        'Application log files and debug information',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: _clearingLogs ? null : _clearLogs,
+                  icon: _clearingLogs
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.delete_outline, size: 16),
+                  tooltip: loc.clearLogs,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.red.shade600,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildInfoChip(
+                      'Log Files',
+                      _logInfo.split(' • ').first,
+                      Icons.inventory_2_outlined,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildInfoChip(
+                      'Log Size',
+                      _logInfo.contains(' • ')
+                          ? _logInfo.split(' • ').last
+                          : 'Unknown',
+                      Icons.storage_outlined,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -451,11 +617,15 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                                       entry.key, entry.value),
                                 ),
                               ),
+                              // Log section
+                              Padding(
+                                padding:
+                                    EdgeInsets.only(bottom: isDesktop ? 8 : 6),
+                                child: _buildLogSection(loc),
+                              ),
                             ],
                           ),
-                        ),
-
-                        // Fixed bottom button area
+                        ), // Fixed bottom button area
                         Container(
                           padding: EdgeInsets.all(isDesktop ? 16 : 12),
                           decoration: BoxDecoration(

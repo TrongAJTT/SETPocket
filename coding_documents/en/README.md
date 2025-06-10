@@ -161,6 +161,11 @@ flutter build apk --release
 flutter build windows --release
 ```
 
+## Additional Documentation
+- **[Logging Implementation](LOGGING_IMPLEMENTATION.md)**: Comprehensive logging system with file persistence and automatic cleanup
+- **[API Reference](API_REFERENCE.md)**: Complete API documentation for models and services
+- **[Setup Guide](SETUP_GUIDE.md)**: Development environment setup instructions
+
 ## Future Enhancements
 - Cloud synchronization
 - Plugin system for custom tools

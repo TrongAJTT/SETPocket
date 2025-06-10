@@ -60,6 +60,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearAllCache => 'Clear All Cache';
 
   @override
+  String get logs => 'Application Logs';
+
+  @override
+  String get viewLogs => 'View Logs';
+
+  @override
+  String get clearLogs => 'Clear Logs';
+
+  @override
+  String get logRetention => 'Log Retention';
+
+  @override
+  String logRetentionDays(int days) {
+    return '$days days';
+  }
+
+  @override
+  String get logRetentionForever => 'Keep forever';
+
+  @override
+  String get logRetentionDesc => 'Set how long to keep application logs before automatic deletion';
+
+  @override
+  String get logRetentionDescDetail => 'Choose log retention period (5-30 days in 5-day intervals, or forever)';
+
+  @override
+  String get logManagement => 'Log Management';
+
+  @override
+  String get logManagementDesc => 'Manage application logs and retention settings';
+
+  @override
+  String get logStatus => 'Log Status';
+
+  @override
+  String get logsDesc => 'Application log files and debug information';
+
+  @override
+  String get dataAndStorage => 'Data & Storage';
+
+  @override
   String confirmClearCache(Object cacheName) {
     return 'Are you sure you want to clear \"$cacheName\" cache?';
   }
@@ -240,9 +281,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportToJson => 'Export to JSON';
-
-  @override
-  String get delete => 'Delete';
 
   @override
   String get confirmDeletion => 'Confirm Deletion';
@@ -652,9 +690,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyConverter => 'Currency Converter';
 
   @override
-  String get currencyConverterDesc => 'Convert between different currencies';
-
-  @override
   String get updatingRates => 'Updating exchange rates...';
 
   @override
@@ -685,9 +720,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addRow => 'Add Row';
-
-  @override
-  String get tableView => 'Table View';
 
   @override
   String get cardView => 'Card View';
@@ -864,6 +896,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get select => 'Select';
+
+  @override
+  String get delete => 'Delete';
 
   @override
   String createdOn(Object date) {
@@ -1127,9 +1162,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lengthConverter => 'Length Converter';
 
   @override
-  String get weightConverter => 'Weight Converter';
-
-  @override
   String get temperatureConverter => 'Temperature Converter';
 
   @override
@@ -1149,6 +1181,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get numberSystemConverter => 'Number System Converter';
+
+  @override
+  String get tables => 'Tables';
+
+  @override
+  String get tableView => 'Table View';
 
   @override
   String get listView => 'List View';
@@ -1337,6 +1375,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vnd => 'Vietnamese Dong';
 
   @override
+  String get currencyConverterDesc => 'Convert between different currencies with live exchange rates';
+
+  @override
   String get lengthConverterDesc => 'Convert between different units of length';
 
   @override
@@ -1499,6 +1540,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cacheTypeConverterToolsDesc => 'Currency/length states, presets and exchange rates cache';
 
   @override
+  String get cardName => 'Card Name';
+
+  @override
+  String get cardNameHint => 'Enter card name (max 20 characters)';
+
+  @override
+  String converterCardNameDefault(Object position) {
+    return 'Card $position';
+  }
+
+  @override
   String unitSelectedStatus(Object count, Object max) {
     return 'Selected $count of $max';
   }
@@ -1507,6 +1559,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String unitVisibleStatus(Object count) {
     return '$count units visible';
   }
+
+  @override
+  String get moveDown => 'Move Down';
+
+  @override
+  String get moveUp => 'Move Up';
 
   @override
   String get lengthUnits => 'Length Units';
@@ -1531,6 +1589,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lengthConverterInfo => 'Length Converter Information';
+
+  @override
+  String get weightConverter => 'Weight Converter';
 
   @override
   String get weightConverterInfo => 'Weight Converter Info';

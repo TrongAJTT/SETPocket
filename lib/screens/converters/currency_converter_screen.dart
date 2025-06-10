@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../models/converter_models.dart';
-import '../../models/currency_preset_model.dart';
 import '../../services/currency_cache_service.dart';
 import '../../services/currency_service.dart';
-import '../../services/currency_preset_service.dart';
 import '../../services/settings_service.dart';
+import '../../services/app_logger.dart';
 import '../../widgets/currency_fetch_progress_dialog.dart';
 import '../../widgets/currency_fetch_status_dialog.dart';
 import '../../widgets/unit_customization_dialog.dart';
@@ -118,10 +117,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         _cardCurrencies.add(cardCurrencies);
       }
 
-      print(
-          'CurrencyConverter: Loaded state with ${_rowControllers.length} cards');
+      logInfo('Loaded state with ${_rowControllers.length} cards');
     } catch (e) {
-      print('CurrencyConverter: Error loading state: $e');
+      logError('Error loading state: $e');
       // Fallback to default
       _addRow();
     }
@@ -156,13 +154,14 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       );
 
       await CurrencyStateService.saveState(state);
-      print('CurrencyConverter: Saved state with ${cards.length} cards');
+      logInfo('Saved state with ${cards.length} cards');
     } catch (e) {
-      print('CurrencyConverter: Error saving state: $e');
+      logError('Error saving state: $e');
     }
   }
 
   void _addRow() {
+    logInfo('Adding new currency converter card');
     final newRowControllers = <String, TextEditingController>{};
     final newRowValues = <String, double>{};
 
@@ -194,6 +193,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   }
 
   void _removeRow(int index) {
+    logInfo('Removing currency converter card at index $index');
     if (_rowControllers.length > index && _rowControllers.length > 1) {
       // Dispose controllers for this row
       for (var controller in _rowControllers[index].values) {
@@ -250,20 +250,21 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     final l10n = AppLocalizations.of(context)!;
     final currentName = cardIndex < _cardNames.length
         ? _cardNames[cardIndex]
-        : 'Converter ${cardIndex + 1}';
+        : l10n.converterCardNameDefault(cardIndex + 1);
     final controller = TextEditingController(text: currentName);
 
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Edit Card Name'),
+        title: Text(l10n.converterCardNameDefault(cardIndex + 1)),
         content: TextField(
           controller: controller,
           maxLength: 20,
           decoration: InputDecoration(
-            labelText: 'Card Name',
-            hintText: 'Enter card name (max 20 characters)',
-            border: OutlineInputBorder(),
+            labelText: l10n.cardName,
+            hintText: l10n.cardNameHint,
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
@@ -286,7 +287,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -312,7 +313,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     showDialog(
       context: context,
       builder: (context) => UnitCustomizationDialog(
-        title: 'Customize Card Currencies',
+        title: l10n.customizeCurrencies,
         availableUnits: availableUnits,
         visibleUnits: currentCurrencies.cast<String>(),
         onChanged: (newCurrencies) {
@@ -328,24 +329,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   // Update card currencies
   void _updateCardCurrencies(int cardIndex, Set<String> newCurrencies) {
-    if (newCurrencies.length < 2) {
-      // Don't allow less than 2 currencies for proper conversion
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please select at least 2 currencies'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
     setState(() {
       // Ensure arrays are properly sized
       while (_cardCurrencies.length <= cardIndex) {
         _cardCurrencies.add(Set.from(_visibleCurrencies));
       }
 
-      final oldCurrencies = _cardCurrencies[cardIndex];
+      // final oldCurrencies = _cardCurrencies[cardIndex];
       _cardCurrencies[cardIndex] = Set.from(newCurrencies);
 
       // Update controllers and values
@@ -386,6 +376,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   }
 
   Future<void> _initializeCurrencyRates() async {
+    logInfo('Starting currency rates initialization');
     setState(() {
       _isLoadingRates = true;
     });
@@ -394,6 +385,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       // Get rates from cache service and update CurrencyService
       final rates = await CurrencyCacheService.getRates();
       final cacheInfo = await CurrencyCacheService.getCacheInfo();
+
+      logInfo('Retrieved ${rates.length} currency rates from cache');
 
       // Update CurrencyService with the cached rates
       await _updateCurrencyServiceRates(rates);
@@ -412,7 +405,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         _updateRowConversions(i, baseCurrency, baseValue);
       }
     } catch (e) {
-      print('Failed to initialize currency rates: $e');
+      logError('Failed to initialize currency rates: $e');
       if (mounted) {
         setState(() {
           _lastUpdated = null;
@@ -432,12 +425,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   Future<void> _updateCurrencyServiceRates(Map<String, double> rates) async {
     // Update CurrencyService with cached rates
     CurrencyService.updateCurrentRates(rates);
-    print(
-        'Currency Converter: Updated CurrencyService with ${rates.length} rates');
+    logInfo('Updated CurrencyService with ${rates.length} rates');
   }
 
   Future<void> _refreshCurrencyRates() async {
     final l10n = AppLocalizations.of(context)!;
+
+    logInfo('Starting manual currency rates refresh');
 
     setState(() {
       _isLoadingRates = true;
@@ -498,7 +492,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         _updateRowConversions(i, baseCurrency, baseValue);
       }
     } catch (e) {
-      print('Failed to refresh currency rates: $e');
+      logError('Failed to refresh currency rates: $e');
 
       // Close progress dialog if still open
       if (mounted) {
@@ -759,7 +753,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: .3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: LayoutBuilder(
@@ -1131,7 +1128,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         color: Theme.of(context)
                             .colorScheme
                             .primaryContainer
-                            .withOpacity(0.9),
+                            .withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Theme.of(context).colorScheme.primary,
@@ -1160,7 +1157,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
-                                    .withOpacity(0.7),
+                                    .withValues(alpha: 0.7),
                               ),
                             ),
                           ],
@@ -1173,33 +1170,33 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.05),
+                          .withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    padding: const EdgeInsets.all(8),
                     child: Icon(
                       Icons.drag_handle,
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.5),
+                          .withValues(alpha: 0.5),
                       size: 20,
                     ),
-                    padding: const EdgeInsets.all(8),
                   ),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    padding: const EdgeInsets.all(8),
                     child: Icon(
                       Icons.drag_handle,
                       color: Theme.of(context).colorScheme.primary,
                       size: 20,
                     ),
-                    padding: const EdgeInsets.all(8),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1431,12 +1428,12 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       Theme.of(context).brightness == Brightness.dark;
                   final errorBackgroundColor = hasError
                       ? (isDarkMode
-                          ? Colors.red.shade900.withOpacity(0.3)
+                          ? Colors.red.shade900.withValues(alpha: 0.3)
                           : Colors.red.shade50)
                       : Theme.of(context)
                           .colorScheme
-                          .surfaceVariant
-                          .withOpacity(0.3);
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.3);
                   final errorBorderColor = hasError
                       ? (isDarkMode ? Colors.red.shade400 : Colors.red.shade300)
                       : null;
@@ -1546,12 +1543,12 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                     Theme.of(context).brightness == Brightness.dark;
                 final errorBackgroundColor = hasError
                     ? (isDarkMode
-                        ? Colors.red.shade900.withOpacity(0.3)
+                        ? Colors.red.shade900.withValues(alpha: 0.3)
                         : Colors.red.shade50)
                     : Theme.of(context)
                         .colorScheme
-                        .surfaceVariant
-                        .withOpacity(0.3);
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.3);
                 final errorBorderColor = hasError
                     ? (isDarkMode ? Colors.red.shade400 : Colors.red.shade300)
                     : null;
@@ -1667,7 +1664,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  '${l10n.rows}: ${_rowControllers.length} • Tables: ${cardGroups.length}',
+                  '${l10n.rows}: ${_rowControllers.length} • ${l10n.tables}: ${cardGroups.length}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -1733,7 +1730,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           child: Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                color: Theme.of(context)
+                    .colorScheme
+                    .outline
+                    .withValues(alpha: 0.5),
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -1752,7 +1752,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   label: SizedBox(
                     width: 100,
                     child: Text(
-                      'Tên Card',
+                      l10n.cardName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
@@ -1777,7 +1777,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         decoration: hasError
                             ? BoxDecoration(
                                 color: isDarkMode
-                                    ? Colors.red.shade900.withOpacity(0.3)
+                                    ? Colors.red.shade900.withValues(alpha: 0.3)
                                     : Colors.red.shade50,
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
@@ -1856,7 +1856,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                 final rowControllers = _rowControllers[index];
                 final cardName = index < _cardNames.length
                     ? _cardNames[index]
-                    : 'Converter ${index + 1}';
+                    : l10n.converterCardNameDefault(index + 1);
 
                 return DataRow(
                   cells: [
@@ -1866,7 +1866,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         alignment: Alignment.center,
                         child: Text(
                           cardName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -1894,7 +1894,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .outline
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: .5),
                                 ),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
@@ -1926,7 +1926,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                   color: Theme.of(context).colorScheme.primary,
                                   size: 16,
                                 ),
-                                tooltip: 'Edit name',
+                                tooltip: l10n.edit,
                                 constraints: const BoxConstraints(
                                   minWidth: 24,
                                   minHeight: 24,
@@ -1941,7 +1941,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                   color: Theme.of(context).colorScheme.primary,
                                   size: 16,
                                 ),
-                                tooltip: 'Edit currencies',
+                                tooltip: l10n.edit,
                                 constraints: const BoxConstraints(
                                   minWidth: 24,
                                   minHeight: 24,
@@ -1959,7 +1959,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                         Theme.of(context).colorScheme.secondary,
                                     size: 16,
                                   ),
-                                  tooltip: 'Move up',
+                                  tooltip: l10n.moveUp,
                                   constraints: const BoxConstraints(
                                     minWidth: 24,
                                     minHeight: 24,
@@ -1977,7 +1977,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                                         Theme.of(context).colorScheme.secondary,
                                     size: 16,
                                   ),
-                                  tooltip: 'Move down',
+                                  tooltip: l10n.moveDown,
                                   constraints: const BoxConstraints(
                                     minWidth: 24,
                                     minHeight: 24,
@@ -2012,451 +2012,6 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _CurrencyInfoDialog extends StatelessWidget {
-  const _CurrencyInfoDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final screenSize = MediaQuery.of(context).size;
-    final isDesktop = screenSize.width > 800;
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 80 : 16,
-        vertical: isDesktop ? 40 : 40,
-      ),
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: isDesktop ? 600 : screenSize.width * 0.9,
-          maxHeight: screenSize.height * 0.8,
-        ),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.primary.withOpacity(0.8),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: theme.colorScheme.onPrimary,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      l10n.currencyConverterInfo,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: theme.colorScheme.onPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(
-                      Icons.close,
-                      color: theme.colorScheme.onPrimary,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Content
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // About this feature
-                    _buildSection(
-                      context,
-                      title: l10n.aboutThisFeature,
-                      content: l10n.aboutThisFeatureDesc,
-                      icon: Icons.currency_exchange,
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // How to use
-                    _buildSection(
-                      context,
-                      title: l10n.howToUse,
-                      content: l10n.howToUseDesc,
-                      icon: Icons.help_outline,
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Static rates info
-                    _buildSection(
-                      context,
-                      title: l10n.staticRatesInfo,
-                      content: l10n.staticRatesInfoDesc,
-                      icon: Icons.table_chart,
-                      hasButton: true,
-                      buttonText: l10n.viewStaticRates,
-                      onButtonPressed: () => _showStaticRatesDialog(context),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Last update info
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color:
-                            theme.colorScheme.surfaceVariant.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.update,
-                            color: theme.colorScheme.onSurfaceVariant,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              l10n.lastStaticUpdate,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSection(
-    BuildContext context, {
-    required String title,
-    required String content,
-    required IconData icon,
-    bool hasButton = false,
-    String? buttonText,
-    VoidCallback? onButtonPressed,
-  }) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: theme.colorScheme.primary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Text(
-          content,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-            height: 1.5,
-          ),
-        ),
-        if (hasButton && buttonText != null) ...[
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: onButtonPressed,
-            icon: const Icon(Icons.visibility, size: 18),
-            label: Text(buttonText),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  void _showStaticRatesDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => _StaticRatesDialog(),
-    );
-  }
-}
-
-class _StaticRatesDialog extends StatelessWidget {
-  const _StaticRatesDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final screenSize = MediaQuery.of(context).size;
-    final isDesktop = screenSize.width > 800;
-    final staticRates = CurrencyService.getStaticRates();
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 60 : 16,
-        vertical: isDesktop ? 40 : 40,
-      ),
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: isDesktop ? 800 : screenSize.width * 0.95,
-          maxHeight: screenSize.height * 0.85,
-        ),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.blue.shade600,
-                    Colors.blue.shade500,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.table_chart,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      l10n.staticRatesList,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Info banner
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: theme.colorScheme.primary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      l10n.rateBasedOnUSD,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Rates list
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: staticRates.length,
-                itemBuilder: (context, index) {
-                  final entry = staticRates.entries.elementAt(index);
-                  final currencyCode = entry.key;
-                  final rate = entry.value;
-
-                  // Get currency info
-                  final currencies = CurrencyService.getSupportedCurrencies();
-                  final currency = currencies.firstWhere(
-                    (c) => c.code == currencyCode,
-                    orElse: () =>
-                        Currency(currencyCode, currencyCode, currencyCode),
-                  );
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: currencyCode == 'USD'
-                          ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-                          : theme.colorScheme.surface,
-                      border: Border.all(
-                        color: currencyCode == 'USD'
-                            ? theme.colorScheme.primary.withOpacity(0.3)
-                            : theme.colorScheme.outline.withOpacity(0.2),
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        // Currency symbol
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: currencyCode == 'USD'
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.surfaceVariant,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              currency.symbol,
-                              style: TextStyle(
-                                color: currencyCode == 'USD'
-                                    ? theme.colorScheme.onPrimary
-                                    : theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Currency info
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                currencyCode,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                currency.name,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Rate
-                        Expanded(
-                          child: Text(
-                            currencyCode == 'USD'
-                                ? '1.0'
-                                : rate.toStringAsFixed(rate >= 1 ? 2 : 4),
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: currencyCode == 'USD'
-                                  ? theme.colorScheme.primary
-                                  : null,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

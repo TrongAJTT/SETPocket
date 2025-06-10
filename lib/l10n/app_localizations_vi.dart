@@ -60,6 +60,47 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearAllCache => 'Xóa tất cả bộ nhớ đệm';
 
   @override
+  String get logs => 'Nhật ký ứng dụng';
+
+  @override
+  String get viewLogs => 'Xem nhật ký';
+
+  @override
+  String get clearLogs => 'Xóa nhật ký';
+
+  @override
+  String get logRetention => 'Thời gian lưu nhật ký';
+
+  @override
+  String logRetentionDays(int days) {
+    return '$days ngày';
+  }
+
+  @override
+  String get logRetentionForever => 'Vĩnh viễn';
+
+  @override
+  String get logRetentionDesc => 'Tự động xóa các file nhật ký cũ hơn số ngày đã chỉ định';
+
+  @override
+  String get logRetentionDescDetail => 'Nhật ký sẽ được lưu trữ trong bộ nhớ đệm và có thể được xóa tự động sau một khoảng thời gian nhất định. Bạn có thể đặt thời gian lưu giữ nhật ký từ 1 đến 30 ngày hoặc chọn lưu vĩnh viễn.';
+
+  @override
+  String get logManagement => 'Quản lý nhật ký';
+
+  @override
+  String get logManagementDesc => 'Quản lý các file nhật ký ứng dụng và thông tin debug';
+
+  @override
+  String get logStatus => 'Trạng thái nhật ký';
+
+  @override
+  String get logsDesc => 'Các file nhật ký ứng dụng và thông tin debug';
+
+  @override
+  String get dataAndStorage => 'Dữ liệu & Lưu trữ';
+
+  @override
   String confirmClearCache(Object cacheName) {
     return 'Bạn có chắc chắn muốn xóa bộ nhớ đệm \"$cacheName\"?';
   }
@@ -240,9 +281,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get exportToJson => 'Xuất ra JSON';
-
-  @override
-  String get delete => 'Xóa';
 
   @override
   String get confirmDeletion => 'Xác nhận xóa';
@@ -649,10 +687,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cardCount => 'Số lượng lá bài';
 
   @override
-  String get currencyConverter => 'Chuyển đổi Tiền tệ';
-
-  @override
-  String get currencyConverterDesc => 'Chuyển đổi giữa các loại tiền tệ khác nhau';
+  String get currencyConverter => 'Quy đổi tiền tệ';
 
   @override
   String get updatingRates => 'Đang cập nhật tỷ giá tiền tệ...';
@@ -685,9 +720,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get addRow => 'Thêm dòng';
-
-  @override
-  String get tableView => 'Chế độ bảng';
 
   @override
   String get cardView => 'Chế độ thẻ';
@@ -864,6 +896,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get select => 'Chọn';
+
+  @override
+  String get delete => 'Xóa';
 
   @override
   String createdOn(Object date) {
@@ -1127,9 +1162,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get lengthConverter => 'Chuyển đổi Chiều dài';
 
   @override
-  String get weightConverter => 'Bộ chuyển đổi trọng lượng';
-
-  @override
   String get temperatureConverter => 'Chuyển đổi Nhiệt độ';
 
   @override
@@ -1149,6 +1181,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get numberSystemConverter => 'Chuyển đổi Hệ số';
+
+  @override
+  String get tables => 'Bảng';
+
+  @override
+  String get tableView => 'Chế độ bảng';
 
   @override
   String get listView => 'Chế độ danh sách';
@@ -1337,6 +1375,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get vnd => 'Đồng Việt Nam';
 
   @override
+  String get currencyConverterDesc => 'Quy đổi giữa các loại tiền tệ với tỷ giá thời gian thực';
+
+  @override
   String get lengthConverterDesc => 'Chuyển đổi giữa các đơn vị chiều dài khác nhau';
 
   @override
@@ -1499,6 +1540,17 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cacheTypeConverterToolsDesc => 'Trạng thái tiền tệ/chiều dài, cài đặt sẵn và bộ nhớ đệm tỷ giá';
 
   @override
+  String get cardName => 'Tên Thẻ';
+
+  @override
+  String get cardNameHint => 'Nhập tên thẻ (tố đa 20 ký tự)';
+
+  @override
+  String converterCardNameDefault(Object position) {
+    return 'Thẻ $position';
+  }
+
+  @override
   String unitSelectedStatus(Object count, Object max) {
     return 'Đã chọn $count trong $max';
   }
@@ -1507,6 +1559,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String unitVisibleStatus(Object count) {
     return '$count đơn vị hiển thị';
   }
+
+  @override
+  String get moveDown => 'Di chuyển xuống';
+
+  @override
+  String get moveUp => 'Di chuyển lên';
 
   @override
   String get lengthUnits => 'Đơn vị chiều dài';
@@ -1533,10 +1591,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get lengthConverterInfo => 'Thông tin bộ chuyển đổi chiều dài';
 
   @override
-  String get weightConverterInfo => 'Thông tin bộ chuyển đổi trọng lượng';
+  String get weightConverter => 'Chuyển đổi Trọng lượng';
 
   @override
-  String get customizeWeightUnits => 'Tùy chỉnh đơn vị trọng lượng';
+  String get weightConverterInfo => 'Thông tin Chuyển đổi Trọng lượng';
+
+  @override
+  String get customizeWeightUnits => 'Tùy chỉnh đơn vị Trọng lượng';
 
   @override
   String get massConverter => 'Chuyển đổi Khối lượng';

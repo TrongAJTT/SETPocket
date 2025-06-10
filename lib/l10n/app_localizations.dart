@@ -1352,7 +1352,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveRates.
   ///
   /// In en, this message translates to:
-  /// **'Live'**
+  /// **'Live Exchange Rates'**
   String get liveRates;
 
   /// No description provided for @staticRates.
@@ -1376,7 +1376,7 @@ abstract class AppLocalizations {
   /// No description provided for @customizeCurrencies.
   ///
   /// In en, this message translates to:
-  /// **'Customize currencies'**
+  /// **'Customize Currencies'**
   String get customizeCurrencies;
 
   /// No description provided for @addCard.
@@ -1682,8 +1682,8 @@ abstract class AppLocalizations {
   /// No description provided for @presetSaved.
   ///
   /// In en, this message translates to:
-  /// **'Preset saved successfully'**
-  String get presetSaved;
+  /// **'Preset saved: {name}'**
+  String presetSaved(String name);
 
   /// No description provided for @presetLoaded.
   ///
@@ -3148,6 +3148,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scientific notation supported for extreme values'**
   String get scientificNotation;
+
+  /// No description provided for @dragging.
+  ///
+  /// In en, this message translates to:
+  /// **'Dragging...'**
+  String get dragging;
+
+  /// No description provided for @editName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit name'**
+  String get editName;
+
+  /// No description provided for @editCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit currencies'**
+  String get editCurrencies;
+
+  /// No description provided for @tableWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Table {count} cards'**
+  String tableWith(int count);
+
+  /// No description provided for @noUnitsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No units selected'**
+  String get noUnitsSelected;
+
+  /// No description provided for @maximumSelectionExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum selection exceeded'**
+  String get maximumSelectionExceeded;
+
+  /// No description provided for @errorSavingPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving preset: {error}'**
+  String errorSavingPreset(String error);
+
+  /// No description provided for @errorLoadingPresets.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading presets: {error}'**
+  String errorLoadingPresets(String error);
+
+  /// No description provided for @maximumSelectionReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum selection reached'**
+  String get maximumSelectionReached;
+
+  /// No description provided for @minimumSelectionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum {count} selection(s) required'**
+  String minimumSelectionRequired(int count);
+
+  /// No description provided for @renamePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Preset'**
+  String get renamePreset;
+
+  /// No description provided for @rename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get rename;
+
+  /// No description provided for @presetRenamedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset renamed successfully'**
+  String get presetRenamedSuccessfully;
+
+  /// No description provided for @chooseFromSavedPresets.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from your saved presets'**
+  String get chooseFromSavedPresets;
+
+  /// No description provided for @currencyConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Converter - Detailed Information'**
+  String get currencyConverterDetailedInfo;
+
+  /// No description provided for @currencyConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This powerful currency converter allows you to convert between different currencies with live exchange rates.'**
+  String get currencyConverterOverview;
+
+  /// No description provided for @keyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get keyFeatures;
+
+  /// No description provided for @multipleCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Cards'**
+  String get multipleCards;
+
+  /// No description provided for @multipleCardsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create multiple converter cards, each with its own set of currencies and amounts.'**
+  String get multipleCardsDesc;
+
+  /// No description provided for @liveRatesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get real-time exchange rates from reliable financial sources.'**
+  String get liveRatesDesc;
+
+  /// No description provided for @customizeCurrenciesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which currencies to display and save custom presets.'**
+  String get customizeCurrenciesDesc;
+
+  /// No description provided for @dragAndDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag & Drop'**
+  String get dragAndDrop;
+
+  /// No description provided for @dragAndDropDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder your converter cards by dragging them.'**
+  String get dragAndDropDesc;
+
+  /// No description provided for @cardAndTableView.
+  ///
+  /// In en, this message translates to:
+  /// **'Card & Table View'**
+  String get cardAndTableView;
+
+  /// No description provided for @cardAndTableViewDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between card view for easy use or table view for comparison.'**
+  String get cardAndTableViewDesc;
+
+  /// No description provided for @stateManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'State Management'**
+  String get stateManagement;
+
+  /// No description provided for @stateManagementDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your converter state is automatically saved and restored.'**
+  String get stateManagementDesc;
+
+  /// No description provided for @step1.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Add Cards'**
+  String get step1;
+
+  /// No description provided for @step1Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \'Add Card\' to create new converter cards.'**
+  String get step1Desc;
+
+  /// No description provided for @step2.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Enter Amount'**
+  String get step2;
+
+  /// No description provided for @step2Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount in any currency field.'**
+  String get step2Desc;
+
+  /// No description provided for @step3.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Select Base Currency'**
+  String get step3;
+
+  /// No description provided for @step3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the dropdown to select which currency you\'re converting from.'**
+  String get step3Desc;
+
+  /// No description provided for @step4.
+  ///
+  /// In en, this message translates to:
+  /// **'4. View Results'**
+  String get step4;
+
+  /// No description provided for @step4Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'See instant conversions to all other currencies in the card.'**
+  String get step4Desc;
+
+  /// No description provided for @tips.
+  ///
+  /// In en, this message translates to:
+  /// **'Tips'**
+  String get tips;
+
+  /// No description provided for @tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'• Tap the edit icon next to card names to rename them'**
+  String get tip1;
+
+  /// No description provided for @tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use the currency icon to customize which currencies appear'**
+  String get tip2;
+
+  /// No description provided for @tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'• Save currency presets for quick access'**
+  String get tip3;
+
+  /// No description provided for @tip4.
+  ///
+  /// In en, this message translates to:
+  /// **'• Check the status indicator for exchange rate freshness'**
+  String get tip4;
+
+  /// No description provided for @tip5.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use table view to compare multiple cards side by side'**
+  String get tip5;
+
+  /// No description provided for @rateUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Updates'**
+  String get rateUpdate;
+
+  /// No description provided for @rateUpdateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior.'**
+  String get rateUpdateDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

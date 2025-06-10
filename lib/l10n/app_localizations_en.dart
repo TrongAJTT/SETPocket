@@ -704,7 +704,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRatesAvailable => 'No exchange rate information available, fetching rates...';
 
   @override
-  String get liveRates => 'Live';
+  String get liveRates => 'Live Exchange Rates';
 
   @override
   String get staticRates => 'Static';
@@ -716,7 +716,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetLayout => 'Reset Layout';
 
   @override
-  String get customizeCurrencies => 'Customize currencies';
+  String get customizeCurrencies => 'Customize Currencies';
 
   @override
   String get addCard => 'Add Card';
@@ -871,7 +871,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get presetNameRequired => 'Preset name is required';
 
   @override
-  String get presetSaved => 'Preset saved successfully';
+  String presetSaved(String name) {
+    return 'Preset saved: $name';
+  }
 
   @override
   String get presetLoaded => 'Preset loaded successfully';
@@ -1630,4 +1632,141 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scientificNotation => 'Scientific notation supported for extreme values';
+
+  @override
+  String get dragging => 'Dragging...';
+
+  @override
+  String get editName => 'Edit name';
+
+  @override
+  String get editCurrencies => 'Edit currencies';
+
+  @override
+  String tableWith(int count) {
+    return 'Table $count cards';
+  }
+
+  @override
+  String get noUnitsSelected => 'No units selected';
+
+  @override
+  String get maximumSelectionExceeded => 'Maximum selection exceeded';
+
+  @override
+  String errorSavingPreset(String error) {
+    return 'Error saving preset: $error';
+  }
+
+  @override
+  String errorLoadingPresets(String error) {
+    return 'Error loading presets: $error';
+  }
+
+  @override
+  String get maximumSelectionReached => 'Maximum selection reached';
+
+  @override
+  String minimumSelectionRequired(int count) {
+    return 'Minimum $count selection(s) required';
+  }
+
+  @override
+  String get renamePreset => 'Rename Preset';
+
+  @override
+  String get rename => 'Rename';
+
+  @override
+  String get presetRenamedSuccessfully => 'Preset renamed successfully';
+
+  @override
+  String get chooseFromSavedPresets => 'Choose from your saved presets';
+
+  @override
+  String get currencyConverterDetailedInfo => 'Currency Converter - Detailed Information';
+
+  @override
+  String get currencyConverterOverview => 'This powerful currency converter allows you to convert between different currencies with live exchange rates.';
+
+  @override
+  String get keyFeatures => 'Key Features';
+
+  @override
+  String get multipleCards => 'Multiple Cards';
+
+  @override
+  String get multipleCardsDesc => 'Create multiple converter cards, each with its own set of currencies and amounts.';
+
+  @override
+  String get liveRatesDesc => 'Get real-time exchange rates from reliable financial sources.';
+
+  @override
+  String get customizeCurrenciesDesc => 'Choose which currencies to display and save custom presets.';
+
+  @override
+  String get dragAndDrop => 'Drag & Drop';
+
+  @override
+  String get dragAndDropDesc => 'Reorder your converter cards by dragging them.';
+
+  @override
+  String get cardAndTableView => 'Card & Table View';
+
+  @override
+  String get cardAndTableViewDesc => 'Switch between card view for easy use or table view for comparison.';
+
+  @override
+  String get stateManagement => 'State Management';
+
+  @override
+  String get stateManagementDesc => 'Your converter state is automatically saved and restored.';
+
+  @override
+  String get step1 => '1. Add Cards';
+
+  @override
+  String get step1Desc => 'Tap \'Add Card\' to create new converter cards.';
+
+  @override
+  String get step2 => '2. Enter Amount';
+
+  @override
+  String get step2Desc => 'Enter an amount in any currency field.';
+
+  @override
+  String get step3 => '3. Select Base Currency';
+
+  @override
+  String get step3Desc => 'Use the dropdown to select which currency you\'re converting from.';
+
+  @override
+  String get step4 => '4. View Results';
+
+  @override
+  String get step4Desc => 'See instant conversions to all other currencies in the card.';
+
+  @override
+  String get tips => 'Tips';
+
+  @override
+  String get tip1 => '• Tap the edit icon next to card names to rename them';
+
+  @override
+  String get tip2 => '• Use the currency icon to customize which currencies appear';
+
+  @override
+  String get tip3 => '• Save currency presets for quick access';
+
+  @override
+  String get tip4 => '• Check the status indicator for exchange rate freshness';
+
+  @override
+  String get tip5 => '• Use table view to compare multiple cards side by side';
+
+  @override
+  String get rateUpdate => 'Rate Updates';
+
+  @override
+  String get rateUpdateDesc => 'Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior.';
 }

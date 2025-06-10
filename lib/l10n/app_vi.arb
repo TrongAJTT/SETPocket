@@ -578,5 +578,89 @@
     "selectLengthUnits": "Chọn đơn vị chiều dài để hiển thị",
     "lengthConverterInfo": "Thông tin bộ chuyển đổi chiều dài",
     "availableUnits": "Đơn vị có sẵn",
-    "scientificNotation": "Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ"
+    "scientificNotation": "Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ",
+    
+    "dragging": "Đang kéo...",
+    "editName": "Sửa tên",
+    "editCurrencies": "Sửa tiền tệ",
+    "tableWith": "Bảng {count} thẻ",
+    "@tableWith": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "noUnitsSelected": "Chưa chọn đơn vị nào",
+    "maximumSelectionExceeded": "Vượt quá giới hạn lựa chọn tối đa",
+    "presetSaved": "Đã lưu cấu hình: {name}",
+    "@presetSaved": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "errorSavingPreset": "Lỗi lưu cấu hình: {error}",
+    "@errorSavingPreset": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorLoadingPresets": "Lỗi tải cấu hình: {error}",
+    "@errorLoadingPresets": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "maximumSelectionReached": "Đã đạt giới hạn lựa chọn tối đa",
+    "minimumSelectionRequired": "Cần tối thiểu {count} lựa chọn",
+    "@minimumSelectionRequired": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "renamePreset": "Đổi tên cấu hình",
+    "rename": "Đổi tên",
+    "presetRenamedSuccessfully": "Đã đổi tên cấu hình thành công",
+    "chooseFromSavedPresets": "Chọn từ các cấu hình đã lưu",
+    
+    "currencyConverterDetailedInfo": "Bộ chuyển đổi tiền tệ - Thông tin chi tiết",
+    "currencyConverterOverview": "Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.",
+    "keyFeatures": "Tính năng chính",
+    "multipleCards": "Nhiều thẻ chuyển đổi",
+    "multipleCardsDesc": "Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riêng.",
+    "liveRates": "Tỷ giá thời gian thực",
+    "liveRatesDesc": "Nhận tỷ giá hối đoái thời gian thực từ các nguồn tài chính đáng tin cậy.",
+    "customizeCurrencies": "Tùy chỉnh tiền tệ",
+    "customizeCurrenciesDesc": "Chọn tiền tệ hiển thị và lưu cấu hình tùy chỉnh.",
+    "dragAndDrop": "Kéo thả",
+    "dragAndDropDesc": "Sắp xếp lại thứ tự các thẻ chuyển đổi bằng cách kéo thả.",
+    "cardAndTableView": "Chế độ thẻ & bảng",
+    "cardAndTableViewDesc": "Chuyển đổi giữa chế độ thẻ để dễ sử dụng hoặc chế độ bảng để so sánh.",
+    "stateManagement": "Quản lý trạng thái",
+    "stateManagementDesc": "Trạng thái chuyển đổi của bạn được tự động lưu và khôi phục.",
+    "howToUse": "Cách sử dụng",
+    "step1": "1. Thêm thẻ",
+    "step1Desc": "Nhấn 'Thêm thẻ' để tạo thẻ chuyển đổi mới.",
+    "step2": "2. Nhập số tiền",
+    "step2Desc": "Nhập số tiền vào bất kỳ trường tiền tệ nào.",
+    "step3": "3. Chọn tiền tệ gốc",
+    "step3Desc": "Sử dụng menu thả xuống để chọn loại tiền tệ bạn muốn chuyển đổi từ đó.",
+    "step4": "4. Xem kết quả",
+    "step4Desc": "Xem kết quả chuyển đổi tức thì sang tất cả các loại tiền tệ khác trong thẻ.",
+    "tips": "Mẹo sử dụng",
+    "tip1": "• Nhấn vào biểu tượng chỉnh sửa để đổi tên thẻ",
+    "tip2": "• Sử dụng biểu tượng tiền tệ để tùy chỉnh tiền tệ hiển thị",
+    "tip3": "• Lưu cấu hình tiền tệ để truy cập nhanh",
+    "tip4": "• Kiểm tra chỉ báo trạng thái để biết độ mới của tỷ giá",
+    "tip5": "• Sử dụng chế độ bảng để so sánh nhiều thẻ cạnh nhau",
+    "rateUpdate": "Cập nhật tỷ giá",
+    "rateUpdateDesc": "Tỷ giá hối đoái được cập nhật dựa trên cài đặt của bạn. Kiểm tra Cài đặt > Công cụ chuyển đổi để cấu hình tần suất cập nhật và hành vi thử lại."
 }

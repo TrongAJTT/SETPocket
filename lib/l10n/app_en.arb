@@ -573,5 +573,89 @@
         "description": "Title for mass unit customization dialog"
     },
     "availableUnits": "Available Units",
-    "scientificNotation": "Scientific notation supported for extreme values"
+    "scientificNotation": "Scientific notation supported for extreme values",
+    
+    "dragging": "Dragging...",
+    "editName": "Edit name",
+    "editCurrencies": "Edit currencies", 
+    "tableWith": "Table {count} cards",
+    "@tableWith": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "noUnitsSelected": "No units selected",
+    "maximumSelectionExceeded": "Maximum selection exceeded",
+    "presetSaved": "Preset saved: {name}",
+    "@presetSaved": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "errorSavingPreset": "Error saving preset: {error}",
+    "@errorSavingPreset": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorLoadingPresets": "Error loading presets: {error}",
+    "@errorLoadingPresets": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "maximumSelectionReached": "Maximum selection reached",
+    "minimumSelectionRequired": "Minimum {count} selection(s) required",
+    "@minimumSelectionRequired": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "renamePreset": "Rename Preset",
+    "rename": "Rename",
+    "presetRenamedSuccessfully": "Preset renamed successfully",
+    "chooseFromSavedPresets": "Choose from your saved presets",
+    
+    "currencyConverterDetailedInfo": "Currency Converter - Detailed Information",
+    "currencyConverterOverview": "This powerful currency converter allows you to convert between different currencies with live exchange rates.",
+    "keyFeatures": "Key Features",
+    "multipleCards": "Multiple Cards",
+    "multipleCardsDesc": "Create multiple converter cards, each with its own set of currencies and amounts.",
+    "liveRates": "Live Exchange Rates", 
+    "liveRatesDesc": "Get real-time exchange rates from reliable financial sources.",
+    "customizeCurrencies": "Customize Currencies",
+    "customizeCurrenciesDesc": "Choose which currencies to display and save custom presets.",
+    "dragAndDrop": "Drag & Drop",
+    "dragAndDropDesc": "Reorder your converter cards by dragging them.",
+    "cardAndTableView": "Card & Table View",
+    "cardAndTableViewDesc": "Switch between card view for easy use or table view for comparison.",
+    "stateManagement": "State Management",
+    "stateManagementDesc": "Your converter state is automatically saved and restored.",
+    "howToUse": "How to Use",
+    "step1": "1. Add Cards",
+    "step1Desc": "Tap 'Add Card' to create new converter cards.",
+    "step2": "2. Enter Amount",
+    "step2Desc": "Enter an amount in any currency field.",
+    "step3": "3. Select Base Currency",
+    "step3Desc": "Use the dropdown to select which currency you're converting from.",
+    "step4": "4. View Results",
+    "step4Desc": "See instant conversions to all other currencies in the card.",
+    "tips": "Tips",
+    "tip1": "• Tap the edit icon next to card names to rename them",
+    "tip2": "• Use the currency icon to customize which currencies appear",
+    "tip3": "• Save currency presets for quick access",
+    "tip4": "• Check the status indicator for exchange rate freshness",
+    "tip5": "• Use table view to compare multiple cards side by side",
+    "rateUpdate": "Rate Updates",
+    "rateUpdateDesc": "Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior."
 }

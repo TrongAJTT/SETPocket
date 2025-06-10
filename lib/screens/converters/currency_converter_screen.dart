@@ -113,7 +113,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         _rowControllers.add(newRowControllers);
         _rowValues.add(newRowValues);
         _rowBaseCurrencies.add(cardState.currencyCode);
-        _cardNames.add(cardState.name ?? 'Converter ${_rowControllers.length}');
+        _cardNames.add(cardState.name ??
+            'Converter ${_rowControllers.length}'); // Will be localized in UI
         _cardCurrencies.add(cardCurrencies);
       }
 
@@ -133,8 +134,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       for (int i = 0; i < _rowControllers.length; i++) {
         final baseCurrency = _rowBaseCurrencies[i];
         final amount = _rowValues[i][baseCurrency] ?? 1.0;
-        final name =
-            i < _cardNames.length ? _cardNames[i] : 'Converter ${i + 1}';
+        final l10n = AppLocalizations.of(context)!;
+        final name = i < _cardNames.length
+            ? _cardNames[i]
+            : l10n.converterCardNameDefault(i + 1);
         final currencies = i < _cardCurrencies.length
             ? _cardCurrencies[i].toList()
             : _visibleCurrencies.toList();
@@ -178,7 +181,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       _rowControllers.add(newRowControllers);
       _rowValues.add(newRowValues);
       _rowBaseCurrencies.add(defaultCurrency); // Use first visible currency
-      _cardNames.add('Converter ${_rowControllers.length}'); // Add default name
+      _cardNames.add(AppLocalizations.of(context)!.converterCardNameDefault(
+          _rowControllers.length)); // Add default name
       _cardCurrencies
           .add(Set.from(_visibleCurrencies)); // Use current visible currencies
     });
@@ -279,7 +283,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
               if (newName.isNotEmpty && newName.length <= 20) {
                 setState(() {
                   while (_cardNames.length <= cardIndex) {
-                    _cardNames.add('Converter ${_cardNames.length + 1}');
+                    _cardNames.add(
+                        l10n.converterCardNameDefault(_cardNames.length + 1));
                   }
                   _cardNames[cardIndex] = newName;
                 });
@@ -445,6 +450,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       final currencies =
           CurrencyService.getSupportedCurrencies().map((c) => c.code).toList();
 
+      if (!mounted) {
+        return;
+      }
+
       // Show dialog and wait for completion
       showDialog(
         context: context,
@@ -591,17 +600,347 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   void _showInfoDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.currencyConverterInfo),
-        content: Text(l10n.currencyConverterDesc),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.close),
+      builder: (context) => Dialog(
+        child: Container(
+          width: isDesktop ? 600 : screenWidth * 0.9,
+          height: isDesktop ? 700 : MediaQuery.of(context).size.height * 0.8,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.onPrimary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.currency_exchange,
+                        color: theme.colorScheme.onPrimary,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.currencyConverterDetailedInfo,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.currencyConverterOverview,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary
+                                  .withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Key Features
+                      _buildInfoSection(
+                        theme,
+                        l10n.keyFeatures,
+                        Icons.star_outline,
+                        Colors.orange,
+                        [
+                          _buildFeatureItem(theme, l10n.multipleCards,
+                              l10n.multipleCardsDesc, Icons.credit_card),
+                          _buildFeatureItem(theme, l10n.liveRates,
+                              l10n.liveRatesDesc, Icons.trending_up),
+                          _buildFeatureItem(theme, l10n.customizeCurrencies,
+                              l10n.customizeCurrenciesDesc, Icons.tune),
+                          _buildFeatureItem(theme, l10n.dragAndDrop,
+                              l10n.dragAndDropDesc, Icons.drag_handle),
+                          _buildFeatureItem(theme, l10n.cardAndTableView,
+                              l10n.cardAndTableViewDesc, Icons.view_agenda),
+                          _buildFeatureItem(theme, l10n.stateManagement,
+                              l10n.stateManagementDesc, Icons.save),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // How to Use
+                      _buildInfoSection(
+                        theme,
+                        l10n.howToUse,
+                        Icons.help_outline,
+                        Colors.blue,
+                        [
+                          _buildStepItem(theme, l10n.step1, l10n.step1Desc),
+                          _buildStepItem(theme, l10n.step2, l10n.step2Desc),
+                          _buildStepItem(theme, l10n.step3, l10n.step3Desc),
+                          _buildStepItem(theme, l10n.step4, l10n.step4Desc),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Tips
+                      _buildInfoSection(
+                        theme,
+                        l10n.tips,
+                        Icons.lightbulb_outline,
+                        Colors.green,
+                        [
+                          _buildTipItem(theme, l10n.tip1),
+                          _buildTipItem(theme, l10n.tip2),
+                          _buildTipItem(theme, l10n.tip3),
+                          _buildTipItem(theme, l10n.tip4),
+                          _buildTipItem(theme, l10n.tip5),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Rate Updates
+                      _buildInfoSection(
+                        theme,
+                        l10n.rateUpdate,
+                        Icons.update,
+                        Colors.purple,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Text(
+                              l10n.rateUpdateDesc,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.check),
+                      label: Text(l10n.close),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(ThemeData theme, String title, IconData icon,
+      Color color, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: Column(children: children),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(
+      ThemeData theme, String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepItem(ThemeData theme, String step, String description) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                step.substring(0, 1),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  step,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTipItem(ThemeData theme, String tip) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      child: Text(
+        tip,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
@@ -1062,14 +1401,15 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         : _visibleCurrencies.toList();
     final cardName = index < _cardNames.length
         ? _cardNames[index]
-        : 'Converter ${index + 1}';
+        : l10n.converterCardNameDefault(index + 1);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 300;
 
         return DragTarget<int>(
-          onAccept: (draggedIndex) {
+          onAcceptWithDetails: (details) {
+            final draggedIndex = details.data;
             if (draggedIndex != index) {
               _reorderCards(draggedIndex, index);
             }
@@ -1152,7 +1492,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Dragging...',
+                              l10n.dragging,
                               style: TextStyle(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -1218,7 +1558,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                     color: Theme.of(context).colorScheme.primary,
                     size: 18,
                   ),
-                  tooltip: 'Edit name',
+                  tooltip: l10n.edit, // Using existing l10n key
                   padding: const EdgeInsets.all(4),
                   constraints: const BoxConstraints(
                     minWidth: 32,
@@ -1233,7 +1573,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                     color: Theme.of(context).colorScheme.primary,
                     size: 18,
                   ),
-                  tooltip: 'Edit currencies',
+                  tooltip: l10n.edit, // Using existing l10n key
                   padding: const EdgeInsets.all(4),
                   constraints: const BoxConstraints(
                     minWidth: 32,
@@ -1440,7 +1780,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
                   return SizedBox(
                     // Optimized width calculation for proper 2-item display with generous spacing
-                    width: constraints.maxWidth > 500
+                    width: constraints.maxWidth >= 500
                         ? (constraints.maxWidth - 44) /
                             2 // 2 columns: account for 12px spacing + 16px padding each side
                         : constraints.maxWidth -
@@ -1706,7 +2046,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           child: Row(
             children: [
               Text(
-                'Table ${cardIndices.length} cards',
+                l10n.tableWith(cardIndices.length),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

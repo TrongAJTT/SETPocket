@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import '../l10n/app_localizations.dart';
 import '../services/currency_preset_service.dart';
 import '../models/currency_preset_model.dart';
@@ -97,8 +98,8 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_tempVisible.isEmpty
-              ? 'No units selected'
-              : 'Maximum selection exceeded'),
+              ? AppLocalizations.of(context)!.noUnitsSelected
+              : AppLocalizations.of(context)!.maximumSelectionExceeded),
           backgroundColor: Colors.red,
         ),
       );
@@ -120,16 +121,18 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Preset saved: $result'),
+              content: Text(AppLocalizations.of(context)!.presetSaved(result)),
               backgroundColor: Colors.green,
             ),
           );
         }
       } catch (e) {
+        AppLogger.instance.logError(e.toString(), e, StackTrace.current);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error saving preset: $e'),
+              content: Text(AppLocalizations.of(context)!
+                  .errorSavingPreset(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -147,10 +150,14 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
     try {
       final presets = await CurrencyPresetService.loadPresets();
 
+      if (!mounted) {
+        return;
+      }
+
       if (presets.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('No presets found'),
+            content: Text(AppLocalizations.of(context)!.noPresetsFound),
             backgroundColor: Colors.orange,
           ),
         );
@@ -171,19 +178,23 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Preset loaded'),
+              content: Text(AppLocalizations.of(context)!.presetLoaded),
               backgroundColor: Colors.green,
             ),
           );
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error loading presets: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppLogger.instance.logError(e.toString(), e, StackTrace.current);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!
+                .errorLoadingPresets(e.toString())),
+          ),
+        );
+      }
+      AppLogger.instance.logError(e.toString(), e, StackTrace.current);
     }
   }
 
@@ -616,7 +627,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
                             if (_tempVisible.length >= widget.maxSelection) ...[
                               const SizedBox(height: 4),
                               Text(
-                                'Maximum selection reached',
+                                l10n.maximumSelectionReached,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.primary,
                                   fontSize: 11,
@@ -626,7 +637,8 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
                             if (_tempVisible.length < widget.minSelection) ...[
                               const SizedBox(height: 4),
                               Text(
-                                'Minimum ${widget.minSelection} selection(s) required',
+                                l10n.minimumSelectionRequired(
+                                    widget.minSelection),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: Colors.orange,
                                   fontSize: 11,
@@ -777,6 +789,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      AppLogger.instance.logError(e.toString(), e, StackTrace.current);
     }
   }
 
@@ -787,7 +800,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
     final newName = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Rename Preset'),
+        title: Text(l10n.renamePreset),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
@@ -808,7 +821,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                 Navigator.of(context).pop(name);
               }
             },
-            child: Text('Rename'),
+            child: Text(l10n.rename),
           ),
         ],
       ),
@@ -821,12 +834,13 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Preset renamed successfully'),
+              content: Text(l10n.presetRenamedSuccessfully),
               backgroundColor: Colors.green,
             ),
           );
         }
       } catch (e) {
+        AppLogger.instance.logError(e.toString(), e, StackTrace.current);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -881,6 +895,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
             ),
           );
         }
+        AppLogger.instance.logError(e.toString(), e, StackTrace.current);
       }
     }
   }
@@ -960,7 +975,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Choose from your saved presets',
+                          l10n.chooseFromSavedPresets,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onPrimary
                                 .withValues(alpha: 0.8),
@@ -1040,7 +1055,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                               value: PresetSortOrder.date,
                               child: Row(
                                 children: [
-                                  Icon(Icons.access_time, size: 16),
+                                  const Icon(Icons.access_time, size: 16),
                                   const SizedBox(width: 8),
                                   Text(l10n.sortByDate),
                                 ],
@@ -1050,7 +1065,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                               value: PresetSortOrder.name,
                               child: Row(
                                 children: [
-                                  Icon(Icons.sort_by_alpha, size: 16),
+                                  const Icon(Icons.sort_by_alpha, size: 16),
                                   const SizedBox(width: 8),
                                   Text(l10n.sortByName),
                                 ],
@@ -1253,11 +1268,11 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                                                   OutlinedButton.icon(
                                                     onPressed: () =>
                                                         _renamePreset(preset),
-                                                    icon: Icon(Icons.edit,
+                                                    icon: const Icon(Icons.edit,
                                                         size: 16),
                                                     label: Text(
-                                                      'Rename',
-                                                      style: TextStyle(
+                                                      l10n.rename,
+                                                      style: const TextStyle(
                                                           fontSize: 12),
                                                     ),
                                                     style: OutlinedButton
@@ -1273,13 +1288,13 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                                                   OutlinedButton.icon(
                                                     onPressed: () =>
                                                         _deletePreset(preset),
-                                                    icon: Icon(
+                                                    icon: const Icon(
                                                         Icons
                                                             .delete_outline_rounded,
                                                         size: 16),
                                                     label: Text(
-                                                      'Delete',
-                                                      style: TextStyle(
+                                                      l10n.delete,
+                                                      style: const TextStyle(
                                                           fontSize: 12),
                                                     ),
                                                     style: OutlinedButton
@@ -1300,7 +1315,8 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                                                 ],
                                               )
                                             : PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert,
+                                                icon: const Icon(
+                                                    Icons.more_vert,
                                                     size: 20),
                                                 onSelected: (value) {
                                                   if (value == 'rename') {
@@ -1315,11 +1331,11 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                                                     value: 'rename',
                                                     child: Row(
                                                       children: [
-                                                        Icon(Icons.edit,
+                                                        const Icon(Icons.edit,
                                                             size: 16),
                                                         const SizedBox(
                                                             width: 8),
-                                                        Text('Rename'),
+                                                        Text(l10n.rename),
                                                       ],
                                                     ),
                                                   ),
@@ -1327,17 +1343,18 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                                                     value: 'delete',
                                                     child: Row(
                                                       children: [
-                                                        Icon(
+                                                        const Icon(
                                                             Icons
                                                                 .delete_outline,
                                                             size: 16,
                                                             color: Colors.red),
                                                         const SizedBox(
                                                             width: 8),
-                                                        Text('Delete',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .red)),
+                                                        Text(l10n.delete,
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .red)),
                                                       ],
                                                     ),
                                                   ),
@@ -1390,8 +1407,8 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                           ? () => Navigator.of(context)
                               .pop(_selectedPreset!.currencies)
                           : null,
-                      icon: Icon(Icons.check_rounded, size: 18),
-                      label: Text('Select'),
+                      icon: const Icon(Icons.check_rounded, size: 18),
+                      label: Text(l10n.select),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(

@@ -704,7 +704,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get noRatesAvailable => 'Chưa có thông tin tỷ giá tiền tệ, đang lấy tỷ giá...';
 
   @override
-  String get liveRates => 'Trực tiếp';
+  String get liveRates => 'Tỷ giá thời gian thực';
 
   @override
   String get staticRates => 'Tĩnh';
@@ -716,7 +716,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get resetLayout => 'Đặt lại bố cục';
 
   @override
-  String get customizeCurrencies => 'Tùy chỉnh loại tiền';
+  String get customizeCurrencies => 'Tùy chỉnh tiền tệ';
 
   @override
   String get addCard => 'Thêm thẻ';
@@ -871,7 +871,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get presetNameRequired => 'Tên cấu hình là bắt buộc';
 
   @override
-  String get presetSaved => 'Cấu hình đã được lưu thành công';
+  String presetSaved(String name) {
+    return 'Đã lưu cấu hình: $name';
+  }
 
   @override
   String get presetLoaded => 'Cấu hình đã được tải thành công';
@@ -1630,4 +1632,141 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get scientificNotation => 'Hỗ trợ ký hiệu khoa học cho giá trị cực lớn/nhỏ';
+
+  @override
+  String get dragging => 'Đang kéo...';
+
+  @override
+  String get editName => 'Sửa tên';
+
+  @override
+  String get editCurrencies => 'Sửa tiền tệ';
+
+  @override
+  String tableWith(int count) {
+    return 'Bảng $count thẻ';
+  }
+
+  @override
+  String get noUnitsSelected => 'Chưa chọn đơn vị nào';
+
+  @override
+  String get maximumSelectionExceeded => 'Vượt quá giới hạn lựa chọn tối đa';
+
+  @override
+  String errorSavingPreset(String error) {
+    return 'Lỗi lưu cấu hình: $error';
+  }
+
+  @override
+  String errorLoadingPresets(String error) {
+    return 'Lỗi tải cấu hình: $error';
+  }
+
+  @override
+  String get maximumSelectionReached => 'Đã đạt giới hạn lựa chọn tối đa';
+
+  @override
+  String minimumSelectionRequired(int count) {
+    return 'Cần tối thiểu $count lựa chọn';
+  }
+
+  @override
+  String get renamePreset => 'Đổi tên cấu hình';
+
+  @override
+  String get rename => 'Đổi tên';
+
+  @override
+  String get presetRenamedSuccessfully => 'Đã đổi tên cấu hình thành công';
+
+  @override
+  String get chooseFromSavedPresets => 'Chọn từ các cấu hình đã lưu';
+
+  @override
+  String get currencyConverterDetailedInfo => 'Bộ chuyển đổi tiền tệ - Thông tin chi tiết';
+
+  @override
+  String get currencyConverterOverview => 'Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.';
+
+  @override
+  String get keyFeatures => 'Tính năng chính';
+
+  @override
+  String get multipleCards => 'Nhiều thẻ chuyển đổi';
+
+  @override
+  String get multipleCardsDesc => 'Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riêng.';
+
+  @override
+  String get liveRatesDesc => 'Nhận tỷ giá hối đoái thời gian thực từ các nguồn tài chính đáng tin cậy.';
+
+  @override
+  String get customizeCurrenciesDesc => 'Chọn tiền tệ hiển thị và lưu cấu hình tùy chỉnh.';
+
+  @override
+  String get dragAndDrop => 'Kéo thả';
+
+  @override
+  String get dragAndDropDesc => 'Sắp xếp lại thứ tự các thẻ chuyển đổi bằng cách kéo thả.';
+
+  @override
+  String get cardAndTableView => 'Chế độ thẻ & bảng';
+
+  @override
+  String get cardAndTableViewDesc => 'Chuyển đổi giữa chế độ thẻ để dễ sử dụng hoặc chế độ bảng để so sánh.';
+
+  @override
+  String get stateManagement => 'Quản lý trạng thái';
+
+  @override
+  String get stateManagementDesc => 'Trạng thái chuyển đổi của bạn được tự động lưu và khôi phục.';
+
+  @override
+  String get step1 => '1. Thêm thẻ';
+
+  @override
+  String get step1Desc => 'Nhấn \'Thêm thẻ\' để tạo thẻ chuyển đổi mới.';
+
+  @override
+  String get step2 => '2. Nhập số tiền';
+
+  @override
+  String get step2Desc => 'Nhập số tiền vào bất kỳ trường tiền tệ nào.';
+
+  @override
+  String get step3 => '3. Chọn tiền tệ gốc';
+
+  @override
+  String get step3Desc => 'Sử dụng menu thả xuống để chọn loại tiền tệ bạn muốn chuyển đổi từ đó.';
+
+  @override
+  String get step4 => '4. Xem kết quả';
+
+  @override
+  String get step4Desc => 'Xem kết quả chuyển đổi tức thì sang tất cả các loại tiền tệ khác trong thẻ.';
+
+  @override
+  String get tips => 'Mẹo sử dụng';
+
+  @override
+  String get tip1 => '• Nhấn vào biểu tượng chỉnh sửa để đổi tên thẻ';
+
+  @override
+  String get tip2 => '• Sử dụng biểu tượng tiền tệ để tùy chỉnh tiền tệ hiển thị';
+
+  @override
+  String get tip3 => '• Lưu cấu hình tiền tệ để truy cập nhanh';
+
+  @override
+  String get tip4 => '• Kiểm tra chỉ báo trạng thái để biết độ mới của tỷ giá';
+
+  @override
+  String get tip5 => '• Sử dụng chế độ bảng để so sánh nhiều thẻ cạnh nhau';
+
+  @override
+  String get rateUpdate => 'Cập nhật tỷ giá';
+
+  @override
+  String get rateUpdateDesc => 'Tỷ giá hối đoái được cập nhật dựa trên cài đặt của bạn. Kiểm tra Cài đặt > Công cụ chuyển đổi để cấu hình tần suất cập nhật và hành vi thử lại.';
 }

@@ -1,5 +1,5 @@
 import 'package:live_currency_rate/live_currency_rate.dart';
-import 'package:logger/logger.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import '../settings_service.dart';
 
 enum CurrencyStatus {
@@ -276,19 +276,26 @@ class CurrencyService {
       final newRates = await fetchLiveRates();
       _currentRates = newRates;
     } catch (e) {
-      print('Failed to refresh rates: $e');
+      logError('Failed to refresh rates: $e');
       _currentRates = _staticRates;
       _isUsingLiveRates = false;
     }
   } // Progress tracking
 
   static void Function(String currency, CurrencyStatus status)? _onProgress;
+  static void Function(int attempt, int retryCount)? _onRetryProgress;
   static bool _isCancelled = false;
 
   // Set progress callback
   static void setProgressCallback(
       void Function(String currency, CurrencyStatus status)? callback) {
     _onProgress = callback;
+  }
+
+  // Set retry progress callback
+  static void setRetryProgressCallback(
+      void Function(int attempt, int retryCount)? callback) {
+    _onRetryProgress = callback;
   }
 
   // Cancel current fetch operation
@@ -299,7 +306,7 @@ class CurrencyService {
   // Future method for real API integration
 
   // Map to track last fetch time for each currency
-  static Map<String, DateTime> _currencyFetchTimes = {};
+  static final Map<String, DateTime> _currencyFetchTimes = {};
 
   // Get last fetch time for a currency
   static DateTime? getCurrencyLastFetchTime(String currencyCode) {
@@ -329,7 +336,7 @@ class CurrencyService {
 
   static Future<Map<String, double>> fetchLiveRates() async {
     try {
-      print('CurrencyService: Starting to fetch live rates...');
+      logInfo('CurrencyService: Starting to fetch live rates...');
       _isCancelled = false; // Reset cancel flag
       var rates = <String, double>{};
       bool hasLiveData = false;
@@ -346,11 +353,11 @@ class CurrencyService {
       _currencyStatus['USD'] = CurrencyStatus.success;
       _currencyFetchTimes['USD'] = DateTime.now();
       _onProgress?.call('USD', CurrencyStatus.success);
-      print('CurrencyService: Added USD base rate');
+      logInfo('CurrencyService: Added USD base rate');
 
       // Try to get rates for each currency - PARALLEL FETCHING for better performance
       final currencies = getSupportedCurrencies();
-      print(
+      logInfo(
           'CurrencyService: Fetching rates for ${currencies.length} currencies in parallel...');
 
       // Create futures for all currency fetches (except USD)
@@ -367,12 +374,12 @@ class CurrencyService {
           if (shouldFetch) {
             fetchFutures[currency.code] =
                 _fetchSingleRateWithStatus(currency.code);
-            print(
+            logInfo(
                 'CurrencyService: Will fetch ${currency.code} (needs refresh: $needsRefresh, previous status: $previousStatus)');
           } else {
             // Skip fetch but report as recently fetched for progress dialog
             _onProgress?.call(currency.code, CurrencyStatus.fetchedRecently);
-            print(
+            logInfo(
                 'CurrencyService: Skipping fetch for ${currency.code} (recently fetched)');
           }
         }
@@ -390,8 +397,10 @@ class CurrencyService {
         if (_isCancelled) break;
 
         if (attempt > 0) {
-          print(
+          logInfo(
               'CurrencyService: Retry attempt $attempt for ${currentFutures.length} currencies');
+          // Notify dialog about retry attempt
+          _onRetryProgress?.call(attempt, retryTimes);
         }
 
         final results = await Future.wait(
@@ -418,7 +427,7 @@ class CurrencyService {
               _onProgress?.call(entry.key, result.status);
               return MapEntry(entry.key, result);
             } catch (e) {
-              print('CurrencyService: Timeout/Error for ${entry.key}: $e');
+              logError('CurrencyService: Timeout/Error for ${entry.key}: $e');
               _onProgress?.call(entry.key, CurrencyStatus.timeout);
               return MapEntry(
                   entry.key,
@@ -439,7 +448,7 @@ class CurrencyService {
               (result.value.status == CurrencyStatus.failed ||
                   result.value.status == CurrencyStatus.timeout)) {
             nextFutures[result.key] = _fetchSingleRateWithStatus(result.key);
-            print(
+            logInfo(
                 'CurrencyService: Will retry ${result.key} (status: ${result.value.status})');
           }
         }
@@ -486,28 +495,28 @@ class CurrencyService {
       if (hasLiveData) {
         _lastUpdated = DateTime.now();
         _isUsingLiveRates = true;
-        Logger().i('CurrencyService: Successfully fetched live currency rates');
+        logInfo('CurrencyService: Successfully fetched live currency rates');
       } else {
         _isUsingLiveRates = false;
-        Logger().i(
+        logInfo(
             'CurrencyService: Using static currency rates (live data unavailable)');
       }
 
-      Logger().i('CurrencyService: Final rates count: ${rates.length}');
-      Logger().i(
+      logInfo('CurrencyService: Final rates count: ${rates.length}');
+      logInfo(
           'CurrencyService: Sample rates: ${rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
 
       // Update current rates for use in convert() method
       _currentRates = Map<String, double>.from(rates);
-      Logger().i('CurrencyService: Updated _currentRates with new data');
+      logInfo('CurrencyService: Updated _currentRates with new data');
 
       return rates;
     } catch (e) {
-      Logger().e('CurrencyService: Error fetching live rates: $e');
+      logError('CurrencyService: Error fetching live rates: $e');
       // Fall back to static rates
       _isUsingLiveRates = false;
       await Future.delayed(const Duration(milliseconds: 500));
-      Logger().e('CurrencyService: Returning static rates as fallback');
+      logInfo('CurrencyService: Returning static rates as fallback');
       return Map<String, double>.from(_staticRates);
     }
   }
@@ -516,24 +525,24 @@ class CurrencyService {
   static Future<CurrencyFetchResult> _fetchSingleRateWithStatus(
       String currencyCode) async {
     try {
-      Logger().i('CurrencyService: Fetching rate for $currencyCode...');
+      logInfo('CurrencyService: Fetching rate for $currencyCode...');
       final result =
           await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
       if (result.result > 0) {
-        Logger().i(
+        logInfo(
             'CurrencyService: Got live rate for $currencyCode: ${result.result}');
         return CurrencyFetchResult(
             rate: result.result, status: CurrencyStatus.success);
       } else {
-        Logger().i(
+        logInfo(
             'CurrencyService: Invalid result for $currencyCode, using static rate');
         return CurrencyFetchResult(
             rate: _staticRates[currencyCode] ?? 1.0,
             status: CurrencyStatus.failed);
       }
     } catch (e) {
-      Logger()
-          .e('CurrencyService: Failed to get live rate for $currencyCode: $e');
+      logError(
+          'CurrencyService: Failed to get live rate for $currencyCode: $e');
       return CurrencyFetchResult(
           rate: _staticRates[currencyCode] ?? 1.0,
           status: CurrencyStatus.failed);
@@ -545,8 +554,18 @@ class CurrencyService {
     _currentRates = Map<String, double>.from(newRates);
     _lastUpdated = DateTime.now();
     _isUsingLiveRates = true;
-    Logger().i(
+    logInfo(
         'CurrencyService: Current rates updated with ${newRates.length} currencies');
+  }
+
+  // Reset to static rates (used when clearing cache)
+  static void resetToStaticRates() {
+    _currentRates = Map<String, double>.from(_staticRates);
+    _lastUpdated = null;
+    _isUsingLiveRates = false;
+    _currencyStatus.clear();
+    _currencyFetchTimes.clear();
+    logInfo('CurrencyService: Reset to static rates');
   }
 
   // Check if API is available

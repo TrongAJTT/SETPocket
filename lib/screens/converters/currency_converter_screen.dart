@@ -134,10 +134,19 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       for (int i = 0; i < _rowControllers.length; i++) {
         final baseCurrency = _rowBaseCurrencies[i];
         final amount = _rowValues[i][baseCurrency] ?? 1.0;
-        final l10n = AppLocalizations.of(context)!;
-        final name = i < _cardNames.length
-            ? _cardNames[i]
-            : l10n.converterCardNameDefault(i + 1);
+
+        // Use fallback name if context is not available (widget disposed)
+        String name;
+        if (mounted && context.mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          name = i < _cardNames.length
+              ? _cardNames[i]
+              : l10n.converterCardNameDefault(i + 1);
+        } else {
+          // Fallback when context is not available
+          name = i < _cardNames.length ? _cardNames[i] : 'Converter ${i + 1}';
+        }
+
         final currencies = i < _cardCurrencies.length
             ? _cardCurrencies[i].toList()
             : _visibleCurrencies.toList();
@@ -177,12 +186,15 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           TextEditingController(text: currency == defaultCurrency ? '1' : '0');
       newRowValues[currency] = currency == defaultCurrency ? 1.0 : 0.0;
     }
+
+    // Safe default name without context access during setState
+    final defaultName = 'Converter ${_rowControllers.length + 1}';
+
     setState(() {
       _rowControllers.add(newRowControllers);
       _rowValues.add(newRowValues);
       _rowBaseCurrencies.add(defaultCurrency); // Use first visible currency
-      _cardNames.add(AppLocalizations.of(context)!.converterCardNameDefault(
-          _rowControllers.length)); // Add default name
+      _cardNames.add(defaultName); // Add safe default name
       _cardCurrencies
           .add(Set.from(_visibleCurrencies)); // Use current visible currencies
     });
@@ -387,13 +399,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     });
 
     try {
-      // Get rates from cache service and update CurrencyService
-      final rates = await CurrencyCacheService.getRates();
+      // Always load cached data first (safe, no background fetching)
+      final rates = await CurrencyCacheService.getCachedRates();
       final cacheInfo = await CurrencyCacheService.getCacheInfo();
 
-      logInfo('Retrieved ${rates.length} currency rates from cache');
+      logInfo('Retrieved ${rates.length} currency rates from cache/static');
 
-      // Update CurrencyService with the cached rates
+      // Update CurrencyService with the cached/static rates
       await _updateCurrencyServiceRates(rates);
 
       if (mounted) {
@@ -408,6 +420,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         final baseCurrency = _rowBaseCurrencies[i];
         final baseValue = _rowValues[i][baseCurrency] ?? 1.0;
         _updateRowConversions(i, baseCurrency, baseValue);
+      }
+
+      // Check if we should fetch new rates (but don't auto-fetch)
+      final shouldFetch = await CurrencyCacheService.shouldFetchRates();
+      if (shouldFetch && mounted) {
+        // Show dialog to ask user if they want to fetch new rates
+        _showFetchPromptDialog();
       }
     } catch (e) {
       logError('Failed to initialize currency rates: $e');
@@ -434,13 +453,12 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   }
 
   Future<void> _refreshCurrencyRates() async {
+    // Capture l10n early to avoid context access issues
     final l10n = AppLocalizations.of(context)!;
+    bool dialogOpen = false;
+    bool fetchCompleted = false;
 
     logInfo('Starting manual currency rates refresh');
-
-    setState(() {
-      _isLoadingRates = true;
-    });
 
     try {
       // Get timeout from settings
@@ -454,26 +472,63 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         return;
       }
 
-      // Show dialog and wait for completion
+      // Show dialog and track its state
+      logInfo('Showing currency fetch progress dialog...');
+      dialogOpen = true;
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => CurrencyFetchProgressDialog(
-          timeoutSeconds: fetchTimeout,
-          currencies: currencies,
-          onCancel: () {
-            // Handle cancel if needed
-          },
-        ),
-      );
+        builder: (context) {
+          logInfo('Building CurrencyFetchProgressDialog widget');
+          return CurrencyFetchProgressDialog(
+            timeoutSeconds: fetchTimeout,
+            currencies: currencies,
+            onCancel: () {
+              logInfo('Dialog cancel callback triggered');
+              dialogOpen = false;
+              CurrencyService.cancelFetch();
+            },
+            onComplete: () {
+              logInfo(
+                  'Dialog complete callback triggered - clearing loading state');
+              if (mounted) {
+                setState(() {
+                  _isLoadingRates = false;
+                });
+              }
+            },
+          );
+        },
+      ).then((_) {
+        // Dialog closed (either by completion or manually)
+        logInfo('Currency fetch dialog closed');
+        dialogOpen = false;
+      });
+      logInfo('Dialog showDialog() called');
 
-      final rates = await CurrencyCacheService.forceRefresh();
-      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      // Small delay to ensure dialog is rendered before starting fetch
+      await Future.delayed(const Duration(milliseconds: 200));
 
-      // Close progress dialog
+      // Set loading state only after dialog is shown
       if (mounted) {
-        Navigator.of(context).pop();
+        setState(() {
+          _isLoadingRates = true;
+        });
       }
+
+      final rates = await CurrencyCacheService.forceRefreshWithDialog();
+      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      fetchCompleted = true;
+
+      // Close progress dialog safely (only if still open)
+      if (mounted && dialogOpen) {
+        logInfo('Manually closing currency fetch dialog');
+        Navigator.of(context).pop();
+        dialogOpen = false;
+      }
+
+      // Small delay to ensure dialog is completely closed
+      await Future.delayed(const Duration(milliseconds: 100));
 
       // Update CurrencyService with fresh rates
       await _updateCurrencyServiceRates(rates);
@@ -504,9 +559,13 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       logError('Failed to refresh currency rates: $e');
 
       // Close progress dialog if still open
-      if (mounted) {
+      if (mounted && dialogOpen) {
+        logInfo('Closing currency fetch dialog due to error');
         Navigator.of(context).pop();
+        dialogOpen = false;
+      }
 
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.failedToUpdateRates),
@@ -515,7 +574,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         );
       }
     } finally {
+      // Ensure loading state is always cleared
       if (mounted) {
+        logInfo(
+            'Clearing loading state - fetchCompleted: $fetchCompleted, dialogOpen: $dialogOpen');
         setState(() {
           _isLoadingRates = false;
         });
@@ -949,6 +1011,79 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     showDialog(
       context: context,
       builder: (context) => const CurrencyFetchStatusDialog(),
+    );
+  }
+
+  void _showFetchPromptDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              Icons.currency_exchange,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(l10n.refreshRates),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                'New exchange rates are available. Would you like to fetch them now?'),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This will show a progress dialog while fetching rates.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _refreshCurrencyRates();
+            },
+            child: Text(l10n.refreshRates),
+          ),
+        ],
+      ),
     );
   }
 

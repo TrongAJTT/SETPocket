@@ -7,12 +7,14 @@ class CurrencyFetchProgressDialog extends StatefulWidget {
   final int timeoutSeconds;
   final List<String> currencies;
   final VoidCallback? onCancel;
+  final VoidCallback? onComplete;
 
   const CurrencyFetchProgressDialog({
     super.key,
     required this.timeoutSeconds,
     required this.currencies,
     this.onCancel,
+    this.onComplete,
   });
 
   @override
@@ -31,6 +33,8 @@ class _CurrencyFetchProgressDialogState
   int _completedCount = 0;
   bool _isCompleted = false;
   bool _isCancelled = false;
+  int _currentRetryAttempt = 0;
+  int _maxRetryAttempts = 0;
 
   @override
   void initState() {
@@ -53,6 +57,7 @@ class _CurrencyFetchProgressDialogState
 
     // Set up progress callback
     CurrencyService.setProgressCallback(_onCurrencyProgress);
+    CurrencyService.setRetryProgressCallback(_onRetryProgress);
 
     // Start countdown timer
     _startCountdown();
@@ -66,10 +71,13 @@ class _CurrencyFetchProgressDialogState
     _countdownTimer.cancel();
     _progressController.dispose();
     CurrencyService.setProgressCallback(null);
+    CurrencyService.setRetryProgressCallback(null);
     super.dispose();
   }
 
   void _startCountdown() {
+    debugPrint(
+        'CurrencyFetchProgressDialog: Starting countdown timer with ${_remainingSeconds}s');
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {
@@ -78,7 +86,9 @@ class _CurrencyFetchProgressDialogState
 
         if (_remainingSeconds <= 0 || _isCompleted) {
           timer.cancel();
-          if (!_isCompleted) {
+          debugPrint('CurrencyFetchProgressDialog: Countdown timer finished');
+          // Don't auto-complete if we're in retry mode
+          if (!_isCompleted && _currentRetryAttempt == 0) {
             _markAsCompleted();
           }
         }
@@ -93,14 +103,59 @@ class _CurrencyFetchProgressDialogState
       setState(() {
         _currencyStatuses[currency] = status;
 
-        // Count completed currencies
+        // Count completed currencies (final status only, not retry statuses)
         _completedCount = _currencyStatuses.values
-            .where((s) => s != CurrencyStatus.staticRate)
+            .where((s) =>
+                s == CurrencyStatus.success ||
+                s == CurrencyStatus.failed ||
+                s == CurrencyStatus.timeout ||
+                s == CurrencyStatus.fetchedRecently)
             .length;
 
-        // Check if all currencies are completed
-        if (_completedCount >= widget.currencies.length) {
+        // Check if all currencies are completed AND not in retry mode
+        // AND we have final status (not retry status)
+        if (_completedCount >= widget.currencies.length &&
+            // _currentRetryAttempt == 0 &&
+            _currencyStatuses.values.every((s) =>
+                s == CurrencyStatus.success ||
+                s == CurrencyStatus.failed ||
+                s == CurrencyStatus.timeout ||
+                s == CurrencyStatus.fetchedRecently)) {
           _markAsCompleted();
+        }
+      });
+    }
+  }
+
+  void _onRetryProgress(int attempt, int maxRetries) {
+    if (mounted && !_isCancelled) {
+      setState(() {
+        _currentRetryAttempt = attempt;
+        _maxRetryAttempts = maxRetries;
+
+        // Reset completion flag and count when retry starts
+        if (attempt > 0) {
+          _isCompleted = false;
+
+          // Reset timer and progress animation completely
+          _countdownTimer.cancel();
+          _progressController.reset();
+
+          // Reset remaining seconds to original timeout
+          _remainingSeconds = widget.timeoutSeconds;
+
+          // Update progress animation duration to match reset timeout
+          _progressController.duration =
+              Duration(seconds: widget.timeoutSeconds);
+
+          // Restart countdown timer
+          _startCountdown();
+
+          // Restart progress animation
+          _progressController.forward();
+
+          debugPrint(
+              'CurrencyFetchProgressDialog: Reset timer and animation for retry $attempt');
         }
       });
     }
@@ -108,20 +163,34 @@ class _CurrencyFetchProgressDialogState
 
   void _markAsCompleted() {
     if (!_isCompleted && mounted) {
+      debugPrint('CurrencyFetchProgressDialog: Marking as completed');
       setState(() {
         _isCompleted = true;
       });
       _progressController.stop();
 
-      // Auto close after 2 seconds
+      // Call onComplete callback immediately when marking as completed
+      if (widget.onComplete != null) {
+        debugPrint('CurrencyFetchProgressDialog: Calling onComplete callback');
+        widget.onComplete!();
+      }
+
+      // Auto close after 2 seconds with additional safety checks
       Timer(const Duration(seconds: 2), () {
-        if (mounted && !_isCancelled) {
-          Navigator.of(context).pop();
+        if (mounted && !_isCancelled && context.mounted) {
+          try {
+            debugPrint('CurrencyFetchProgressDialog: Auto-closing dialog');
+            Navigator.of(context).pop();
+          } catch (e) {
+            // Silent fail if navigation context is invalid
+            debugPrint('Warning: Could not close progress dialog - $e');
+          }
         }
       });
     }
   }
 
+  // Note: This method is kept for potential future use
   void _cancelFetch() {
     setState(() {
       _isCancelled = true;
@@ -130,7 +199,15 @@ class _CurrencyFetchProgressDialogState
     if (widget.onCancel != null) {
       widget.onCancel!();
     }
-    Navigator.of(context).pop();
+
+    // Safe navigation with context check
+    if (mounted && context.mounted) {
+      try {
+        Navigator.of(context).pop();
+      } catch (e) {
+        debugPrint('Warning: Could not close progress dialog on cancel - $e');
+      }
+    }
   }
 
   Color _getStatusColor(CurrencyStatus status) {
@@ -304,13 +381,22 @@ class _CurrencyFetchProgressDialogState
                           AnimatedBuilder(
                             animation: _progressAnimation,
                             builder: (context, child) {
+                              // Calculate progress based on remaining time
+                              final progressValue = _isCompleted
+                                  ? 1.0
+                                  : 1.0 -
+                                      (_remainingSeconds /
+                                          widget.timeoutSeconds);
+
                               return CircularProgressIndicator(
-                                value: _isCompleted
-                                    ? 1.0
-                                    : (_progressAnimation.value),
+                                value: progressValue,
                                 strokeWidth: 8,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  _isCompleted ? Colors.green : Colors.blue,
+                                  _isCompleted
+                                      ? Colors.green
+                                      : _currentRetryAttempt > 0
+                                          ? Colors.orange
+                                          : Colors.blue,
                                 ),
                               );
                             },
@@ -366,6 +452,40 @@ class _CurrencyFetchProgressDialogState
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+
+                    // Retry information
+                    if (_currentRetryAttempt > 0) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.orange.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.refresh,
+                              size: 16,
+                              color: Colors.orange.shade600,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Retry ${_currentRetryAttempt}/${_maxRetryAttempts}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.orange.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -375,7 +495,8 @@ class _CurrencyFetchProgressDialogState
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(

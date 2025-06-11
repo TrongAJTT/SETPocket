@@ -24,7 +24,46 @@ class CurrencyCacheService {
     }
   }
 
-  // Get cached rates or fetch new ones based on settings
+  // Get cached rates only (no auto-fetch) - for safe loading
+  static Future<Map<String, double>> getCachedRates() async {
+    await initialize();
+
+    // Get cached data
+    final cachedData = _cacheBox!.get(_cacheKey);
+
+    // Load fetch times from cache if available
+    if (cachedData != null) {
+      _loadFetchTimesFromCache(cachedData);
+    }
+
+    // Return cached data if available and valid
+    if (cachedData != null && cachedData.isValid) {
+      logInfo('CurrencyCacheService: Returning cached data');
+      return cachedData.rates;
+    }
+
+    logInfo('CurrencyCacheService: No valid cache, returning static rates');
+    return CurrencyService.getStaticRates();
+  }
+
+  // Check if fetch is needed based on settings (without fetching)
+  static Future<bool> shouldFetchRates() async {
+    await initialize();
+
+    final settings = await SettingsService.getSettings();
+    final fetchMode = settings.currencyFetchMode;
+
+    // Get cached data
+    final cachedData = _cacheBox!.get(_cacheKey);
+
+    if (cachedData == null) {
+      return true; // No cache, should fetch
+    }
+
+    return cachedData.shouldRefresh(fetchMode);
+  }
+
+  // Get cached rates or fetch new ones based on settings (DEPRECATED - use getCachedRates + shouldFetchRates)
   static Future<Map<String, double>> getRates(
       {bool forceRefresh = false}) async {
     await initialize();
@@ -185,7 +224,11 @@ class CurrencyCacheService {
       await initialize();
       await _cacheBox!.delete(_cacheKey);
       await _cacheBox!.flush();
-      logInfo('CurrencyCacheService: Cache cleared');
+
+      // Reset CurrencyService to static rates
+      CurrencyService.resetToStaticRates();
+
+      logInfo('CurrencyCacheService: Cache cleared and service reset');
     } catch (e) {
       logError('CurrencyCacheService: Error clearing cache: $e');
     }
@@ -217,10 +260,41 @@ class CurrencyCacheService {
     }
   }
 
-  // Force refresh rates
+  // Force refresh rates (DEPRECATED - use forceRefreshWithDialog)
   static Future<Map<String, double>> forceRefresh() async {
     logInfo('CurrencyCacheService: Force refresh requested');
     return await getRates(forceRefresh: true);
+  }
+
+  // Force refresh rates (for use with dialog only - no background fetch)
+  static Future<Map<String, double>> forceRefreshWithDialog() async {
+    logInfo('CurrencyCacheService: Force refresh with dialog requested');
+    await initialize();
+
+    if (_isFetching) {
+      logInfo('CurrencyCacheService: Already fetching, returning cached data');
+      return await getCachedRates();
+    }
+
+    try {
+      _isFetching = true;
+
+      // This should only be called when progress dialog is already showing
+      final newRates = await CurrencyService.fetchLiveRates();
+      logInfo(
+          'CurrencyCacheService: Fetched ${newRates.length} rates, now saving to cache...');
+
+      await _saveToCache(newRates);
+      logInfo('CurrencyCacheService: Successfully saved to cache');
+
+      return newRates;
+    } catch (e) {
+      logError('CurrencyCacheService: Failed to fetch new rates: $e');
+      // Return cached data as fallback
+      return await getCachedRates();
+    } finally {
+      _isFetching = false;
+    }
   }
 
   // Debug method to check cache content

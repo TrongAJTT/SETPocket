@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
-import '../services/currency_service.dart';
+import '../../l10n/app_localizations.dart';
+import '../../services/converter_services/currency_service.dart';
 
 class CurrencyFetchStatusDialog extends StatelessWidget {
   const CurrencyFetchStatusDialog({super.key});

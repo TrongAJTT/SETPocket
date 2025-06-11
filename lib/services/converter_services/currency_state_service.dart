@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import '../models/currency_state_model.dart';
-import 'settings_service.dart';
+import '../../models/currency_state_model.dart';
+import '../settings_service.dart';
 
 class CurrencyStateService {
   static const String _stateBoxName = 'currency_state';

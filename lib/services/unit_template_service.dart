@@ -1,4 +1,7 @@
 import 'package:hive/hive.dart';
+import 'package:logger/logger.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:my_multi_tools/services/file_logger_service.dart';
 import '../models/unit_template_model.dart';
 
 class UnitTemplateService {
@@ -10,10 +13,12 @@ class UnitTemplateService {
     try {
       if (_templateBox == null || !_templateBox!.isOpen) {
         _templateBox = await Hive.openBox<UnitTemplateModel>(_templateBoxName);
-        print('UnitTemplateService: Template box opened successfully');
+        Logger().i('UnitTemplateService: Template box opened successfully');
       }
     } catch (e) {
-      print('UnitTemplateService: Error opening template box: $e');
+      String logMsg = 'UnitTemplateService: Error opening template box: $e';
+      AppLogger.instance.error(logMsg, e, StackTrace.current);
+      FileLoggerService.instance.logError(logMsg, e, StackTrace.current);
       rethrow;
     }
   }
@@ -39,7 +44,8 @@ class UnitTemplateService {
 
     await _templateBox!.put(id, template);
     await _templateBox!.flush();
-    print('UnitTemplateService: Template saved: $name (Type: $templateType)');
+    AppLogger.instance.info(
+        'UnitTemplateService: Template saved: $name (Type: $templateType)');
   }
 
   // Load templates by type

@@ -114,9 +114,8 @@ class SettingsService {
     final currentSettings = await getSettings();
     final updatedSettings = currentSettings.copyWith(logRetentionDays: days);
     await saveSettings(updatedSettings);
-  }
+  } // Get log retention days with migration support
 
-  // Get log retention days with migration support
   static Future<int> getLogRetentionDays() async {
     final settings = await getSettings();
     int retentionDays = settings.logRetentionDays;

@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import '../models/currency_preset_model.dart';
+import '../../models/currency_preset_model.dart';
 
 enum PresetSortOrder { name, date }
 
@@ -26,24 +26,25 @@ class CurrencyPresetService {
     required List<String> currencies,
   }) async {
     await initialize();
-    
+
     if (name.trim().isEmpty) {
       throw Exception('Preset name cannot be empty');
     }
-    
+
     if (currencies.isEmpty || currencies.length > 10) {
       throw Exception('Preset must contain 1-10 currencies');
     }
-    
+
     final preset = CurrencyPresetModel.create(
       name: name.trim(),
       currencies: currencies,
     );
-    
+
     await _box!.put(preset.id, preset);
     await _box!.flush();
-    
-    print('CurrencyPresetService: Saved preset "${preset.name}" with ${preset.currencies.length} currencies');
+
+    print(
+        'CurrencyPresetService: Saved preset "${preset.name}" with ${preset.currencies.length} currencies');
   }
 
   // Load all presets
@@ -51,20 +52,23 @@ class CurrencyPresetService {
     PresetSortOrder sortOrder = PresetSortOrder.date,
   }) async {
     await initialize();
-    
+
     final presets = _box!.values.toList();
-    
+
     // Sort presets
     switch (sortOrder) {
       case PresetSortOrder.name:
-        presets.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        presets.sort(
+            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
         break;
       case PresetSortOrder.date:
-        presets.sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Newest first
+        presets
+            .sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Newest first
         break;
     }
-    
-    print('CurrencyPresetService: Loaded ${presets.length} presets, sorted by $sortOrder');
+
+    print(
+        'CurrencyPresetService: Loaded ${presets.length} presets, sorted by $sortOrder');
     return presets;
   }
 
@@ -77,7 +81,7 @@ class CurrencyPresetService {
   // Delete preset
   static Future<void> deletePreset(String id) async {
     await initialize();
-    
+
     final preset = _box!.get(id);
     if (preset != null) {
       await _box!.delete(id);
@@ -89,9 +93,10 @@ class CurrencyPresetService {
   // Check if preset name exists
   static Future<bool> presetNameExists(String name) async {
     await initialize();
-    
+
     final normalizedName = name.trim().toLowerCase();
-    return _box!.values.any((preset) => preset.name.toLowerCase() == normalizedName);
+    return _box!.values
+        .any((preset) => preset.name.toLowerCase() == normalizedName);
   }
 
   // Get preset count
@@ -109,37 +114,40 @@ class CurrencyPresetService {
   }
 
   // Update preset
-  static Future<void> updatePreset(String id, {
+  static Future<void> updatePreset(
+    String id, {
     String? name,
     List<String>? currencies,
   }) async {
     await initialize();
-    
+
     final existingPreset = _box!.get(id);
     if (existingPreset == null) {
       throw Exception('Preset not found');
     }
-    
+
     final updatedPreset = existingPreset.copyWith(
       name: name,
       currencies: currencies,
     );
-    
+
     await _box!.put(id, updatedPreset);
     await _box!.flush();
-    
+
     print('CurrencyPresetService: Updated preset "${updatedPreset.name}"');
   }
 
   // Export presets (returns JSON-like structure)
   static Future<List<Map<String, dynamic>>> exportPresets() async {
     await initialize();
-    
-    return _box!.values.map((preset) => {
-      'id': preset.id,
-      'name': preset.name,
-      'currencies': preset.currencies,
-      'createdAt': preset.createdAt.toIso8601String(),
-    }).toList();
+
+    return _box!.values
+        .map((preset) => {
+              'id': preset.id,
+              'name': preset.name,
+              'currencies': preset.currencies,
+              'createdAt': preset.createdAt.toIso8601String(),
+            })
+        .toList();
   }
-} 
+}

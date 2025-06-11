@@ -2,11 +2,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
 import 'hive_service.dart';
-import 'currency_state_service.dart';
-import 'currency_preset_service.dart';
-import 'currency_cache_service.dart';
-import 'length_state_service.dart';
-import 'mass_state_service.dart';
+import 'converter_services/currency_state_service.dart';
+import 'converter_services/currency_preset_service.dart';
+import 'converter_services/currency_cache_service.dart';
+import 'converter_services/length_state_service.dart';
+import 'converter_services/mass_state_service.dart';
 
 class CacheInfo {
   final String name;

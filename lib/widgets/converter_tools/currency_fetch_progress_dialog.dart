@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../services/currency_service.dart';
-import '../l10n/app_localizations.dart';
+import '../../services/converter_services/currency_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class CurrencyFetchProgressDialog extends StatefulWidget {
   final int timeoutSeconds;

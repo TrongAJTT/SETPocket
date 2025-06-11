@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/converter_models.dart';
-import 'package:my_multi_tools/services/currency_service.dart';
-import 'package:my_multi_tools/services/currency_cache_service.dart';
+import 'package:my_multi_tools/services/converter_services/currency_service.dart';
+import 'package:my_multi_tools/services/converter_services/currency_cache_service.dart';
 
 enum ConverterViewMode { table, list }
 

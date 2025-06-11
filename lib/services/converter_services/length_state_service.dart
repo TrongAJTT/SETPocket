@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import '../models/length_state_model.dart';
-import '../services/settings_service.dart';
+import '../../models/length_state_model.dart';
+import '../settings_service.dart';
 
 class LengthStateService {
   static const String _stateBoxName = 'length_states';

@@ -1,4 +1,4 @@
-import '../services/currency_service.dart';
+import '../services/converter_services/currency_service.dart';
 import 'package:decimal/decimal.dart';
 
 /// Base class for all conversion units

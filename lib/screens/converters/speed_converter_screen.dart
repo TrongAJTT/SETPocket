@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/converter_models.dart';
-import '../../widgets/converter_widget.dart';
+import '../../widgets/converter_tools/converter_widget.dart';
 import '../../l10n/app_localizations.dart';
 
 class SpeedConverterScreen extends StatelessWidget {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:my_multi_tools/models/tool_config.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tool_visibility_service.dart';
 
@@ -30,7 +31,7 @@ class QuickActionsService {
     } catch (e) {
       // Silently handle any platform-specific errors
       // This prevents crashes on unsupported platforms
-      print('Quick actions initialization failed: $e');
+      logFatal('Quick actions initialization failed: $e');
     }
   }
 
@@ -78,7 +79,7 @@ class QuickActionsService {
         await _updatePlatformQuickActions(quickActions, limitedTools);
       } catch (e) {
         // Silently handle any platform-specific errors
-        print('Quick actions update failed: $e');
+        logError('Quick actions update failed: $e');
       }
     }
   }
@@ -110,7 +111,7 @@ class QuickActionsService {
       quickActions.initialize(onQuickActionSelected);
     } catch (e) {
       // Silently handle any platform-specific errors
-      print('Quick actions handler setup failed: $e');
+      logError('Quick actions handler setup failed: $e');
     }
   }
 

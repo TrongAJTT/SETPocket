@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_multi_tools/l10n/app_localizations.dart';
 import 'package:my_multi_tools/models/converter_models.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import 'package:my_multi_tools/services/converter_services/currency_service.dart';
 import 'package:my_multi_tools/services/converter_services/currency_cache_service.dart';
 
@@ -33,7 +34,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
   ConverterViewMode _viewMode = ConverterViewMode.table;
   Map<ConversionUnit, bool> _unitVisibility = {};
   double _inputValue = 0.0;
-  Map<ConversionUnit, double> _conversions = {};
+  final Map<ConversionUnit, double> _conversions = {};
   bool _isLoadingRates = false;
   DateTime? _lastUpdated;
   bool _isUsingLiveRates = false;
@@ -84,7 +85,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
 
         _updateConversions();
       } catch (e) {
-        print('Failed to initialize currency rates: $e');
+        logError('Failed to initialize currency rates: $e');
         // Set fallback state
         if (mounted) {
           setState(() {
@@ -138,7 +139,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
         );
       }
     } catch (e) {
-      print('Failed to refresh currency rates: $e');
+      logError('Failed to refresh currency rates: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -198,7 +199,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
     return Row(
       children: [
         if (_isUsingLiveRates) ...[
-          Icon(
+          const Icon(
             Icons.wifi,
             size: 16,
             color: Colors.green,
@@ -212,7 +213,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
                 ),
           ),
         ] else ...[
-          Icon(
+          const Icon(
             Icons.wifi_off,
             size: 16,
             color: Colors.orange,
@@ -248,7 +249,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
                   ? Theme.of(context)
                       .colorScheme
                       .onSurfaceVariant
-                      .withOpacity(0.5)
+                      .withValues(alpha: 0.5)
                   : Theme.of(context).colorScheme.primary,
             ),
           ),
@@ -345,7 +346,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
                   ? Theme.of(context)
                       .colorScheme
                       .onSurfaceVariant
-                      .withOpacity(0.5)
+                      .withValues(alpha: 0.5)
                   : Theme.of(context).colorScheme.primary,
             ),
           ),
@@ -412,14 +413,14 @@ class _ConverterWidgetState extends State<ConverterWidget> {
                     decoration: BoxDecoration(
                       color: Theme.of(context)
                           .colorScheme
-                          .surfaceVariant
-                          .withOpacity(0.3),
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: Theme.of(context)
                             .colorScheme
                             .outline
-                            .withOpacity(0.2),
+                            .withValues(alpha: 0.2),
                       ),
                     ),
                     child: _isLoadingRates

@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import '../../models/currency_cache_model.dart';
 import 'currency_service.dart';
 import '../settings_service.dart';
@@ -15,10 +16,10 @@ class CurrencyCacheService {
     try {
       if (_cacheBox == null || !_cacheBox!.isOpen) {
         _cacheBox = await Hive.openBox<CurrencyCacheModel>(_cacheBoxName);
-        print('CurrencyCacheService: Box opened successfully');
+        logInfo('CurrencyCacheService: Box opened successfully');
       }
     } catch (e) {
-      print('CurrencyCacheService: Error opening box: $e');
+      logError('CurrencyCacheService: Error opening box: $e');
       rethrow;
     }
   }
@@ -49,33 +50,33 @@ class CurrencyCacheService {
     }
 
     if (shouldFetch && !_isFetching) {
-      print('CurrencyCacheService: Starting fetch...');
+      logInfo('CurrencyCacheService: Starting fetch...');
       try {
         _isFetching = true;
         final newRates = await CurrencyService.fetchLiveRates();
-        print(
+        logInfo(
             'CurrencyCacheService: Fetched ${newRates.length} rates, now saving to cache...');
 
         await _saveToCache(newRates);
-        print('CurrencyCacheService: Successfully saved to cache');
+        logInfo('CurrencyCacheService: Successfully saved to cache');
 
         // Verify the save worked
         final verifyCache = _cacheBox!.get(_cacheKey);
-        print(
+        logInfo(
             'CurrencyCacheService: Cache verification - data exists: ${verifyCache != null}');
         if (verifyCache != null) {
-          print(
+          logInfo(
               'CurrencyCacheService: Cache verification - rates count: ${verifyCache.rates.length}');
         }
 
         return newRates;
       } catch (e) {
-        print('CurrencyCacheService: Failed to fetch new rates: $e');
+        logError('CurrencyCacheService: Failed to fetch new rates: $e');
         if (cachedData != null && cachedData.isValid) {
-          print('CurrencyCacheService: Returning cached data as fallback');
+          logInfo('CurrencyCacheService: Returning cached data as fallback');
           return cachedData.rates;
         }
-        print('CurrencyCacheService: Returning static rates as fallback');
+        logInfo('CurrencyCacheService: Returning static rates as fallback');
         return CurrencyService.getStaticRates();
       } finally {
         _isFetching = false;
@@ -84,11 +85,11 @@ class CurrencyCacheService {
 
     // Return cached data if available and valid
     if (cachedData != null && cachedData.isValid) {
-      print('CurrencyCacheService: Returning cached data (no fetch needed)');
+      logInfo('CurrencyCacheService: Returning cached data (no fetch needed)');
       return cachedData.rates;
     }
 
-    print('CurrencyCacheService: Returning static rates (no valid cache)');
+    logInfo('CurrencyCacheService: Returning static rates (no valid cache)');
     return CurrencyService.getStaticRates();
   }
 
@@ -100,7 +101,7 @@ class CurrencyCacheService {
         final fetchTime = DateTime.fromMillisecondsSinceEpoch(entry.value);
         CurrencyService.updateCurrencyFetchTime(entry.key, fetchTime);
       }
-      print(
+      logInfo(
           'CurrencyCacheService: Loaded ${cacheModel.currencyFetchTimes!.length} fetch times from cache');
     }
 
@@ -108,7 +109,7 @@ class CurrencyCacheService {
     final statuses = cacheModel.getCurrencyStatuses();
     if (statuses.isNotEmpty) {
       CurrencyService.updateCurrencyStatuses(statuses);
-      print(
+      logInfo(
           'CurrencyCacheService: Loaded ${statuses.length} currency statuses from cache');
     }
   }
@@ -118,7 +119,7 @@ class CurrencyCacheService {
     try {
       await initialize();
 
-      print(
+      logInfo(
           'CurrencyCacheService: Creating cache model with ${rates.length} rates');
       final cacheModel = CurrencyCacheModel(
         rates: Map<String, double>.from(rates), // Ensure proper type
@@ -130,7 +131,7 @@ class CurrencyCacheService {
       final statuses = CurrencyService.currencyStatuses;
       if (statuses.isNotEmpty) {
         cacheModel.setCurrencyStatuses(statuses);
-        print(
+        logInfo(
             'CurrencyCacheService: Saved ${statuses.length} currency statuses');
       }
 
@@ -145,18 +146,18 @@ class CurrencyCacheService {
 
       if (fetchTimes.isNotEmpty) {
         cacheModel.setCurrencyFetchTimes(fetchTimes);
-        print(
+        logInfo(
             'CurrencyCacheService: Saved ${fetchTimes.length} currency fetch times');
       }
 
-      print('CurrencyCacheService: Saving to cache with key: $_cacheKey');
+      logInfo('CurrencyCacheService: Saving to cache with key: $_cacheKey');
       await _cacheBox!.put(_cacheKey, cacheModel);
 
       // Force flush to disk
       await _cacheBox!.flush();
-      print('CurrencyCacheService: Cache saved and flushed to disk');
+      logInfo('CurrencyCacheService: Cache saved and flushed to disk');
     } catch (e) {
-      print('CurrencyCacheService: Error saving to cache: $e');
+      logError('CurrencyCacheService: Error saving to cache: $e');
       rethrow;
     }
   }
@@ -166,11 +167,11 @@ class CurrencyCacheService {
     try {
       await initialize();
       final data = _cacheBox!.get(_cacheKey);
-      print(
+      logInfo(
           'CurrencyCacheService: getCacheInfo - data exists: ${data != null}');
       return data;
     } catch (e) {
-      print('CurrencyCacheService: Error getting cache info: $e');
+      logError('CurrencyCacheService: Error getting cache info: $e');
       return null;
     }
   }
@@ -184,9 +185,9 @@ class CurrencyCacheService {
       await initialize();
       await _cacheBox!.delete(_cacheKey);
       await _cacheBox!.flush();
-      print('CurrencyCacheService: Cache cleared');
+      logInfo('CurrencyCacheService: Cache cleared');
     } catch (e) {
-      print('CurrencyCacheService: Error clearing cache: $e');
+      logError('CurrencyCacheService: Error clearing cache: $e');
     }
   }
 
@@ -197,7 +198,7 @@ class CurrencyCacheService {
       final cachedData = _cacheBox!.get(_cacheKey);
       return cachedData?.lastUpdated;
     } catch (e) {
-      print('CurrencyCacheService: Error getting last updated: $e');
+      logError('CurrencyCacheService: Error getting last updated: $e');
       return null;
     }
   }
@@ -208,17 +209,17 @@ class CurrencyCacheService {
       await initialize();
       final cachedData = _cacheBox!.get(_cacheKey);
       final hasData = cachedData != null && cachedData.isValid;
-      print('CurrencyCacheService: hasCachedData: $hasData');
+      logInfo('CurrencyCacheService: hasCachedData: $hasData');
       return hasData;
     } catch (e) {
-      print('CurrencyCacheService: Error checking cached data: $e');
+      logError('CurrencyCacheService: Error checking cached data: $e');
       return false;
     }
   }
 
   // Force refresh rates
   static Future<Map<String, double>> forceRefresh() async {
-    print('CurrencyCacheService: Force refresh requested');
+    logInfo('CurrencyCacheService: Force refresh requested');
     return await getRates(forceRefresh: true);
   }
 
@@ -227,19 +228,19 @@ class CurrencyCacheService {
     try {
       await initialize();
       final cachedData = _cacheBox!.get(_cacheKey);
-      print('=== CACHE DEBUG ===');
-      print('Cache exists: ${cachedData != null}');
+      logInfo('=== CACHE DEBUG ===');
+      logInfo('Cache exists: ${cachedData != null}');
       if (cachedData != null) {
-        print('Last updated: ${cachedData.lastUpdated}');
-        print('Is valid: ${cachedData.isValid}');
-        print('Is expired: ${cachedData.isExpired}');
-        print('Rates count: ${cachedData.rates.length}');
-        print(
+        logInfo('Last updated: ${cachedData.lastUpdated}');
+        logInfo('Is valid: ${cachedData.isValid}');
+        logInfo('Is expired: ${cachedData.isExpired}');
+        logInfo('Rates count: ${cachedData.rates.length}');
+        logInfo(
             'Sample rates: ${cachedData.rates.entries.take(3).map((e) => '${e.key}: ${e.value}').join(', ')}');
       }
-      print('=== END DEBUG ===');
+      logInfo('=== END DEBUG ===');
     } catch (e) {
-      print('CurrencyCacheService: Error in debug: $e');
+      logError('CurrencyCacheService: Error in debug: $e');
     }
   }
 }

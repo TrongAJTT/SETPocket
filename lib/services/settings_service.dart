@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import '../models/settings_model.dart';
 import '../models/currency_cache_model.dart';
 
@@ -20,10 +21,11 @@ class SettingsService {
         try {
           await Hive.deleteBoxFromDisk(_settingsBoxName);
           _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
-          print(
+          logInfo(
               'SettingsService: Reset settings box due to compatibility issue');
         } catch (resetError) {
-          print('SettingsService: Failed to reset settings box: $resetError');
+          logError(
+              'SettingsService: Failed to reset settings box: $resetError');
           rethrow;
         }
       } else {
@@ -48,13 +50,13 @@ class SettingsService {
     } catch (e) {
       // If reading fails due to compatibility, return default and save it
       if (e.toString().contains('type') && e.toString().contains('subtype')) {
-        print('SettingsService: Settings read failed, using defaults: $e');
+        logError('SettingsService: Settings read failed, using defaults: $e');
         final defaultSettings = SettingsModel();
         try {
           await _settingsBox!.clear();
           await saveSettings(defaultSettings);
         } catch (clearError) {
-          print('SettingsService: Failed to clear settings: $clearError');
+          logError('SettingsService: Failed to clear settings: $clearError');
         }
         return defaultSettings;
       }

@@ -1,5 +1,3 @@
-import 'package:logging/logging.dart';
-
 import '../../models/converter_base.dart';
 import 'converter_service_base.dart';
 import 'currency_service.dart';
@@ -160,7 +158,6 @@ class CurrencyConverterService implements ConverterServiceBase {
     }
   }
 
-  @override
   Future<void> initialize() async {
     try {
       logInfo('Initializing currency converter service');
@@ -181,7 +178,6 @@ class CurrencyConverterService implements ConverterServiceBase {
     }
   }
 
-  @override
   void dispose() {
     // Clean up any resources if needed
     logInfo('Currency converter service disposed');

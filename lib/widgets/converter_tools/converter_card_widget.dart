@@ -527,7 +527,7 @@ class ConverterCardWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Edit Card Name'), // Will be localized
+        title: Text(l10n.edit),
         content: TextField(
           controller: textController,
           maxLength: 20,
@@ -559,7 +559,6 @@ class ConverterCardWidget extends StatelessWidget {
   }
 
   void _editCardUnits(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final card = controller.state.cards[cardIndex];
     final availableUnits = controller.units
         .map((unit) => unit_dialog.UnitItem(
@@ -572,7 +571,7 @@ class ConverterCardWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => unit_dialog.UnitCustomizationDialog(
-        title: 'Customize Card Units', // Will be localized
+        title: AppLocalizations.of(context)!.customizeUnits,
         availableUnits: availableUnits,
         visibleUnits: Set<String>.from(card.visibleUnits),
         onChanged: (newUnits) {

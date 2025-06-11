@@ -1,7 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
 import 'package:my_multi_tools/services/app_logger.dart';
-import 'package:my_multi_tools/services/file_logger_service.dart';
 import '../models/unit_template_model.dart';
 
 class UnitTemplateService {
@@ -17,8 +16,7 @@ class UnitTemplateService {
       }
     } catch (e) {
       String logMsg = 'UnitTemplateService: Error opening template box: $e';
-      AppLogger.instance.error(logMsg, e, StackTrace.current);
-      FileLoggerService.instance.logError(logMsg, e, StackTrace.current);
+      logFatal(logMsg, e, StackTrace.current);
       rethrow;
     }
   }
@@ -44,8 +42,7 @@ class UnitTemplateService {
 
     await _templateBox!.put(id, template);
     await _templateBox!.flush();
-    AppLogger.instance.info(
-        'UnitTemplateService: Template saved: $name (Type: $templateType)');
+    logInfo('UnitTemplateService: Template saved: $name (Type: $templateType)');
   }
 
   // Load templates by type
@@ -72,7 +69,7 @@ class UnitTemplateService {
         break;
     }
 
-    print(
+    logInfo(
         'UnitTemplateService: Loaded ${templates.length} templates for type: $templateType');
     return templates;
   }
@@ -98,7 +95,7 @@ class UnitTemplateService {
         break;
     }
 
-    print('UnitTemplateService: Loaded ${templates.length} total templates');
+    logInfo('UnitTemplateService: Loaded ${templates.length} total templates');
     return templates;
   }
 
@@ -108,7 +105,7 @@ class UnitTemplateService {
 
     await _templateBox!.delete(templateId);
     await _templateBox!.flush();
-    print('UnitTemplateService: Template deleted: $templateId');
+    logInfo('UnitTemplateService: Template deleted: $templateId');
   }
 
   // Check if template name exists for a specific type
@@ -143,7 +140,7 @@ class UnitTemplateService {
     }
 
     await _templateBox!.flush();
-    print(
+    logInfo(
         'UnitTemplateService: Cleared ${keysToDelete.length} templates for type: $templateType');
   }
 
@@ -153,7 +150,7 @@ class UnitTemplateService {
 
     await _templateBox!.clear();
     await _templateBox!.flush();
-    print('UnitTemplateService: All templates cleared');
+    logInfo('UnitTemplateService: All templates cleared');
   }
 
   // Get template count by type
@@ -201,7 +198,7 @@ class UnitTemplateService {
     }
 
     await _templateBox!.flush();
-    print(
+    logInfo(
         'UnitTemplateService: Imported ${templatesList.length} templates for type: $templateType');
   }
 }

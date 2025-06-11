@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import '../../models/currency_preset_model.dart';
 
 enum PresetSortOrder { name, date }
@@ -12,10 +13,10 @@ class CurrencyPresetService {
     try {
       if (_box == null || !_box!.isOpen) {
         _box = await Hive.openBox<CurrencyPresetModel>(_boxName);
-        print('CurrencyPresetService: Box opened successfully');
+        logInfo('CurrencyPresetService: Box opened successfully');
       }
     } catch (e) {
-      print('CurrencyPresetService: Error opening box: $e');
+      logError('CurrencyPresetService: Error opening box: $e');
       rethrow;
     }
   }
@@ -43,7 +44,7 @@ class CurrencyPresetService {
     await _box!.put(preset.id, preset);
     await _box!.flush();
 
-    print(
+    logInfo(
         'CurrencyPresetService: Saved preset "${preset.name}" with ${preset.currencies.length} currencies');
   }
 
@@ -67,7 +68,7 @@ class CurrencyPresetService {
         break;
     }
 
-    print(
+    logInfo(
         'CurrencyPresetService: Loaded ${presets.length} presets, sorted by $sortOrder');
     return presets;
   }
@@ -86,7 +87,7 @@ class CurrencyPresetService {
     if (preset != null) {
       await _box!.delete(id);
       await _box!.flush();
-      print('CurrencyPresetService: Deleted preset "${preset.name}"');
+      logInfo('CurrencyPresetService: Deleted preset "${preset.name}"');
     }
   }
 
@@ -110,7 +111,7 @@ class CurrencyPresetService {
     await initialize();
     await _box!.clear();
     await _box!.flush();
-    print('CurrencyPresetService: Cleared all presets');
+    logInfo('CurrencyPresetService: Cleared all presets');
   }
 
   // Update preset
@@ -134,7 +135,7 @@ class CurrencyPresetService {
     await _box!.put(id, updatedPreset);
     await _box!.flush();
 
-    print('CurrencyPresetService: Updated preset "${updatedPreset.name}"');
+    logInfo('CurrencyPresetService: Updated preset "${updatedPreset.name}"');
   }
 
   // Export presets (returns JSON-like structure)

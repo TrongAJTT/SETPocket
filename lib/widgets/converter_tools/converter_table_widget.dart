@@ -272,7 +272,7 @@ class ConverterTableWidget extends StatelessWidget {
     Map<String, TextEditingController>? cardControllers,
   ) {
     if (cardControllers == null || !cardControllers.containsKey(unitId)) {
-      return DataCell(
+      return const DataCell(
         SizedBox(
           width: 100,
           child: Text('--'),
@@ -417,7 +417,7 @@ class ConverterTableWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Edit Card Name'), // Will be localized
+        title: const Text('Edit Card Name'), // Will be localized
         content: TextField(
           controller: textController,
           maxLength: 20,

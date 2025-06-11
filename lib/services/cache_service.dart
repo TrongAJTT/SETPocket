@@ -1,3 +1,4 @@
+import 'package:my_multi_tools/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
@@ -171,7 +172,7 @@ class CacheService {
         keys: _cacheKeys['converter_tools'] ?? [],
       );
     } catch (e) {
-      print('CacheService: Error getting converter tools cache info: $e');
+      logError('CacheService: Error getting converter tools cache info: $e');
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??

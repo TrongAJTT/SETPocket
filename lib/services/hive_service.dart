@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:logger/logger.dart';
+import 'package:my_multi_tools/services/app_logger.dart';
 import '../models/currency_cache_model.dart';
 import '../models/currency_preset_model.dart';
 import '../models/currency_state_model.dart';
@@ -9,8 +9,6 @@ import '../models/length_state_model.dart';
 import '../models/mass_state_model.dart';
 
 class HiveService {
-  static final Logger _logger = Logger();
-
   // Box names
   static const String templatesBoxName = 'templates';
   static const String historyBoxName = 'history';
@@ -68,9 +66,9 @@ class HiveService {
       _templatesBox = await Hive.openBox(templatesBoxName);
       _historyBox = await Hive.openBox(historyBoxName);
 
-      _logger.i('Hive initialized successfully');
+      logInfo('Hive initialized successfully');
     } catch (e) {
-      _logger.e('Failed to initialize Hive: $e');
+      logFatal('Failed to initialize Hive: $e');
       rethrow;
     }
   }
@@ -98,9 +96,9 @@ class HiveService {
     try {
       await _templatesBox?.close();
       await _historyBox?.close();
-      _logger.i('All Hive boxes closed');
+      logInfo('All Hive boxes closed');
     } catch (e) {
-      _logger.e('Error closing Hive boxes: $e');
+      logError('Error closing Hive boxes: $e');
     }
   }
 
@@ -120,9 +118,9 @@ class HiveService {
       }
 
       await box.clear();
-      _logger.i('Cleared box: $boxName');
+      logInfo('Cleared box: $boxName');
     } catch (e) {
-      _logger.e('Error clearing box $boxName: $e');
+      logError('Error clearing box $boxName: $e');
       rethrow;
     }
   }
@@ -155,7 +153,7 @@ class HiveService {
 
       return totalSize;
     } catch (e) {
-      _logger.e('Error calculating box size for $boxName: $e');
+      logError('Error calculating box size for $boxName: $e');
       return 0;
     }
   }
@@ -177,7 +175,7 @@ class HiveService {
 
       return box.length;
     } catch (e) {
-      _logger.e('Error getting item count for $boxName: $e');
+      logError('Error getting item count for $boxName: $e');
       return 0;
     }
   }
@@ -190,7 +188,7 @@ class HiveService {
       }
       return Hive.box<T>(boxName);
     } catch (e) {
-      _logger.e('Error opening box $boxName: $e');
+      logError('Error opening box $boxName: $e');
       rethrow;
     }
   }

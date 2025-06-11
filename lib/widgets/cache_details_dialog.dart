@@ -236,7 +236,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('All logs cleared successfully'),
               backgroundColor: Colors.green,
             ),
@@ -430,7 +430,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.description_outlined,
                   color: Colors.orange,
                 ),

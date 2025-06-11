@@ -60,7 +60,7 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -75,7 +75,7 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     theme.colorScheme.primary,
-                    theme.colorScheme.primary.withOpacity(0.8),
+                    theme.colorScheme.primary.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -118,7 +118,8 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
-              color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.3),
               child: Column(
                 children: [
                   Row(
@@ -186,19 +187,21 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
                     TabBar(
                       tabs: [
                         Tab(
-                          icon: Icon(Icons.check_circle, color: Colors.green),
+                          icon: const Icon(Icons.check_circle,
+                              color: Colors.green),
                           text: '${l10n.success} (${successCurrencies.length})',
                         ),
                         Tab(
-                          icon: Icon(Icons.error, color: Colors.red),
+                          icon: const Icon(Icons.error, color: Colors.red),
                           text: '${l10n.failed} (${failedCurrencies.length})',
                         ),
                         Tab(
-                          icon: Icon(Icons.access_time, color: Colors.orange),
+                          icon: const Icon(Icons.access_time,
+                              color: Colors.orange),
                           text: '${l10n.timeout} (${timeoutCurrencies.length})',
                         ),
                         Tab(
-                          icon: Icon(Icons.storage, color: Colors.grey),
+                          icon: const Icon(Icons.storage, color: Colors.grey),
                           text: '${l10n.static} (${staticCurrencies.length})',
                         ),
                       ],
@@ -241,9 +244,9 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -289,7 +292,7 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
             Icon(
               _getStatusIcon(status),
               size: 48,
-              color: _getStatusColor(status).withOpacity(0.5),
+              color: _getStatusColor(status).withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -317,9 +320,9 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: _getStatusColor(status).withOpacity(0.05),
+            color: _getStatusColor(status).withValues(alpha: 0.05),
             border: Border.all(
-              color: _getStatusColor(status).withOpacity(0.2),
+              color: _getStatusColor(status).withValues(alpha: 0.2),
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -330,7 +333,7 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: _getStatusColor(status).withOpacity(0.1),
+                  color: _getStatusColor(status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -352,7 +355,7 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${currencyCode} - ${currency.name}',
+                      '$currencyCode - ${currency.name}',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),

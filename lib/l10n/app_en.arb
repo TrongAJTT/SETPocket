@@ -505,11 +505,9 @@
     "currencyFetchMode": "Currency Rate Fetching",
     "currencyFetchModeDesc": "Choose how currency exchange rates are updated",
     "fetchModeManual": "Manual",
-    "fetchModeManualDesc": "Only use cached rates, update manually by tapping refresh",
+    "fetchModeManualDesc": "Only use cached rates, update manually by tapping refresh (limited to once every 6 hours)",
     "fetchModeOnceADay": "Once a day",
     "fetchModeOnceADayDesc": "Automatically fetch rates once per day",
-    "fetchModeEverytime": "Every time",
-    "fetchModeEverytimeDesc": "Fetch fresh rates every time the converter is opened",
 
     "currencyFetchStatus": "Currency Fetch Status",
     "fetchStatusSummary": "Fetch Status Summary",
@@ -773,5 +771,35 @@
     "tip4": "• Check the status indicator for exchange rate freshness",
     "tip5": "• Use table view to compare multiple cards side by side",
     "rateUpdate": "Rate Updates",
-    "rateUpdateDesc": "Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior."
+    "rateUpdateDesc": "Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior.",
+    "poweredBy": "Powered by {service}",
+    "@poweredBy": {
+        "placeholders": {
+            "service": {
+                "type": "String"
+            }
+        }
+    },
+    "exchangeRatesBy": "Exchange rates by {service}",
+    "@exchangeRatesBy": {
+        "placeholders": {
+            "service": {
+                "type": "String"
+            }
+        }
+    },
+    "dataAttribution": "Data Attribution",
+    "apiProviderAttribution": "Exchange rate data is provided by ExchangeRate-API.com",
+    "rateLimitReached": "Rate limit reached",
+    "rateLimitMessage": "You can only fetch currency rates once every 6 hours. Please try again later.",
+    "nextFetchAllowedIn": "Next fetch allowed in: {timeRemaining}",
+    "@nextFetchAllowedIn": {
+        "placeholders": {
+            "timeRemaining": {
+                "type": "String"
+            }
+        }
+    },
+    "rateLimitInfo": "Rate limiting helps prevent API abuse and ensures service availability for everyone.",
+    "understood": "Understood"
 }

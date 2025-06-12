@@ -1502,19 +1502,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get fetchModeManual => 'Thủ công';
 
   @override
-  String get fetchModeManualDesc => 'Chỉ sử dụng tỷ giá đã lưu, cập nhật thủ công bằng nút làm mới';
+  String get fetchModeManualDesc => 'Chỉ sử dụng tỷ giá đã lưu, cập nhật thủ công bằng nút làm mới (giới hạn 6 tiếng 1 lần)';
 
   @override
   String get fetchModeOnceADay => 'Một lần mỗi ngày';
 
   @override
   String get fetchModeOnceADayDesc => 'Tự động tải tỷ giá một lần mỗi ngày';
-
-  @override
-  String get fetchModeEverytime => 'Mỗi lần mở';
-
-  @override
-  String get fetchModeEverytimeDesc => 'Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi';
 
   @override
   String get currencyFetchStatus => 'Trạng thái tải tiền tệ';
@@ -1899,4 +1893,37 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get rateUpdateDesc => 'Tỷ giá hối đoái được cập nhật dựa trên cài đặt của bạn. Kiểm tra Cài đặt > Công cụ chuyển đổi để cấu hình tần suất cập nhật và hành vi thử lại.';
+
+  @override
+  String poweredBy(String service) {
+    return 'Được hỗ trợ bởi $service';
+  }
+
+  @override
+  String exchangeRatesBy(String service) {
+    return 'Tỷ giá hối đoái từ $service';
+  }
+
+  @override
+  String get dataAttribution => 'Nguồn dữ liệu';
+
+  @override
+  String get apiProviderAttribution => 'Dữ liệu tỷ giá hối đoái được cung cấp bởi ExchangeRate-API.com';
+
+  @override
+  String get rateLimitReached => 'Đã đạt giới hạn tần suất';
+
+  @override
+  String get rateLimitMessage => 'Bạn chỉ có thể tải tỷ giá tiền tệ 6 tiếng 1 lần. Vui lòng thử lại sau.';
+
+  @override
+  String nextFetchAllowedIn(String timeRemaining) {
+    return 'Có thể tải tiếp theo sau: $timeRemaining';
+  }
+
+  @override
+  String get rateLimitInfo => 'Giới hạn tần suất giúp ngăn ngừa lạm dụng API và đảm bảo dịch vụ luôn khả dụng cho mọi người.';
+
+  @override
+  String get understood => 'Đã hiểu';
 }

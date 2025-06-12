@@ -538,11 +538,9 @@
     "currencyFetchMode": "Tải tỷ giá Tiền tệ",
     "currencyFetchModeDesc": "Chọn cách cập nhật tỷ giá hối đoái",
     "fetchModeManual": "Thủ công",
-    "fetchModeManualDesc": "Chỉ sử dụng tỷ giá đã lưu, cập nhật thủ công bằng nút làm mới",
+    "fetchModeManualDesc": "Chỉ sử dụng tỷ giá đã lưu, cập nhật thủ công bằng nút làm mới (giới hạn 6 tiếng 1 lần)",
     "fetchModeOnceADay": "Một lần mỗi ngày",
     "fetchModeOnceADayDesc": "Tự động tải tỷ giá một lần mỗi ngày",
-    "fetchModeEverytime": "Mỗi lần mở",
-    "fetchModeEverytimeDesc": "Tải tỷ giá mới mỗi lần mở công cụ chuyển đổi",
 
     "currencyFetchStatus": "Trạng thái tải tiền tệ",
     "fetchStatusSummary": "Tóm tắt trạng thái tải",
@@ -778,5 +776,35 @@
     "tip4": "• Kiểm tra chỉ báo trạng thái để biết độ mới của tỷ giá",
     "tip5": "• Sử dụng chế độ bảng để so sánh nhiều thẻ cạnh nhau",
     "rateUpdate": "Cập nhật tỷ giá",
-    "rateUpdateDesc": "Tỷ giá hối đoái được cập nhật dựa trên cài đặt của bạn. Kiểm tra Cài đặt > Công cụ chuyển đổi để cấu hình tần suất cập nhật và hành vi thử lại."
+    "rateUpdateDesc": "Tỷ giá hối đoái được cập nhật dựa trên cài đặt của bạn. Kiểm tra Cài đặt > Công cụ chuyển đổi để cấu hình tần suất cập nhật và hành vi thử lại.",
+    "poweredBy": "Được hỗ trợ bởi {service}",
+    "@poweredBy": {
+        "placeholders": {
+            "service": {
+                "type": "String"
+            }
+        }
+    },
+    "exchangeRatesBy": "Tỷ giá hối đoái từ {service}",
+    "@exchangeRatesBy": {
+        "placeholders": {
+            "service": {
+                "type": "String"
+            }
+        }
+    },
+    "dataAttribution": "Nguồn dữ liệu",
+    "apiProviderAttribution": "Dữ liệu tỷ giá hối đoái được cung cấp bởi ExchangeRate-API.com",
+    "rateLimitReached": "Đã đạt giới hạn tần suất",
+    "rateLimitMessage": "Bạn chỉ có thể tải tỷ giá tiền tệ 6 tiếng 1 lần. Vui lòng thử lại sau.",
+    "nextFetchAllowedIn": "Có thể tải tiếp theo sau: {timeRemaining}",
+    "@nextFetchAllowedIn": {
+        "placeholders": {
+            "timeRemaining": {
+                "type": "String"
+            }
+        }
+    },
+    "rateLimitInfo": "Giới hạn tần suất giúp ngăn ngừa lạm dụng API và đảm bảo dịch vụ luôn khả dụng cho mọi người.",
+    "understood": "Đã hiểu"
 }

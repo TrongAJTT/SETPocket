@@ -500,6 +500,18 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   Future<void> _refreshCurrencyRates() async {
     // Capture l10n early to avoid context access issues
     final l10n = AppLocalizations.of(context)!;
+
+    // Check rate limiting for manual fetch
+    final isAllowed = await CurrencyCacheService.isManualFetchAllowed();
+    if (!isAllowed) {
+      final remainingTime =
+          await CurrencyCacheService.getManualFetchCooldownRemaining();
+      if (remainingTime != null && mounted) {
+        _showRateLimitDialog(remainingTime);
+        return;
+      }
+    }
+
     bool dialogOpen = false;
     bool fetchCompleted = false;
 
@@ -987,6 +999,63 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 24),
+
+                      // Data Attribution
+                      _buildInfoSection(
+                        theme,
+                        l10n.dataAttribution,
+                        Icons.attribution,
+                        Colors.teal,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.apiProviderAttribution,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary
+                                          .withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.link,
+                                        size: 16,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'ExchangeRate-API.com',
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -1181,6 +1250,101 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     showDialog(
       context: context,
       builder: (context) => const CurrencyFetchStatusDialog(),
+    );
+  }
+
+  void _showRateLimitDialog(Duration remainingTime) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Format remaining time
+    String formatDuration(Duration duration) {
+      int hours = duration.inHours;
+      int minutes = duration.inMinutes.remainder(60);
+
+      if (hours > 0) {
+        return '${hours}h ${minutes}m';
+      } else {
+        return '${minutes}m';
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(l10n.rateLimitReached),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.rateLimitMessage),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .errorContainer
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.nextFetchAllowedIn(
+                              formatDuration(remainingTime)),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onErrorContainer,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.rateLimitInfo,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onErrorContainer
+                              .withValues(alpha: 0.8),
+                          fontSize: 11,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.understood),
+          ),
+        ],
+      ),
     );
   }
 

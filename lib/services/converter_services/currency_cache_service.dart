@@ -7,6 +7,8 @@ import '../settings_service.dart';
 class CurrencyCacheService {
   static const String _cacheBoxName = 'currency_cache';
   static const String _cacheKey = 'current_rates';
+  static const String _lastManualFetchKey = 'last_manual_fetch';
+  static const Duration _manualFetchCooldown = Duration(hours: 6);
 
   static Box<CurrencyCacheModel>? _cacheBox;
   static bool _isFetching = false;
@@ -221,8 +223,24 @@ class CurrencyCacheService {
   // Check if currently fetching
   static bool get isFetching => _isFetching;
 
-  // Clear cache
+  // Clear cache (but preserve currency rates and rate limiting data)
   static Future<void> clearCache() async {
+    try {
+      await initialize();
+
+      // Only clear general cache, but preserve currency cache and rate limiting
+      // This method should NOT clear currency rates or manual fetch times
+      // as requested by user
+
+      logInfo(
+          'CurrencyCacheService: Cache clearing requested, but currency rates and rate limiting data preserved');
+    } catch (e) {
+      logError('CurrencyCacheService: Error in cache operation: $e');
+    }
+  }
+
+  // Clear all currency data (for complete reset - not exposed to user)
+  static Future<void> _clearAllCurrencyData() async {
     try {
       await initialize();
       await _cacheBox!.delete(_cacheKey);
@@ -231,9 +249,10 @@ class CurrencyCacheService {
       // Reset CurrencyService to static rates
       CurrencyService.resetToStaticRates();
 
-      logInfo('CurrencyCacheService: Cache cleared and service reset');
+      logInfo(
+          'CurrencyCacheService: All currency data cleared and service reset');
     } catch (e) {
-      logError('CurrencyCacheService: Error clearing cache: $e');
+      logError('CurrencyCacheService: Error clearing all currency data: $e');
     }
   }
 
@@ -269,6 +288,71 @@ class CurrencyCacheService {
     return await getRates(forceRefresh: true);
   }
 
+  // Check if manual fetch is allowed (respects 6-hour rate limit)
+  static Future<bool> isManualFetchAllowed() async {
+    await initialize();
+
+    try {
+      final lastFetchBox =
+          await Hive.openBox('app_settings'); // Use same box as settings
+      final lastFetch = lastFetchBox.get(_lastManualFetchKey);
+
+      if (lastFetch == null) {
+        return true; // No previous fetch recorded
+      }
+
+      final lastFetchTime = DateTime.fromMillisecondsSinceEpoch(lastFetch);
+      final now = DateTime.now();
+      final timeSinceLastFetch = now.difference(lastFetchTime);
+
+      return timeSinceLastFetch >= _manualFetchCooldown;
+    } catch (e) {
+      logError(
+          'CurrencyCacheService: Error checking manual fetch cooldown: $e');
+      return true; // Allow if there's an error
+    }
+  }
+
+  // Get remaining time until next manual fetch is allowed
+  static Future<Duration?> getManualFetchCooldownRemaining() async {
+    await initialize();
+
+    try {
+      final lastFetchBox = await Hive.openBox('app_settings');
+      final lastFetch = lastFetchBox.get(_lastManualFetchKey);
+
+      if (lastFetch == null) {
+        return null; // No cooldown
+      }
+
+      final lastFetchTime = DateTime.fromMillisecondsSinceEpoch(lastFetch);
+      final now = DateTime.now();
+      final timeSinceLastFetch = now.difference(lastFetchTime);
+
+      if (timeSinceLastFetch >= _manualFetchCooldown) {
+        return null; // No cooldown
+      }
+
+      return _manualFetchCooldown - timeSinceLastFetch;
+    } catch (e) {
+      logError(
+          'CurrencyCacheService: Error getting manual fetch cooldown remaining: $e');
+      return null; // No cooldown if error
+    }
+  }
+
+  // Record manual fetch time
+  static Future<void> _recordManualFetch() async {
+    try {
+      final lastFetchBox = await Hive.openBox('app_settings');
+      await lastFetchBox.put(
+          _lastManualFetchKey, DateTime.now().millisecondsSinceEpoch);
+      logInfo('CurrencyCacheService: Recorded manual fetch time');
+    } catch (e) {
+      logError('CurrencyCacheService: Error recording manual fetch time: $e');
+    }
+  }
+
   // Force refresh rates (for use with dialog only - no background fetch)
   static Future<Map<String, double>> forceRefreshWithDialog() async {
     logInfo('CurrencyCacheService: Force refresh with dialog requested');
@@ -281,6 +365,9 @@ class CurrencyCacheService {
 
     try {
       _isFetching = true;
+
+      // Record manual fetch time for rate limiting
+      await _recordManualFetch();
 
       // This should only be called when progress dialog is already showing
       final newRates = await CurrencyService.fetchLiveRates();

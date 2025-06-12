@@ -2900,7 +2900,7 @@ abstract class AppLocalizations {
   /// No description provided for @fetchModeManualDesc.
   ///
   /// In en, this message translates to:
-  /// **'Only use cached rates, update manually by tapping refresh'**
+  /// **'Only use cached rates, update manually by tapping refresh (limited to once every 6 hours)'**
   String get fetchModeManualDesc;
 
   /// No description provided for @fetchModeOnceADay.
@@ -2914,18 +2914,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Automatically fetch rates once per day'**
   String get fetchModeOnceADayDesc;
-
-  /// No description provided for @fetchModeEverytime.
-  ///
-  /// In en, this message translates to:
-  /// **'Every time'**
-  String get fetchModeEverytime;
-
-  /// No description provided for @fetchModeEverytimeDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Fetch fresh rates every time the converter is opened'**
-  String get fetchModeEverytimeDesc;
 
   /// No description provided for @currencyFetchStatus.
   ///
@@ -3622,6 +3610,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior.'**
   String get rateUpdateDesc;
+
+  /// No description provided for @poweredBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by {service}'**
+  String poweredBy(String service);
+
+  /// No description provided for @exchangeRatesBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange rates by {service}'**
+  String exchangeRatesBy(String service);
+
+  /// No description provided for @dataAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Attribution'**
+  String get dataAttribution;
+
+  /// No description provided for @apiProviderAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange rate data is provided by ExchangeRate-API.com'**
+  String get apiProviderAttribution;
+
+  /// No description provided for @rateLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate limit reached'**
+  String get rateLimitReached;
+
+  /// No description provided for @rateLimitMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only fetch currency rates once every 6 hours. Please try again later.'**
+  String get rateLimitMessage;
+
+  /// No description provided for @nextFetchAllowedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Next fetch allowed in: {timeRemaining}'**
+  String nextFetchAllowedIn(String timeRemaining);
+
+  /// No description provided for @rateLimitInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate limiting helps prevent API abuse and ensures service availability for everyone.'**
+  String get rateLimitInfo;
+
+  /// No description provided for @understood.
+  ///
+  /// In en, this message translates to:
+  /// **'Understood'**
+  String get understood;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

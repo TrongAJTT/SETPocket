@@ -91,8 +91,6 @@ class CurrencyCacheModel extends HiveObject {
         return false; // Only refresh when manually requested
       case CurrencyFetchMode.onceADay:
         return isExpired;
-      case CurrencyFetchMode.everytime:
-        return true; // Always refresh
     }
   }
 }
@@ -104,9 +102,6 @@ enum CurrencyFetchMode {
 
   @HiveField(1)
   onceADay,
-
-  @HiveField(2)
-  everytime,
 }
 
 extension CurrencyFetchModeExtension on CurrencyFetchMode {
@@ -116,8 +111,6 @@ extension CurrencyFetchModeExtension on CurrencyFetchMode {
         return loc?.fetchModeManual ?? 'Manual';
       case CurrencyFetchMode.onceADay:
         return loc?.fetchModeOnceADay ?? 'Once a day';
-      case CurrencyFetchMode.everytime:
-        return loc?.fetchModeEverytime ?? 'Every time';
     }
   }
 
@@ -129,9 +122,6 @@ extension CurrencyFetchModeExtension on CurrencyFetchMode {
       case CurrencyFetchMode.onceADay:
         return loc?.fetchModeOnceADayDesc ??
             'Automatically fetch rates once per day';
-      case CurrencyFetchMode.everytime:
-        return loc?.fetchModeEverytimeDesc ??
-            'Fetch fresh rates every time you use the converter';
     }
   }
 }

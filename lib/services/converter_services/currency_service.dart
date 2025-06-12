@@ -1,4 +1,6 @@
-import 'package:live_currency_rate/live_currency_rate.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:setpocket/services/app_logger.dart';
 import '../settings_service.dart';
 
@@ -26,6 +28,64 @@ class CurrencyFetchResult {
 
   CurrencyFetchResult(
       {required this.rate, required this.status, this.fetchDate});
+}
+
+// Custom HTTP-based currency fetcher to replace live_currency_rate
+class CustomCurrencyFetcher {
+  static const String _baseUrl = 'https://api.exchangerate-api.com/v4/latest';
+  static const Duration _timeout = Duration(seconds: 10);
+
+  static Future<double> fetchRate(
+      String fromCurrency, String toCurrency) async {
+    try {
+      // Create HTTP client with proper headers
+      final client = http.Client();
+
+      // Set up headers for better compatibility
+      final headers = {
+        'User-Agent': 'SETPocket/1.0.2 (Flutter App)',
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+      };
+
+      final uri = Uri.parse('$_baseUrl/$fromCurrency');
+      logInfo('CustomCurrencyFetcher: Fetching from $uri');
+
+      final response =
+          await client.get(uri, headers: headers).timeout(_timeout);
+
+      client.close();
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final rates = data['rates'] as Map<String, dynamic>;
+
+        if (rates.containsKey(toCurrency)) {
+          final rate = (rates[toCurrency] as num).toDouble();
+          logInfo('CustomCurrencyFetcher: Got rate for $toCurrency: $rate');
+          return rate;
+        } else {
+          throw Exception('Currency $toCurrency not found in response');
+        }
+      } else {
+        throw HttpException(
+            'HTTP ${response.statusCode}: ${response.reasonPhrase}');
+      }
+    } on SocketException catch (e) {
+      logError('CustomCurrencyFetcher: Network error: $e');
+      throw Exception('Network error: Check internet connection');
+    } on HttpException catch (e) {
+      logError('CustomCurrencyFetcher: HTTP error: $e');
+      throw Exception('HTTP error: $e');
+    } on FormatException catch (e) {
+      logError('CustomCurrencyFetcher: JSON parse error: $e');
+      throw Exception('Invalid response format');
+    } catch (e) {
+      logError('CustomCurrencyFetcher: Unexpected error: $e');
+      throw Exception('Failed to fetch currency rate: $e');
+    }
+  }
 }
 
 class CurrencyService {
@@ -514,8 +574,10 @@ class CurrencyService {
       }
 
       logInfo('CurrencyService: Fetching rate for $currencyCode...');
-      final result =
-          await LiveCurrencyRate.convertCurrency('USD', currencyCode, 1.0);
+      final result = await CustomCurrencyFetcher.fetchRate('USD', currencyCode)
+          .timeout(const Duration(seconds: 15), onTimeout: () {
+        throw Exception('Request timeout after 15 seconds');
+      });
 
       // Check if cancelled after API call
       if (_isCancelled) {
@@ -526,17 +588,14 @@ class CurrencyService {
             status: CurrencyStatus.failed);
       }
 
-      if (result.result > 0) {
+      if (result > 0) {
         final fetchDate = DateTime.now();
         // Only log if not cancelled to avoid spam
         if (!_isCancelled) {
-          logInfo(
-              'CurrencyService: Got live rate for $currencyCode: ${result.result}');
+          logInfo('CurrencyService: Got live rate for $currencyCode: $result');
         }
         return CurrencyFetchResult(
-            rate: result.result,
-            status: CurrencyStatus.success,
-            fetchDate: fetchDate);
+            rate: result, status: CurrencyStatus.success, fetchDate: fetchDate);
       } else {
         // Only log if not cancelled to avoid spam
         if (!_isCancelled) {

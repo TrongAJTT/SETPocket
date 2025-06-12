@@ -1502,19 +1502,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fetchModeManual => 'Manual';
 
   @override
-  String get fetchModeManualDesc => 'Only use cached rates, update manually by tapping refresh';
+  String get fetchModeManualDesc => 'Only use cached rates, update manually by tapping refresh (limited to once every 6 hours)';
 
   @override
   String get fetchModeOnceADay => 'Once a day';
 
   @override
   String get fetchModeOnceADayDesc => 'Automatically fetch rates once per day';
-
-  @override
-  String get fetchModeEverytime => 'Every time';
-
-  @override
-  String get fetchModeEverytimeDesc => 'Fetch fresh rates every time the converter is opened';
 
   @override
   String get currencyFetchStatus => 'Currency Fetch Status';
@@ -1899,4 +1893,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rateUpdateDesc => 'Exchange rates are updated based on your settings. Check Settings > Converter Tools to configure update frequency and retry behavior.';
+
+  @override
+  String poweredBy(String service) {
+    return 'Powered by $service';
+  }
+
+  @override
+  String exchangeRatesBy(String service) {
+    return 'Exchange rates by $service';
+  }
+
+  @override
+  String get dataAttribution => 'Data Attribution';
+
+  @override
+  String get apiProviderAttribution => 'Exchange rate data is provided by ExchangeRate-API.com';
+
+  @override
+  String get rateLimitReached => 'Rate limit reached';
+
+  @override
+  String get rateLimitMessage => 'You can only fetch currency rates once every 6 hours. Please try again later.';
+
+  @override
+  String nextFetchAllowedIn(String timeRemaining) {
+    return 'Next fetch allowed in: $timeRemaining';
+  }
+
+  @override
+  String get rateLimitInfo => 'Rate limiting helps prevent API abuse and ensures service availability for everyone.';
+
+  @override
+  String get understood => 'Understood';
 }

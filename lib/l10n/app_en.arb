@@ -523,9 +523,113 @@
     "saveFeatureStateDesc": "Remember the state of features between app sessions",
     "testCache": "Test Cache",
     
-    "viewFetchStatus": "View Fetch Status",
-    
-    "cacheTypeConverterTools": "Converter Tools",
+      "viewDataStatus": "View Data Status",
+  "retryAttempt": "Retry {current}/{max}",
+  "@retryAttempt": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ratesUpdatedWithErrors": "Rates updated with {errorCount} errors",
+  "@ratesUpdatedWithErrors": {
+    "placeholders": {
+      "errorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "newRatesAvailable": "New exchange rates are available. Would you like to fetch them now?",
+  "progressDialogInfo": "This will show a progress dialog while fetching rates.",
+  "calculating": "Calculating...",
+  "unknown": "Unknown",
+  "logsManagement": "App logs management and storage settings",
+  "statusInfo": "Status: {info}",
+  "@statusInfo": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "logsAvailable": "Logs available",
+  "noTimeData": "--:--:--",
+  "fetchStatusTab": "Fetch Status",
+  "currencyValueTab": "Currency Value",
+  "successfulCount": "Successful ({count})",
+  "@successfulCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "failedCount": "Failed ({count})",
+  "@failedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeoutCount": "Timeout ({count})",
+  "@timeoutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recentlyUpdatedCount": "Recently Updated ({count})",
+  "@recentlyUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "updatedCount": "Updated ({count})",
+  "@updatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "staticCount": "Static ({count})",
+  "@staticCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noCurrenciesInCategory": "No currencies in this category",
+  "updatedWithinLastHour": "Updated within the last hour",
+  "updatedDaysAgo": "Updated {days} days ago",
+  "@updatedDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "updatedHoursAgo": "Updated {hours} hours ago",
+  "@updatedHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "hasUpdateData": "Has update data",
+  "usingStaticRates": "Using static rates",
+
+  "cacheTypeConverterTools": "Converter Tools",
     "cacheTypeConverterToolsDesc": "Currency/length states, presets and exchange rates cache",
 
     "cardName": "Card Name",

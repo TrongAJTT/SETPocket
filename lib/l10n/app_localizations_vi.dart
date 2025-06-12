@@ -1547,7 +1547,101 @@ class AppLocalizationsVi extends AppLocalizations {
   String get testCache => 'Kiểm tra bộ nhớ đệm';
 
   @override
-  String get viewFetchStatus => 'Xem trạng thái tải';
+  String get viewDataStatus => 'Xem trạng thái dữ liệu';
+
+  @override
+  String retryAttempt(int current, int max) {
+    return 'Thử lại lần $current/$max';
+  }
+
+  @override
+  String ratesUpdatedWithErrors(int errorCount) {
+    return 'Đã cập nhật tỷ giá với $errorCount lỗi';
+  }
+
+  @override
+  String get newRatesAvailable => 'Có tỷ giá mới khả dụng. Bạn có muốn tải ngay bây giờ không?';
+
+  @override
+  String get progressDialogInfo => 'Điều này sẽ hiện dialog tiến trình trong khi tải tỷ giá.';
+
+  @override
+  String get calculating => 'Đang tính toán...';
+
+  @override
+  String get unknown => 'Không rõ';
+
+  @override
+  String get logsManagement => 'Quản lý log ứng dụng và cài đặt lưu trữ';
+
+  @override
+  String statusInfo(String info) {
+    return 'Trạng thái: $info';
+  }
+
+  @override
+  String get logsAvailable => 'Log khả dụng';
+
+  @override
+  String get noTimeData => '--:--:--';
+
+  @override
+  String get fetchStatusTab => 'Trạng thái fetch';
+
+  @override
+  String get currencyValueTab => 'Giá trị tiền tệ';
+
+  @override
+  String successfulCount(int count) {
+    return 'Thành công ($count)';
+  }
+
+  @override
+  String failedCount(int count) {
+    return 'Thất bại ($count)';
+  }
+
+  @override
+  String timeoutCount(int count) {
+    return 'Timeout ($count)';
+  }
+
+  @override
+  String recentlyUpdatedCount(int count) {
+    return 'Cập nhật gần đây ($count)';
+  }
+
+  @override
+  String updatedCount(int count) {
+    return 'Đã cập nhật ($count)';
+  }
+
+  @override
+  String staticCount(int count) {
+    return 'Static ($count)';
+  }
+
+  @override
+  String get noCurrenciesInCategory => 'Không có tiền tệ nào trong danh mục này';
+
+  @override
+  String get updatedWithinLastHour => 'Cập nhật trong vòng 1 giờ qua';
+
+  @override
+  String updatedDaysAgo(int days) {
+    return 'Cập nhật $days ngày trước';
+  }
+
+  @override
+  String updatedHoursAgo(int hours) {
+    return 'Cập nhật $hours giờ trước';
+  }
+
+  @override
+  String get hasUpdateData => 'Có dữ liệu cập nhật';
+
+  @override
+  String get usingStaticRates => 'Sử dụng tỷ giá tĩnh';
 
   @override
   String get cacheTypeConverterTools => 'Công cụ chuyển đổi';

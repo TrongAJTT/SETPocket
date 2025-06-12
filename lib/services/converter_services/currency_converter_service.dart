@@ -155,6 +155,8 @@ class CurrencyConverterService implements ConverterServiceBase {
         return ConversionStatus.notAvailable;
       case CurrencyStatus.fetchedRecently:
         return ConversionStatus.success;
+      case CurrencyStatus.fetching:
+        return ConversionStatus.loading;
     }
   }
 

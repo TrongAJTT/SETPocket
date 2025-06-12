@@ -151,6 +151,9 @@ class CurrencyCacheService {
       logInfo(
           'CurrencyCacheService: Loaded ${statuses.length} currency statuses from cache');
     }
+
+    // Apply status transitions based on current time to ensure status accuracy
+    CurrencyService.updateStatusAfterLoad();
   }
 
   // Save rates to cache

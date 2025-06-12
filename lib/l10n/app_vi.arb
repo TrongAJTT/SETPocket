@@ -556,9 +556,113 @@
     "saveFeatureStateDesc": "Ghi nhớ trạng thái của các tính năng giữa các phiên sử dụng",
     "testCache": "Kiểm tra bộ nhớ đệm",
     
-    "viewFetchStatus": "Xem trạng thái tải",
-    
-    "cacheTypeConverterTools": "Công cụ chuyển đổi",
+      "viewDataStatus": "Xem trạng thái dữ liệu",
+  "retryAttempt": "Thử lại lần {current}/{max}",
+  "@retryAttempt": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ratesUpdatedWithErrors": "Đã cập nhật tỷ giá với {errorCount} lỗi",
+  "@ratesUpdatedWithErrors": {
+    "placeholders": {
+      "errorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "newRatesAvailable": "Có tỷ giá mới khả dụng. Bạn có muốn tải ngay bây giờ không?",
+  "progressDialogInfo": "Điều này sẽ hiện dialog tiến trình trong khi tải tỷ giá.",
+  "calculating": "Đang tính toán...",
+  "unknown": "Không rõ",
+  "logsManagement": "Quản lý log ứng dụng và cài đặt lưu trữ",
+  "statusInfo": "Trạng thái: {info}",
+  "@statusInfo": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "logsAvailable": "Log khả dụng",
+  "noTimeData": "--:--:--",
+  "fetchStatusTab": "Trạng thái fetch",
+  "currencyValueTab": "Giá trị tiền tệ",
+  "successfulCount": "Thành công ({count})",
+  "@successfulCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "failedCount": "Thất bại ({count})",
+  "@failedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeoutCount": "Timeout ({count})",
+  "@timeoutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recentlyUpdatedCount": "Cập nhật gần đây ({count})",
+  "@recentlyUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "updatedCount": "Đã cập nhật ({count})",
+  "@updatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "staticCount": "Static ({count})",
+  "@staticCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noCurrenciesInCategory": "Không có tiền tệ nào trong danh mục này",
+  "updatedWithinLastHour": "Cập nhật trong vòng 1 giờ qua",
+  "updatedDaysAgo": "Cập nhật {days} ngày trước",
+  "@updatedDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "updatedHoursAgo": "Cập nhật {hours} giờ trước",
+  "@updatedHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "hasUpdateData": "Có dữ liệu cập nhật",
+  "usingStaticRates": "Sử dụng tỷ giá tĩnh",
+
+  "cacheTypeConverterTools": "Công cụ chuyển đổi",
     "cacheTypeConverterToolsDesc": "Trạng thái tiền tệ/chiều dài, cài đặt sẵn và bộ nhớ đệm tỷ giá",
 
     "cardName": "Tên Thẻ",

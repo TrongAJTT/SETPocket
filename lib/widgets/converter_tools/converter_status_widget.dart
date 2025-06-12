@@ -162,7 +162,7 @@ class ConverterStatusWidget extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
-            tooltip: l10n.viewFetchStatus,
+            tooltip: l10n.viewDataStatus,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(
               minWidth: 32,

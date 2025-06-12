@@ -2987,11 +2987,155 @@ abstract class AppLocalizations {
   /// **'Test Cache'**
   String get testCache;
 
-  /// No description provided for @viewFetchStatus.
+  /// No description provided for @viewDataStatus.
   ///
   /// In en, this message translates to:
-  /// **'View Fetch Status'**
-  String get viewFetchStatus;
+  /// **'View Data Status'**
+  String get viewDataStatus;
+
+  /// No description provided for @retryAttempt.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry {current}/{max}'**
+  String retryAttempt(int current, int max);
+
+  /// No description provided for @ratesUpdatedWithErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates updated with {errorCount} errors'**
+  String ratesUpdatedWithErrors(int errorCount);
+
+  /// No description provided for @newRatesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'New exchange rates are available. Would you like to fetch them now?'**
+  String get newRatesAvailable;
+
+  /// No description provided for @progressDialogInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'This will show a progress dialog while fetching rates.'**
+  String get progressDialogInfo;
+
+  /// No description provided for @calculating.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating...'**
+  String get calculating;
+
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// No description provided for @logsManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'App logs management and storage settings'**
+  String get logsManagement;
+
+  /// No description provided for @statusInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: {info}'**
+  String statusInfo(String info);
+
+  /// No description provided for @logsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs available'**
+  String get logsAvailable;
+
+  /// No description provided for @noTimeData.
+  ///
+  /// In en, this message translates to:
+  /// **'--:--:--'**
+  String get noTimeData;
+
+  /// No description provided for @fetchStatusTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Status'**
+  String get fetchStatusTab;
+
+  /// No description provided for @currencyValueTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Value'**
+  String get currencyValueTab;
+
+  /// No description provided for @successfulCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful ({count})'**
+  String successfulCount(int count);
+
+  /// No description provided for @failedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed ({count})'**
+  String failedCount(int count);
+
+  /// No description provided for @timeoutCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout ({count})'**
+  String timeoutCount(int count);
+
+  /// No description provided for @recentlyUpdatedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Updated ({count})'**
+  String recentlyUpdatedCount(int count);
+
+  /// No description provided for @updatedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated ({count})'**
+  String updatedCount(int count);
+
+  /// No description provided for @staticCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Static ({count})'**
+  String staticCount(int count);
+
+  /// No description provided for @noCurrenciesInCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No currencies in this category'**
+  String get noCurrenciesInCategory;
+
+  /// No description provided for @updatedWithinLastHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated within the last hour'**
+  String get updatedWithinLastHour;
+
+  /// No description provided for @updatedDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {days} days ago'**
+  String updatedDaysAgo(int days);
+
+  /// No description provided for @updatedHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {hours} hours ago'**
+  String updatedHoursAgo(int hours);
+
+  /// No description provided for @hasUpdateData.
+  ///
+  /// In en, this message translates to:
+  /// **'Has update data'**
+  String get hasUpdateData;
+
+  /// No description provided for @usingStaticRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Using static rates'**
+  String get usingStaticRates;
 
   /// No description provided for @cacheTypeConverterTools.
   ///

@@ -1547,7 +1547,101 @@ class AppLocalizationsEn extends AppLocalizations {
   String get testCache => 'Test Cache';
 
   @override
-  String get viewFetchStatus => 'View Fetch Status';
+  String get viewDataStatus => 'View Data Status';
+
+  @override
+  String retryAttempt(int current, int max) {
+    return 'Retry $current/$max';
+  }
+
+  @override
+  String ratesUpdatedWithErrors(int errorCount) {
+    return 'Rates updated with $errorCount errors';
+  }
+
+  @override
+  String get newRatesAvailable => 'New exchange rates are available. Would you like to fetch them now?';
+
+  @override
+  String get progressDialogInfo => 'This will show a progress dialog while fetching rates.';
+
+  @override
+  String get calculating => 'Calculating...';
+
+  @override
+  String get unknown => 'Unknown';
+
+  @override
+  String get logsManagement => 'App logs management and storage settings';
+
+  @override
+  String statusInfo(String info) {
+    return 'Status: $info';
+  }
+
+  @override
+  String get logsAvailable => 'Logs available';
+
+  @override
+  String get noTimeData => '--:--:--';
+
+  @override
+  String get fetchStatusTab => 'Fetch Status';
+
+  @override
+  String get currencyValueTab => 'Currency Value';
+
+  @override
+  String successfulCount(int count) {
+    return 'Successful ($count)';
+  }
+
+  @override
+  String failedCount(int count) {
+    return 'Failed ($count)';
+  }
+
+  @override
+  String timeoutCount(int count) {
+    return 'Timeout ($count)';
+  }
+
+  @override
+  String recentlyUpdatedCount(int count) {
+    return 'Recently Updated ($count)';
+  }
+
+  @override
+  String updatedCount(int count) {
+    return 'Updated ($count)';
+  }
+
+  @override
+  String staticCount(int count) {
+    return 'Static ($count)';
+  }
+
+  @override
+  String get noCurrenciesInCategory => 'No currencies in this category';
+
+  @override
+  String get updatedWithinLastHour => 'Updated within the last hour';
+
+  @override
+  String updatedDaysAgo(int days) {
+    return 'Updated $days days ago';
+  }
+
+  @override
+  String updatedHoursAgo(int hours) {
+    return 'Updated $hours hours ago';
+  }
+
+  @override
+  String get hasUpdateData => 'Has update data';
+
+  @override
+  String get usingStaticRates => 'Using static rates';
 
   @override
   String get cacheTypeConverterTools => 'Converter Tools';

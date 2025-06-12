@@ -34,6 +34,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   DateTime? _lastUpdated;
   bool _isUsingLiveRates = false;
 
+  // Auto-retry variables
+  int _currentRetryAttempt = 0;
+  int _maxRetryAttempts = 0;
+
   // Currency visibility
   final Set<String> _visibleCurrencies = {
     'USD',
@@ -229,7 +233,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     }
   }
 
-  void _updateRowConversions(int rowIndex, String fromCurrency, double value) {
+  void _updateRowConversions(int rowIndex, String fromCurrency, double value,
+      {bool shouldSetState = true}) {
     if (rowIndex >= _rowValues.length) return;
 
     _rowBaseCurrencies[rowIndex] = fromCurrency;
@@ -250,7 +255,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         _rowValues[rowIndex][currencyCode] = value;
       }
     }
-    setState(() {});
+
+    // Only call setState if requested (default true for backward compatibility)
+    if (shouldSetState) {
+      setState(() {});
+    }
   }
 
   void _onRowValueChanged(int rowIndex, String currencyCode, String value) {
@@ -408,18 +417,59 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       // Update CurrencyService with the cached/static rates
       await _updateCurrencyServiceRates(rates);
 
+      // First, update UI state immediately
       if (mounted) {
+        final isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+
         setState(() {
           _lastUpdated = cacheInfo?.lastUpdated;
-          _isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+          _isUsingLiveRates = isUsingLiveRates;
+          _isLoadingRates = false; // Clear loading state immediately
         });
+
+        logInfo(
+            'Initialized UI state immediately: isUsingLiveRates=$isUsingLiveRates, lastUpdated=${cacheInfo?.lastUpdated}');
       }
 
-      // Update all existing rows
-      for (int i = 0; i < _rowControllers.length; i++) {
-        final baseCurrency = _rowBaseCurrencies[i];
-        final baseValue = _rowValues[i][baseCurrency] ?? 1.0;
-        _updateRowConversions(i, baseCurrency, baseValue);
+      // Then update existing rows asynchronously
+      if (mounted) {
+        Future.microtask(() async {
+          if (!mounted) return;
+
+          final updateStart = DateTime.now();
+
+          // Process cards in chunks to avoid blocking UI
+          const chunkSize = 3;
+          for (int chunkStart = 0;
+              chunkStart < _rowControllers.length;
+              chunkStart += chunkSize) {
+            if (!mounted) return;
+
+            final chunkEnd =
+                (chunkStart + chunkSize).clamp(0, _rowControllers.length);
+
+            for (int i = chunkStart; i < chunkEnd; i++) {
+              final baseCurrency = _rowBaseCurrencies[i];
+              final baseValue = _rowValues[i][baseCurrency] ?? 1.0;
+              _updateRowConversions(i, baseCurrency, baseValue,
+                  shouldSetState: false);
+            }
+
+            // Small delay between chunks
+            if (chunkEnd < _rowControllers.length) {
+              await Future.delayed(const Duration(milliseconds: 1));
+            }
+          }
+
+          // Single setState after all updates
+          if (mounted) {
+            setState(() {});
+          }
+
+          final updateEnd = DateTime.now();
+          logInfo(
+              'Initialization row conversions updated in ${updateEnd.difference(updateStart).inMilliseconds}ms');
+        });
       }
 
       // Check if we should fetch new rates (but don't auto-fetch)
@@ -434,11 +484,6 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         setState(() {
           _lastUpdated = null;
           _isUsingLiveRates = false;
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
           _isLoadingRates = false;
         });
       }
@@ -458,7 +503,15 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     bool dialogOpen = false;
     bool fetchCompleted = false;
 
-    logInfo('Starting manual currency rates refresh');
+    // Initialize retry variables if this is first attempt
+    if (_currentRetryAttempt == 0) {
+      _maxRetryAttempts = await SettingsService.getFetchRetryTimes();
+      logInfo(
+          'Starting currency rates refresh with max ${_maxRetryAttempts} retries');
+    }
+
+    logInfo(
+        'Starting manual currency rates refresh (attempt ${_currentRetryAttempt + 1}/${_maxRetryAttempts + 1})');
 
     try {
       // Get timeout from settings
@@ -487,15 +540,14 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
               logInfo('Dialog cancel callback triggered');
               dialogOpen = false;
               CurrencyService.cancelFetch();
+              // Reset retry attempts when cancelled
+              _currentRetryAttempt = 0;
             },
             onComplete: () {
               logInfo(
-                  'Dialog complete callback triggered - clearing loading state');
-              if (mounted) {
-                setState(() {
-                  _isLoadingRates = false;
-                });
-              }
+                  'Dialog complete callback triggered - but NOT clearing loading state yet');
+              // Don't clear loading state here - let the main method handle it
+              // This prevents premature state clearing before final update
             },
           );
         },
@@ -517,8 +569,15 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       }
 
       final rates = await CurrencyCacheService.forceRefreshWithDialog();
-      final cacheInfo = await CurrencyCacheService.getCacheInfo();
       fetchCompleted = true;
+      logInfo('Fetch completed, got ${rates.length} rates');
+
+      // Get cache info immediately after fetch while it's fresh in memory
+      final cacheInfoStart = DateTime.now();
+      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      final cacheInfoEnd = DateTime.now();
+      logInfo(
+          'Cache info retrieved in ${cacheInfoEnd.difference(cacheInfoStart).inMilliseconds}ms');
 
       // Close progress dialog safely (only if still open)
       if (mounted && dialogOpen) {
@@ -527,33 +586,138 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         dialogOpen = false;
       }
 
-      // Small delay to ensure dialog is completely closed
-      await Future.delayed(const Duration(milliseconds: 100));
-
       // Update CurrencyService with fresh rates
       await _updateCurrencyServiceRates(rates);
+      logInfo('CurrencyService updated');
 
-      if (mounted) {
-        setState(() {
-          _lastUpdated = cacheInfo?.lastUpdated;
-          _isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
-        });
+      // Check if any currencies failed/timeout and decide on retry
+      final statuses = CurrencyService.currencyStatuses;
+      final failedCurrencies = statuses.entries
+          .where((entry) =>
+              entry.value == CurrencyStatus.failed ||
+              entry.value == CurrencyStatus.timeout)
+          .map((entry) => entry.key)
+          .toList();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _isUsingLiveRates ? l10n.liveRatesUpdated : l10n.staticRatesUsed,
+      logInfo(
+          'Failed currencies: ${failedCurrencies.length} - ${failedCurrencies.join(', ')}');
+
+      // Check if we should retry
+      bool shouldRetry = failedCurrencies.isNotEmpty &&
+          _currentRetryAttempt < _maxRetryAttempts;
+
+      if (shouldRetry) {
+        // Increment retry attempt
+        _currentRetryAttempt++;
+        logInfo(
+            'Will retry (attempt $_currentRetryAttempt/$_maxRetryAttempts) for ${failedCurrencies.length} failed currencies');
+
+        // Show retry snackbar
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  l10n.retryAttempt(_currentRetryAttempt, _maxRetryAttempts)),
+              duration: const Duration(seconds: 2),
             ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+          );
+        }
 
-      // Update all existing rows
-      for (int i = 0; i < _rowControllers.length; i++) {
-        final baseCurrency = _rowBaseCurrencies[i];
-        final baseValue = _rowValues[i][baseCurrency] ?? 1.0;
-        _updateRowConversions(i, baseCurrency, baseValue);
+        // Small delay before retry
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        // Recursive call for retry (but don't update UI state yet)
+        if (mounted) {
+          return _refreshCurrencyRates();
+        }
+      } else {
+        // Final result - reset retry attempts and update UI
+        _currentRetryAttempt = 0;
+
+        // First, update the UI state immediately to show the user that fetch is complete
+        if (mounted) {
+          final stateUpdateStart = DateTime.now();
+          final isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+
+          setState(() {
+            _lastUpdated = cacheInfo?.lastUpdated;
+            _isUsingLiveRates = isUsingLiveRates;
+            _isLoadingRates = false; // Clear loading state immediately
+          });
+
+          final stateUpdateEnd = DateTime.now();
+          logInfo(
+              'UI state updated immediately in ${stateUpdateEnd.difference(stateUpdateStart).inMilliseconds}ms');
+
+          // Show final result snackbar
+          String snackbarMessage;
+          if (failedCurrencies.isEmpty) {
+            snackbarMessage =
+                isUsingLiveRates ? l10n.liveRatesUpdated : l10n.staticRatesUsed;
+          } else {
+            snackbarMessage =
+                l10n.ratesUpdatedWithErrors(failedCurrencies.length);
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(snackbarMessage),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+
+          logInfo(
+              'Updated UI state: isUsingLiveRates=$isUsingLiveRates, lastUpdated=${cacheInfo?.lastUpdated}');
+        }
+
+        // Then update all existing rows asynchronously to avoid blocking UI
+        if (mounted) {
+          // Use a microtask to allow UI to render the state change first
+          Future.microtask(() async {
+            if (!mounted) return;
+
+            final updateStart = DateTime.now();
+            final totalCards = _rowControllers.length;
+            int totalCurrencies = 0;
+
+            // Process cards in chunks to avoid blocking UI
+            const chunkSize = 3; // Process 3 cards at a time
+            for (int chunkStart = 0;
+                chunkStart < _rowControllers.length;
+                chunkStart += chunkSize) {
+              if (!mounted) return;
+
+              final chunkEnd =
+                  (chunkStart + chunkSize).clamp(0, _rowControllers.length);
+
+              for (int i = chunkStart; i < chunkEnd; i++) {
+                final cardCurrencies = i < _cardCurrencies.length
+                    ? _cardCurrencies[i]
+                    : _visibleCurrencies;
+                totalCurrencies += cardCurrencies.length;
+
+                final baseCurrency = _rowBaseCurrencies[i];
+                final baseValue = _rowValues[i][baseCurrency] ?? 1.0;
+                _updateRowConversions(i, baseCurrency, baseValue,
+                    shouldSetState: false);
+              }
+
+              // Small delay between chunks to keep UI responsive
+              if (chunkEnd < _rowControllers.length) {
+                await Future.delayed(const Duration(milliseconds: 1));
+              }
+            }
+
+            // Trigger a single setState after all conversions are updated
+            if (mounted) {
+              setState(() {});
+            }
+
+            final updateEnd = DateTime.now();
+            logInfo(
+                'Row conversions updated: $totalCards cards, $totalCurrencies total currency conversions in ${updateEnd.difference(updateStart).inMilliseconds}ms');
+          });
+        }
       }
     } catch (e) {
       logError('Failed to refresh currency rates: $e');
@@ -565,7 +729,14 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         dialogOpen = false;
       }
 
+      // Reset retry attempts on error
+      _currentRetryAttempt = 0;
+
       if (mounted) {
+        setState(() {
+          _isLoadingRates = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.failedToUpdateRates),
@@ -574,10 +745,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         );
       }
     } finally {
-      // Ensure loading state is always cleared
-      if (mounted) {
-        logInfo(
-            'Clearing loading state - fetchCompleted: $fetchCompleted, dialogOpen: $dialogOpen');
+      // Ensure loading state is always cleared - but only if not retrying
+      if (mounted && _isLoadingRates && _currentRetryAttempt == 0) {
+        logInfo('Finally block: clearing loading state as fallback');
         setState(() {
           _isLoadingRates = false;
         });
@@ -1036,8 +1206,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-                'New exchange rates are available. Would you like to fetch them now?'),
+            Text(l10n.newRatesAvailable),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -1058,7 +1227,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'This will show a progress dialog while fetching rates.',
+                      l10n.progressDialogInfo,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -1291,7 +1460,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                             color: Theme.of(context).colorScheme.primary,
                             size: 20,
                           ),
-                          tooltip: l10n.viewFetchStatus,
+                          tooltip: l10n.viewDataStatus,
                           padding: const EdgeInsets.all(4),
                           constraints: const BoxConstraints(
                             minWidth: 32,
@@ -1387,7 +1556,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         color: Theme.of(context).colorScheme.primary,
                         size: 20,
                       ),
-                      tooltip: l10n.viewFetchStatus,
+                      tooltip: l10n.viewDataStatus,
                       padding: const EdgeInsets.all(4),
                       constraints: const BoxConstraints(
                         minWidth: 32,
@@ -1895,6 +2064,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   final value = _rowValues[index][currency] ?? 0.0;
                   final currencyStatus =
                       CurrencyService.getCurrencyStatus(currency);
+                  final currencyValueStatus =
+                      CurrencyService.getCurrencyValueStatus(currency);
                   final hasError = currencyStatus == CurrencyStatus.failed ||
                       currencyStatus == CurrencyStatus.timeout;
 
@@ -2010,6 +2181,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                 final value = _rowValues[index][currency] ?? 0.0;
                 final currencyStatus =
                     CurrencyService.getCurrencyStatus(currency);
+                final currencyValueStatus =
+                    CurrencyService.getCurrencyValueStatus(currency);
                 final hasError = currencyStatus == CurrencyStatus.failed ||
                     currencyStatus == CurrencyStatus.timeout;
 
@@ -2238,6 +2411,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       _converter.units.firstWhere((u) => u.id == currency);
                   final currencyStatus =
                       CurrencyService.getCurrencyStatus(currency);
+                  final currencyValueStatus =
+                      CurrencyService.getCurrencyValueStatus(currency);
                   final hasError = currencyStatus == CurrencyStatus.failed ||
                       currencyStatus == CurrencyStatus.timeout;
                   final isDarkMode =

@@ -29,7 +29,7 @@ class MainSettingsScreen extends StatefulWidget {
 class _MainSettingsScreenState extends State<MainSettingsScreen> {
   late ThemeMode _themeMode = settingsController.themeMode;
   late String _language = settingsController.locale.languageCode;
-  String _cacheInfo = 'Calculating...';
+  String _cacheInfo = '';
   bool _clearing = false;
   bool _loading = true;
   bool _historyEnabled = false;
@@ -41,13 +41,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   // Add state variables for log section
   bool _logSectionExpanded = false;
   int _logRetentionDays = 7;
-  String _logInfo = 'Calculating...';
+  String _logInfo = '';
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
     _loadCacheInfo();
+    _loadLogInfo();
   }
 
   Future<void> _loadSettings() async {
@@ -77,6 +78,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _loadCacheInfo() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _cacheInfo = l10n.calculating;
+    });
+
     try {
       final totalSize = await CacheService.getTotalCacheSize();
       setState(() {
@@ -84,7 +90,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       });
     } catch (e) {
       setState(() {
-        _cacheInfo = 'Unknown';
+        _cacheInfo = l10n.unknown;
       });
     }
   }
@@ -220,9 +226,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               const SizedBox(height: 8),
               TextField(
                 controller: textController,
-                decoration: const InputDecoration(
-                  hintText: 'confirm',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: loc.confirmText,
+                  border: const OutlineInputBorder(),
                 ),
                 onChanged: (value) => setState(() {}),
               ),
@@ -234,7 +240,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
               child: Text(loc.cancel),
             ),
             FilledButton(
-              onPressed: textController.text.toLowerCase() == 'confirm'
+              onPressed: textController.text.toLowerCase() ==
+                      loc.confirmText.toLowerCase()
                   ? () => Navigator.of(context).pop(true)
                   : null,
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -1393,7 +1400,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Quản lý log ứng dụng và cài đặt lưu trữ',
+                          loc.logsManagement,
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: Theme.of(context)
@@ -1430,7 +1437,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Status: $_logInfo',
+                        loc.statusInfo(_logInfo),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -1605,10 +1612,18 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _loadLogInfo() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _logInfo = l10n.calculating;
+    });
+
+    // Simulate loading time
+    await Future.delayed(const Duration(milliseconds: 500));
+
     // This would load actual log information
     // For now, just set some placeholder data
     setState(() {
-      _logInfo = 'Logs available';
+      _logInfo = l10n.logsAvailable;
     });
   }
 

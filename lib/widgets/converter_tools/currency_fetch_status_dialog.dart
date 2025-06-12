@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/converter_services/currency_service.dart';
 
-class CurrencyFetchStatusDialog extends StatelessWidget {
+class CurrencyFetchStatusDialog extends StatefulWidget {
   const CurrencyFetchStatusDialog({super.key});
+
+  @override
+  State<CurrencyFetchStatusDialog> createState() =>
+      _CurrencyFetchStatusDialogState();
+}
+
+class _CurrencyFetchStatusDialogState extends State<CurrencyFetchStatusDialog> {
+  int _selectedTabIndex = 0; // 0 = Fetch Status, 1 = Value Status
 
   @override
   Widget build(BuildContext context) {
@@ -12,37 +20,7 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = screenSize.width > 800;
 
-    final statuses = CurrencyService.currencyStatuses;
     final currencies = CurrencyService.getSupportedCurrencies();
-
-    // Group currencies by status
-    final successCurrencies = <String>[];
-    final failedCurrencies = <String>[];
-    final timeoutCurrencies = <String>[];
-    final staticCurrencies = <String>[];
-
-    for (final currency in currencies) {
-      final status = statuses[currency.code] ?? CurrencyStatus.staticRate;
-      switch (status) {
-        case CurrencyStatus.success:
-          successCurrencies.add(currency.code);
-          break;
-        case CurrencyStatus.failed:
-          failedCurrencies.add(currency.code);
-          break;
-        case CurrencyStatus.timeout:
-          timeoutCurrencies.add(currency.code);
-          break;
-        case CurrencyStatus.staticRate:
-        case CurrencyStatus.notSupported:
-          staticCurrencies.add(currency.code);
-          break;
-        case CurrencyStatus.fetchedRecently:
-          // Treat fetchedRecently as success for status dialog
-          successCurrencies.add(currency.code);
-          break;
-      }
-    }
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -114,118 +92,89 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
               ),
             ),
 
-            // Status summary
+            // Mode selector tabs
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: theme.colorScheme.surfaceContainerHighest
-                  .withValues(alpha: 0.3),
-              child: Column(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.3),
+                border: Border(
+                  bottom: BorderSide(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
+              ),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.assessment,
-                        color: theme.colorScheme.primary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.fetchStatusSummary,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedTabIndex = 0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: _selectedTabIndex == 0
+                                  ? theme.colorScheme.primary
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.fetchStatusTab,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: _selectedTabIndex == 0
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                            fontWeight: _selectedTabIndex == 0
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _buildStatusChip(
-                        context,
-                        l10n.success,
-                        successCurrencies.length,
-                        Colors.green,
-                        Icons.check_circle,
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedTabIndex = 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: _selectedTabIndex == 1
+                                  ? theme.colorScheme.primary
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.currencyValueTab,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: _selectedTabIndex == 1
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                            fontWeight: _selectedTabIndex == 1
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      _buildStatusChip(
-                        context,
-                        l10n.failed,
-                        failedCurrencies.length,
-                        Colors.red,
-                        Icons.error,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildStatusChip(
-                        context,
-                        l10n.timeout,
-                        timeoutCurrencies.length,
-                        Colors.orange,
-                        Icons.access_time,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildStatusChip(
-                        context,
-                        l10n.static,
-                        staticCurrencies.length,
-                        Colors.grey,
-                        Icons.storage,
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Detailed status list
+            // Content based on selected tab
             Expanded(
-              child: DefaultTabController(
-                length: 4,
-                child: Column(
-                  children: [
-                    TabBar(
-                      tabs: [
-                        Tab(
-                          icon: const Icon(Icons.check_circle,
-                              color: Colors.green),
-                          text: '${l10n.success} (${successCurrencies.length})',
-                        ),
-                        Tab(
-                          icon: const Icon(Icons.error, color: Colors.red),
-                          text: '${l10n.failed} (${failedCurrencies.length})',
-                        ),
-                        Tab(
-                          icon: const Icon(Icons.access_time,
-                              color: Colors.orange),
-                          text: '${l10n.timeout} (${timeoutCurrencies.length})',
-                        ),
-                        Tab(
-                          icon: const Icon(Icons.storage, color: Colors.grey),
-                          text: '${l10n.static} (${staticCurrencies.length})',
-                        ),
-                      ],
-                      isScrollable: true,
-                      labelColor: theme.colorScheme.primary,
-                      unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          _buildCurrencyList(context, successCurrencies,
-                              CurrencyStatus.success),
-                          _buildCurrencyList(
-                              context, failedCurrencies, CurrencyStatus.failed),
-                          _buildCurrencyList(context, timeoutCurrencies,
-                              CurrencyStatus.timeout),
-                          _buildCurrencyList(context, staticCurrencies,
-                              CurrencyStatus.staticRate),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: _selectedTabIndex == 0
+                  ? _buildFetchStatusView(currencies, l10n, theme)
+                  : _buildValueStatusView(currencies, l10n, theme),
             ),
           ],
         ),
@@ -233,44 +182,129 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(
-    BuildContext context,
-    String label,
-    int count,
-    Color color,
-    IconData icon,
-  ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 16),
-            const SizedBox(height: 4),
-            Text(
-              '$count',
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+  Widget _buildFetchStatusView(
+      List<Currency> currencies, AppLocalizations l10n, ThemeData theme) {
+    final statuses = CurrencyService.currencyStatuses;
+
+    // Group currencies by fetch status (only success, failed, timeout)
+    final successCurrencies = <String>[];
+    final failedCurrencies = <String>[];
+    final timeoutCurrencies = <String>[];
+
+    for (final currency in currencies) {
+      final status = statuses[currency.code] ?? CurrencyStatus.staticRate;
+      switch (status) {
+        case CurrencyStatus.success:
+        case CurrencyStatus.fetchedRecently:
+          successCurrencies.add(currency.code);
+          break;
+        case CurrencyStatus.failed:
+          failedCurrencies.add(currency.code);
+          break;
+        case CurrencyStatus.timeout:
+          timeoutCurrencies.add(currency.code);
+          break;
+        case CurrencyStatus.staticRate:
+        case CurrencyStatus.notSupported:
+        case CurrencyStatus.fetching:
+          // Don't show these in fetch status
+          break;
+      }
+    }
+
+    return DefaultTabController(
+      length: 3,
+      child: Column(
+        children: [
+          TabBar(
+            tabs: [
+              Tab(
+                icon: const Icon(Icons.check_circle, color: Colors.green),
+                text: l10n.successfulCount(successCurrencies.length),
               ),
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 10,
+              Tab(
+                icon: const Icon(Icons.error, color: Colors.red),
+                text: l10n.failedCount(failedCurrencies.length),
               ),
-              overflow: TextOverflow.ellipsis,
+              Tab(
+                icon: const Icon(Icons.access_time, color: Colors.orange),
+                text: l10n.timeoutCount(timeoutCurrencies.length),
+              ),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _buildCurrencyList(
+                    context, successCurrencies, CurrencyStatus.success),
+                _buildCurrencyList(
+                    context, failedCurrencies, CurrencyStatus.failed),
+                _buildCurrencyList(
+                    context, timeoutCurrencies, CurrencyStatus.timeout),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildValueStatusView(
+      List<Currency> currencies, AppLocalizations l10n, ThemeData theme) {
+    // Group currencies by value status
+    final recentlyUpdatedCurrencies = <String>[];
+    final updatedCurrencies = <String>[];
+    final staticCurrencies = <String>[];
+
+    for (final currency in currencies) {
+      final valueStatus = CurrencyService.getCurrencyValueStatus(currency.code);
+      switch (valueStatus) {
+        case CurrencyValueStatus.recentlyUpdated:
+          recentlyUpdatedCurrencies.add(currency.code);
+          break;
+        case CurrencyValueStatus.updated:
+          updatedCurrencies.add(currency.code);
+          break;
+        case CurrencyValueStatus.static:
+          staticCurrencies.add(currency.code);
+          break;
+      }
+    }
+
+    return DefaultTabController(
+      length: 3,
+      child: Column(
+        children: [
+          TabBar(
+            tabs: [
+              Tab(
+                icon: const Icon(Icons.access_time, color: Colors.green),
+                text:
+                    l10n.recentlyUpdatedCount(recentlyUpdatedCurrencies.length),
+              ),
+              Tab(
+                icon: const Icon(Icons.update, color: Colors.blue),
+                text: l10n.updatedCount(updatedCurrencies.length),
+              ),
+              Tab(
+                icon: const Icon(Icons.storage, color: Colors.grey),
+                text: l10n.staticCount(staticCurrencies.length),
+              ),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _buildValueCurrencyList(context, recentlyUpdatedCurrencies,
+                    CurrencyValueStatus.recentlyUpdated),
+                _buildValueCurrencyList(
+                    context, updatedCurrencies, CurrencyValueStatus.updated),
+                _buildValueCurrencyList(
+                    context, staticCurrencies, CurrencyValueStatus.static),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -290,13 +324,13 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              _getStatusIcon(status),
+              _getFetchStatusIcon(status),
               size: 48,
-              color: _getStatusColor(status).withValues(alpha: 0.5),
+              color: _getFetchStatusColor(status).withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
-              l10n.noCurrenciesInThisCategory,
+              l10n.noCurrenciesInCategory,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -320,9 +354,9 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: _getStatusColor(status).withValues(alpha: 0.05),
+            color: _getFetchStatusColor(status).withValues(alpha: 0.05),
             border: Border.all(
-              color: _getStatusColor(status).withValues(alpha: 0.2),
+              color: _getFetchStatusColor(status).withValues(alpha: 0.2),
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -333,14 +367,14 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: _getStatusColor(status).withValues(alpha: 0.1),
+                  color: _getFetchStatusColor(status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
                   child: Text(
                     currency.symbol,
                     style: TextStyle(
-                      color: _getStatusColor(status),
+                      color: _getFetchStatusColor(status),
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -386,8 +420,8 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
 
               // Status icon
               Icon(
-                _getStatusIcon(status),
-                color: _getStatusColor(status),
+                _getFetchStatusIcon(status),
+                color: _getFetchStatusColor(status),
                 size: 20,
               ),
             ],
@@ -397,9 +431,135 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(CurrencyStatus status) {
+  Widget _buildValueCurrencyList(
+    BuildContext context,
+    List<String> currencyCodes,
+    CurrencyValueStatus valueStatus,
+  ) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final currencies = CurrencyService.getSupportedCurrencies();
+
+    if (currencyCodes.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _getValueStatusIcon(valueStatus),
+              size: 48,
+              color: _getValueStatusColor(valueStatus).withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.noCurrenciesInCategory,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: currencyCodes.length,
+      itemBuilder: (context, index) {
+        final currencyCode = currencyCodes[index];
+        final currency = currencies.firstWhere(
+          (c) => c.code == currencyCode,
+          orElse: () => Currency(currencyCode, currencyCode, currencyCode),
+        );
+
+        final fetchTime =
+            CurrencyService.getCurrencyLastFetchTime(currencyCode);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _getValueStatusColor(valueStatus).withValues(alpha: 0.05),
+            border: Border.all(
+              color: _getValueStatusColor(valueStatus).withValues(alpha: 0.2),
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              // Currency symbol
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color:
+                      _getValueStatusColor(valueStatus).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    currency.symbol,
+                    style: TextStyle(
+                      color: _getValueStatusColor(valueStatus),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Currency info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$currencyCode - ${currency.name}',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _getValueStatusDescription(valueStatus, fetchTime, l10n),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Fetch time
+              Text(
+                _getFetchTime(currencyCode),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // Value status icon
+              Icon(
+                _getValueStatusIcon(valueStatus),
+                color: _getValueStatusColor(valueStatus),
+                size: 20,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Color _getFetchStatusColor(CurrencyStatus status) {
     switch (status) {
       case CurrencyStatus.success:
+      case CurrencyStatus.fetchedRecently:
         return Colors.green;
       case CurrencyStatus.failed:
         return Colors.red;
@@ -407,15 +567,15 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
         return Colors.orange;
       case CurrencyStatus.staticRate:
       case CurrencyStatus.notSupported:
+      case CurrencyStatus.fetching:
         return Colors.grey;
-      case CurrencyStatus.fetchedRecently:
-        return Colors.green; // Same as success
     }
   }
 
-  IconData _getStatusIcon(CurrencyStatus status) {
+  IconData _getFetchStatusIcon(CurrencyStatus status) {
     switch (status) {
       case CurrencyStatus.success:
+      case CurrencyStatus.fetchedRecently:
         return Icons.check_circle;
       case CurrencyStatus.failed:
         return Icons.error;
@@ -424,8 +584,51 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
       case CurrencyStatus.staticRate:
       case CurrencyStatus.notSupported:
         return Icons.storage;
-      case CurrencyStatus.fetchedRecently:
-        return Icons.check_circle; // Same as success
+      case CurrencyStatus.fetching:
+        return Icons.sync;
+    }
+  }
+
+  Color _getValueStatusColor(CurrencyValueStatus valueStatus) {
+    switch (valueStatus) {
+      case CurrencyValueStatus.recentlyUpdated:
+        return Colors.green;
+      case CurrencyValueStatus.updated:
+        return Colors.blue;
+      case CurrencyValueStatus.static:
+        return Colors.grey;
+    }
+  }
+
+  IconData _getValueStatusIcon(CurrencyValueStatus valueStatus) {
+    switch (valueStatus) {
+      case CurrencyValueStatus.recentlyUpdated:
+        return Icons.access_time;
+      case CurrencyValueStatus.updated:
+        return Icons.update;
+      case CurrencyValueStatus.static:
+        return Icons.storage;
+    }
+  }
+
+  String _getValueStatusDescription(CurrencyValueStatus valueStatus,
+      DateTime? fetchTime, AppLocalizations l10n) {
+    switch (valueStatus) {
+      case CurrencyValueStatus.recentlyUpdated:
+        return l10n.updatedWithinLastHour;
+      case CurrencyValueStatus.updated:
+        if (fetchTime != null) {
+          final now = DateTime.now();
+          final difference = now.difference(fetchTime);
+          if (difference.inDays > 0) {
+            return l10n.updatedDaysAgo(difference.inDays);
+          } else {
+            return l10n.updatedHoursAgo(difference.inHours);
+          }
+        }
+        return l10n.hasUpdateData;
+      case CurrencyValueStatus.static:
+        return l10n.usingStaticRates;
     }
   }
 
@@ -435,6 +638,6 @@ class CurrencyFetchStatusDialog extends StatelessWidget {
     if (fetchTime != null) {
       return '${fetchTime.hour.toString().padLeft(2, '0')}:${fetchTime.minute.toString().padLeft(2, '0')}:${fetchTime.second.toString().padLeft(2, '0')}';
     }
-    return '--:--:--';
+    return '--:--:--'; // Use hardcoded fallback, this is technical format
   }
 }

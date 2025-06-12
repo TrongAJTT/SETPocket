@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
-import 'package:my_multi_tools/screens/random_tools/password_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/number_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/yes_no_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/coin_flip_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/rock_paper_scissors_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/dice_roll_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/color_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/latin_letter_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/playing_card_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/date_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/time_generator.dart';
-import 'package:my_multi_tools/screens/random_tools/date_time_generator.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/screens/random_tools/password_generator.dart';
+import 'package:setpocket/screens/random_tools/number_generator.dart';
+import 'package:setpocket/screens/random_tools/yes_no_generator.dart';
+import 'package:setpocket/screens/random_tools/coin_flip_generator.dart';
+import 'package:setpocket/screens/random_tools/rock_paper_scissors_generator.dart';
+import 'package:setpocket/screens/random_tools/dice_roll_generator.dart';
+import 'package:setpocket/screens/random_tools/color_generator.dart';
+import 'package:setpocket/screens/random_tools/latin_letter_generator.dart';
+import 'package:setpocket/screens/random_tools/playing_card_generator.dart';
+import 'package:setpocket/screens/random_tools/date_generator.dart';
+import 'package:setpocket/screens/random_tools/time_generator.dart';
+import 'package:setpocket/screens/random_tools/date_time_generator.dart';
 
 class RandomToolsScreen extends StatelessWidget {
   final bool isEmbedded;

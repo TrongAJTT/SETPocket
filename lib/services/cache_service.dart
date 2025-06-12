@@ -1,4 +1,4 @@
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';

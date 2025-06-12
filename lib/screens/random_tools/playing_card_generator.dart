@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
-import 'package:my_multi_tools/services/generation_history_service.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/services/generation_history_service.dart';
 import 'dart:math';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {

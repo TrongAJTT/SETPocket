@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/services/app_logger.dart';
 import '../../models/currency_preset_model.dart';
 
 enum PresetSortOrder { name, date }

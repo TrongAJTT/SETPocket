@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import '../models/text_template.dart';
 import '../services/template_service.dart';
 import '../widgets/import_status_dialog.dart';

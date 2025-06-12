@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class ToolConfig {
   final String id;
@@ -104,9 +104,13 @@ class ToolConfig {
   String get quickActionIcon {
     switch (id) {
       case 'textTemplate':
-        return 'ic_shortcut_text_template';
+        return 'ic_text_template';
       case 'randomTools':
         return 'ic_random_generator';
+      case 'converterTools':
+        return 'ic_converter_tools';
+      case 'calculatorTools':
+        return 'ic_calculator_tools';
       default:
         return 'ic_default_tool';
     }

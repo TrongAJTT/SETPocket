@@ -9,7 +9,7 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get title => 'Nhiều Công Cụ';
+  String get title => 'SETPocket';
 
   @override
   String get settings => 'Cài đặt';
@@ -844,7 +844,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get viewStaticRates => 'Xem tỷ giá tĩnh';
 
   @override
-  String get lastStaticUpdate => 'Lần cập nhật tỷ giá tĩnh cuối: Tháng 12/2024';
+  String get lastStaticUpdate => 'Lần cập nhật tỷ giá tĩnh cuối: Tháng 5/2025';
 
   @override
   String get staticRatesList => 'Danh sách tỷ giá tĩnh';
@@ -1642,6 +1642,42 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get usingStaticRates => 'Sử dụng tỷ giá tĩnh';
+
+  @override
+  String get scrollToTop => 'Lên đầu trang';
+
+  @override
+  String get scrollToBottom => 'Xuống cuối trang';
+
+  @override
+  String get logActions => 'Hành động log';
+
+  @override
+  String get previousChunk => 'Phần trước';
+
+  @override
+  String get nextChunk => 'Phần sau';
+
+  @override
+  String get loadAll => 'Tải tất cả';
+
+  @override
+  String get firstPart => 'Phần đầu';
+
+  @override
+  String get lastPart => 'Phần cuối';
+
+  @override
+  String get largeFile => 'File lớn';
+
+  @override
+  String get loadingLargeFile => 'Đang tải file lớn...';
+
+  @override
+  String get loadingLogContent => 'Đang tải nội dung log...';
+
+  @override
+  String get largeFileDetected => 'Phát hiện file lớn. Đang sử dụng tải tối ưu...';
 
   @override
   String get cacheTypeConverterTools => 'Công cụ chuyển đổi';

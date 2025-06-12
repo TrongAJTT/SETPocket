@@ -94,14 +94,39 @@ class AppLogger {
     await _createNewLogFile();
   }
 
-  /// Create new log file with date-based naming
+  /// Create new log file with date-based naming and rotation
   Future<void> _createNewLogFile() async {
     final appDir = await getApplicationDocumentsDirectory();
     final logDir = Directory('${appDir.path}/logs');
 
+    if (!await logDir.exists()) {
+      await logDir.create(recursive: true);
+    }
+
     final now = DateTime.now();
     final dateStr = DateFormat('yyyy-MM-dd').format(now);
-    _currentLogFile = File('${logDir.path}/app_$dateStr.log');
+
+    // Find next available file number for today
+    int fileNumber = 1;
+    File candidateFile;
+    do {
+      final fileName =
+          fileNumber == 1 ? 'app_$dateStr.log' : 'app_$dateStr-$fileNumber.log';
+      candidateFile = File('${logDir.path}/$fileName');
+
+      // If file exists and is under size limit, use it
+      if (await candidateFile.exists()) {
+        final fileSize = await candidateFile.length();
+        if (fileSize < _maxFileSize) {
+          _currentLogFile = candidateFile;
+          break;
+        }
+        fileNumber++;
+      } else {
+        _currentLogFile = candidateFile;
+        break;
+      }
+    } while (fileNumber <= 100); // Safety limit
 
     // Initialize file sink with optimized buffering
     _logSink = _currentLogFile.openWrite(
@@ -213,14 +238,9 @@ class AppLogger {
     try {
       await _logSink.close();
 
-      final timestamp =
-          DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
-      final newName =
-          _currentLogFile.path.replaceAll('.log', '_$timestamp.log');
-      await _currentLogFile.rename(newName);
-
+      // Simply create new log file - the numbering logic handles rotation
       await _createNewLogFile();
-      _logger.info('Log file rotated to: $newName');
+      _logger.info('Log file rotated, new file: ${_currentLogFile.path}');
     } catch (e) {
       if (kDebugMode) print('[LOG_ERROR] Log rotation failed: $e');
       // Try to recreate log file
@@ -367,6 +387,99 @@ class AppLogger {
     } catch (e) {
       error('Failed to read log file $fileName: $e');
       return 'Error reading log file: $e';
+    }
+  }
+
+  /// Read log file content in chunks for lazy loading with smart chunking
+  Future<List<String>> readLogContentInChunks(String fileName,
+      {int? customChunkSize}) async {
+    try {
+      final files = await getLogFiles();
+      final file = files.firstWhere(
+        (file) => file.path.endsWith(fileName),
+        orElse: () => throw Exception('Log file not found: $fileName'),
+      );
+
+      final content = await file.readAsString();
+      final lines = content.split('\n');
+      final totalLines = lines.length;
+
+      // Smart chunking logic based on line count
+      int chunkSize;
+      if (customChunkSize != null) {
+        chunkSize = customChunkSize;
+      } else if (totalLines > 10000) {
+        chunkSize = 5000; // Large files: 5000 lines per chunk
+      } else if (totalLines > 6000) {
+        chunkSize = totalLines ~/ 2; // Medium files: split into 2 parts
+      } else {
+        chunkSize = totalLines; // Small files: single chunk
+      }
+
+      final chunks = <String>[];
+      for (int i = 0; i < lines.length; i += chunkSize) {
+        final end =
+            (i + chunkSize < lines.length) ? i + chunkSize : lines.length;
+        final chunk = lines.sublist(i, end).join('\n');
+        chunks.add(chunk);
+      }
+
+      return chunks;
+    } catch (e) {
+      error('Failed to read log file $fileName in chunks: $e');
+      return ['Error reading log file: $e'];
+    }
+  }
+
+  /// Get log file info without reading content
+  Future<Map<String, dynamic>> getLogFileInfo(String fileName) async {
+    try {
+      final files = await getLogFiles();
+      final file = files.firstWhere(
+        (file) => file.path.endsWith(fileName),
+        orElse: () => throw Exception('Log file not found: $fileName'),
+      );
+
+      final fileSize = await file.length();
+      final lastModified = await file.lastModified();
+      final content = await file.readAsString();
+      final lineCount = content.split('\n').length;
+
+      // Determine chunking strategy
+      bool requiresChunking = lineCount > 6000;
+      int chunkCount = 1;
+      int chunkSize = lineCount;
+
+      if (lineCount > 10000) {
+        chunkSize = 5000;
+        chunkCount = (lineCount / 5000).ceil();
+      } else if (lineCount > 6000) {
+        chunkSize = lineCount ~/ 2;
+        chunkCount = 2;
+      }
+
+      return {
+        'size': fileSize,
+        'sizeFormatted': formatFileSize(fileSize),
+        'lastModified': lastModified,
+        'lineCount': lineCount,
+        'isLarge': fileSize > 1024 * 1024, // > 1MB
+        'requiresChunking': requiresChunking,
+        'chunkCount': chunkCount,
+        'chunkSize': chunkSize,
+      };
+    } catch (e) {
+      error('Failed to get log file info for $fileName: $e');
+      return {
+        'size': 0,
+        'sizeFormatted': '0 B',
+        'lastModified': DateTime.now(),
+        'lineCount': 0,
+        'isLarge': false,
+        'requiresChunking': false,
+        'chunkCount': 1,
+        'chunkSize': 0,
+      };
     }
   }
 

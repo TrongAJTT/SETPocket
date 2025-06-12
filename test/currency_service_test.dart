@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_multi_tools/services/converter_services/currency_service.dart';
+import 'package:setpocket/services/converter_services/currency_service.dart';
 
 void main() {
   test('Currency service basic test', () {

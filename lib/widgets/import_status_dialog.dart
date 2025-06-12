@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class ImportResult {
   final String fileName;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/services/app_logger.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/converter_services/currency_preset_service.dart';
 import '../../models/currency_preset_model.dart';

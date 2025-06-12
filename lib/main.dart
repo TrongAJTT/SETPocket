@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
-import 'package:my_multi_tools/models/tool_config.dart';
-import 'package:my_multi_tools/widgets/tool_card.dart';
-import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
-import 'package:my_multi_tools/services/cache_service.dart';
-import 'package:my_multi_tools/services/tool_visibility_service.dart';
-import 'package:my_multi_tools/services/quick_actions_service.dart';
-import 'package:my_multi_tools/services/hive_service.dart';
-import 'package:my_multi_tools/services/settings_service.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/models/tool_config.dart';
+import 'package:setpocket/widgets/tool_card.dart';
+import 'package:setpocket/widgets/cache_details_dialog.dart';
+import 'package:setpocket/services/cache_service.dart';
+import 'package:setpocket/services/tool_visibility_service.dart';
+import 'package:setpocket/services/quick_actions_service.dart';
+import 'package:setpocket/services/hive_service.dart';
+import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
@@ -135,7 +135,7 @@ class MainApp extends StatelessWidget {
       animation: settingsController,
       builder: (context, _) {
         return MaterialApp(
-          title: 'Multi Tools',
+          title: 'SETPocket',
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
           theme: ThemeData(

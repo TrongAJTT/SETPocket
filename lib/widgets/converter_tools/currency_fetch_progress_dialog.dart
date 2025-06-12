@@ -29,7 +29,7 @@ class _CurrencyFetchProgressDialogState
   late Animation<double> _progressAnimation;
 
   int _remainingSeconds = 0;
-  Map<String, CurrencyStatus> _currencyStatuses = {};
+  final Map<String, CurrencyStatus> _currencyStatuses = {};
   int _completedCount = 0;
   bool _isCompleted = false;
   bool _isCancelled = false;
@@ -271,7 +271,7 @@ class _CurrencyFetchProgressDialogState
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -300,7 +300,7 @@ class _CurrencyFetchProgressDialogState
                 ),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.sync,
                       color: Colors.white,
                       size: 24,
@@ -345,10 +345,10 @@ class _CurrencyFetchProgressDialogState
                           CircularProgressIndicator(
                             value: 1.0,
                             strokeWidth: 8,
-                            backgroundColor:
-                                theme.colorScheme.outline.withOpacity(0.2),
+                            backgroundColor: theme.colorScheme.outline
+                                .withValues(alpha: 0.2),
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              theme.colorScheme.outline.withOpacity(0.2),
+                              theme.colorScheme.outline.withValues(alpha: 0.2),
                             ),
                           ),
                           // Progress circle
@@ -376,7 +376,7 @@ class _CurrencyFetchProgressDialogState
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (_isCompleted) ...[
-                                Icon(
+                                const Icon(
                                   Icons.check_circle,
                                   color: Colors.green,
                                   size: 32,
@@ -432,7 +432,7 @@ class _CurrencyFetchProgressDialogState
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(

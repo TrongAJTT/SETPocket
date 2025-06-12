@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:my_multi_tools/models/tool_config.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/models/tool_config.dart';
+import 'package:setpocket/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tool_visibility_service.dart';
 

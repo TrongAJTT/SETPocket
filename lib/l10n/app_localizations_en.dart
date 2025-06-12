@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get title => 'Multi Tools';
+  String get title => 'SETPocket';
 
   @override
   String get settings => 'Settings';
@@ -844,7 +844,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewStaticRates => 'View Static Rates';
 
   @override
-  String get lastStaticUpdate => 'Last static rates update: December 2024';
+  String get lastStaticUpdate => 'Last static rates update: May 2025';
 
   @override
   String get staticRatesList => 'Static Exchange Rates List';
@@ -1642,6 +1642,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get usingStaticRates => 'Using static rates';
+
+  @override
+  String get scrollToTop => 'Scroll to Top';
+
+  @override
+  String get scrollToBottom => 'Scroll to Bottom';
+
+  @override
+  String get logActions => 'Log Actions';
+
+  @override
+  String get previousChunk => 'Previous Chunk';
+
+  @override
+  String get nextChunk => 'Next Chunk';
+
+  @override
+  String get loadAll => 'Load All';
+
+  @override
+  String get firstPart => 'First Part';
+
+  @override
+  String get lastPart => 'Last Part';
+
+  @override
+  String get largeFile => 'Large File';
+
+  @override
+  String get loadingLargeFile => 'Loading large file...';
+
+  @override
+  String get loadingLogContent => 'Loading log content...';
+
+  @override
+  String get largeFileDetected => 'Large file detected. Using optimized loading...';
 
   @override
   String get cacheTypeConverterTools => 'Converter Tools';

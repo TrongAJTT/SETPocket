@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.multitools.app"
+    namespace = "com.setpocket.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -20,8 +20,8 @@ android {
     }
 
     defaultConfig {
-        // Application ID for Multi Tools app
-        applicationId = "com.multitools.app"
+        // Application ID for SETPocket app
+        applicationId = "com.setpocket.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

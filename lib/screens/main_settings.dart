@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
-import 'package:my_multi_tools/widgets/cache_details_dialog.dart';
-import 'package:my_multi_tools/widgets/tool_visibility_dialog.dart';
-import 'package:my_multi_tools/widgets/quick_actions_dialog.dart';
-import 'package:my_multi_tools/services/cache_service.dart';
-import 'package:my_multi_tools/services/generation_history_service.dart';
-import 'package:my_multi_tools/services/settings_service.dart';
-import 'package:my_multi_tools/screens/log_viewer_screen.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/widgets/cache_details_dialog.dart';
+import 'package:setpocket/widgets/tool_visibility_dialog.dart';
+import 'package:setpocket/widgets/quick_actions_dialog.dart';
+import 'package:setpocket/services/cache_service.dart';
+import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/screens/log_viewer_screen.dart';
 
-import 'package:my_multi_tools/models/currency_cache_model.dart';
+import 'package:setpocket/models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 

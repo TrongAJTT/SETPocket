@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_multi_tools/l10n/app_localizations.dart';
-import 'package:my_multi_tools/models/tool_config.dart';
-import 'package:my_multi_tools/services/tool_visibility_service.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/models/tool_config.dart';
+import 'package:setpocket/services/tool_visibility_service.dart';
 
 class ToolVisibilityDialog extends StatefulWidget {
   final VoidCallback? onChanged;

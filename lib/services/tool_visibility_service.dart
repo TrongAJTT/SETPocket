@@ -1,4 +1,4 @@
-import 'package:my_multi_tools/models/tool_config.dart';
+import 'package:setpocket/models/tool_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ToolVisibilityService {

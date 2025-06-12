@@ -98,7 +98,7 @@ abstract class AppLocalizations {
   /// No description provided for @title.
   ///
   /// In en, this message translates to:
-  /// **'Multi Tools'**
+  /// **'SETPocket'**
   String get title;
 
   /// No description provided for @settings.
@@ -1628,7 +1628,7 @@ abstract class AppLocalizations {
   /// No description provided for @lastStaticUpdate.
   ///
   /// In en, this message translates to:
-  /// **'Last static rates update: December 2024'**
+  /// **'Last static rates update: May 2025'**
   String get lastStaticUpdate;
 
   /// No description provided for @staticRatesList.
@@ -3136,6 +3136,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Using static rates'**
   String get usingStaticRates;
+
+  /// No description provided for @scrollToTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll to Top'**
+  String get scrollToTop;
+
+  /// No description provided for @scrollToBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll to Bottom'**
+  String get scrollToBottom;
+
+  /// No description provided for @logActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Actions'**
+  String get logActions;
+
+  /// No description provided for @previousChunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous Chunk'**
+  String get previousChunk;
+
+  /// No description provided for @nextChunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Chunk'**
+  String get nextChunk;
+
+  /// No description provided for @loadAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Load All'**
+  String get loadAll;
+
+  /// No description provided for @firstPart.
+  ///
+  /// In en, this message translates to:
+  /// **'First Part'**
+  String get firstPart;
+
+  /// No description provided for @lastPart.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Part'**
+  String get lastPart;
+
+  /// No description provided for @largeFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Large File'**
+  String get largeFile;
+
+  /// No description provided for @loadingLargeFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading large file...'**
+  String get loadingLargeFile;
+
+  /// No description provided for @loadingLogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading log content...'**
+  String get loadingLogContent;
+
+  /// No description provided for @largeFileDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Large file detected. Using optimized loading...'**
+  String get largeFileDetected;
 
   /// No description provided for @cacheTypeConverterTools.
   ///

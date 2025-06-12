@@ -1,5 +1,5 @@
 import 'package:live_currency_rate/live_currency_rate.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/services/app_logger.dart';
 import '../settings_service.dart';
 
 enum CurrencyStatus {

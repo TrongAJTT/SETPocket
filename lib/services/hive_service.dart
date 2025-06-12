@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/services/app_logger.dart';
 import '../models/currency_cache_model.dart';
 import '../models/currency_preset_model.dart';
 import '../models/currency_state_model.dart';

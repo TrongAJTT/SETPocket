@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
-import 'package:my_multi_tools/services/app_logger.dart';
+import 'package:setpocket/services/app_logger.dart';
 import '../models/unit_template_model.dart';
 
 class UnitTemplateService {

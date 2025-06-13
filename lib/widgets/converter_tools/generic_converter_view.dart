@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../controllers/converter_controller.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/focus_mode_service.dart';
 import 'generic_unit_custom_dialog.dart';
 import 'converter_card_widget.dart';
 import 'converter_table_widget.dart';
@@ -49,6 +50,17 @@ class GenericConverterView extends StatelessWidget {
               tooltip: '$displayTitle Info',
             ),
           IconButton(
+            icon: Icon(
+              controller.isFocusMode
+                  ? Icons.center_focus_weak
+                  : Icons.center_focus_strong,
+            ),
+            onPressed: () => _toggleFocusMode(context, controller),
+            tooltip: controller.isFocusMode
+                ? l10n.disableFocusMode
+                : l10n.enableFocusMode,
+          ),
+          IconButton(
             icon: const Icon(Icons.restart_alt),
             onPressed: controller.resetLayout,
             tooltip: l10n.resetLayout,
@@ -66,12 +78,13 @@ class GenericConverterView extends StatelessWidget {
 
   Widget _buildConverterContent(
       BuildContext context, ConverterController controller) {
-    return Padding(
+    // Wrap with GestureDetector for zoom gestures on mobile when embedded
+    final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           // Only show status widget for converters that require real-time data
-          if (controller.requiresRealTimeData) ...[
+          if (controller.requiresRealTimeData && !controller.isFocusMode) ...[
             ConverterStatusWidget(
               controller: controller,
               onRefresh: onRefresh ?? controller.refreshData,
@@ -87,6 +100,23 @@ class GenericConverterView extends StatelessWidget {
         ],
       ),
     );
+
+    // Add gesture detection for mobile when embedded
+    if (isEmbedded && FocusModeService.isMobile) {
+      return GestureDetector(
+        onScaleUpdate: (details) {
+          FocusModeService.handleScaleGesture(
+            scale: details.scale,
+            currentFocusMode: controller.isFocusMode,
+            onEnterFocusMode: () => _toggleFocusMode(context, controller),
+            onExitFocusMode: () => _toggleFocusMode(context, controller),
+          );
+        },
+        child: content,
+      );
+    }
+
+    return content;
   }
 
   Widget _buildCardsView(BuildContext context, ConverterController controller) {
@@ -94,50 +124,67 @@ class GenericConverterView extends StatelessWidget {
 
     return Column(
       children: [
-        // Add card button and view mode toggle
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Row(
-            children: [
-              ElevatedButton.icon(
-                onPressed: controller.addCard,
-                icon: const Icon(Icons.add, size: 16),
-                label: Text(
-                  l10n.add,
-                  style: const TextStyle(fontSize: 12),
+        // Add card button and view mode toggle - hidden in focus mode
+        if (!controller.isFocusMode)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: controller.addCard,
+                  icon: const Icon(Icons.add, size: 16),
+                  label: Text(
+                    l10n.add,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: () =>
+                      controller.setViewMode(ConverterViewMode.table),
+                  icon: const Icon(Icons.table_chart, size: 16),
+                  label: Text(
+                    l10n.tableView,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              OutlinedButton.icon(
-                onPressed: () =>
-                    controller.setViewMode(ConverterViewMode.table),
-                icon: const Icon(Icons.table_chart, size: 16),
-                label: Text(
-                  l10n.tableView,
-                  style: const TextStyle(fontSize: 12),
+                const SizedBox(width: 12),
+                // Add focus button for embedded mode
+                if (isEmbedded) ...[
+                  IconButton(
+                    icon: Icon(
+                      controller.isFocusMode
+                          ? Icons.center_focus_weak
+                          : Icons.center_focus_strong,
+                      size: 20,
+                    ),
+                    onPressed: () => _toggleFocusMode(context, controller),
+                    tooltip: controller.isFocusMode
+                        ? l10n.disableFocusMode
+                        : l10n.enableFocusMode,
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child: Text(
+                    '${l10n.cards}: ${controller.state.cards.length}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '${l10n.cards}: ${controller.state.cards.length}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         // Cards
         Expanded(
           child: LayoutBuilder(
@@ -203,50 +250,67 @@ class GenericConverterView extends StatelessWidget {
 
     return Column(
       children: [
-        // Add row button and view mode toggle
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Row(
-            children: [
-              ElevatedButton.icon(
-                onPressed: controller.addCard,
-                icon: const Icon(Icons.add, size: 16),
-                label: Text(
-                  l10n.add,
-                  style: const TextStyle(fontSize: 12),
+        // Add row button and view mode toggle - hidden in focus mode
+        if (!controller.isFocusMode)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: controller.addCard,
+                  icon: const Icon(Icons.add, size: 16),
+                  label: Text(
+                    l10n.add,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: () =>
+                      controller.setViewMode(ConverterViewMode.cards),
+                  icon: const Icon(Icons.view_agenda, size: 16),
+                  label: Text(
+                    l10n.cardView,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              OutlinedButton.icon(
-                onPressed: () =>
-                    controller.setViewMode(ConverterViewMode.cards),
-                icon: const Icon(Icons.view_agenda, size: 16),
-                label: Text(
-                  l10n.cardView,
-                  style: const TextStyle(fontSize: 12),
+                const SizedBox(width: 12),
+                // Add focus button for embedded mode
+                if (isEmbedded) ...[
+                  IconButton(
+                    icon: Icon(
+                      controller.isFocusMode
+                          ? Icons.center_focus_weak
+                          : Icons.center_focus_strong,
+                      size: 20,
+                    ),
+                    onPressed: () => _toggleFocusMode(context, controller),
+                    tooltip: controller.isFocusMode
+                        ? l10n.disableFocusMode
+                        : l10n.enableFocusMode,
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child: Text(
+                    '${l10n.rows}: ${controller.state.cards.length}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '${l10n.rows}: ${controller.state.cards.length}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         // Table
         Expanded(
           child: ConverterTableWidget(
@@ -278,6 +342,21 @@ class GenericConverterView extends StatelessWidget {
         minSelection: 2,
         presetType: controller.converterService.converterType,
       ),
+    );
+  }
+
+  void _toggleFocusMode(BuildContext context, ConverterController controller) {
+    controller.toggleFocusMode();
+
+    final exitInstruction = FocusModeService.getExitInstruction(
+      context,
+      isEmbedded: isEmbedded,
+    );
+
+    FocusModeService.showFocusModeNotification(
+      context,
+      isEnabled: controller.isFocusMode,
+      exitInstruction: exitInstruction,
     );
   }
 }

@@ -613,66 +613,35 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
   void _editCardUnits(BuildContext context) {
     final card = controller.state.cards[cardIndex];
 
-    // Use enhanced generic dialog for Length Converter with proper preset handling
-    if (controller.converterService.converterType == 'length') {
-      final availableUnits = controller.units
-          .map((unit) => GenericUnitItem(
-                id: unit.id,
-                name: unit.name,
-                symbol: unit.symbol,
-              ))
-          .toList();
+    // Use enhanced generic dialog for all converter types with proper preset handling
+    final availableUnits = controller.units
+        .map((unit) => GenericUnitItem(
+              id: unit.id,
+              name: unit.name,
+              symbol: unit.symbol,
+            ))
+        .toList();
 
-      // Ensure visibleUnits only contains valid units that exist in availableUnits
-      final availableUnitIds = availableUnits.map((u) => u.id).toSet();
-      final validVisibleUnits = card.visibleUnits
-          .where((unitId) => availableUnitIds.contains(unitId))
-          .toSet();
+    // Ensure visibleUnits only contains valid units that exist in availableUnits
+    final availableUnitIds = availableUnits.map((u) => u.id).toSet();
+    final validVisibleUnits = card.visibleUnits
+        .where((unitId) => availableUnitIds.contains(unitId))
+        .toSet();
 
-      showDialog(
-        context: context,
-        builder: (context) => EnhancedGenericUnitCustomizationDialog(
-          title: AppLocalizations.of(context)!.customizeUnits,
-          availableUnits: availableUnits,
-          visibleUnits: validVisibleUnits,
-          onChanged: (newUnits) {
-            controller.updateCardUnits(cardIndex, newUnits);
-          },
-          maxSelection: 10,
-          minSelection: 2,
-          presetType: 'length', // Use the same preset type as main converter
-        ),
-      );
-    } else {
-      // Use generic dialog for other converters
-      final availableUnits = controller.units
-          .map((unit) => unit_dialog.UnitItem(
-                id: unit.id,
-                name: unit.name,
-                symbol: unit.symbol,
-              ))
-          .toList();
-
-      final availableUnitIds = availableUnits.map((u) => u.id).toSet();
-      final validVisibleUnits = card.visibleUnits
-          .where((unitId) => availableUnitIds.contains(unitId))
-          .toSet();
-
-      showDialog(
-        context: context,
-        builder: (context) => unit_dialog.UnitCustomizationDialog(
-          title: AppLocalizations.of(context)!.customizeUnits,
-          availableUnits: availableUnits,
-          visibleUnits: validVisibleUnits,
-          onChanged: (newUnits) {
-            controller.updateCardUnits(cardIndex, newUnits);
-          },
-          maxSelection: 10,
-          minSelection: 2,
-          showPresetOptions: false,
-          presetKey: 'card_${controller.converterService.converterType}',
-        ),
-      );
-    }
+    showDialog(
+      context: context,
+      builder: (context) => EnhancedGenericUnitCustomizationDialog(
+        title: AppLocalizations.of(context)!.customizeUnits,
+        availableUnits: availableUnits,
+        visibleUnits: validVisibleUnits,
+        onChanged: (newUnits) {
+          controller.updateCardUnits(cardIndex, newUnits);
+        },
+        maxSelection: 10,
+        minSelection: 2,
+        presetType: controller.converterService.converterType,
+        showPresetOptions: true, // Enable presets for card level too
+      ),
+    );
   }
 }

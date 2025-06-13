@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import '../../models/converter_models/length_state_model.dart';
 import '../settings_service.dart';
+import '../app_logger.dart';
 
 class LengthStateService {
   static const String _stateBoxName = 'length_states';
@@ -22,28 +23,59 @@ class LengthStateService {
 
   // Check if feature state saving is enabled
   static Future<bool> _isFeatureStateSavingEnabled() async {
-    return await SettingsService.getFeatureStateSaving();
+    try {
+      final enabled = await SettingsService.getFeatureStateSaving();
+      logInfo('LengthStateService: Feature state saving enabled: $enabled');
+      return enabled;
+    } catch (e) {
+      logError(
+          'LengthStateService: Error checking feature state saving settings: $e');
+      // Default to enabled if error occurs
+      return true;
+    }
   }
 
   // Save converter state
   static Future<void> saveState(LengthStateModel state) async {
     try {
+      logInfo(
+          'LengthStateService: Attempting to save state with ${state.cards.length} cards');
+
       // Check if feature state saving is enabled
-      if (!await _isFeatureStateSavingEnabled()) {
-        print(
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        logInfo(
             'LengthStateService: Feature state saving is disabled, skipping save');
         return;
       }
 
       await initialize();
 
-      await _stateBox!.put(_stateKey, state);
-      await _stateBox!.flush();
+      // Verify state before saving
+      logInfo(
+          'LengthStateService: State details - Cards: ${state.cards.length}, Units: ${state.visibleUnits.length}');
+      for (int i = 0; i < state.cards.length; i++) {
+        final card = state.cards[i];
+        logInfo(
+            'LengthStateService: Card $i - Unit: ${card.unitCode}, Amount: ${card.amount}');
+      }
 
-      print(
-          'LengthStateService: State saved with ${state.cards.length} cards, ${state.visibleUnits.length} visible units');
-    } catch (e) {
-      print('LengthStateService: Error saving state: $e');
+      await _stateBox!.put(_stateKey, state);
+      await _stateBox!.flush(); // Force flush to disk for mobile reliability
+
+      // Verify saved state
+      final savedState = _stateBox!.get(_stateKey);
+      if (savedState != null) {
+        logInfo(
+            'LengthStateService: State successfully saved and verified with ${savedState.cards.length} cards');
+      } else {
+        logError(
+            'LengthStateService: Failed to verify saved state - state is null after save');
+      }
+    } catch (e, stackTrace) {
+      logError('LengthStateService: Error saving state: $e');
+      logError('LengthStateService: Stack trace: $stackTrace');
+      // Don't rethrow to avoid breaking the app
     }
   }
 
@@ -53,17 +85,16 @@ class LengthStateService {
       await initialize();
 
       final savedState = _stateBox!.get(_stateKey);
-
       if (savedState != null) {
-        print(
-            'LengthStateService: Loaded saved state with ${savedState.cards.length} cards');
+        logInfo(
+            'LengthStateService: Loaded state with ${savedState.cards.length} cards');
         return savedState;
       } else {
-        print('LengthStateService: No saved state found, returning default');
+        logInfo('LengthStateService: No saved state found, creating default');
         return LengthStateModel.createDefault();
       }
     } catch (e) {
-      print('LengthStateService: Error loading state: $e, returning default');
+      logError('LengthStateService: Error loading state: $e');
       return LengthStateModel.createDefault();
     }
   }

@@ -87,12 +87,14 @@ class ConverterState {
   final Set<String> globalVisibleUnits;
   final DateTime? lastUpdated;
   final bool isLoading;
+  final bool isFocusMode;
 
   const ConverterState({
     required this.cards,
     required this.globalVisibleUnits,
     this.lastUpdated,
     this.isLoading = false,
+    this.isFocusMode = false,
   });
 
   ConverterState copyWith({
@@ -100,12 +102,14 @@ class ConverterState {
     Set<String>? globalVisibleUnits,
     DateTime? lastUpdated,
     bool? isLoading,
+    bool? isFocusMode,
   }) {
     return ConverterState(
       cards: cards ?? this.cards,
       globalVisibleUnits: globalVisibleUnits ?? this.globalVisibleUnits,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       isLoading: isLoading ?? this.isLoading,
+      isFocusMode: isFocusMode ?? this.isFocusMode,
     );
   }
 
@@ -113,6 +117,7 @@ class ConverterState {
         'cards': cards.map((c) => c.toJson()).toList(),
         'globalVisibleUnits': globalVisibleUnits.toList(),
         'lastUpdated': lastUpdated?.toIso8601String(),
+        'isFocusMode': isFocusMode,
       };
 
   factory ConverterState.fromJson(Map<String, dynamic> json) {
@@ -125,6 +130,7 @@ class ConverterState {
       lastUpdated: json['lastUpdated'] != null
           ? DateTime.parse(json['lastUpdated'])
           : null,
+      isFocusMode: json['isFocusMode'] ?? false,
     );
   }
 }

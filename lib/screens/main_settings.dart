@@ -6,6 +6,9 @@ import 'package:setpocket/widgets/quick_actions_dialog.dart';
 import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/converter_services/currency_cache_service.dart';
+import 'package:setpocket/services/converter_services/currency_state_service.dart';
+import 'package:setpocket/services/converter_services/length_state_service.dart';
 import 'package:setpocket/screens/log_viewer_screen.dart';
 
 import 'package:setpocket/models/converter_models/currency_cache_model.dart';
@@ -1221,6 +1224,21 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       onPressed: _showCacheDetails,
     );
 
+    final debugButton = OutlinedButton.icon(
+      icon: const Icon(Icons.bug_report_outlined),
+      label: Text('Debug Cache'),
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 20 : 16,
+          vertical: isDesktop ? 14 : 12,
+        ),
+        minimumSize:
+            isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
+      ),
+      onPressed: _debugMobileCache,
+    );
+
     // Use Column layout on mobile, Row layout on desktop
     if (isMobile) {
       return Column(
@@ -1229,15 +1247,27 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           clearButton,
           const SizedBox(height: 12),
           detailsButton,
+          const SizedBox(height: 12),
+          debugButton,
         ],
       );
     } else {
       // Desktop and tablet: use Row layout with proper expansion
-      return Row(
+      return Column(
         children: [
-          Expanded(child: clearButton),
-          SizedBox(width: isDesktop ? 16 : 12),
-          Expanded(child: detailsButton),
+          Row(
+            children: [
+              Expanded(child: clearButton),
+              SizedBox(width: isDesktop ? 16 : 12),
+              Expanded(child: detailsButton),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: debugButton),
+            ],
+          ),
         ],
       );
     }
@@ -1653,5 +1683,107 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       _logRetentionDays = days;
     });
     await SettingsService.updateLogRetentionDays(days);
+  }
+
+  // Debug function for mobile cache issues
+  Future<void> _debugMobileCache() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Mobile Cache Debug'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Running cache diagnostics...'),
+            SizedBox(height: 16),
+            CircularProgressIndicator(),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // Run diagnostics
+      final isReliable = await CurrencyCacheService.isCacheReliable();
+      final settings = await SettingsService.getSettings();
+      final hasCache = await CurrencyCacheService.hasCachedData();
+      final isManualAllowed = await CurrencyCacheService.isManualFetchAllowed();
+
+      // Check state services
+      final hasLengthState = await LengthStateService.hasState();
+      final hasCurrencyState = await CurrencyStateService.hasState();
+
+      Navigator.of(context).pop(); // Close loading dialog
+
+      // Show results
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Cache Debug Results'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Cache Reliability: ${isReliable ? "✓ Good" : "✗ Poor"}'),
+                Text(
+                    'Feature State Saving: ${settings.featureStateSavingEnabled ? "✓ Enabled" : "✗ Disabled"}'),
+                Text('Currency Cache: ${hasCache ? "✓ Exists" : "✗ Missing"}'),
+                Text(
+                    'Manual Fetch Allowed: ${isManualAllowed ? "✓ Yes" : "✗ Rate Limited"}'),
+                Text(
+                    'Length State: ${hasLengthState ? "✓ Saved" : "✗ Default"}'),
+                Text(
+                    'Currency State: ${hasCurrencyState ? "✓ Saved" : "✗ Default"}'),
+                SizedBox(height: 16),
+                if (!isReliable)
+                  Text(
+                      'Cache reliability issues detected. Try restarting the app.',
+                      style: TextStyle(color: Colors.red)),
+                if (!settings.featureStateSavingEnabled)
+                  Text('State saving is disabled in settings.',
+                      style: TextStyle(color: Colors.orange)),
+              ],
+            ),
+          ),
+          actions: [
+            if (!isManualAllowed)
+              TextButton(
+                onPressed: () async {
+                  await CurrencyCacheService.resetRateLimiting();
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Rate limiting reset')),
+                  );
+                },
+                child: Text('Reset Rate Limit'),
+              ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop(); // Close loading dialog
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Debug Error'),
+          content: Text('Failed to run diagnostics: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

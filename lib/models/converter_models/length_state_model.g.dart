@@ -19,17 +19,23 @@ class LengthCardStateAdapter extends TypeAdapter<LengthCardState> {
     return LengthCardState(
       unitCode: fields[0] as String,
       amount: fields[1] as double,
+      name: fields[2] as String?,
+      visibleUnits: (fields[3] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, LengthCardState obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.unitCode)
       ..writeByte(1)
-      ..write(obj.amount);
+      ..write(obj.amount)
+      ..writeByte(2)
+      ..write(obj.name)
+      ..writeByte(3)
+      ..write(obj.visibleUnits);
   }
 
   @override

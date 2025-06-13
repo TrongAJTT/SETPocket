@@ -1929,4 +1929,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get understood => 'Understood';
+
+  @override
+  String get focusMode => 'Focus Mode';
+
+  @override
+  String get focusModeEnabled => 'Focus mode enabled';
+
+  @override
+  String get focusModeDisabled => 'Focus mode disabled';
+
+  @override
+  String get enableFocusMode => 'Enable Focus Mode';
+
+  @override
+  String get disableFocusMode => 'Disable Focus Mode';
+
+  @override
+  String get focusModeDescription => 'Hide interface elements to focus on your conversions';
+
+  @override
+  String focusModeEnabledMessage(String exitInstruction) {
+    return 'Focus mode activated. $exitInstruction';
+  }
+
+  @override
+  String get focusModeDisabledMessage => 'Focus mode deactivated. All interface elements are now visible.';
+
+  @override
+  String get exitFocusModeDesktop => 'Tap the focus icon in the app bar to exit';
+
+  @override
+  String get exitFocusModeMobile => 'Zoom out or tap the focus icon to exit';
+
+  @override
+  String get zoomToEnterFocusMode => 'Zoom in to enter focus mode';
+
+  @override
+  String get zoomToExitFocusMode => 'Zoom out to exit focus mode';
+
+  @override
+  String get focusModeGesture => 'Use zoom gestures to toggle focus mode';
+
+  @override
+  String get focusModeButton => 'Use the focus button to toggle focus mode';
+
+  @override
+  String get focusModeHidesElements => 'Focus mode hides status widgets, add buttons, view mode buttons, and statistics';
+
+  @override
+  String get focusModeHelp => 'Focus Mode Help';
+
+  @override
+  String get focusModeHelpTitle => 'Focus Mode';
+
+  @override
+  String get focusModeHelpDescription => 'Focus mode helps you concentrate on your conversions by hiding non-essential interface elements.';
+
+  @override
+  String get focusModeHelpHidden => 'Hidden in Focus Mode:';
+
+  @override
+  String get focusModeHelpHiddenStatus => '• Status indicators and widgets';
+
+  @override
+  String get focusModeHelpHiddenButtons => '• Add card/row buttons';
+
+  @override
+  String get focusModeHelpHiddenViewMode => '• View mode toggle buttons (Card/Table)';
+
+  @override
+  String get focusModeHelpHiddenStats => '• Statistics and count information';
+
+  @override
+  String get focusModeHelpActivation => 'Activation:';
+
+  @override
+  String get focusModeHelpActivationDesktop => '• Desktop: Click the focus icon in the app bar';
+
+  @override
+  String get focusModeHelpActivationMobile => '• Mobile: Use zoom in gesture or tap focus icon';
+
+  @override
+  String get focusModeHelpDeactivation => 'Deactivation:';
+
+  @override
+  String get focusModeHelpDeactivationDesktop => '• Desktop: Click the focus icon again';
+
+  @override
+  String get focusModeHelpDeactivationMobile => '• Mobile: Use zoom out gesture or tap focus icon again';
 }

@@ -3670,6 +3670,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Understood'**
   String get understood;
+
+  /// No description provided for @focusMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Mode'**
+  String get focusMode;
+
+  /// No description provided for @focusModeEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus mode enabled'**
+  String get focusModeEnabled;
+
+  /// No description provided for @focusModeDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus mode disabled'**
+  String get focusModeDisabled;
+
+  /// No description provided for @enableFocusMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Focus Mode'**
+  String get enableFocusMode;
+
+  /// No description provided for @disableFocusMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Focus Mode'**
+  String get disableFocusMode;
+
+  /// No description provided for @focusModeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide interface elements to focus on your conversions'**
+  String get focusModeDescription;
+
+  /// No description provided for @focusModeEnabledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus mode activated. {exitInstruction}'**
+  String focusModeEnabledMessage(String exitInstruction);
+
+  /// No description provided for @focusModeDisabledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus mode deactivated. All interface elements are now visible.'**
+  String get focusModeDisabledMessage;
+
+  /// No description provided for @exitFocusModeDesktop.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the focus icon in the app bar to exit'**
+  String get exitFocusModeDesktop;
+
+  /// No description provided for @exitFocusModeMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out or tap the focus icon to exit'**
+  String get exitFocusModeMobile;
+
+  /// No description provided for @zoomToEnterFocusMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in to enter focus mode'**
+  String get zoomToEnterFocusMode;
+
+  /// No description provided for @zoomToExitFocusMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out to exit focus mode'**
+  String get zoomToExitFocusMode;
+
+  /// No description provided for @focusModeGesture.
+  ///
+  /// In en, this message translates to:
+  /// **'Use zoom gestures to toggle focus mode'**
+  String get focusModeGesture;
+
+  /// No description provided for @focusModeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the focus button to toggle focus mode'**
+  String get focusModeButton;
+
+  /// No description provided for @focusModeHidesElements.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus mode hides status widgets, add buttons, view mode buttons, and statistics'**
+  String get focusModeHidesElements;
+
+  /// No description provided for @focusModeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Mode Help'**
+  String get focusModeHelp;
+
+  /// No description provided for @focusModeHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Mode'**
+  String get focusModeHelpTitle;
+
+  /// No description provided for @focusModeHelpDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus mode helps you concentrate on your conversions by hiding non-essential interface elements.'**
+  String get focusModeHelpDescription;
+
+  /// No description provided for @focusModeHelpHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden in Focus Mode:'**
+  String get focusModeHelpHidden;
+
+  /// No description provided for @focusModeHelpHiddenStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'• Status indicators and widgets'**
+  String get focusModeHelpHiddenStatus;
+
+  /// No description provided for @focusModeHelpHiddenButtons.
+  ///
+  /// In en, this message translates to:
+  /// **'• Add card/row buttons'**
+  String get focusModeHelpHiddenButtons;
+
+  /// No description provided for @focusModeHelpHiddenViewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'• View mode toggle buttons (Card/Table)'**
+  String get focusModeHelpHiddenViewMode;
+
+  /// No description provided for @focusModeHelpHiddenStats.
+  ///
+  /// In en, this message translates to:
+  /// **'• Statistics and count information'**
+  String get focusModeHelpHiddenStats;
+
+  /// No description provided for @focusModeHelpActivation.
+  ///
+  /// In en, this message translates to:
+  /// **'Activation:'**
+  String get focusModeHelpActivation;
+
+  /// No description provided for @focusModeHelpActivationDesktop.
+  ///
+  /// In en, this message translates to:
+  /// **'• Desktop: Click the focus icon in the app bar'**
+  String get focusModeHelpActivationDesktop;
+
+  /// No description provided for @focusModeHelpActivationMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'• Mobile: Use zoom in gesture or tap focus icon'**
+  String get focusModeHelpActivationMobile;
+
+  /// No description provided for @focusModeHelpDeactivation.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivation:'**
+  String get focusModeHelpDeactivation;
+
+  /// No description provided for @focusModeHelpDeactivationDesktop.
+  ///
+  /// In en, this message translates to:
+  /// **'• Desktop: Click the focus icon again'**
+  String get focusModeHelpDeactivationDesktop;
+
+  /// No description provided for @focusModeHelpDeactivationMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'• Mobile: Use zoom out gesture or tap focus icon again'**
+  String get focusModeHelpDeactivationMobile;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

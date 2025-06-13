@@ -10,9 +10,17 @@ class LengthCardState extends HiveObject {
   @HiveField(1)
   double amount;
 
+  @HiveField(2)
+  String? name;
+
+  @HiveField(3)
+  List<String>? visibleUnits;
+
   LengthCardState({
     required this.unitCode,
     required this.amount,
+    this.name,
+    this.visibleUnits,
   });
 
   // Convert to JSON
@@ -20,6 +28,9 @@ class LengthCardState extends HiveObject {
     return {
       'unitCode': unitCode,
       'amount': amount,
+      'name': name ?? 'Card 1',
+      'visibleUnits': visibleUnits ??
+          ['meter', 'kilometer', 'centimeter', 'millimeter', 'inch', 'foot'],
     };
   }
 
@@ -28,6 +39,10 @@ class LengthCardState extends HiveObject {
     return LengthCardState(
       unitCode: json['unitCode'] as String,
       amount: (json['amount'] as num).toDouble(),
+      name: json['name'] as String?,
+      visibleUnits: json['visibleUnits'] != null
+          ? List<String>.from(json['visibleUnits'])
+          : null,
     );
   }
 }
@@ -53,9 +68,32 @@ class LengthStateModel extends HiveObject {
   static LengthStateModel createDefault() {
     return LengthStateModel(
       cards: [
-        LengthCardState(unitCode: 'meters', amount: 1.0),
+        LengthCardState(
+          unitCode: 'meter',
+          amount: 1.0,
+          name: 'Card 1',
+          visibleUnits: [
+            'kilometer',
+            'meter',
+            'centimeter',
+            'millimeter',
+            'inch',
+            'foot',
+            'yard',
+            'mile'
+          ],
+        ),
       ],
-      visibleUnits: ['kilometers', 'meters', 'miles'],
+      visibleUnits: [
+        'kilometer',
+        'meter',
+        'centimeter',
+        'millimeter',
+        'inch',
+        'foot',
+        'yard',
+        'mile'
+      ],
       lastUpdated: DateTime.now(),
     );
   }

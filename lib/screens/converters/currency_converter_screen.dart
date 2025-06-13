@@ -364,6 +364,70 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
                       const SizedBox(height: 24),
 
+                      // Focus Mode
+                      _buildInfoSection(
+                        theme,
+                        l10n.focusModeHelpTitle,
+                        Icons.center_focus_strong,
+                        Colors.indigo,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.focusModeHelpDescription,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.focusModeHelpHidden,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.focusModeHelpHiddenStatus,
+                                    style: theme.textTheme.bodySmall),
+                                Text(l10n.focusModeHelpHiddenButtons,
+                                    style: theme.textTheme.bodySmall),
+                                Text(l10n.focusModeHelpHiddenViewMode,
+                                    style: theme.textTheme.bodySmall),
+                                Text(l10n.focusModeHelpHiddenStats,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.focusModeHelpActivation,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.focusModeHelpActivationDesktop,
+                                    style: theme.textTheme.bodySmall),
+                                Text(l10n.focusModeHelpActivationMobile,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.focusModeHelpDeactivation,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.focusModeHelpDeactivationDesktop,
+                                    style: theme.textTheme.bodySmall),
+                                Text(l10n.focusModeHelpDeactivationMobile,
+                                    style: theme.textTheme.bodySmall),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
                       // Data Attribution
                       _buildInfoSection(
                         theme,

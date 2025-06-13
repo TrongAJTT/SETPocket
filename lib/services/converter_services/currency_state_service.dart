@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import '../../models/converter_models/currency_state_model.dart';
 import '../settings_service.dart';
+import '../app_logger.dart';
 
 class CurrencyStateService {
   static const String _stateBoxName = 'currency_state';
@@ -23,8 +24,17 @@ class CurrencyStateService {
 
   // Check if state saving is enabled
   static Future<bool> isStateSavingEnabled() async {
-    final settings = await SettingsService.getSettings();
-    return settings.featureStateSavingEnabled;
+    try {
+      final settings = await SettingsService.getSettings();
+      final enabled = settings.featureStateSavingEnabled;
+      logInfo('CurrencyStateService: State saving enabled: $enabled');
+      return enabled;
+    } catch (e) {
+      logError(
+          'CurrencyStateService: Error checking state saving settings: $e');
+      // Default to enabled if error occurs
+      return true;
+    }
   }
 
   // Save currency converter state
@@ -41,10 +51,11 @@ class CurrencyStateService {
       print(
           'CurrencyStateService: Saving converter state with ${state.cards.length} cards');
       await _stateBox!.put(_stateKey, state);
-      await _stateBox!.flush();
+      await _stateBox!.flush(); // Force flush to disk for mobile reliability
       print('CurrencyStateService: State saved successfully');
     } catch (e) {
       print('CurrencyStateService: Error saving state: $e');
+      // Don't rethrow to avoid breaking the app
     }
   }
 

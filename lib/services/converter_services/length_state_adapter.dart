@@ -7,17 +7,31 @@ import '../../models/converter_models/length_state_model.dart';
 class LengthStateAdapter implements ConverterStateService {
   @override
   Future<void> saveState(String converterType, ConverterState state) async {
+    print('LengthStateAdapter: Saving state with ${state.cards.length} cards');
+    print(
+        'LengthStateAdapter: Global visible units: ${state.globalVisibleUnits}');
+
     // Convert ConverterState to LengthStateModel
     final lengthState = LengthStateModel(
       cards: state.cards
           .map((card) => LengthCardState(
                 unitCode: card.baseUnitId,
                 amount: card.baseValue,
+                name: card.name,
+                visibleUnits: card.visibleUnits, // Save per-card visible units
               ))
           .toList(),
       visibleUnits: state.globalVisibleUnits.toList(),
       lastUpdated: DateTime.now(),
     );
+
+    print(
+        'LengthStateAdapter: Converted to LengthStateModel with ${lengthState.cards.length} cards');
+    for (int i = 0; i < lengthState.cards.length; i++) {
+      final card = lengthState.cards[i];
+      print(
+          'LengthStateAdapter: Card $i - Name: ${card.name}, Unit: ${card.unitCode}, Amount: ${card.amount}, VisibleUnits: ${card.visibleUnits?.length ?? 0}');
+    }
 
     await LengthStateService.saveState(lengthState);
   }
@@ -25,37 +39,79 @@ class LengthStateAdapter implements ConverterStateService {
   @override
   Future<ConverterState> loadState(String converterType) async {
     try {
+      print('LengthStateAdapter: Loading state for $converterType');
       final lengthState = await LengthStateService.loadState();
+
+      print(
+          'LengthStateAdapter: Loaded LengthStateModel with ${lengthState.cards.length} cards');
+      print(
+          'LengthStateAdapter: Global visible units from loaded state: ${lengthState.visibleUnits}');
 
       // Convert LengthStateModel to ConverterState
       final cards = lengthState.cards.map((card) {
-        final visibleUnits = lengthState.visibleUnits;
+        // Use per-card visible units if available, otherwise fall back to global
+        final cardVisibleUnits = card.visibleUnits ?? lengthState.visibleUnits;
         final values = <String, double>{};
 
         // Initialize all units with 0, then set base unit value
-        for (String unit in visibleUnits) {
+        for (String unit in cardVisibleUnits) {
           values[unit] = unit == card.unitCode ? card.amount : 0.0;
         }
 
-        return ConverterCardState(
-          name: 'Card ${lengthState.cards.indexOf(card) + 1}',
+        final convertedCard = ConverterCardState(
+          name: card.name ?? 'Card ${lengthState.cards.indexOf(card) + 1}',
           baseUnitId: card.unitCode,
           baseValue: card.amount,
-          visibleUnits: visibleUnits,
+          visibleUnits: cardVisibleUnits,
           values: values,
         );
+
+        print(
+            'LengthStateAdapter: Converted card - Name: ${convertedCard.name}, BaseUnit: ${convertedCard.baseUnitId}, BaseValue: ${convertedCard.baseValue}, VisibleUnits: ${convertedCard.visibleUnits.length}');
+        return convertedCard;
       }).toList();
 
-      return ConverterState(
+      final converterState = ConverterState(
         cards: cards,
         globalVisibleUnits: lengthState.visibleUnits.toSet(),
         lastUpdated: lengthState.lastUpdated,
       );
+
+      print(
+          'LengthStateAdapter: Final ConverterState - Cards: ${converterState.cards.length}, GlobalUnits: ${converterState.globalVisibleUnits}');
+
+      return converterState;
     } catch (e) {
-      // Return default state if loading fails
-      return const ConverterState(
-        cards: [],
-        globalVisibleUnits: {},
+      print('LengthStateAdapter: Error loading state, creating default: $e');
+
+      // Return proper default state with default length units instead of empty state
+      const defaultUnits = {
+        'kilometer',
+        'meter',
+        'centimeter',
+        'millimeter',
+        'inch',
+        'foot',
+        'yard',
+        'mile'
+      };
+
+      final defaultCard = ConverterCardState(
+        name: 'Card 1',
+        baseUnitId: 'meter',
+        baseValue: 1.0,
+        visibleUnits: defaultUnits.toList(),
+        values: {
+          for (String unit in defaultUnits) unit: unit == 'meter' ? 1.0 : 0.0
+        },
+      );
+
+      print(
+          'LengthStateAdapter: Created default state with ${defaultUnits.length} units');
+
+      return ConverterState(
+        cards: [defaultCard],
+        globalVisibleUnits: defaultUnits,
       );
     }
   }

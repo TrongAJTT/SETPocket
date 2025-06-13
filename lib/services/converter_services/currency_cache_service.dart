@@ -285,6 +285,18 @@ class CurrencyCacheService {
   // Force refresh rates (DEPRECATED - use forceRefreshWithDialog)
   static Future<Map<String, double>> forceRefresh() async {
     logInfo('CurrencyCacheService: Force refresh requested');
+
+    // Check rate limiting for manual fetch
+    final isAllowed = await isManualFetchAllowed();
+    if (!isAllowed) {
+      logInfo(
+          'CurrencyCacheService: Manual fetch blocked by rate limiting, returning cached data');
+      return await getCachedRates();
+    }
+
+    // Record manual fetch time for rate limiting
+    await _recordManualFetch();
+
     return await getRates(forceRefresh: true);
   }
 
@@ -293,11 +305,13 @@ class CurrencyCacheService {
     await initialize();
 
     try {
-      final lastFetchBox =
-          await Hive.openBox('app_settings'); // Use same box as settings
-      final lastFetch = lastFetchBox.get(_lastManualFetchKey);
+      // Use a dedicated box for rate limiting to avoid conflicts
+      final rateLimitBox = await Hive.openBox('rate_limiting');
+      final lastFetch = rateLimitBox.get(_lastManualFetchKey);
 
       if (lastFetch == null) {
+        logInfo(
+            'CurrencyCacheService: No previous manual fetch recorded, allowing fetch');
         return true; // No previous fetch recorded
       }
 
@@ -305,7 +319,11 @@ class CurrencyCacheService {
       final now = DateTime.now();
       final timeSinceLastFetch = now.difference(lastFetchTime);
 
-      return timeSinceLastFetch >= _manualFetchCooldown;
+      final isAllowed = timeSinceLastFetch >= _manualFetchCooldown;
+      logInfo(
+          'CurrencyCacheService: Manual fetch allowed: $isAllowed (time since last: ${timeSinceLastFetch.inHours} hours)');
+
+      return isAllowed;
     } catch (e) {
       logError(
           'CurrencyCacheService: Error checking manual fetch cooldown: $e');
@@ -318,8 +336,9 @@ class CurrencyCacheService {
     await initialize();
 
     try {
-      final lastFetchBox = await Hive.openBox('app_settings');
-      final lastFetch = lastFetchBox.get(_lastManualFetchKey);
+      // Use the same dedicated box for consistency
+      final rateLimitBox = await Hive.openBox('rate_limiting');
+      final lastFetch = rateLimitBox.get(_lastManualFetchKey);
 
       if (lastFetch == null) {
         return null; // No cooldown
@@ -344,9 +363,11 @@ class CurrencyCacheService {
   // Record manual fetch time
   static Future<void> _recordManualFetch() async {
     try {
-      final lastFetchBox = await Hive.openBox('app_settings');
-      await lastFetchBox.put(
+      // Use the same dedicated box for consistency
+      final rateLimitBox = await Hive.openBox('rate_limiting');
+      await rateLimitBox.put(
           _lastManualFetchKey, DateTime.now().millisecondsSinceEpoch);
+      await rateLimitBox.flush(); // Force flush to disk for mobile reliability
       logInfo('CurrencyCacheService: Recorded manual fetch time');
     } catch (e) {
       logError('CurrencyCacheService: Error recording manual fetch time: $e');
@@ -405,6 +426,45 @@ class CurrencyCacheService {
       logInfo('=== END DEBUG ===');
     } catch (e) {
       logError('CurrencyCacheService: Error in debug: $e');
+    }
+  }
+
+  // Reset rate limiting (for testing/debugging)
+  static Future<void> resetRateLimiting() async {
+    try {
+      final rateLimitBox = await Hive.openBox('rate_limiting');
+      await rateLimitBox.delete(_lastManualFetchKey);
+      await rateLimitBox.flush();
+      logInfo('CurrencyCacheService: Rate limiting reset');
+    } catch (e) {
+      logError('CurrencyCacheService: Error resetting rate limiting: $e');
+    }
+  }
+
+  // Check mobile platform reliability
+  static Future<bool> isCacheReliable() async {
+    try {
+      await initialize();
+
+      // Basic reliability check - can we read/write?
+      // Use a separate test box to avoid type conflicts
+      final testBox = await Hive.openBox('cache_test');
+      final testKey = 'test_reliability';
+      final testValue = DateTime.now().millisecondsSinceEpoch;
+
+      await testBox.put(testKey, testValue);
+      await testBox.flush();
+
+      final readValue = testBox.get(testKey);
+      await testBox.delete(testKey);
+      await testBox.close();
+
+      final isReliable = readValue == testValue;
+      logInfo('CurrencyCacheService: Cache reliability test: $isReliable');
+      return isReliable;
+    } catch (e) {
+      logError('CurrencyCacheService: Cache reliability test failed: $e');
+      return false;
     }
   }
 }

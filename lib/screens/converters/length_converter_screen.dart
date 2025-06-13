@@ -83,6 +83,43 @@ class _LengthConverterNewScreenState extends State<LengthConverterNewScreen> {
                   'Scientific and engineering units', Icons.calculate),
               _buildFeatureItem(
                   'Real-time conversion across multiple units', Icons.science),
+              const SizedBox(height: 16),
+              Text(
+                l10n.focusModeHelpTitle,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.focusModeHelpDescription,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.focusModeHelpHidden,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              _buildFeatureItem(l10n.focusModeHelpHiddenButtons.substring(2),
+                  Icons.add_circle_outline),
+              _buildFeatureItem(l10n.focusModeHelpHiddenViewMode.substring(2),
+                  Icons.view_agenda),
+              _buildFeatureItem(
+                  l10n.focusModeHelpHiddenStats.substring(2), Icons.bar_chart),
+              const SizedBox(height: 8),
+              Text(
+                l10n.focusModeHelpActivation,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              _buildFeatureItem(
+                  l10n.focusModeHelpActivationDesktop.substring(2),
+                  Icons.desktop_windows),
+              _buildFeatureItem(l10n.focusModeHelpActivationMobile.substring(2),
+                  Icons.zoom_in),
             ],
           ),
         ),

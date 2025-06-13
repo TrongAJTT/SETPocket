@@ -803,5 +803,42 @@
         }
     },
     "rateLimitInfo": "Rate limiting helps prevent API abuse and ensures service availability for everyone.",
-    "understood": "Understood"
+    "understood": "Understood",
+    
+    "focusMode": "Focus Mode",
+    "focusModeEnabled": "Focus mode enabled",
+    "focusModeDisabled": "Focus mode disabled", 
+    "enableFocusMode": "Enable Focus Mode",
+    "disableFocusMode": "Disable Focus Mode",
+    "focusModeDescription": "Hide interface elements to focus on your conversions",
+    "focusModeEnabledMessage": "Focus mode activated. {exitInstruction}",
+    "@focusModeEnabledMessage": {
+        "placeholders": {
+            "exitInstruction": {
+                "type": "String"
+            }
+        }
+    },
+    "focusModeDisabledMessage": "Focus mode deactivated. All interface elements are now visible.",
+    "exitFocusModeDesktop": "Tap the focus icon in the app bar to exit",
+    "exitFocusModeMobile": "Zoom out or tap the focus icon to exit",
+    "zoomToEnterFocusMode": "Zoom in to enter focus mode",
+    "zoomToExitFocusMode": "Zoom out to exit focus mode",
+    "focusModeGesture": "Use zoom gestures to toggle focus mode",
+    "focusModeButton": "Use the focus button to toggle focus mode",
+    "focusModeHidesElements": "Focus mode hides status widgets, add buttons, view mode buttons, and statistics",
+    "focusModeHelp": "Focus Mode Help",
+    "focusModeHelpTitle": "Focus Mode",
+    "focusModeHelpDescription": "Focus mode helps you concentrate on your conversions by hiding non-essential interface elements.",
+    "focusModeHelpHidden": "Hidden in Focus Mode:",
+    "focusModeHelpHiddenStatus": "• Status indicators and widgets",
+    "focusModeHelpHiddenButtons": "• Add card/row buttons",
+    "focusModeHelpHiddenViewMode": "• View mode toggle buttons (Card/Table)",
+    "focusModeHelpHiddenStats": "• Statistics and count information",
+    "focusModeHelpActivation": "Activation:",
+    "focusModeHelpActivationDesktop": "• Desktop: Click the focus icon in the app bar",
+    "focusModeHelpActivationMobile": "• Mobile: Use zoom in gesture or tap focus icon",
+    "focusModeHelpDeactivation": "Deactivation:",
+    "focusModeHelpDeactivationDesktop": "• Desktop: Click the focus icon again",
+    "focusModeHelpDeactivationMobile": "• Mobile: Use zoom out gesture or tap focus icon again"
 }

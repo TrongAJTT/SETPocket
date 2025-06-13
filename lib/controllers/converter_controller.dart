@@ -41,6 +41,7 @@ class ConverterController extends ChangeNotifier {
       _cardControllers;
 
   bool get isLoading => _state.isLoading;
+  bool get isFocusMode => _state.isFocusMode;
   DateTime? get lastUpdated => _converterService.lastUpdated;
   bool get isUsingLiveData => _converterService.isUsingLiveData;
   bool get requiresRealTimeData => _converterService.requiresRealTimeData;
@@ -318,8 +319,10 @@ class ConverterController extends ChangeNotifier {
     final value = double.tryParse(valueText) ?? 0.0;
     _updateCardConversions(cardIndex, unitId, value);
 
-    // Save state after value changes to ensure persistence
-    _saveState();
+    // Save state after value changes to ensure persistence (async but don't block UI)
+    _saveState().catchError((e) {
+      logError('Error saving state after value change: $e');
+    });
   }
 
   void _updateCardConversions(
@@ -439,6 +442,22 @@ class ConverterController extends ChangeNotifier {
 
   Future<void> refreshData() async {
     await _refreshData();
+  }
+
+  /// Toggle focus mode on/off
+  Future<void> toggleFocusMode() async {
+    _state = _state.copyWith(isFocusMode: !_state.isFocusMode);
+    await _saveState();
+    _notifyListenersDebounced();
+  }
+
+  /// Set focus mode state
+  Future<void> setFocusMode(bool enabled) async {
+    if (_state.isFocusMode != enabled) {
+      _state = _state.copyWith(isFocusMode: enabled);
+      await _saveState();
+      _notifyListenersDebounced();
+    }
   }
 
   @override

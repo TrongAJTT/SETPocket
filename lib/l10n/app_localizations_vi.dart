@@ -1929,4 +1929,93 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get understood => 'Đã hiểu';
+
+  @override
+  String get focusMode => 'Chế độ tập trung';
+
+  @override
+  String get focusModeEnabled => 'Đã bật chế độ tập trung';
+
+  @override
+  String get focusModeDisabled => 'Đã tắt chế độ tập trung';
+
+  @override
+  String get enableFocusMode => 'Bật chế độ tập trung';
+
+  @override
+  String get disableFocusMode => 'Tắt chế độ tập trung';
+
+  @override
+  String get focusModeDescription => 'Ẩn các thành phần giao diện để tập trung vào chuyển đổi';
+
+  @override
+  String focusModeEnabledMessage(String exitInstruction) {
+    return 'Đã kích hoạt chế độ tập trung. $exitInstruction';
+  }
+
+  @override
+  String get focusModeDisabledMessage => 'Đã tắt chế độ tập trung. Tất cả thành phần giao diện hiện đã hiển thị.';
+
+  @override
+  String get exitFocusModeDesktop => 'Nhấn biểu tượng tập trung trên thanh ứng dụng để thoát';
+
+  @override
+  String get exitFocusModeMobile => 'Zoom out hoặc nhấn biểu tượng tập trung để thoát';
+
+  @override
+  String get zoomToEnterFocusMode => 'Zoom in để vào chế độ tập trung';
+
+  @override
+  String get zoomToExitFocusMode => 'Zoom out để thoát chế độ tập trung';
+
+  @override
+  String get focusModeGesture => 'Sử dụng cử chỉ zoom để bật/tắt chế độ tập trung';
+
+  @override
+  String get focusModeButton => 'Sử dụng nút tập trung để bật/tắt chế độ tập trung';
+
+  @override
+  String get focusModeHidesElements => 'Chế độ tập trung ẩn widget trạng thái, nút thêm, nút chuyển chế độ xem và thống kê';
+
+  @override
+  String get focusModeHelp => 'Trợ giúp chế độ tập trung';
+
+  @override
+  String get focusModeHelpTitle => 'Chế độ tập trung';
+
+  @override
+  String get focusModeHelpDescription => 'Chế độ tập trung giúp bạn tập trung vào việc chuyển đổi bằng cách ẩn các thành phần giao diện không cần thiết.';
+
+  @override
+  String get focusModeHelpHidden => 'Được ẩn trong chế độ tập trung:';
+
+  @override
+  String get focusModeHelpHiddenStatus => '• Chỉ báo trạng thái và widget';
+
+  @override
+  String get focusModeHelpHiddenButtons => '• Nút thêm card/dòng';
+
+  @override
+  String get focusModeHelpHiddenViewMode => '• Nút chuyển chế độ xem (Card/Bảng)';
+
+  @override
+  String get focusModeHelpHiddenStats => '• Thông tin thống kê và đếm';
+
+  @override
+  String get focusModeHelpActivation => 'Kích hoạt:';
+
+  @override
+  String get focusModeHelpActivationDesktop => '• Desktop: Nhấn biểu tượng tập trung trên thanh ứng dụng';
+
+  @override
+  String get focusModeHelpActivationMobile => '• Mobile: Sử dụng cử chỉ zoom in hoặc nhấn biểu tượng tập trung';
+
+  @override
+  String get focusModeHelpDeactivation => 'Tắt:';
+
+  @override
+  String get focusModeHelpDeactivationDesktop => '• Desktop: Nhấn lại biểu tượng tập trung';
+
+  @override
+  String get focusModeHelpDeactivationMobile => '• Mobile: Sử dụng cử chỉ zoom out hoặc nhấn lại biểu tượng tập trung';
 }

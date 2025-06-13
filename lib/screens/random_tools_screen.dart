@@ -15,7 +15,8 @@ import 'package:setpocket/screens/random_tools/date_time_generator.dart';
 
 class RandomToolsScreen extends StatelessWidget {
   final bool isEmbedded;
-  final Function(Widget, String, {String? parentCategory})? onToolSelected;
+  final Function(Widget, String, {String? parentCategory, IconData? icon})?
+      onToolSelected;
 
   const RandomToolsScreen({
     super.key,
@@ -139,7 +140,7 @@ class RandomToolsScreen extends StatelessWidget {
               if (isEmbedded && onToolSelected != null) {
                 // Desktop mode: sử dụng callback để hiển thị công cụ trong main widget
                 onToolSelected!(screen, title,
-                    parentCategory: 'RandomToolsScreen');
+                    parentCategory: 'RandomToolsScreen', icon: icon);
               } else {
                 // Mobile mode: navigation stack bình thường
                 Navigator.of(context).push(

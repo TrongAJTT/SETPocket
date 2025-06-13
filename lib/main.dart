@@ -22,6 +22,20 @@ import 'screens/calculator_tools_screen.dart';
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+class BreadcrumbData {
+  final String title;
+  final String toolType;
+  final Widget? tool;
+  final IconData? icon;
+
+  const BreadcrumbData({
+    required this.title,
+    required this.toolType,
+    this.tool,
+    this.icon,
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -227,6 +241,7 @@ class _DesktopLayoutState extends State<DesktopLayout> {
   String? selectedToolType;
   String? parentToolType; // Track parent category for sub-tools
   String? currentToolTitle;
+  List<BreadcrumbData> breadcrumbs = []; // Track navigation hierarchy
   final GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
 
   void _refreshToolSelection() {
@@ -238,7 +253,140 @@ class _DesktopLayoutState extends State<DesktopLayout> {
       selectedToolType = null;
       parentToolType = null;
       currentToolTitle = null;
+      breadcrumbs.clear();
     });
+  }
+
+  void _navigateToParent() {
+    if (breadcrumbs.isNotEmpty) {
+      // Remove current breadcrumb
+      breadcrumbs.removeLast();
+
+      if (breadcrumbs.isNotEmpty) {
+        // Navigate to parent breadcrumb
+        final parent = breadcrumbs.last;
+        setState(() {
+          currentTool = parent.tool;
+          selectedToolType = parent.toolType;
+          currentToolTitle = parent.title;
+          // Set parentToolType based on breadcrumb hierarchy
+          parentToolType = breadcrumbs.length > 1
+              ? breadcrumbs[breadcrumbs.length - 2].toolType
+              : null;
+        });
+      } else {
+        // Return to main screen
+        setState(() {
+          currentTool = null;
+          selectedToolType = null;
+          parentToolType = null;
+          currentToolTitle = null;
+        });
+      }
+    }
+  }
+
+  Widget _buildBreadcrumbBar() {
+    if (breadcrumbs.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer.withValues(alpha: 0.8),
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.navigation,
+            size: 16,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int i = 0; i < breadcrumbs.length; i++) ...[
+                    if (i > 0) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    InkWell(
+                      onTap: i < breadcrumbs.length - 1
+                          ? () {
+                              // Navigate to this breadcrumb level
+                              final targetBreadcrumb = breadcrumbs[i];
+                              // Remove all breadcrumbs after this one
+                              breadcrumbs = breadcrumbs.sublist(0, i + 1);
+                              setState(() {
+                                currentTool = targetBreadcrumb.tool;
+                                selectedToolType = targetBreadcrumb.toolType;
+                                currentToolTitle = targetBreadcrumb.title;
+                                parentToolType =
+                                    i > 0 ? breadcrumbs[i - 1].toolType : null;
+                              });
+                            }
+                          : null,
+                      borderRadius: BorderRadius.circular(4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: i == breadcrumbs.length - 1
+                              ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                              : null,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (breadcrumbs[i].icon != null) ...[
+                              Icon(
+                                breadcrumbs[i].icon,
+                                size: 14,
+                                color: i == breadcrumbs.length - 1
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                            ],
+                            Text(
+                              breadcrumbs[i].title,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: i == breadcrumbs.length - 1
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurfaceVariant,
+                                fontWeight: i == breadcrumbs.length - 1
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -249,97 +397,171 @@ class _DesktopLayoutState extends State<DesktopLayout> {
         leading: currentTool != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    currentTool = null;
-                    selectedToolType = null;
-                    parentToolType = null;
-                    currentToolTitle = null;
-                  });
-                },
+                onPressed: _navigateToParent,
+                tooltip: breadcrumbs.length > 1
+                    ? 'Back to ${breadcrumbs[breadcrumbs.length - 2].title}'
+                    : 'Back to main menu',
               )
             : null,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final totalWidth = constraints.maxWidth;
-          // Sidebar chiếm 1/4, main chiếm 3/4, nhưng sidebar min 280, max 380
-          double sidebarWidth = (totalWidth / 4).clamp(280, 380);
+      body: Column(
+        children: [
+          _buildBreadcrumbBar(),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final totalWidth = constraints.maxWidth;
+                // Sidebar chiếm 1/4, main chiếm 3/4, nhưng sidebar min 280, max 380
+                double sidebarWidth = (totalWidth / 4).clamp(280, 380);
 
-          return Row(
-            children: [
-              // Sidebar với danh sách tools
-              SizedBox(
-                width: sidebarWidth,
-                child: ToolSelectionScreen(
-                  key: _toolSelectionKey,
-                  isDesktop: true,
-                  selectedToolType: selectedToolType,
-                  parentToolType: parentToolType,
-                  onToolVisibilityChanged: _refreshToolSelection,
-                  onToolSelected: (Widget tool, String title,
-                      {String? parentCategory}) {
-                    setState(() {
-                      currentTool = tool;
-                      selectedToolType = tool.runtimeType.toString();
-                      parentToolType = parentCategory;
-                      currentToolTitle = title;
-                    });
-                  },
-                ),
-              ),
-              // Main content area
-              Expanded(
-                child: currentTool != null
-                    ? ClipRect(
-                        child: currentTool!,
-                      )
-                    : Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.touch_app,
-                              size: 64,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withValues(alpha: 0.5),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              AppLocalizations.of(context)!.selectTool,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(
+                return Row(
+                  children: [
+                    // Sidebar với danh sách tools
+                    SizedBox(
+                      width: sidebarWidth,
+                      child: ToolSelectionScreen(
+                        key: _toolSelectionKey,
+                        isDesktop: true,
+                        selectedToolType: selectedToolType,
+                        parentToolType: parentToolType,
+                        onToolVisibilityChanged: _refreshToolSelection,
+                        onToolSelected: (Widget tool, String title,
+                            {String? parentCategory, IconData? icon}) {
+                          setState(() {
+                            currentTool = tool;
+                            final newToolType = tool.runtimeType.toString();
+                            selectedToolType = newToolType;
+                            parentToolType = parentCategory;
+                            currentToolTitle = title;
+
+                            // Determine if this is a top-level tool or sub-tool
+                            final isTopLevelTool = parentCategory == null;
+                            final isSubTool = parentCategory != null;
+
+                            if (isTopLevelTool) {
+                              // Top-level tool from sidebar: Start fresh breadcrumb
+                              breadcrumbs.clear();
+                              breadcrumbs.add(BreadcrumbData(
+                                title: title,
+                                toolType: newToolType,
+                                tool: tool,
+                                icon: icon,
+                              ));
+                            } else if (isSubTool) {
+                              // Sub-tool navigation: Check if we're going deeper or switching
+
+                              // If breadcrumbs is empty, this shouldn't happen but handle it
+                              if (breadcrumbs.isEmpty) {
+                                breadcrumbs.add(BreadcrumbData(
+                                  title: title,
+                                  toolType: newToolType,
+                                  tool: tool,
+                                  icon: icon,
+                                ));
+                              } else {
+                                // Check if this is a direct child of the current breadcrumb
+                                final currentBreadcrumb = breadcrumbs.last;
+                                final isDirectChild =
+                                    currentBreadcrumb.toolType ==
+                                        parentCategory;
+
+                                if (isDirectChild) {
+                                  // Going deeper: Add to breadcrumbs
+                                  breadcrumbs.add(BreadcrumbData(
+                                    title: title,
+                                    toolType: newToolType,
+                                    tool: tool,
+                                    icon: icon,
+                                  ));
+                                } else {
+                                  // Switching to different sub-tool:
+                                  // Find the parent in breadcrumbs and truncate there
+                                  int parentIndex = breadcrumbs.indexWhere(
+                                      (bc) => bc.toolType == parentCategory);
+
+                                  if (parentIndex >= 0) {
+                                    // Keep breadcrumbs up to parent, add new child
+                                    breadcrumbs =
+                                        breadcrumbs.sublist(0, parentIndex + 1);
+                                    breadcrumbs.add(BreadcrumbData(
+                                      title: title,
+                                      toolType: newToolType,
+                                      tool: tool,
+                                      icon: icon,
+                                    ));
+                                  } else {
+                                    // Parent not found, start fresh with this tool
+                                    breadcrumbs.clear();
+                                    breadcrumbs.add(BreadcrumbData(
+                                      title: title,
+                                      toolType: newToolType,
+                                      tool: tool,
+                                      icon: icon,
+                                    ));
+                                  }
+                                }
+                              }
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                    // Main content area
+                    Expanded(
+                      child: currentTool != null
+                          ? ClipRect(
+                              child: currentTool!,
+                            )
+                          : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.touch_app,
+                                    size: 64,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              AppLocalizations.of(context)!.selectToolDesc,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
+                                        .primary
                                         .withValues(alpha: 0.5),
                                   ),
-                              textAlign: TextAlign.center,
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    AppLocalizations.of(context)!.selectTool,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.7),
+                                        ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    AppLocalizations.of(context)!
+                                        .selectToolDesc,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.5),
+                                        ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
-              ),
-            ],
-          );
-        },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -347,7 +569,8 @@ class _DesktopLayoutState extends State<DesktopLayout> {
 
 class ToolSelectionScreen extends StatefulWidget {
   final bool isDesktop;
-  final Function(Widget, String, {String? parentCategory})? onToolSelected;
+  final Function(Widget, String, {String? parentCategory, IconData? icon})?
+      onToolSelected;
   final String? selectedToolType;
   final String? parentToolType;
   final VoidCallback? onToolVisibilityChanged;
@@ -396,30 +619,34 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       case 'textTemplate':
         return TemplateListScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: (tool, title, {parentCategory}) =>
+          onToolSelected: (tool, title, {parentCategory, icon}) =>
               widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'TemplateListScreen'),
+                  parentCategory: parentCategory ?? 'TemplateListScreen',
+                  icon: icon),
         );
       case 'randomTools':
         return RandomToolsScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: (tool, title, {parentCategory}) =>
+          onToolSelected: (tool, title, {parentCategory, icon}) =>
               widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'RandomToolsScreen'),
+                  parentCategory: parentCategory ?? 'RandomToolsScreen',
+                  icon: icon),
         );
       case 'converterTools':
         return ConverterToolsScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: (tool, title, {parentCategory}) =>
+          onToolSelected: (tool, title, {parentCategory, icon}) =>
               widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'ConverterToolsScreen'),
+                  parentCategory: parentCategory ?? 'ConverterToolsScreen',
+                  icon: icon),
         );
       case 'calculatorTools':
         return CalculatorToolsScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: (tool, title, {parentCategory}) =>
+          onToolSelected: (tool, title, {parentCategory, icon}) =>
               widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'CalculatorToolsScreen'),
+                  parentCategory: parentCategory ?? 'CalculatorToolsScreen',
+                  icon: icon),
         );
       default:
         return const SizedBox.shrink();
@@ -574,8 +801,11 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
             onTap: () {
               final tool = _getToolWidget(config, loc);
               if (widget.isDesktop) {
-                widget.onToolSelected
-                    ?.call(tool, _getLocalizedName(context, config.nameKey));
+                widget.onToolSelected?.call(
+                  tool,
+                  _getLocalizedName(context, config.nameKey),
+                  icon: _getIconData(config.icon),
+                );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -599,8 +829,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               onToolVisibilityChanged: widget.onToolVisibilityChanged,
             );
             if (widget.isDesktop) {
-              widget.onToolSelected?.call(tool, loc.settings,
-                  parentCategory: widget.parentToolType);
+              widget.onToolSelected
+                  ?.call(tool, loc.settings, icon: Icons.settings);
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(

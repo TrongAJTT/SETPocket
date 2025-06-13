@@ -13,7 +13,8 @@ import 'text_template_gen_use_screen.dart';
 
 class TemplateListScreen extends StatefulWidget {
   final bool isEmbedded;
-  final Function(Widget, String, {String? parentCategory})? onToolSelected;
+  final Function(Widget, String, {String? parentCategory, IconData? icon})?
+      onToolSelected;
 
   const TemplateListScreen(
       {super.key, this.isEmbedded = false, this.onToolSelected});
@@ -356,7 +357,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     if (widget.isEmbedded && widget.onToolSelected != null) {
       // Desktop mode: callback để hiển thị trong main widget
       widget.onToolSelected!(useScreen, 'Generate Document: ${template.title}',
-          parentCategory: 'TemplateListScreen');
+          parentCategory: 'TemplateListScreen', icon: Icons.description);
     } else {
       // Mobile mode: navigation bình thường
       Navigator.push(

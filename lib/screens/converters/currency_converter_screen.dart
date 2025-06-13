@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../../models/converter_models.dart';
+import 'dart:async';
+import '../../models/converter_models/converter_models.dart';
 import '../../services/converter_services/currency_cache_service.dart';
 import '../../services/converter_services/currency_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/app_logger.dart';
 import '../../widgets/converter_tools/currency_fetch_progress_dialog.dart';
 import '../../widgets/converter_tools/currency_fetch_status_dialog.dart';
-import '../../widgets/converter_tools/unit_customization_dialog.dart';
+import '../../widgets/converter_tools/generic_unit_custom_dialog.dart';
 import '../../services/converter_services/currency_state_service.dart';
-import '../../models/currency_state_model.dart';
+import '../../models/converter_models/currency_state_model.dart';
 import '../../l10n/app_localizations.dart';
 
 enum CurrencyViewMode { cards, table }
@@ -57,6 +58,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   final List<String> _cardNames = []; // Names for each card
   final List<Set<String>> _cardCurrencies = []; // Currencies for each card
 
+  // Debounce timer to reduce rapid updates
+  Timer? _debounceTimer;
+
   @override
   void initState() {
     super.initState();
@@ -67,6 +71,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   @override
   void dispose() {
     _saveState(); // Save state before disposing
+    _debounceTimer?.cancel();
     // Dispose all row controllers
     for (var rowControllers in _rowControllers) {
       for (var controller in rowControllers.values) {
@@ -267,7 +272,14 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
     final numValue = double.tryParse(value) ?? 0.0;
     _rowValues[rowIndex][currencyCode] = numValue;
-    _updateRowConversions(rowIndex, currencyCode, numValue);
+
+    // Debounce the conversion update to reduce rapid setState calls
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _updateRowConversions(rowIndex, currencyCode, numValue);
+      }
+    });
   }
 
   // Edit card name
@@ -325,7 +337,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     final l10n = AppLocalizations.of(context)!;
     final converter = CurrencyConverter();
     final availableUnits = converter.units
-        .map((unit) => UnitItem(
+        .map((unit) => GenericUnitItem(
               id: unit.id,
               name: unit.name,
               symbol: unit.symbol,
@@ -338,7 +350,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => UnitCustomizationDialog(
+      builder: (context) => EnhancedGenericUnitCustomizationDialog(
         title: l10n.customizeCurrencies,
         availableUnits: availableUnits,
         visibleUnits: currentCurrencies.cast<String>(),
@@ -348,7 +360,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         maxSelection: 10,
         minSelection: 2,
         showPresetOptions: true,
-        presetKey: 'card_currencies',
+        presetType: 'currency',
       ),
     );
   }
@@ -519,7 +531,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     if (_currentRetryAttempt == 0) {
       _maxRetryAttempts = await SettingsService.getFetchRetryTimes();
       logInfo(
-          'Starting currency rates refresh with max ${_maxRetryAttempts} retries');
+          'Starting currency rates refresh with max $_maxRetryAttempts retries');
     }
 
     logInfo(
@@ -820,7 +832,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   void _showCurrencyCustomization() {
     final converter = CurrencyConverter();
     final availableUnits = converter.units
-        .map((unit) => UnitItem(
+        .map((unit) => GenericUnitItem(
               id: unit.id,
               name: unit.name,
               symbol: unit.symbol,
@@ -829,7 +841,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => UnitCustomizationDialog(
+      builder: (context) => EnhancedGenericUnitCustomizationDialog(
         title: AppLocalizations.of(context)!.customizeCurrenciesDialog,
         availableUnits: availableUnits,
         visibleUnits: Set.from(_visibleCurrencies),
@@ -837,7 +849,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         maxSelection: 10,
         minSelection: 2,
         showPresetOptions: true,
-        presetKey: 'global_currencies',
+        presetType: 'currency',
       ),
     );
   }

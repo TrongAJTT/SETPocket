@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../../models/currency_cache_model.dart';
+import '../../models/converter_models/currency_cache_model.dart';
 import 'currency_service.dart';
 import '../settings_service.dart';
 
@@ -240,21 +240,21 @@ class CurrencyCacheService {
   }
 
   // Clear all currency data (for complete reset - not exposed to user)
-  static Future<void> _clearAllCurrencyData() async {
-    try {
-      await initialize();
-      await _cacheBox!.delete(_cacheKey);
-      await _cacheBox!.flush();
+  // static Future<void> _clearAllCurrencyData() async {
+  //   try {
+  //     await initialize();
+  //     await _cacheBox!.delete(_cacheKey);
+  //     await _cacheBox!.flush();
 
-      // Reset CurrencyService to static rates
-      CurrencyService.resetToStaticRates();
+  //     // Reset CurrencyService to static rates
+  //     CurrencyService.resetToStaticRates();
 
-      logInfo(
-          'CurrencyCacheService: All currency data cleared and service reset');
-    } catch (e) {
-      logError('CurrencyCacheService: Error clearing all currency data: $e');
-    }
-  }
+  //     logInfo(
+  //         'CurrencyCacheService: All currency data cleared and service reset');
+  //   } catch (e) {
+  //     logError('CurrencyCacheService: Error clearing all currency data: $e');
+  //   }
+  // }
 
   // Get last updated time
   static Future<DateTime?> getLastUpdated() async {

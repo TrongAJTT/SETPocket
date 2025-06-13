@@ -1,22 +1,22 @@
 import 'package:hive/hive.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../../models/converter_models/currency_preset_model.dart';
+import '../../models/converter_models/length_preset_model.dart';
 
 enum PresetSortOrder { name, date }
 
-class CurrencyPresetService {
-  static const String _boxName = 'currency_presets';
-  static Box<CurrencyPresetModel>? _box;
+class LengthPresetService {
+  static const String _boxName = 'length_presets';
+  static Box<LengthPresetModel>? _box;
 
   // Initialize service
   static Future<void> initialize() async {
     try {
       if (_box == null || !_box!.isOpen) {
-        _box = await Hive.openBox<CurrencyPresetModel>(_boxName);
-        logInfo('CurrencyPresetService: Box opened successfully');
+        _box = await Hive.openBox<LengthPresetModel>(_boxName);
+        logInfo('LengthPresetService: Box opened successfully');
       }
     } catch (e) {
-      logError('CurrencyPresetService: Error opening box: $e');
+      logError('LengthPresetService: Error opening box: $e');
       rethrow;
     }
   }
@@ -24,7 +24,7 @@ class CurrencyPresetService {
   // Save preset
   static Future<void> savePreset({
     required String name,
-    required List<String> currencies,
+    required List<String> units,
   }) async {
     await initialize();
 
@@ -32,24 +32,24 @@ class CurrencyPresetService {
       throw Exception('Preset name cannot be empty');
     }
 
-    if (currencies.isEmpty || currencies.length > 10) {
-      throw Exception('Preset must contain 1-10 currencies');
+    if (units.isEmpty || units.length > 10) {
+      throw Exception('Preset must contain 1-10 units');
     }
 
-    final preset = CurrencyPresetModel.create(
+    final preset = LengthPresetModel.create(
       name: name.trim(),
-      currencies: currencies,
+      units: units,
     );
 
     await _box!.put(preset.id, preset);
     await _box!.flush();
 
     logInfo(
-        'CurrencyPresetService: Saved preset "${preset.name}" with ${preset.currencies.length} currencies');
+        'LengthPresetService: Saved preset "${preset.name}" with ${preset.units.length} units');
   }
 
   // Load all presets
-  static Future<List<CurrencyPresetModel>> loadPresets({
+  static Future<List<LengthPresetModel>> loadPresets({
     PresetSortOrder sortOrder = PresetSortOrder.date,
   }) async {
     await initialize();
@@ -69,12 +69,12 @@ class CurrencyPresetService {
     }
 
     logInfo(
-        'CurrencyPresetService: Loaded ${presets.length} presets, sorted by $sortOrder');
+        'LengthPresetService: Loaded ${presets.length} presets, sorted by $sortOrder');
     return presets;
   }
 
   // Get preset by ID
-  static Future<CurrencyPresetModel?> getPreset(String id) async {
+  static Future<LengthPresetModel?> getPreset(String id) async {
     await initialize();
     return _box!.get(id);
   }
@@ -87,7 +87,7 @@ class CurrencyPresetService {
     if (preset != null) {
       await _box!.delete(id);
       await _box!.flush();
-      logInfo('CurrencyPresetService: Deleted preset "${preset.name}"');
+      logInfo('LengthPresetService: Deleted preset "${preset.name}"');
     }
   }
 
@@ -111,14 +111,14 @@ class CurrencyPresetService {
     await initialize();
     await _box!.clear();
     await _box!.flush();
-    logInfo('CurrencyPresetService: Cleared all presets');
+    logInfo('LengthPresetService: Cleared all presets');
   }
 
   // Update preset
   static Future<void> updatePreset(
     String id, {
     String? name,
-    List<String>? currencies,
+    List<String>? units,
   }) async {
     await initialize();
 
@@ -129,13 +129,13 @@ class CurrencyPresetService {
 
     final updatedPreset = existingPreset.copyWith(
       name: name,
-      currencies: currencies,
+      units: units,
     );
 
     await _box!.put(id, updatedPreset);
     await _box!.flush();
 
-    logInfo('CurrencyPresetService: Updated preset "${updatedPreset.name}"');
+    logInfo('LengthPresetService: Updated preset "${updatedPreset.name}"');
   }
 
   // Export presets (returns JSON-like structure)
@@ -146,7 +146,7 @@ class CurrencyPresetService {
         .map((preset) => {
               'id': preset.id,
               'name': preset.name,
-              'currencies': preset.currencies,
+              'units': preset.units,
               'createdAt': preset.createdAt.toIso8601String(),
             })
         .toList();

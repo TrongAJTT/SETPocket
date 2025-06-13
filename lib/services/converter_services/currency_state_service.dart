@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import '../../models/currency_state_model.dart';
+import '../../models/converter_models/currency_state_model.dart';
 import '../settings_service.dart';
 
 class CurrencyStateService {

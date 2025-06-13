@@ -451,8 +451,7 @@ class CurrencyService {
             // Skip fetch but report current status for progress dialog
             // Only call progress callback if not cancelled
             if (!_isCancelled) {
-              _onProgress?.call(
-                  currency.code, previousStatus ?? CurrencyStatus.staticRate);
+              _onProgress?.call(currency.code, previousStatus);
             }
             logInfo(
                 'CurrencyService: Skipping fetch for ${currency.code} (recently fetched)');

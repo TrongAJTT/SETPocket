@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../models/unit_models.dart';
+import '../../models/converter_models/unit_models.dart';
 import '../../services/unit_conversion_service.dart';
 import '../../services/converter_services/currency_service.dart';
 import '../../services/converter_services/currency_cache_service.dart';

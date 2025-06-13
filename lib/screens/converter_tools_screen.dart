@@ -50,7 +50,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.green;
             break;
           case 1:
-            screen = const LengthConverterScreen();
+            screen = const LengthConverterNewScreen();
             title = loc.lengthConverter;
             icon = Icons.straighten;
             iconColor = Colors.blue;

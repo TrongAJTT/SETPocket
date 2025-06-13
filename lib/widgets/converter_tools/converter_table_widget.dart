@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../controllers/converter_controller.dart';
-import '../../models/converter_base.dart';
+import '../../models/converter_models/converter_base.dart';
 import '../../l10n/app_localizations.dart';
+import 'unit_customization_dialog.dart' as unit_dialog;
+import 'generic_unit_custom_dialog.dart';
 
 class ConverterTableWidget extends StatelessWidget {
   final ConverterController controller;
@@ -449,20 +451,57 @@ class ConverterTableWidget extends StatelessWidget {
   }
 
   void _editCardUnits(BuildContext context, int cardIndex) {
-    // final l10n = AppLocalizations.of(context)!;
-    // final card = controller.state.cards[cardIndex];
-    // final availableUnits = controller.units
-    //     .map((unit) => UnitItem(
-    //           id: unit.id,
-    //           name: unit.name,
-    //           symbol: unit.symbol,
-    //         ))
-    //     .toList();
+    final card = controller.state.cards[cardIndex];
 
-    // Will implement when UnitCustomizationDialog is ready
-    // showDialog(
-    //   context: context,
-    //   builder: (context) => UnitCustomizationDialog(...),
-    // );
+    // Use enhanced generic dialog for Length Converter with proper preset handling
+    if (controller.converterService.converterType == 'length') {
+      final availableUnits = controller.units
+          .map((unit) => GenericUnitItem(
+                id: unit.id,
+                name: unit.name,
+                symbol: unit.symbol,
+              ))
+          .toList();
+
+      showDialog(
+        context: context,
+        builder: (context) => EnhancedGenericUnitCustomizationDialog(
+          title: AppLocalizations.of(context)!.customizeUnits,
+          availableUnits: availableUnits,
+          visibleUnits: Set<String>.from(card.visibleUnits),
+          onChanged: (newUnits) {
+            controller.updateCardUnits(cardIndex, newUnits);
+          },
+          maxSelection: 10,
+          minSelection: 2,
+          presetType: 'length', // Use the same preset type as main converter
+        ),
+      );
+    } else {
+      // Use generic dialog for other converters
+      final availableUnits = controller.units
+          .map((unit) => unit_dialog.UnitItem(
+                id: unit.id,
+                name: unit.name,
+                symbol: unit.symbol,
+              ))
+          .toList();
+
+      showDialog(
+        context: context,
+        builder: (context) => unit_dialog.UnitCustomizationDialog(
+          title: AppLocalizations.of(context)!.customizeUnits,
+          availableUnits: availableUnits,
+          visibleUnits: Set<String>.from(card.visibleUnits),
+          onChanged: (newUnits) {
+            controller.updateCardUnits(cardIndex, newUnits);
+          },
+          maxSelection: 10,
+          minSelection: 2,
+          showPresetOptions: false,
+          presetKey: 'table_${controller.converterService.converterType}',
+        ),
+      );
+    }
   }
 }

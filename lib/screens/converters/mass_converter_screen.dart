@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../models/converter_models.dart';
+import '../../models/converter_models/converter_models.dart';
 import '../../services/converter_services/mass_state_service.dart';
-import '../../models/mass_state_model.dart';
+import '../../models/converter_models/mass_state_model.dart';
 import '../../widgets/converter_tools/unit_customization_dialog.dart';
 import '../../l10n/app_localizations.dart';
 

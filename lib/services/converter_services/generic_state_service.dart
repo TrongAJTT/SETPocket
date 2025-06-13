@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'converter_service_base.dart';
-import '../../models/converter_base.dart';
+import '../../models/converter_models/converter_base.dart';
 import '../app_logger.dart';
 
 class GenericStateService implements ConverterStateService {

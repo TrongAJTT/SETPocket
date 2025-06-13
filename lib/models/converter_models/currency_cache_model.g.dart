@@ -63,8 +63,6 @@ class CurrencyFetchModeAdapter extends TypeAdapter<CurrencyFetchMode> {
         return CurrencyFetchMode.manual;
       case 1:
         return CurrencyFetchMode.onceADay;
-      case 2:
-        return CurrencyFetchMode.manual; // Handle old everytime values
       default:
         return CurrencyFetchMode.manual;
     }

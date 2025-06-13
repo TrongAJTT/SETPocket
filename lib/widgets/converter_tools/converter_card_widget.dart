@@ -1,19 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 import '../../controllers/converter_controller.dart';
-import '../../models/converter_base.dart';
+import '../../models/converter_models/converter_base.dart';
 import '../../l10n/app_localizations.dart';
 import 'unit_customization_dialog.dart' as unit_dialog;
+import 'generic_unit_custom_dialog.dart';
 
-class ConverterCardWidget extends StatelessWidget {
-  final int cardIndex;
+class ConverterCardWidget extends StatefulWidget {
   final ConverterController controller;
+  final int cardIndex;
+  final VoidCallback? onRemove;
+  final VoidCallback? onCustomize;
 
   const ConverterCardWidget({
     super.key,
-    required this.cardIndex,
     required this.controller,
+    required this.cardIndex,
+    this.onRemove,
+    this.onCustomize,
   });
+
+  @override
+  State<ConverterCardWidget> createState() => _ConverterCardWidgetState();
+}
+
+class _ConverterCardWidgetState extends State<ConverterCardWidget> {
+  Timer? _debounceTimer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _debouncedOnChanged(int cardIndex, String unitId, String value) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      widget.controller.onValueChanged(cardIndex, unitId, value);
+    });
+  }
+
+  ConverterController get controller => widget.controller;
+  int get cardIndex => widget.cardIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -318,7 +347,7 @@ class ConverterCardWidget extends StatelessWidget {
       ),
       style: const TextStyle(fontSize: 14),
       onChanged: (value) =>
-          controller.onValueChanged(cardIndex, card.baseUnitId, value),
+          _debouncedOnChanged(cardIndex, card.baseUnitId, value),
     );
   }
 
@@ -327,8 +356,21 @@ class ConverterCardWidget extends StatelessWidget {
     AppLocalizations l10n,
     ConverterCardState card,
   ) {
+    // Get unique visible units and ensure they exist
+    final availableUnits = controller.converterService.units;
+    final availableUnitIds = availableUnits.map((u) => u.id).toSet();
+    final validVisibleUnits = card.visibleUnits
+        .where((unitId) => availableUnitIds.contains(unitId))
+        .toSet()
+        .toList();
+
+    // Ensure baseUnitId is in the list
+    final dropdownValue = validVisibleUnits.contains(card.baseUnitId)
+        ? card.baseUnitId
+        : (validVisibleUnits.isNotEmpty ? validVisibleUnits.first : null);
+
     return DropdownButtonFormField<String>(
-      value: card.baseUnitId,
+      value: dropdownValue,
       decoration: InputDecoration(
         labelText: l10n.from,
         border: const OutlineInputBorder(),
@@ -338,7 +380,7 @@ class ConverterCardWidget extends StatelessWidget {
         fontSize: 13,
         color: Theme.of(context).colorScheme.onSurface,
       ),
-      items: card.visibleUnits
+      items: validVisibleUnits
           .map((unitId) {
             final unit = controller.converterService.getUnit(unitId);
             if (unit == null) return null;
@@ -361,8 +403,7 @@ class ConverterCardWidget extends StatelessWidget {
       onChanged: (newUnitId) {
         if (newUnitId != null) {
           final currentValue = card.baseValue;
-          controller.onValueChanged(
-              cardIndex, newUnitId, currentValue.toString());
+          _debouncedOnChanged(cardIndex, newUnitId, currentValue.toString());
         }
       },
     );
@@ -374,8 +415,15 @@ class ConverterCardWidget extends StatelessWidget {
     bool isDesktop,
     ConverterCardState card,
   ) {
+    // Get unique visible units and ensure they exist
+    final availableUnits = controller.converterService.units;
+    final availableUnitIds = availableUnits.map((u) => u.id).toSet();
+    final validVisibleUnits = card.visibleUnits
+        .where((unitId) => availableUnitIds.contains(unitId))
+        .toSet();
+
     final otherUnits =
-        card.visibleUnits.where((u) => u != card.baseUnitId).toList();
+        validVisibleUnits.where((u) => u != card.baseUnitId).toList();
 
     if (isDesktop) {
       return _buildDesktopUnitsLayout(context, constraints, otherUnits, card);
@@ -560,28 +608,67 @@ class ConverterCardWidget extends StatelessWidget {
 
   void _editCardUnits(BuildContext context) {
     final card = controller.state.cards[cardIndex];
-    final availableUnits = controller.units
-        .map((unit) => unit_dialog.UnitItem(
-              id: unit.id,
-              name: unit.name,
-              symbol: unit.symbol,
-            ))
-        .toList();
 
-    showDialog(
-      context: context,
-      builder: (context) => unit_dialog.UnitCustomizationDialog(
-        title: AppLocalizations.of(context)!.customizeUnits,
-        availableUnits: availableUnits,
-        visibleUnits: Set<String>.from(card.visibleUnits),
-        onChanged: (newUnits) {
-          controller.updateCardUnits(cardIndex, newUnits);
-        },
-        maxSelection: 10,
-        minSelection: 2,
-        showPresetOptions: false,
-        presetKey: 'card_${controller.converterService.converterType}',
-      ),
-    );
+    // Use enhanced generic dialog for Length Converter with proper preset handling
+    if (controller.converterService.converterType == 'length') {
+      final availableUnits = controller.units
+          .map((unit) => GenericUnitItem(
+                id: unit.id,
+                name: unit.name,
+                symbol: unit.symbol,
+              ))
+          .toList();
+
+      // Ensure visibleUnits only contains valid units that exist in availableUnits
+      final availableUnitIds = availableUnits.map((u) => u.id).toSet();
+      final validVisibleUnits = card.visibleUnits
+          .where((unitId) => availableUnitIds.contains(unitId))
+          .toSet();
+
+      showDialog(
+        context: context,
+        builder: (context) => EnhancedGenericUnitCustomizationDialog(
+          title: AppLocalizations.of(context)!.customizeUnits,
+          availableUnits: availableUnits,
+          visibleUnits: validVisibleUnits,
+          onChanged: (newUnits) {
+            controller.updateCardUnits(cardIndex, newUnits);
+          },
+          maxSelection: 10,
+          minSelection: 2,
+          presetType: 'length', // Use the same preset type as main converter
+        ),
+      );
+    } else {
+      // Use generic dialog for other converters
+      final availableUnits = controller.units
+          .map((unit) => unit_dialog.UnitItem(
+                id: unit.id,
+                name: unit.name,
+                symbol: unit.symbol,
+              ))
+          .toList();
+
+      final availableUnitIds = availableUnits.map((u) => u.id).toSet();
+      final validVisibleUnits = card.visibleUnits
+          .where((unitId) => availableUnitIds.contains(unitId))
+          .toSet();
+
+      showDialog(
+        context: context,
+        builder: (context) => unit_dialog.UnitCustomizationDialog(
+          title: AppLocalizations.of(context)!.customizeUnits,
+          availableUnits: availableUnits,
+          visibleUnits: validVisibleUnits,
+          onChanged: (newUnits) {
+            controller.updateCardUnits(cardIndex, newUnits);
+          },
+          maxSelection: 10,
+          minSelection: 2,
+          showPresetOptions: false,
+          presetKey: 'card_${controller.converterService.converterType}',
+        ),
+      );
+    }
   }
 }

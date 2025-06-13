@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../models/unit_template_model.dart';
+import '../models/converter_models/unit_template_model.dart';
 
 class UnitTemplateService {
   static const String _templateBoxName = 'unit_templates';

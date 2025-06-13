@@ -53,7 +53,9 @@ class ConverterCardState {
       name: name ?? this.name,
       baseUnitId: baseUnitId ?? this.baseUnitId,
       baseValue: baseValue ?? this.baseValue,
-      visibleUnits: visibleUnits ?? this.visibleUnits,
+      visibleUnits: visibleUnits != null
+          ? visibleUnits.toSet().toList() // Remove duplicates
+          : this.visibleUnits,
       values: values ?? this.values,
       statuses: statuses ?? this.statuses,
     );
@@ -68,11 +70,12 @@ class ConverterCardState {
       };
 
   factory ConverterCardState.fromJson(Map<String, dynamic> json) {
+    final rawVisibleUnits = List<String>.from(json['visibleUnits'] ?? []);
     return ConverterCardState(
       name: json['name'] ?? '',
       baseUnitId: json['baseUnitId'] ?? '',
       baseValue: (json['baseValue'] ?? 0.0).toDouble(),
-      visibleUnits: List<String>.from(json['visibleUnits'] ?? []),
+      visibleUnits: rawVisibleUnits.toSet().toList(), // Remove duplicates
       values: Map<String, double>.from(json['values'] ?? {}),
     );
   }

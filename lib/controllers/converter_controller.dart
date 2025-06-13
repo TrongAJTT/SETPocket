@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/converter_base.dart';
+import 'dart:async';
+import '../models/converter_models/converter_base.dart';
 import '../services/converter_services/converter_service_base.dart';
 import '../services/app_logger.dart';
 
@@ -17,6 +18,12 @@ class ConverterController extends ChangeNotifier {
   ConverterViewMode _viewMode = ConverterViewMode.cards;
 
   final Map<int, Map<String, TextEditingController>> _cardControllers = {};
+
+  // Debounce timer to reduce rapid updates
+  Timer? _notifyTimer;
+
+  // Prevent recursive updates
+  bool _isUpdatingControllers = false;
 
   ConverterController({
     required ConverterServiceBase converterService,
@@ -36,6 +43,16 @@ class ConverterController extends ChangeNotifier {
   DateTime? get lastUpdated => _converterService.lastUpdated;
   bool get isUsingLiveData => _converterService.isUsingLiveData;
   bool get requiresRealTimeData => _converterService.requiresRealTimeData;
+
+  // Debounced notify listeners
+  void _notifyListenersDebounced() {
+    _notifyTimer?.cancel();
+    _notifyTimer = Timer(const Duration(milliseconds: 50), () {
+      if (!_isUpdatingControllers) {
+        notifyListeners();
+      }
+    });
+  }
 
   Future<void> initialize() async {
     logInfo(
@@ -58,12 +75,12 @@ class ConverterController extends ChangeNotifier {
         await _refreshData();
       }
 
-      notifyListeners();
+      _notifyListenersDebounced();
     } catch (e) {
       logError('Error initializing converter controller: $e');
       _createDefaultState();
       _initializeControllers();
-      notifyListeners();
+      _notifyListenersDebounced();
     }
   }
 
@@ -143,16 +160,18 @@ class ConverterController extends ChangeNotifier {
     if (!_converterService.requiresRealTimeData) return;
 
     _state = _state.copyWith(isLoading: true);
-    notifyListeners();
+    _notifyListenersDebounced();
 
     try {
       await _converterService.refreshData();
 
-      // Update all conversions
+      // Update all conversions in batch
+      _isUpdatingControllers = true;
       for (int i = 0; i < _state.cards.length; i++) {
         _updateCardConversions(
             i, _state.cards[i].baseUnitId, _state.cards[i].baseValue);
       }
+      _isUpdatingControllers = false;
 
       _state = _state.copyWith(
         isLoading: false,
@@ -163,7 +182,7 @@ class ConverterController extends ChangeNotifier {
       _state = _state.copyWith(isLoading: false);
     }
 
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   // Public methods
@@ -200,7 +219,7 @@ class ConverterController extends ChangeNotifier {
 
     _updateCardConversions(cardIndex, defaultUnit, 1.0);
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   Future<void> removeCard(int cardIndex) async {
@@ -230,7 +249,7 @@ class ConverterController extends ChangeNotifier {
     _state = _state.copyWith(cards: newCards);
 
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   Future<void> updateCardName(int cardIndex, String newName) async {
@@ -242,7 +261,7 @@ class ConverterController extends ChangeNotifier {
 
     _state = _state.copyWith(cards: newCards);
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   Future<void> updateCardUnits(int cardIndex, Set<String> newUnits) async {
@@ -261,7 +280,8 @@ class ConverterController extends ChangeNotifier {
 
     final updatedCard = oldCard.copyWith(
       baseUnitId: baseUnit,
-      visibleUnits: newUnits.toList(),
+      visibleUnits:
+          newUnits.toList(), // newUnits is already a Set, so no duplicates
       values: newValues,
     );
 
@@ -282,7 +302,7 @@ class ConverterController extends ChangeNotifier {
 
     _updateCardConversions(cardIndex, baseUnit, updatedCard.baseValue);
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   void onValueChanged(int cardIndex, String unitId, String valueText) {
@@ -300,6 +320,9 @@ class ConverterController extends ChangeNotifier {
     final newValues = <String, double>{};
     final newStatuses = <String, ConversionStatus>{};
 
+    // Prevent recursive controller updates
+    _isUpdatingControllers = true;
+
     for (String unitId in card.visibleUnits) {
       if (unitId == baseUnitId) {
         newValues[unitId] = baseValue;
@@ -311,13 +334,24 @@ class ConverterController extends ChangeNotifier {
           newValues[unitId] = convertedValue;
           newStatuses[unitId] = _converterService.getUnitStatus(unitId);
 
-          // Update controller
-          _cardControllers[cardIndex]?[unitId]?.text =
-              _formatValue(convertedValue, unitId);
+          // Update controller without triggering listeners
+          final controller = _cardControllers[cardIndex]?[unitId];
+          if (controller != null) {
+            final newText = _formatValue(convertedValue, unitId);
+            if (controller.text != newText) {
+              controller.value = controller.value.copyWith(
+                text: newText,
+                selection: TextSelection.collapsed(offset: newText.length),
+              );
+            }
+          }
         } catch (e) {
           newValues[unitId] = 0.0;
           newStatuses[unitId] = ConversionStatus.failed;
-          _cardControllers[cardIndex]?[unitId]?.text = '0.00';
+          final controller = _cardControllers[cardIndex]?[unitId];
+          if (controller != null && controller.text != '0.00') {
+            controller.text = '0.00';
+          }
         }
       }
     }
@@ -333,7 +367,8 @@ class ConverterController extends ChangeNotifier {
     newCards[cardIndex] = updatedCard;
     _state = _state.copyWith(cards: newCards);
 
-    notifyListeners();
+    _isUpdatingControllers = false;
+    _notifyListenersDebounced();
   }
 
   Future<void> updateGlobalVisibleUnits(Set<String> newUnits) async {
@@ -343,12 +378,12 @@ class ConverterController extends ChangeNotifier {
     // This depends on your UX preference
 
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   void setViewMode(ConverterViewMode mode) {
     _viewMode = mode;
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   Future<void> reorderCards(int oldIndex, int newIndex) async {
@@ -381,7 +416,7 @@ class ConverterController extends ChangeNotifier {
 
     _state = _state.copyWith(cards: cards);
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   Future<void> resetLayout() async {
@@ -389,7 +424,7 @@ class ConverterController extends ChangeNotifier {
     _createDefaultState();
     _initializeControllers();
     await _saveState();
-    notifyListeners();
+    _notifyListenersDebounced();
   }
 
   Future<void> refreshData() async {
@@ -398,6 +433,7 @@ class ConverterController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _notifyTimer?.cancel();
     _disposeControllers();
     super.dispose();
   }

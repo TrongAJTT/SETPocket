@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import '../services/converter_services/currency_service.dart';
+import '../../services/converter_services/currency_service.dart';
 
 part 'currency_cache_model.g.dart';
 

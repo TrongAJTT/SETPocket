@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/converter_models.dart';
+import '../../models/converter_models/converter_models.dart';
 import '../../widgets/converter_tools/converter_widget.dart';
 import '../../l10n/app_localizations.dart';
 

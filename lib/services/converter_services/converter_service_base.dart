@@ -1,4 +1,4 @@
-import '../../models/converter_base.dart';
+import '../../models/converter_models/converter_base.dart';
 
 /// Abstract service interface for all converters
 abstract class ConverterServiceBase {

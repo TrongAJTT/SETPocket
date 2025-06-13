@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../controllers/converter_controller.dart';
-import '../../models/converter_base.dart';
 import '../../l10n/app_localizations.dart';
-import 'unit_customization_dialog.dart' as unit_dialog;
+import 'generic_unit_custom_dialog.dart';
 import 'converter_card_widget.dart';
 import 'converter_table_widget.dart';
 import 'converter_status_widget.dart';
@@ -35,21 +33,16 @@ class GenericConverterView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            if (titleIcon != null) ...[
-              Icon(titleIcon),
-              const SizedBox(width: 8),
-            ],
-            Text(displayTitle),
-          ],
+        title: Text(
+          displayTitle,
+          overflow: TextOverflow.ellipsis,
         ),
         actions: [
           if (onShowInfo != null)
             IconButton(
               icon: const Icon(Icons.info_outline),
               onPressed: onShowInfo,
-              tooltip: '${displayTitle} Info',
+              tooltip: '$displayTitle Info',
             ),
           IconButton(
             icon: const Icon(Icons.restart_alt),
@@ -246,7 +239,7 @@ class GenericConverterView extends StatelessWidget {
   void _showGlobalUnitsCustomization(
       BuildContext context, ConverterController controller) {
     final availableUnits = controller.units
-        .map((unit) => unit_dialog.UnitItem(
+        .map((unit) => GenericUnitItem(
               id: unit.id,
               name: unit.name,
               symbol: unit.symbol,
@@ -255,15 +248,14 @@ class GenericConverterView extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => unit_dialog.UnitCustomizationDialog(
+      builder: (context) => EnhancedGenericUnitCustomizationDialog(
         title: 'Customize ${controller.converterService.displayName} Units',
         availableUnits: availableUnits,
         visibleUnits: controller.state.globalVisibleUnits,
         onChanged: controller.updateGlobalVisibleUnits,
         maxSelection: 10,
         minSelection: 2,
-        showPresetOptions: true,
-        presetKey: 'global_${controller.converterService.converterType}',
+        presetType: controller.converterService.converterType,
       ),
     );
   }

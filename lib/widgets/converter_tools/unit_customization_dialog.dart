@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/services/app_logger.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/converter_services/currency_preset_service.dart';
-import '../../models/currency_preset_model.dart';
-import 'package:intl/intl.dart';
+import '../../models/converter_models/currency_preset_model.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class UnitItem {
   final String id;
@@ -27,7 +26,7 @@ class UnitCustomizationDialog extends StatefulWidget {
   final int maxSelection;
   final int minSelection;
   final bool showPresetOptions;
-  final String? presetKey; // Optional key for saving/loading presets on hive
+  final String? presetKey;
 
   const UnitCustomizationDialog({
     super.key,
@@ -113,6 +112,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
 
     if (result != null && result.isNotEmpty) {
       try {
+        // Only work for currency converters for now
         await CurrencyPresetService.savePreset(
           name: result,
           currencies: _tempVisible.toList(),
@@ -131,8 +131,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!
-                  .errorSavingPreset(e.toString())),
+              content: Text('Error saving preset: $e'),
               backgroundColor: Colors.red,
             ),
           );
@@ -189,12 +188,10 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!
-                .errorLoadingPresets(e.toString())),
+            content: Text('Error loading presets: $e'),
           ),
         );
       }
-      AppLogger.instance.logError(e.toString(), e, StackTrace.current);
     }
   }
 
@@ -294,7 +291,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
                   ),
                 ),
 
-                // Search bar and Select/Deselect All buttons
+                // Search bar and Preset buttons
                 Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -420,8 +417,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
                                   final unit = filteredUnits[index];
                                   final isSelected =
                                       _tempVisible.contains(unit.id);
-                                  const canUnselect =
-                                      true; // Always allow deselection to 0
+                                  const canUnselect = true;
                                   final canSelect = !isSelected &&
                                       _tempVisible.length < widget.maxSelection;
 
@@ -752,677 +748,47 @@ class _LoadPresetDialog extends StatefulWidget {
 }
 
 class _LoadPresetDialogState extends State<_LoadPresetDialog> {
-  List<CurrencyPresetModel> _presets = [];
-  bool _isLoading = true;
-  PresetSortOrder _sortOrder = PresetSortOrder.date;
-  CurrencyPresetModel? _selectedPreset;
-
-  @override
-  void initState() {
-    super.initState();
-    _presets = widget.presets;
-    _sortPresets();
-    setState(() => _isLoading = false);
-  }
-
-  void _sortPresets() {
-    switch (_sortOrder) {
-      case PresetSortOrder.name:
-        _presets.sort(
-            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-        break;
-      case PresetSortOrder.date:
-        _presets
-            .sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Newest first
-        break;
-    }
-  }
-
-  Future<void> _loadPresets() async {
-    setState(() => _isLoading = true);
-    try {
-      final presets =
-          await CurrencyPresetService.loadPresets(sortOrder: _sortOrder);
-      setState(() {
-        _presets = presets;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      AppLogger.instance.logError(e.toString(), e, StackTrace.current);
-    }
-  }
-
-  Future<void> _renamePreset(CurrencyPresetModel preset) async {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController(text: preset.name);
-
-    final newName = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.renamePreset),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: l10n.presetName,
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                Navigator.of(context).pop(name);
-              }
-            },
-            child: Text(l10n.rename),
-          ),
-        ],
-      ),
-    );
-
-    if (newName != null && newName != preset.name) {
-      try {
-        await CurrencyPresetService.updatePreset(preset.id, name: newName);
-        _loadPresets();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.presetRenamedSuccessfully),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } catch (e) {
-        AppLogger.instance.logError(e.toString(), e, StackTrace.current);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${l10n.errorLabel} $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  Future<void> _deletePreset(CurrencyPresetModel preset) async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.deletePresetTitle),
-        content: Text(l10n.deletePresetConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(l10n.deletePresetAction),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      try {
-        await CurrencyPresetService.deletePreset(preset.id);
-        _loadPresets();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.presetDeletedSuccess),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${l10n.errorLabel} $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-        AppLogger.instance.logError(e.toString(), e, StackTrace.current);
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery.of(context).size;
-    final isDesktop = screenSize.width > 800;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 80 : 20,
-        vertical: isDesktop ? 60 : 40,
-      ),
-      child: Container(
-        width: isDesktop ? 600 : screenSize.width * 0.9,
-        height: isDesktop ? 700 : screenSize.height * 0.8,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.primary.withValues(alpha: 0.8),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
+    return AlertDialog(
+      title: Text(l10n.loadPreset),
+      content: SizedBox(
+        width: 300,
+        height: 400,
+        child: ListView.builder(
+          itemCount: widget.presets.length,
+          itemBuilder: (context, index) {
+            final preset = widget.presets[index];
+            return ListTile(
+              title: Text(preset.name),
+              subtitle: Text('${preset.currencies.length} units'),
+              onTap: () => Navigator.of(context).pop(preset.currencies),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () async {
+                  try {
+                    await CurrencyPresetService.deletePreset(preset.id);
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  } catch (e) {
+                    AppLogger.instance
+                        .logError(e.toString(), e, StackTrace.current);
+                  }
+                },
               ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color:
-                          theme.colorScheme.onPrimary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.folder_open_rounded,
-                      color: theme.colorScheme.onPrimary,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.loadPreset,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.chooseFromSavedPresets,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onPrimary
-                                .withValues(alpha: 0.8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: theme.colorScheme.onPrimary,
-                        size: 20,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 40,
-                        minHeight: 40,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Sort options
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.3),
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.12),
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.sort_rounded,
-                    size: 20,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    l10n.sortByLabel,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color:
-                              theme.colorScheme.outline.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<PresetSortOrder>(
-                          value: _sortOrder,
-                          isDense: true,
-                          items: [
-                            DropdownMenuItem(
-                              value: PresetSortOrder.date,
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.access_time, size: 16),
-                                  const SizedBox(width: 8),
-                                  Text(l10n.sortByDate),
-                                ],
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: PresetSortOrder.name,
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.sort_by_alpha, size: 16),
-                                  const SizedBox(width: 8),
-                                  Text(l10n.sortByName),
-                                ],
-                              ),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _sortOrder = value);
-                              _sortPresets();
-                              setState(() {});
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Presets list
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _presets.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.folder_off,
-                                size: 64,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                l10n.noPresetsFound,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(24),
-                          itemCount: _presets.length,
-                          itemBuilder: (context, index) {
-                            final preset = _presets[index];
-                            final isSelected = _selectedPreset?.id == preset.id;
-
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? theme.colorScheme.primaryContainer
-                                        .withValues(alpha: 0.3)
-                                    : theme.colorScheme.surface,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.outline
-                                          .withValues(alpha: 0.12),
-                                  width: isSelected ? 2 : 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: isSelected
-                                        ? theme.colorScheme.primary
-                                            .withValues(alpha: 0.15)
-                                        : Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: isSelected ? 12 : 8,
-                                    offset: Offset(0, isSelected ? 4 : 2),
-                                  ),
-                                ],
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedPreset =
-                                          _selectedPreset?.id == preset.id
-                                              ? null
-                                              : preset;
-                                    });
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Row(
-                                      children: [
-                                        // Preset icon
-                                        Container(
-                                          width: 56,
-                                          height: 56,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                theme.colorScheme
-                                                    .primaryContainer,
-                                                theme.colorScheme
-                                                    .primaryContainer
-                                                    .withValues(alpha: 0.7),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              preset.name
-                                                  .substring(0, 1)
-                                                  .toUpperCase(),
-                                              style: theme.textTheme.titleLarge
-                                                  ?.copyWith(
-                                                color: theme.colorScheme
-                                                    .onPrimaryContainer,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-
-                                        // Preset info
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                preset.name,
-                                                style: theme
-                                                    .textTheme.titleMedium
-                                                    ?.copyWith(
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons
-                                                        .account_balance_wallet_outlined,
-                                                    size: 16,
-                                                    color: theme.colorScheme
-                                                        .onSurfaceVariant,
-                                                  ),
-                                                  const SizedBox(width: 6),
-                                                  Text(
-                                                    l10n.currenciesCount(preset
-                                                        .currencies.length),
-                                                    style: theme
-                                                        .textTheme.bodyMedium
-                                                        ?.copyWith(
-                                                      color: theme.colorScheme
-                                                          .onSurfaceVariant,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.schedule_rounded,
-                                                    size: 16,
-                                                    color: theme.colorScheme
-                                                        .onSurfaceVariant,
-                                                  ),
-                                                  const SizedBox(width: 6),
-                                                  Text(
-                                                    l10n.createdDate(DateFormat(
-                                                            'MM/dd/yyyy')
-                                                        .format(
-                                                            preset.createdAt)),
-                                                    style: theme
-                                                        .textTheme.bodySmall
-                                                        ?.copyWith(
-                                                      color: theme.colorScheme
-                                                          .onSurfaceVariant,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        // Actions
-                                        isDesktop
-                                            ? Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  OutlinedButton.icon(
-                                                    onPressed: () =>
-                                                        _renamePreset(preset),
-                                                    icon: const Icon(Icons.edit,
-                                                        size: 16),
-                                                    label: Text(
-                                                      l10n.rename,
-                                                      style: const TextStyle(
-                                                          fontSize: 12),
-                                                    ),
-                                                    style: OutlinedButton
-                                                        .styleFrom(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 6,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  OutlinedButton.icon(
-                                                    onPressed: () =>
-                                                        _deletePreset(preset),
-                                                    icon: const Icon(
-                                                        Icons
-                                                            .delete_outline_rounded,
-                                                        size: 16),
-                                                    label: Text(
-                                                      l10n.delete,
-                                                      style: const TextStyle(
-                                                          fontSize: 12),
-                                                    ),
-                                                    style: OutlinedButton
-                                                        .styleFrom(
-                                                      foregroundColor:
-                                                          Colors.red,
-                                                      side: BorderSide(
-                                                          color: Colors.red
-                                                              .withValues(
-                                                                  alpha: 0.5)),
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 6,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                            : PopupMenuButton<String>(
-                                                icon: const Icon(
-                                                    Icons.more_vert,
-                                                    size: 20),
-                                                onSelected: (value) {
-                                                  if (value == 'rename') {
-                                                    _renamePreset(preset);
-                                                  } else if (value ==
-                                                      'delete') {
-                                                    _deletePreset(preset);
-                                                  }
-                                                },
-                                                itemBuilder: (context) => [
-                                                  PopupMenuItem(
-                                                    value: 'rename',
-                                                    child: Row(
-                                                      children: [
-                                                        const Icon(Icons.edit,
-                                                            size: 16),
-                                                        const SizedBox(
-                                                            width: 8),
-                                                        Text(l10n.rename),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 'delete',
-                                                    child: Row(
-                                                      children: [
-                                                        const Icon(
-                                                            Icons
-                                                                .delete_outline,
-                                                            size: 16,
-                                                            color: Colors.red),
-                                                        const SizedBox(
-                                                            width: 8),
-                                                        Text(l10n.delete,
-                                                            style:
-                                                                const TextStyle(
-                                                                    color: Colors
-                                                                        .red)),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-            ),
-
-            // Footer with Select button
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.3),
-                border: Border(
-                  top: BorderSide(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.12),
-                  ),
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(l10n.cancel),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _selectedPreset != null
-                          ? () => Navigator.of(context)
-                              .pop(_selectedPreset!.currencies)
-                          : null,
-                      icon: const Icon(Icons.check_rounded, size: 18),
-                      label: Text(l10n.select),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+      ],
     );
   }
 }

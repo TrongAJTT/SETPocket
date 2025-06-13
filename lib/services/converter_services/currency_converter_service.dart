@@ -1,4 +1,4 @@
-import '../../models/converter_base.dart';
+import '../../models/converter_models/converter_base.dart';
 import 'converter_service_base.dart';
 import 'currency_service.dart';
 import 'currency_cache_service.dart';

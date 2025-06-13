@@ -1,12 +1,14 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../models/currency_cache_model.dart';
-import '../models/currency_preset_model.dart';
-import '../models/currency_state_model.dart';
+import '../models/converter_models/currency_cache_model.dart';
+import '../models/converter_models/currency_preset_model.dart';
+import '../models/converter_models/currency_state_model.dart';
 import '../models/settings_model.dart';
-import '../models/unit_template_model.dart';
-import '../models/length_state_model.dart';
-import '../models/mass_state_model.dart';
+import '../models/converter_models/unit_template_model.dart';
+import '../models/converter_models/length_state_model.dart';
+import '../models/converter_models/mass_state_model.dart';
+import '../models/converter_models/length_preset_model.dart';
+import '../models/converter_models/generic_preset_model.dart';
 
 class HiveService {
   // Box names
@@ -25,13 +27,13 @@ class HiveService {
       await Hive.initFlutter();
 
       // Register type adapters
-      if (!Hive.isAdapterRegistered(10)) {
+      if (!Hive.isAdapterRegistered(1)) {
         Hive.registerAdapter(CurrencyCacheModelAdapter());
       }
-      if (!Hive.isAdapterRegistered(11)) {
+      if (!Hive.isAdapterRegistered(2)) {
         Hive.registerAdapter(CurrencyFetchModeAdapter());
       }
-      if (!Hive.isAdapterRegistered(12)) {
+      if (!Hive.isAdapterRegistered(7)) {
         Hive.registerAdapter(SettingsModelAdapter());
       }
       if (!Hive.isAdapterRegistered(3)) {
@@ -60,6 +62,12 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(9)) {
         Hive.registerAdapter(MassStateModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(4)) {
+        Hive.registerAdapter(LengthPresetModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(19)) {
+        Hive.registerAdapter(GenericPresetModelAdapter());
       }
 
       // Open boxes

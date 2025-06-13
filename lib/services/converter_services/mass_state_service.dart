@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import '../../models/mass_state_model.dart';
+import '../../models/converter_models/mass_state_model.dart';
 
 class MassStateService {
   static const String _boxName = 'mass_state';

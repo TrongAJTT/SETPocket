@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/tool_config.dart';
@@ -22,6 +23,12 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Reduce accessibility tree errors on Windows debug builds
+  if (kDebugMode && defaultTargetPlatform == TargetPlatform.windows) {
+    // Disable semantic debugging to reduce accessibility bridge errors
+    WidgetsBinding.instance.ensureSemantics();
+  }
 
   // Initialize Hive database first
   await HiveService.initialize();

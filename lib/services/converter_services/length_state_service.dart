@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import '../../models/length_state_model.dart';
+import '../../models/converter_models/length_state_model.dart';
 import '../settings_service.dart';
 
 class LengthStateService {

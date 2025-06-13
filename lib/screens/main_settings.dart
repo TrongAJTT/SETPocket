@@ -8,7 +8,7 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/screens/log_viewer_screen.dart';
 
-import 'package:setpocket/models/currency_cache_model.dart';
+import 'package:setpocket/models/converter_models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
@@ -47,8 +47,15 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   void initState() {
     super.initState();
     _loadSettings();
-    _loadCacheInfo();
-    _loadLogInfo();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_loading) {
+      _loadCacheInfo();
+      _loadLogInfo();
+    }
   }
 
   Future<void> _loadSettings() async {
@@ -78,20 +85,28 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _loadCacheInfo() async {
+    if (!mounted) return;
+
     final l10n = AppLocalizations.of(context)!;
-    setState(() {
-      _cacheInfo = l10n.calculating;
-    });
+    if (mounted) {
+      setState(() {
+        _cacheInfo = l10n.calculating;
+      });
+    }
 
     try {
       final totalSize = await CacheService.getTotalCacheSize();
-      setState(() {
-        _cacheInfo = CacheService.formatCacheSize(totalSize);
-      });
+      if (mounted) {
+        setState(() {
+          _cacheInfo = CacheService.formatCacheSize(totalSize);
+        });
+      }
     } catch (e) {
-      setState(() {
-        _cacheInfo = l10n.unknown;
-      });
+      if (mounted) {
+        setState(() {
+          _cacheInfo = l10n.unknown;
+        });
+      }
     }
   }
 
@@ -1612,19 +1627,25 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _loadLogInfo() async {
+    if (!mounted) return;
+
     final l10n = AppLocalizations.of(context)!;
-    setState(() {
-      _logInfo = l10n.calculating;
-    });
+    if (mounted) {
+      setState(() {
+        _logInfo = l10n.calculating;
+      });
+    }
 
     // Simulate loading time
     await Future.delayed(const Duration(milliseconds: 500));
 
     // This would load actual log information
     // For now, just set some placeholder data
-    setState(() {
-      _logInfo = l10n.logsAvailable;
-    });
+    if (mounted) {
+      setState(() {
+        _logInfo = l10n.logsAvailable;
+      });
+    }
   }
 
   Future<void> _updateLogRetention(int days) async {

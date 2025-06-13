@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
-import '../../models/converter_models/currency_state_model.dart';
-import '../settings_service.dart';
-import '../app_logger.dart';
+import 'package:setpocket/models/converter_models/currency_state_model.dart';
+import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class CurrencyStateService {
   static const String _stateBoxName = 'currency_state';
@@ -14,10 +14,10 @@ class CurrencyStateService {
     try {
       if (_stateBox == null || !_stateBox!.isOpen) {
         _stateBox = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
-        print('CurrencyStateService: Box opened successfully');
+        logInfo('CurrencyStateService: Box opened successfully');
       }
     } catch (e) {
-      print('CurrencyStateService: Error opening box: $e');
+      logError('CurrencyStateService: Error opening box: $e');
       rethrow;
     }
   }
@@ -40,22 +40,23 @@ class CurrencyStateService {
   // Save currency converter state
   static Future<void> saveState(CurrencyStateModel state) async {
     try {
-      // Debug: Temporarily bypass feature state saving check
-      // final enabled = await isStateSavingEnabled();
-      // if (!enabled) {
-      //   print('CurrencyStateService: State saving is disabled');
-      //   return;
-      // }
+      // Check if feature state saving is enabled
+      final enabled = await isStateSavingEnabled();
+      if (!enabled) {
+        logInfo(
+            'CurrencyStateService: State saving is disabled, skipping save');
+        return;
+      }
 
       await initialize();
 
-      print(
+      logInfo(
           'CurrencyStateService: Saving converter state with ${state.cards.length} cards, focus: ${state.isFocusMode}, view: ${state.viewMode}');
       await _stateBox!.put(_stateKey, state);
       await _stateBox!.flush(); // Force flush to disk for mobile reliability
-      print('CurrencyStateService: State saved successfully');
+      logInfo('CurrencyStateService: State saved successfully');
     } catch (e) {
-      print('CurrencyStateService: Error saving state: $e');
+      logError('CurrencyStateService: Error saving state: $e');
       // Don't rethrow to avoid breaking the app
     }
   }
@@ -65,20 +66,27 @@ class CurrencyStateService {
     try {
       logInfo('CurrencyStateService: Starting loadState');
 
-      // Debug: Always try to load state regardless of setting for debugging
+      // Check if feature state saving is enabled
+      final enabled = await isStateSavingEnabled();
+      if (!enabled) {
+        logInfo(
+            'CurrencyStateService: State saving is disabled, returning default state');
+        return CurrencyStateModel.getDefault();
+      }
+
       await initialize();
 
       final state = _stateBox!.get(_stateKey);
       if (state != null) {
-        print(
+        logInfo(
             'CurrencyStateService: Loaded state with ${state.cards.length} cards, focus: ${state.isFocusMode}, view: ${state.viewMode}');
         return state;
       } else {
-        print('CurrencyStateService: No saved state, returning default');
+        logInfo('CurrencyStateService: No saved state, returning default');
         return CurrencyStateModel.getDefault();
       }
     } catch (e) {
-      print('CurrencyStateService: Error loading state: $e');
+      logError('CurrencyStateService: Error loading state: $e');
       return CurrencyStateModel.getDefault();
     }
   }
@@ -89,9 +97,9 @@ class CurrencyStateService {
       await initialize();
       await _stateBox!.delete(_stateKey);
       await _stateBox!.flush();
-      print('CurrencyStateService: State cleared');
+      logInfo('CurrencyStateService: State cleared');
     } catch (e) {
-      print('CurrencyStateService: Error clearing state: $e');
+      logError('CurrencyStateService: Error clearing state: $e');
     }
   }
 
@@ -101,7 +109,7 @@ class CurrencyStateService {
       await initialize();
       return _stateBox!.containsKey(_stateKey);
     } catch (e) {
-      print('CurrencyStateService: Error checking state: $e');
+      logError('CurrencyStateService: Error checking state: $e');
       return false;
     }
   }
@@ -118,7 +126,7 @@ class CurrencyStateService {
       }
       return 0;
     } catch (e) {
-      print('CurrencyStateService: Error getting state size: $e');
+      logError('CurrencyStateService: Error getting state size: $e');
       return 0;
     }
   }
@@ -128,20 +136,20 @@ class CurrencyStateService {
     try {
       await initialize();
       final state = _stateBox!.get(_stateKey);
-      print('=== CURRENCY STATE DEBUG ===');
-      print('State exists: ${state != null}');
+      logInfo('=== CURRENCY STATE DEBUG ===');
+      logInfo('State exists: ${state != null}');
       if (state != null) {
-        print('Cards count: ${state.cards.length}');
-        print('Visible currencies: ${state.visibleCurrencies}');
-        print('Last updated: ${state.lastUpdated}');
+        logInfo('Cards count: ${state.cards.length}');
+        logInfo('Visible currencies: ${state.visibleCurrencies}');
+        logInfo('Last updated: ${state.lastUpdated}');
         for (int i = 0; i < state.cards.length; i++) {
           final card = state.cards[i];
-          print('Card $i: ${card.currencyCode} = ${card.amount}');
+          logInfo('Card $i: ${card.currencyCode} = ${card.amount}');
         }
       }
-      print('=== END STATE DEBUG ===');
+      logInfo('=== END STATE DEBUG ===');
     } catch (e) {
-      print('CurrencyStateService: Error in debug: $e');
+      logError('CurrencyStateService: Error in debug: $e');
     }
   }
 }

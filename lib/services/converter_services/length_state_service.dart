@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
-import '../../models/converter_models/length_state_model.dart';
-import '../settings_service.dart';
-import '../app_logger.dart';
+import 'package:setpocket/models/converter_models/length_state_model.dart';
+import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class LengthStateService {
   static const String _stateBoxName = 'length_states';
@@ -13,10 +13,10 @@ class LengthStateService {
     try {
       if (_stateBox == null || !_stateBox!.isOpen) {
         _stateBox = await Hive.openBox<LengthStateModel>(_stateBoxName);
-        print('LengthStateService: State box opened successfully');
+        logInfo('LengthStateService: State box opened successfully');
       }
     } catch (e) {
-      print('LengthStateService: Error opening state box: $e');
+      logError('LengthStateService: Error opening state box: $e');
       rethrow;
     }
   }
@@ -42,13 +42,13 @@ class LengthStateService {
       logInfo(
           'LengthStateService: Attempting to save state with ${state.cards.length} cards');
 
-      // Debug: Temporarily bypass feature state saving check
-      // final enabled = await _isFeatureStateSavingEnabled();
-      // if (!enabled) {
-      //   logInfo(
-      //       'LengthStateService: Feature state saving is disabled, skipping save');
-      //   return;
-      // }
+      // Check if feature state saving is enabled
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        logInfo(
+            'LengthStateService: Feature state saving is disabled, skipping save');
+        return;
+      }
 
       await initialize();
 
@@ -85,7 +85,14 @@ class LengthStateService {
     try {
       logInfo('LengthStateService: Starting loadState');
 
-      // Debug: Always try to load state regardless of setting for debugging
+      // Check if feature state saving is enabled
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        logInfo(
+            'LengthStateService: Feature state saving is disabled, returning default state');
+        return LengthStateModel.createDefault();
+      }
+
       await initialize();
 
       final savedState = _stateBox!.get(_stateKey);
@@ -111,9 +118,9 @@ class LengthStateService {
       await _stateBox!.delete(_stateKey);
       await _stateBox!.flush();
 
-      print('LengthStateService: State cleared');
+      logInfo('LengthStateService: State cleared');
     } catch (e) {
-      print('LengthStateService: Error clearing state: $e');
+      logError('LengthStateService: Error clearing state: $e');
     }
   }
 
@@ -123,7 +130,7 @@ class LengthStateService {
       await initialize();
       return _stateBox!.containsKey(_stateKey);
     } catch (e) {
-      print('LengthStateService: Error checking state existence: $e');
+      logError('LengthStateService: Error checking state existence: $e');
       return false;
     }
   }
@@ -143,7 +150,7 @@ class LengthStateService {
       }
       return 0;
     } catch (e) {
-      print('LengthStateService: Error calculating state size: $e');
+      logError('LengthStateService: Error calculating state size: $e');
       return 0;
     }
   }
@@ -160,22 +167,22 @@ class LengthStateService {
 
       final state = _stateBox!.get(_stateKey);
 
-      print('=== Length State Debug ===');
+      logInfo('=== Length State Debug ===');
       if (state != null) {
-        print('Cards: ${state.cards.length}');
+        logInfo('Cards: ${state.cards.length}');
         for (int i = 0; i < state.cards.length; i++) {
           final card = state.cards[i];
-          print('  Card $i: ${card.unitCode} = ${card.amount}');
+          logInfo('  Card $i: ${card.unitCode} = ${card.amount}');
         }
-        print('Visible Units: ${state.visibleUnits.join(", ")}');
-        print('Last Updated: ${state.lastUpdated}');
+        logInfo('Visible Units: ${state.visibleUnits.join(", ")}');
+        logInfo('Last Updated: ${state.lastUpdated}');
       } else {
-        print('No state saved');
+        logInfo('No state saved');
       }
-      print('Box Length: ${_stateBox!.length}');
-      print('=====================');
+      logInfo('Box Length: ${_stateBox!.length}');
+      logInfo('=====================');
     } catch (e) {
-      print('LengthStateService: Error in debug: $e');
+      logError('LengthStateService: Error in debug: $e');
     }
   }
 }

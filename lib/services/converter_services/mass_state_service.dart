@@ -1,5 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import '../../models/converter_models/mass_state_model.dart';
+import 'package:setpocket/models/converter_models/mass_state_model.dart';
+import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class MassStateService {
   static const String _boxName = 'mass_state';
@@ -12,9 +14,31 @@ class MassStateService {
     return Hive.box<MassStateModel>(_boxName);
   }
 
+  // Check if feature state saving is enabled
+  static Future<bool> _isFeatureStateSavingEnabled() async {
+    try {
+      final enabled = await SettingsService.getFeatureStateSaving();
+      logInfo('MassStateService: Feature state saving enabled: $enabled');
+      return enabled;
+    } catch (e) {
+      logError(
+          'MassStateService: Error checking feature state saving settings: $e');
+      // Default to enabled if error occurs
+      return true;
+    }
+  }
+
   /// Load mass state from storage
   static Future<MassStateModel> loadState() async {
     try {
+      // Check if feature state saving is enabled
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        print(
+            'MassStateService: Feature state saving is disabled, returning default state');
+        return MassStateModel.createDefault();
+      }
+
       final box = await _getBox();
       final state = box.get('current_state');
 
@@ -34,6 +58,14 @@ class MassStateService {
   /// Save mass state to storage
   static Future<void> saveState(MassStateModel state) async {
     try {
+      // Check if feature state saving is enabled
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        print(
+            'MassStateService: Feature state saving is disabled, skipping save');
+        return;
+      }
+
       final box = await _getBox();
       await box.put('current_state', state);
       print('MassStateService: Saved state with ${state.cards.length} cards');

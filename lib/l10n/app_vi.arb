@@ -229,6 +229,7 @@
     "rows": "Dòng",
     "converter": "Bộ chuyển đổi",
     "amount": "Số tiền",
+    "quantity": "Số lượng",
     "from": "Từ",
     "fromCurrency": "Từ loại tiền",
     "convertedTo": "Chuyển đổi thành",

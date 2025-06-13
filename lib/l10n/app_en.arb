@@ -236,6 +236,7 @@
     "rows": "Rows",
     "converter": "Converter",
     "amount": "Amount",
+    "quantity": "Quantity",
     "from": "From",
     "fromCurrency": "From Currency",
     "convertedTo": "Converted to",

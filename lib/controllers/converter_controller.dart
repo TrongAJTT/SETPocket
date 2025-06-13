@@ -70,6 +70,12 @@ class ConverterController extends ChangeNotifier {
       // Initialize text controllers
       _initializeControllers();
 
+      // Perform conversions for loaded state to populate all unit values
+      for (int i = 0; i < _state.cards.length; i++) {
+        final card = _state.cards[i];
+        _updateCardConversions(i, card.baseUnitId, card.baseValue);
+      }
+
       // Refresh data if needed
       if (_converterService.requiresRealTimeData) {
         await _refreshData();
@@ -310,6 +316,9 @@ class ConverterController extends ChangeNotifier {
 
     final value = double.tryParse(valueText) ?? 0.0;
     _updateCardConversions(cardIndex, unitId, value);
+
+    // Save state after value changes to ensure persistence
+    _saveState();
   }
 
   void _updateCardConversions(

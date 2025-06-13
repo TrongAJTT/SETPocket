@@ -654,7 +654,7 @@ class _MassConverterScreenState extends State<MassConverterScreen> {
                                   RegExp(r'[0-9.eE+-]')),
                             ],
                             decoration: InputDecoration(
-                              labelText: l10n.amount,
+                              labelText: l10n.quantity,
                               border: const OutlineInputBorder(),
                               isDense: true,
                             ),
@@ -716,7 +716,7 @@ class _MassConverterScreenState extends State<MassConverterScreen> {
                                     RegExp(r'[0-9.eE+-]')),
                               ],
                               decoration: InputDecoration(
-                                labelText: l10n.amount,
+                                labelText: l10n.quantity,
                                 border: const OutlineInputBorder(),
                                 isDense: true,
                               ),

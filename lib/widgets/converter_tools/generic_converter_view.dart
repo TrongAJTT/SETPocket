@@ -52,7 +52,7 @@ class GenericConverterView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.tune),
             onPressed: () => _showGlobalUnitsCustomization(context, controller),
-            tooltip: l10n.customizeCurrencies, // Will be generalized
+            tooltip: l10n.customizeUnits,
           ),
         ],
       ),
@@ -66,12 +66,14 @@ class GenericConverterView extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          ConverterStatusWidget(
-            controller: controller,
-            onRefresh:
-                controller.requiresRealTimeData ? controller.refreshData : null,
-          ),
-          const SizedBox(height: 16),
+          // Only show status widget for converters that require real-time data
+          if (controller.requiresRealTimeData) ...[
+            ConverterStatusWidget(
+              controller: controller,
+              onRefresh: controller.refreshData,
+            ),
+            const SizedBox(height: 16),
+          ],
           Expanded(
             child: controller.viewMode == ConverterViewMode.cards
                 ? _buildCardsView(context, controller)

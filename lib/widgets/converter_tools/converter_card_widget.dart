@@ -334,6 +334,10 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
     ConverterCardState card,
     Map<String, TextEditingController> cardControllers,
   ) {
+    // Use different labels based on converter type
+    final isCurrency = controller.converterService.converterType == 'currency';
+    final labelText = isCurrency ? l10n.amount : l10n.quantity;
+
     return TextField(
       controller: cardControllers[card.baseUnitId],
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -341,7 +345,7 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
         FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
       ],
       decoration: InputDecoration(
-        labelText: l10n.amount,
+        labelText: labelText,
         border: const OutlineInputBorder(),
         isDense: true,
       ),

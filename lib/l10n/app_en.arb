@@ -651,6 +651,9 @@
     "unitVisibleStatus": "{count} units visible",
     "moveDown": "Move Down",
     "moveUp": "Move Up",
+    "moveToFirst": "Move to First",
+    "moveToLast": "Move to Last",
+    "cardActions": "Card Actions",
     
     "lengthUnits": "Length Units",
     "angstroms": "Angstroms",
@@ -840,5 +843,7 @@
     "focusModeHelpActivationMobile": "• Mobile: Use zoom in gesture or tap focus icon",
     "focusModeHelpDeactivation": "Deactivation:",
     "focusModeHelpDeactivationDesktop": "• Desktop: Click the focus icon again",
-    "focusModeHelpDeactivationMobile": "• Mobile: Use zoom out gesture or tap focus icon again"
+    "focusModeHelpDeactivationMobile": "• Mobile: Use zoom out gesture or tap focus icon again",
+    "moreActions": "More Actions",
+    "moreOptions": "More Options"
 }

@@ -40,16 +40,17 @@ class CurrencyStateService {
   // Save currency converter state
   static Future<void> saveState(CurrencyStateModel state) async {
     try {
-      final enabled = await isStateSavingEnabled();
-      if (!enabled) {
-        print('CurrencyStateService: State saving is disabled');
-        return;
-      }
+      // Debug: Temporarily bypass feature state saving check
+      // final enabled = await isStateSavingEnabled();
+      // if (!enabled) {
+      //   print('CurrencyStateService: State saving is disabled');
+      //   return;
+      // }
 
       await initialize();
 
       print(
-          'CurrencyStateService: Saving converter state with ${state.cards.length} cards');
+          'CurrencyStateService: Saving converter state with ${state.cards.length} cards, focus: ${state.isFocusMode}, view: ${state.viewMode}');
       await _stateBox!.put(_stateKey, state);
       await _stateBox!.flush(); // Force flush to disk for mobile reliability
       print('CurrencyStateService: State saved successfully');
@@ -62,19 +63,15 @@ class CurrencyStateService {
   // Load currency converter state
   static Future<CurrencyStateModel> loadState() async {
     try {
-      final enabled = await isStateSavingEnabled();
-      if (!enabled) {
-        print(
-            'CurrencyStateService: State saving is disabled, returning default');
-        return CurrencyStateModel.getDefault();
-      }
+      logInfo('CurrencyStateService: Starting loadState');
 
+      // Debug: Always try to load state regardless of setting for debugging
       await initialize();
 
       final state = _stateBox!.get(_stateKey);
       if (state != null) {
         print(
-            'CurrencyStateService: Loaded state with ${state.cards.length} cards');
+            'CurrencyStateService: Loaded state with ${state.cards.length} cards, focus: ${state.isFocusMode}, view: ${state.viewMode}');
         return state;
       } else {
         print('CurrencyStateService: No saved state, returning default');

@@ -1710,6 +1710,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moveUp => 'Di chuyển lên';
 
   @override
+  String get moveToFirst => 'Di chuyển lên đầu';
+
+  @override
+  String get moveToLast => 'Di chuyển xuống cuối';
+
+  @override
+  String get cardActions => 'Hành động thẻ';
+
+  @override
   String get lengthUnits => 'Đơn vị chiều dài';
 
   @override
@@ -2014,8 +2023,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get focusModeHelpDeactivation => 'Tắt:';
 
   @override
-  String get focusModeHelpDeactivationDesktop => '• Desktop: Nhấn lại biểu tượng tập trung';
+  String get focusModeHelpDeactivationDesktop => '• Desktop: Nhấn biểu tượng tập trung lần nữa';
 
   @override
-  String get focusModeHelpDeactivationMobile => '• Mobile: Sử dụng cử chỉ zoom out hoặc nhấn lại biểu tượng tập trung';
+  String get focusModeHelpDeactivationMobile => '• Mobile: Sử dụng cử chỉ zoom out hoặc nhấn biểu tượng tập trung lần nữa';
+
+  @override
+  String get moreActions => 'Thêm tùy chọn';
+
+  @override
+  String get moreOptions => 'Tùy chọn khác';
 }

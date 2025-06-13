@@ -13,10 +13,18 @@ class CurrencyStateModel extends HiveObject {
   @HiveField(2)
   DateTime lastUpdated;
 
+  @HiveField(3)
+  bool isFocusMode;
+
+  @HiveField(4)
+  String viewMode; // Store as string for Hive compatibility
+
   CurrencyStateModel({
     required this.cards,
     required this.visibleCurrencies,
     required this.lastUpdated,
+    this.isFocusMode = false,
+    this.viewMode = 'cards',
   });
 
   // Default state
@@ -32,6 +40,8 @@ class CurrencyStateModel extends HiveObject {
       ],
       visibleCurrencies: ['USD', 'EUR', 'JPY', 'AUD', 'CNY', 'VND'],
       lastUpdated: DateTime.now(),
+      isFocusMode: false,
+      viewMode: 'cards',
     );
   }
 
@@ -40,16 +50,27 @@ class CurrencyStateModel extends HiveObject {
       'cards': cards.map((c) => c.toJson()).toList(),
       'visibleCurrencies': visibleCurrencies,
       'lastUpdated': lastUpdated.toIso8601String(),
+      'isFocusMode': isFocusMode,
+      'viewMode': viewMode,
     };
   }
 
-  static CurrencyStateModel fromJson(Map<String, dynamic> json) {
+  factory CurrencyStateModel.fromJson(Map<String, dynamic> json) {
     return CurrencyStateModel(
-      cards: (json['cards'] as List)
-          .map((c) => CurrencyCardState.fromJson(c))
-          .toList(),
-      visibleCurrencies: List<String>.from(json['visibleCurrencies']),
-      lastUpdated: DateTime.parse(json['lastUpdated']),
+      cards: (json['cards'] as List<dynamic>?)
+              ?.map(
+                  (e) => CurrencyCardState.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      visibleCurrencies: (json['visibleCurrencies'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      lastUpdated: json['lastUpdated'] != null
+          ? DateTime.parse(json['lastUpdated'] as String)
+          : DateTime.now(),
+      isFocusMode: json['isFocusMode'] as bool? ?? false,
+      viewMode: json['viewMode'] as String? ?? 'cards',
     );
   }
 }

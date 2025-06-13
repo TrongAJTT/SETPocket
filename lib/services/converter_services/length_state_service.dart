@@ -31,6 +31,7 @@ class LengthStateService {
       logError(
           'LengthStateService: Error checking feature state saving settings: $e');
       // Default to enabled if error occurs
+      logInfo('LengthStateService: Using default enabled=true due to error');
       return true;
     }
   }
@@ -41,19 +42,19 @@ class LengthStateService {
       logInfo(
           'LengthStateService: Attempting to save state with ${state.cards.length} cards');
 
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'LengthStateService: Feature state saving is disabled, skipping save');
-        return;
-      }
+      // Debug: Temporarily bypass feature state saving check
+      // final enabled = await _isFeatureStateSavingEnabled();
+      // if (!enabled) {
+      //   logInfo(
+      //       'LengthStateService: Feature state saving is disabled, skipping save');
+      //   return;
+      // }
 
       await initialize();
 
       // Verify state before saving
       logInfo(
-          'LengthStateService: State details - Cards: ${state.cards.length}, Units: ${state.visibleUnits.length}');
+          'LengthStateService: State details - Cards: ${state.cards.length}, Units: ${state.visibleUnits.length}, Focus: ${state.isFocusMode}, View: ${state.viewMode}');
       for (int i = 0; i < state.cards.length; i++) {
         final card = state.cards[i];
         logInfo(
@@ -67,7 +68,7 @@ class LengthStateService {
       final savedState = _stateBox!.get(_stateKey);
       if (savedState != null) {
         logInfo(
-            'LengthStateService: State successfully saved and verified with ${savedState.cards.length} cards');
+            'LengthStateService: State successfully saved and verified with ${savedState.cards.length} cards, focus: ${savedState.isFocusMode}, view: ${savedState.viewMode}');
       } else {
         logError(
             'LengthStateService: Failed to verify saved state - state is null after save');
@@ -82,12 +83,15 @@ class LengthStateService {
   // Load converter state
   static Future<LengthStateModel> loadState() async {
     try {
+      logInfo('LengthStateService: Starting loadState');
+
+      // Debug: Always try to load state regardless of setting for debugging
       await initialize();
 
       final savedState = _stateBox!.get(_stateKey);
       if (savedState != null) {
         logInfo(
-            'LengthStateService: Loaded state with ${savedState.cards.length} cards');
+            'LengthStateService: Loaded state with ${savedState.cards.length} cards, focus: ${savedState.isFocusMode}, view: ${savedState.viewMode}');
         return savedState;
       } else {
         logInfo('LengthStateService: No saved state found, creating default');

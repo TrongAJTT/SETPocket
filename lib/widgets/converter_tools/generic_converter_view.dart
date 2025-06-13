@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/converter_controller.dart';
+import '../../models/converter_models/converter_base.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/focus_mode_service.dart';
 import 'generic_unit_custom_dialog.dart';
@@ -35,6 +36,7 @@ class GenericConverterView extends StatelessWidget {
 
     final l10n = AppLocalizations.of(context)!;
     final displayTitle = title ?? controller.converterService.displayName;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       appBar: AppBar(
@@ -49,27 +51,92 @@ class GenericConverterView extends StatelessWidget {
               onPressed: onShowInfo,
               tooltip: '$displayTitle Info',
             ),
-          IconButton(
-            icon: Icon(
-              controller.isFocusMode
-                  ? Icons.center_focus_weak
-                  : Icons.center_focus_strong,
+
+          // Mobile: Show more actions menu
+          if (isMobile) ...[
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: l10n.moreActions,
+              onSelected: (value) {
+                switch (value) {
+                  case 'focus_mode':
+                    _toggleFocusMode(context, controller);
+                    break;
+                  case 'reset_layout':
+                    controller.resetLayout();
+                    break;
+                  case 'customize_units':
+                    _showGlobalUnitsCustomization(context, controller);
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'focus_mode',
+                  child: Row(
+                    children: [
+                      Icon(
+                        controller.isFocusMode
+                            ? Icons.center_focus_weak
+                            : Icons.center_focus_strong,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        controller.isFocusMode
+                            ? l10n.disableFocusMode
+                            : l10n.enableFocusMode,
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'reset_layout',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.restart_alt),
+                      const SizedBox(width: 12),
+                      Text(l10n.resetLayout),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'customize_units',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.tune),
+                      const SizedBox(width: 12),
+                      Text(l10n.customizeUnits),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            onPressed: () => _toggleFocusMode(context, controller),
-            tooltip: controller.isFocusMode
-                ? l10n.disableFocusMode
-                : l10n.enableFocusMode,
-          ),
-          IconButton(
-            icon: const Icon(Icons.restart_alt),
-            onPressed: controller.resetLayout,
-            tooltip: l10n.resetLayout,
-          ),
-          IconButton(
-            icon: const Icon(Icons.tune),
-            onPressed: () => _showGlobalUnitsCustomization(context, controller),
-            tooltip: l10n.customizeUnits,
-          ),
+          ]
+          // Desktop/Tablet: Show individual buttons
+          else ...[
+            IconButton(
+              icon: Icon(
+                controller.isFocusMode
+                    ? Icons.center_focus_weak
+                    : Icons.center_focus_strong,
+              ),
+              onPressed: () => _toggleFocusMode(context, controller),
+              tooltip: controller.isFocusMode
+                  ? l10n.disableFocusMode
+                  : l10n.enableFocusMode,
+            ),
+            IconButton(
+              icon: const Icon(Icons.restart_alt),
+              onPressed: controller.resetLayout,
+              tooltip: l10n.resetLayout,
+            ),
+            IconButton(
+              icon: const Icon(Icons.tune),
+              onPressed: () =>
+                  _showGlobalUnitsCustomization(context, controller),
+              tooltip: l10n.customizeUnits,
+            ),
+          ],
         ],
       ),
       body: _buildConverterContent(context, controller),
@@ -78,7 +145,6 @@ class GenericConverterView extends StatelessWidget {
 
   Widget _buildConverterContent(
       BuildContext context, ConverterController controller) {
-    // Wrap with GestureDetector for zoom gestures on mobile when embedded
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -101,22 +167,21 @@ class GenericConverterView extends StatelessWidget {
       ),
     );
 
-    // Add gesture detection for mobile when embedded
-    if (isEmbedded && FocusModeService.isMobile) {
-      return GestureDetector(
-        onScaleUpdate: (details) {
+    // Add gesture detection for zoom-based focus mode toggle on mobile
+    return GestureDetector(
+      onScaleUpdate: (details) {
+        // Only handle zoom gestures on mobile devices
+        if (FocusModeService.isMobile) {
           FocusModeService.handleScaleGesture(
             scale: details.scale,
             currentFocusMode: controller.isFocusMode,
             onEnterFocusMode: () => _toggleFocusMode(context, controller),
             onExitFocusMode: () => _toggleFocusMode(context, controller),
           );
-        },
-        child: content,
-      );
-    }
-
-    return content;
+        }
+      },
+      child: content,
+    );
   }
 
   Widget _buildCardsView(BuildContext context, ConverterController controller) {
@@ -213,28 +278,12 @@ class GenericConverterView extends StatelessWidget {
                   ),
                 );
               } else {
-                // Multi-column layout for larger screens
+                // Multi-column layout for larger screens with proper drag support
                 return SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: List.generate(
-                        controller.state.cards.length,
-                        (index) => SizedBox(
-                          width: (constraints.maxWidth -
-                                  16 -
-                                  (16 * (crossAxisCount - 1))) /
-                              crossAxisCount,
-                          child: ConverterCardWidget(
-                            key: ValueKey('card_$index'),
-                            cardIndex: index,
-                            controller: controller,
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: _buildDesktopGridLayout(
+                        context, constraints, crossAxisCount, controller),
                   ),
                 );
               }
@@ -357,6 +406,29 @@ class GenericConverterView extends StatelessWidget {
       context,
       isEnabled: controller.isFocusMode,
       exitInstruction: exitInstruction,
+    );
+  }
+
+  Widget _buildDesktopGridLayout(
+      BuildContext context,
+      BoxConstraints constraints,
+      int crossAxisCount,
+      ConverterController controller) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: List.generate(
+        controller.state.cards.length,
+        (index) => SizedBox(
+          width: (constraints.maxWidth - 16 - (16 * (crossAxisCount - 1))) /
+              crossAxisCount,
+          child: ConverterCardWidget(
+            key: ValueKey('card_$index'),
+            cardIndex: index,
+            controller: controller,
+          ),
+        ),
+      ),
     );
   }
 }

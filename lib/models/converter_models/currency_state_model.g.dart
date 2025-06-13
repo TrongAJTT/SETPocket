@@ -20,19 +20,25 @@ class CurrencyStateModelAdapter extends TypeAdapter<CurrencyStateModel> {
       cards: (fields[0] as List).cast<CurrencyCardState>(),
       visibleCurrencies: (fields[1] as List).cast<String>(),
       lastUpdated: fields[2] as DateTime,
+      isFocusMode: fields[3] as bool,
+      viewMode: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, CurrencyStateModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.cards)
       ..writeByte(1)
       ..write(obj.visibleCurrencies)
       ..writeByte(2)
-      ..write(obj.lastUpdated);
+      ..write(obj.lastUpdated)
+      ..writeByte(3)
+      ..write(obj.isFocusMode)
+      ..writeByte(4)
+      ..write(obj.viewMode);
   }
 
   @override

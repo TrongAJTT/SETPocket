@@ -14,6 +14,8 @@ import 'package:setpocket/screens/log_viewer_screen.dart';
 import 'package:setpocket/models/converter_models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
+import 'package:hive/hive.dart';
+import '../services/hive_service.dart';
 
 class MainSettingsScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -1710,80 +1712,187 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       final isReliable = await CurrencyCacheService.isCacheReliable();
       final settings = await SettingsService.getSettings();
       final hasCache = await CurrencyCacheService.hasCachedData();
-      final isManualAllowed = await CurrencyCacheService.isManualFetchAllowed();
 
-      // Check state services
-      final hasLengthState = await LengthStateService.hasState();
-      final hasCurrencyState = await CurrencyStateService.hasState();
+      // Test state loading with error handling
+      String currencyStateResult = '✗ Error';
+      String lengthStateResult = '✗ Error';
 
-      Navigator.of(context).pop(); // Close loading dialog
+      try {
+        await CurrencyStateService.loadState();
+        currencyStateResult = '✓ Saved';
+      } catch (e) {
+        print('Currency state load error: $e');
+        currencyStateResult =
+            '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
+      }
+
+      try {
+        await LengthStateService.loadState();
+        lengthStateResult = '✓ Saved';
+      } catch (e) {
+        print('Length state load error: $e');
+        lengthStateResult =
+            '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
+      }
+
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
 
       // Show results
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Cache Debug Results'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Cache Reliability: ${isReliable ? "✓ Good" : "✗ Poor"}'),
-                Text(
-                    'Feature State Saving: ${settings.featureStateSavingEnabled ? "✓ Enabled" : "✗ Disabled"}'),
-                Text('Currency Cache: ${hasCache ? "✓ Exists" : "✗ Missing"}'),
-                Text(
-                    'Manual Fetch Allowed: ${isManualAllowed ? "✓ Yes" : "✗ Rate Limited"}'),
-                Text(
-                    'Length State: ${hasLengthState ? "✓ Saved" : "✗ Default"}'),
-                Text(
-                    'Currency State: ${hasCurrencyState ? "✓ Saved" : "✗ Default"}'),
-                SizedBox(height: 16),
-                if (!isReliable)
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Cache Diagnostics Results'),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Cache Status:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   Text(
-                      'Cache reliability issues detected. Try restarting the app.',
-                      style: TextStyle(color: Colors.red)),
-                if (!settings.featureStateSavingEnabled)
-                  Text('State saving is disabled in settings.',
-                      style: TextStyle(color: Colors.orange)),
-              ],
-            ),
-          ),
-          actions: [
-            if (!isManualAllowed)
-              TextButton(
-                onPressed: () async {
-                  await CurrencyCacheService.resetRateLimiting();
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Rate limiting reset')),
-                  );
-                },
-                child: Text('Reset Rate Limit'),
+                      '• Reliability: ${isReliable ? "✓ Reliable" : "✗ Unreliable"}'),
+                  Text('• Has Cache: ${hasCache ? "✓ Yes" : "✗ No"}'),
+                  SizedBox(height: 12),
+                  Text('Settings:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                      '• Feature State Saving: ${settings.featureStateSavingEnabled ? "✓ Enabled" : "✗ Disabled"}'),
+                  SizedBox(height: 12),
+                  Text('State Persistence:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('• Currency State: $currencyStateResult'),
+                  Text('• Length State: $lengthStateResult'),
+                  if (currencyStateResult.contains('Error') ||
+                      lengthStateResult.contains('Error')) ...[
+                    SizedBox(height: 12),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        border: Border.all(color: Colors.orange),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('⚠️ State Loading Issues Detected',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          Text(
+                              'This usually happens after app updates that change data structure.'),
+                          SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              await _clearAllStateData();
+                            },
+                            child: Text('Clear All State Data'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close'),
             ),
-          ],
-        ),
-      );
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Close'),
+              ),
+            ],
+          ),
+        );
+      }
     } catch (e) {
-      Navigator.of(context).pop(); // Close loading dialog
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
 
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Debug Error'),
-          content: Text('Failed to run diagnostics: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close'),
-            ),
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to run diagnostics: $e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Close'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _clearAllStateData() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Clearing State Data'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Clearing all converter state data...'),
+            SizedBox(height: 16),
+            CircularProgressIndicator(),
           ],
         ),
-      );
+      ),
+    );
+
+    try {
+      // Clear Hive boxes to fix compatibility issues
+      await Hive.deleteFromDisk();
+
+      // Re-initialize Hive with new adapters
+      await HiveService.initialize();
+
+      if (mounted) Navigator.of(context).pop();
+
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Success'),
+            content: Text(
+                'All state data has been cleared. The app will restart to complete the process.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Restart app
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/', (route) => false);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to clear state data: $e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Close'),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 }

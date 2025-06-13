@@ -10,6 +10,8 @@ class LengthStateAdapter implements ConverterStateService {
     print('LengthStateAdapter: Saving state with ${state.cards.length} cards');
     print(
         'LengthStateAdapter: Global visible units: ${state.globalVisibleUnits}');
+    print(
+        'LengthStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
     // Convert ConverterState to LengthStateModel
     final lengthState = LengthStateModel(
@@ -23,6 +25,8 @@ class LengthStateAdapter implements ConverterStateService {
           .toList(),
       visibleUnits: state.globalVisibleUnits.toList(),
       lastUpdated: DateTime.now(),
+      isFocusMode: state.isFocusMode,
+      viewMode: state.viewMode.name,
     );
 
     print(
@@ -46,6 +50,8 @@ class LengthStateAdapter implements ConverterStateService {
           'LengthStateAdapter: Loaded LengthStateModel with ${lengthState.cards.length} cards');
       print(
           'LengthStateAdapter: Global visible units from loaded state: ${lengthState.visibleUnits}');
+      print(
+          'LengthStateAdapter: Focus mode: ${lengthState.isFocusMode}, View mode: ${lengthState.viewMode}');
 
       // Convert LengthStateModel to ConverterState
       final cards = lengthState.cards.map((card) {
@@ -71,14 +77,22 @@ class LengthStateAdapter implements ConverterStateService {
         return convertedCard;
       }).toList();
 
+      // Parse view mode
+      final viewMode = ConverterViewMode.values.firstWhere(
+        (mode) => mode.name == lengthState.viewMode,
+        orElse: () => ConverterViewMode.cards,
+      );
+
       final converterState = ConverterState(
         cards: cards,
         globalVisibleUnits: lengthState.visibleUnits.toSet(),
         lastUpdated: lengthState.lastUpdated,
+        isFocusMode: lengthState.isFocusMode,
+        viewMode: viewMode,
       );
 
       print(
-          'LengthStateAdapter: Final ConverterState - Cards: ${converterState.cards.length}, GlobalUnits: ${converterState.globalVisibleUnits}');
+          'LengthStateAdapter: Final ConverterState - Cards: ${converterState.cards.length}, GlobalUnits: ${converterState.globalVisibleUnits}, Focus: ${converterState.isFocusMode}, View: ${converterState.viewMode.name}');
 
       return converterState;
     } catch (e) {
@@ -112,6 +126,8 @@ class LengthStateAdapter implements ConverterStateService {
       return ConverterState(
         cards: [defaultCard],
         globalVisibleUnits: defaultUnits,
+        isFocusMode: false,
+        viewMode: ConverterViewMode.cards,
       );
     }
   }

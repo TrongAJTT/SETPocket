@@ -58,10 +58,18 @@ class LengthStateModel extends HiveObject {
   @HiveField(2)
   DateTime lastUpdated;
 
+  @HiveField(3)
+  bool isFocusMode;
+
+  @HiveField(4)
+  String viewMode; // Store as string for Hive compatibility
+
   LengthStateModel({
     required this.cards,
     required this.visibleUnits,
     required this.lastUpdated,
+    this.isFocusMode = false,
+    this.viewMode = 'cards',
   });
 
   // Create default state
@@ -95,6 +103,8 @@ class LengthStateModel extends HiveObject {
         'mile'
       ],
       lastUpdated: DateTime.now(),
+      isFocusMode: false,
+      viewMode: 'cards',
     );
   }
 
@@ -104,6 +114,8 @@ class LengthStateModel extends HiveObject {
       'cards': cards.map((card) => card.toJson()).toList(),
       'visibleUnits': visibleUnits,
       'lastUpdated': lastUpdated.toIso8601String(),
+      'isFocusMode': isFocusMode,
+      'viewMode': viewMode,
     };
   }
 
@@ -116,6 +128,8 @@ class LengthStateModel extends HiveObject {
           .toList(),
       visibleUnits: List<String>.from(json['visibleUnits'] as List),
       lastUpdated: DateTime.parse(json['lastUpdated'] as String),
+      isFocusMode: json['isFocusMode'] ?? false,
+      viewMode: json['viewMode'] ?? 'cards',
     );
   }
 }

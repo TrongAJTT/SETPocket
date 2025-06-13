@@ -19,6 +19,8 @@ class CurrencyStateAdapter implements ConverterStateService {
           .toList(),
       visibleCurrencies: state.globalVisibleUnits.toList(),
       lastUpdated: DateTime.now(),
+      isFocusMode: state.isFocusMode,
+      viewMode: state.viewMode.name, // Convert enum to string
     );
 
     await CurrencyStateService.saveState(currencyState);
@@ -49,16 +51,31 @@ class CurrencyStateAdapter implements ConverterStateService {
         );
       }).toList();
 
+      // Parse view mode from string with fallback
+      ConverterViewMode viewMode;
+      try {
+        viewMode = ConverterViewMode.values.firstWhere(
+          (mode) => mode.name == currencyState.viewMode,
+          orElse: () => ConverterViewMode.cards,
+        );
+      } catch (e) {
+        viewMode = ConverterViewMode.cards;
+      }
+
       return ConverterState(
         cards: cards,
         globalVisibleUnits: currencyState.visibleCurrencies.toSet(),
         lastUpdated: currencyState.lastUpdated,
+        isFocusMode: currencyState.isFocusMode,
+        viewMode: viewMode,
       );
     } catch (e) {
       // Return default state if loading fails
       return const ConverterState(
         cards: [],
         globalVisibleUnits: {},
+        isFocusMode: false,
+        viewMode: ConverterViewMode.cards,
       );
     }
   }

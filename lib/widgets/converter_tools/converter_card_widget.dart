@@ -60,8 +60,19 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 300;
+        final isMobile = ConverterController.isMobile(context);
 
+        // On mobile, don't use DragTarget since we're using context menu
+        if (isMobile) {
+          return _buildCardContent(
+              context, constraints, isDesktop, card, cardControllers);
+        }
+
+        // Desktop: Use DragTarget with improved visual feedback
         return DragTarget<int>(
+          onWillAcceptWithDetails: (details) {
+            return details.data != cardIndex;
+          },
           onAcceptWithDetails: (details) {
             final draggedIndex = details.data;
             if (draggedIndex != cardIndex) {
@@ -72,6 +83,7 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
             final isReceivingDrag = candidateData.isNotEmpty;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
+              margin: EdgeInsets.all(isReceivingDrag ? 4 : 0),
               decoration: BoxDecoration(
                 border: isReceivingDrag
                     ? Border.all(
@@ -80,6 +92,18 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
                       )
                     : null,
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: isReceivingDrag
+                    ? [
+                        BoxShadow(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        )
+                      ]
+                    : null,
               ),
               child: _buildCardContent(
                   context, constraints, isDesktop, card, cardControllers),
@@ -161,75 +185,176 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
 
   Widget _buildDragHandle(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isMobile = ConverterController.isMobile(context);
 
-    return Draggable<int>(
-      data: cardIndex,
-      feedback: Material(
-        elevation: 8,
-        borderRadius: BorderRadius.circular(12),
+    if (isMobile) {
+      // Mobile: Show context menu on tap
+      return GestureDetector(
+        onTap: () => _showMobileCardActionsMenu(context),
         child: Container(
-          width: 200,
           decoration: BoxDecoration(
-            color: Theme.of(context)
-                .colorScheme
-                .primaryContainer
-                .withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary,
-              width: 2,
-            ),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  controller.state.cards[cardIndex].name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.dragging,
-                  style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onPrimaryContainer
-                        .withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
-            ),
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            Icons.drag_handle,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
           ),
         ),
-      ),
-      childWhenDragging: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(8),
+      );
+    } else {
+      // Desktop: Keep drag functionality but make it work better with grid
+      return Draggable<int>(
+        data: cardIndex,
+        feedback: Material(
+          elevation: 8,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 200,
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    controller.state.cards[cardIndex].name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.dragging,
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer
+                          .withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-        padding: const EdgeInsets.all(8),
-        child: Icon(
-          Icons.drag_handle,
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-          size: 20,
+        childWhenDragging: Container(
+          decoration: BoxDecoration(
+            color:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            Icons.drag_handle,
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+            size: 20,
+          ),
         ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            Icons.drag_handle,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
         ),
-        padding: const EdgeInsets.all(8),
-        child: Icon(
-          Icons.drag_handle,
-          color: Theme.of(context).colorScheme.primary,
-          size: 20,
+      );
+    }
+  }
+
+  void _showMobileCardActionsMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final totalCards = controller.state.cards.length;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                l10n.cardActions,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            const Divider(),
+
+            // Action buttons
+            if (cardIndex > 0) ...[
+              ListTile(
+                leading: const Icon(Icons.keyboard_double_arrow_up),
+                title: Text(l10n.moveToFirst),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.moveCardToFirst(cardIndex);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.keyboard_arrow_up),
+                title: Text(l10n.moveUp),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.moveCardUp(cardIndex);
+                },
+              ),
+            ],
+            if (cardIndex < totalCards - 1) ...[
+              ListTile(
+                leading: const Icon(Icons.keyboard_arrow_down),
+                title: Text(l10n.moveDown),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.moveCardDown(cardIndex);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.keyboard_double_arrow_down),
+                title: Text(l10n.moveToLast),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.moveCardToLast(cardIndex);
+                },
+              ),
+            ],
+
+            // Cancel button
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

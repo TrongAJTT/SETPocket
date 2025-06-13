@@ -1710,6 +1710,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moveUp => 'Move Up';
 
   @override
+  String get moveToFirst => 'Move to First';
+
+  @override
+  String get moveToLast => 'Move to Last';
+
+  @override
+  String get cardActions => 'Card Actions';
+
+  @override
   String get lengthUnits => 'Length Units';
 
   @override
@@ -2018,4 +2027,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get focusModeHelpDeactivationMobile => '• Mobile: Use zoom out gesture or tap focus icon again';
+
+  @override
+  String get moreActions => 'More Actions';
+
+  @override
+  String get moreOptions => 'More Options';
 }

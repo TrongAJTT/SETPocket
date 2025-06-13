@@ -81,6 +81,9 @@ class ConverterCardState {
   }
 }
 
+/// View mode for converter display
+enum ConverterViewMode { cards, table }
+
 /// Overall state for converter
 class ConverterState {
   final List<ConverterCardState> cards;
@@ -88,6 +91,7 @@ class ConverterState {
   final DateTime? lastUpdated;
   final bool isLoading;
   final bool isFocusMode;
+  final ConverterViewMode viewMode;
 
   const ConverterState({
     required this.cards,
@@ -95,6 +99,7 @@ class ConverterState {
     this.lastUpdated,
     this.isLoading = false,
     this.isFocusMode = false,
+    this.viewMode = ConverterViewMode.cards,
   });
 
   ConverterState copyWith({
@@ -103,6 +108,7 @@ class ConverterState {
     DateTime? lastUpdated,
     bool? isLoading,
     bool? isFocusMode,
+    ConverterViewMode? viewMode,
   }) {
     return ConverterState(
       cards: cards ?? this.cards,
@@ -110,6 +116,7 @@ class ConverterState {
       lastUpdated: lastUpdated ?? this.lastUpdated,
       isLoading: isLoading ?? this.isLoading,
       isFocusMode: isFocusMode ?? this.isFocusMode,
+      viewMode: viewMode ?? this.viewMode,
     );
   }
 
@@ -118,6 +125,7 @@ class ConverterState {
         'globalVisibleUnits': globalVisibleUnits.toList(),
         'lastUpdated': lastUpdated?.toIso8601String(),
         'isFocusMode': isFocusMode,
+        'viewMode': viewMode.name,
       };
 
   factory ConverterState.fromJson(Map<String, dynamic> json) {
@@ -131,6 +139,10 @@ class ConverterState {
           ? DateTime.parse(json['lastUpdated'])
           : null,
       isFocusMode: json['isFocusMode'] ?? false,
+      viewMode: ConverterViewMode.values.firstWhere(
+        (mode) => mode.name == json['viewMode'],
+        orElse: () => ConverterViewMode.cards,
+      ),
     );
   }
 }

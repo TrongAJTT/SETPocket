@@ -684,6 +684,9 @@
     "unitVisibleStatus": "{count} đơn vị hiển thị",
     "moveDown": "Di chuyển xuống",
     "moveUp": "Di chuyển lên",
+    "moveToFirst": "Di chuyển lên đầu",
+    "moveToLast": "Di chuyển xuống cuối",
+    "cardActions": "Hành động thẻ",
     
     "lengthUnits": "Đơn vị chiều dài",
     "angstroms": "Angstrom",
@@ -837,6 +840,8 @@
     "focusModeHelpActivationDesktop": "• Desktop: Nhấn biểu tượng tập trung trên thanh ứng dụng",
     "focusModeHelpActivationMobile": "• Mobile: Sử dụng cử chỉ zoom in hoặc nhấn biểu tượng tập trung",
     "focusModeHelpDeactivation": "Tắt:",
-    "focusModeHelpDeactivationDesktop": "• Desktop: Nhấn lại biểu tượng tập trung",
-    "focusModeHelpDeactivationMobile": "• Mobile: Sử dụng cử chỉ zoom out hoặc nhấn lại biểu tượng tập trung"
+    "focusModeHelpDeactivationDesktop": "• Desktop: Nhấn biểu tượng tập trung lần nữa",
+    "focusModeHelpDeactivationMobile": "• Mobile: Sử dụng cử chỉ zoom out hoặc nhấn biểu tượng tập trung lần nữa",
+    "moreActions": "Thêm tùy chọn",
+    "moreOptions": "Tùy chọn khác"
 }

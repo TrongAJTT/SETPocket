@@ -4,8 +4,7 @@ import '../models/converter_models/converter_base.dart';
 import '../services/converter_services/converter_service_base.dart';
 import '../services/app_logger.dart';
 import '../services/number_format_service.dart';
-
-enum ConverterViewMode { cards, table }
+import '../services/settings_service.dart';
 
 class ConverterController extends ChangeNotifier {
   final ConverterServiceBase _converterService;
@@ -15,8 +14,6 @@ class ConverterController extends ChangeNotifier {
     cards: [],
     globalVisibleUnits: {},
   );
-
-  ConverterViewMode _viewMode = ConverterViewMode.cards;
 
   final Map<int, Map<String, TextEditingController>> _cardControllers = {};
 
@@ -34,7 +31,7 @@ class ConverterController extends ChangeNotifier {
 
   // Getters
   ConverterState get state => _state;
-  ConverterViewMode get viewMode => _viewMode;
+  ConverterViewMode get viewMode => _state.viewMode;
   ConverterServiceBase get converterService => _converterService;
   List<ConverterUnit> get units => _converterService.units;
   Map<int, Map<String, TextEditingController>> get cardControllers =>
@@ -94,12 +91,25 @@ class ConverterController extends ChangeNotifier {
 
   Future<void> _loadState() async {
     try {
+      logInfo(
+          'ConverterController: Loading state for ${_converterService.converterType}');
+
+      // Debug: check if feature state saving is enabled
+      try {
+        final settings = await SettingsService.getSettings();
+        logInfo(
+            'ConverterController: Feature state saving enabled: ${settings.featureStateSavingEnabled}');
+      } catch (e) {
+        logError('ConverterController: Error checking settings: $e');
+      }
+
       final loadedState =
           await _stateService.loadState(_converterService.converterType);
       _state = loadedState;
-      logInfo('Loaded state with ${_state.cards.length} cards');
+      logInfo(
+          'ConverterController: Loaded state with ${_state.cards.length} cards, focus: ${_state.isFocusMode}, view: ${_state.viewMode.name}');
     } catch (e) {
-      logError('Error loading state: $e');
+      logError('ConverterController: Error loading state: $e');
       _createDefaultState();
     }
   }
@@ -121,6 +131,8 @@ class ConverterController extends ChangeNotifier {
     _state = ConverterState(
       cards: [defaultCard],
       globalVisibleUnits: defaultUnits,
+      isFocusMode: false,
+      viewMode: ConverterViewMode.cards,
     );
   }
 
@@ -394,9 +406,12 @@ class ConverterController extends ChangeNotifier {
     _notifyListenersDebounced();
   }
 
-  void setViewMode(ConverterViewMode mode) {
-    _viewMode = mode;
-    _notifyListenersDebounced();
+  Future<void> setViewMode(ConverterViewMode mode) async {
+    if (_state.viewMode != mode) {
+      _state = _state.copyWith(viewMode: mode);
+      await _saveState();
+      _notifyListenersDebounced();
+    }
   }
 
   Future<void> reorderCards(int oldIndex, int newIndex) async {
@@ -430,6 +445,35 @@ class ConverterController extends ChangeNotifier {
     _state = _state.copyWith(cards: cards);
     await _saveState();
     _notifyListenersDebounced();
+  }
+
+  // New methods for mobile card movement
+  Future<void> moveCardToFirst(int cardIndex) async {
+    if (cardIndex <= 0) return; // Already at first position
+    await reorderCards(cardIndex, 0);
+  }
+
+  Future<void> moveCardToLast(int cardIndex) async {
+    final lastIndex = _state.cards.length - 1;
+    if (cardIndex >= lastIndex) return; // Already at last position
+    await reorderCards(cardIndex, lastIndex);
+  }
+
+  Future<void> moveCardUp(int cardIndex) async {
+    if (cardIndex <= 0) return; // Already at first position
+    await reorderCards(cardIndex, cardIndex - 1);
+  }
+
+  Future<void> moveCardDown(int cardIndex) async {
+    if (cardIndex >= _state.cards.length - 1) {
+      return; // Already at last position
+    }
+    await reorderCards(cardIndex, cardIndex + 1);
+  }
+
+  // Helper method to check if platform is mobile
+  static bool isMobile(BuildContext context) {
+    return MediaQuery.of(context).size.width < 600;
   }
 
   Future<void> resetLayout() async {

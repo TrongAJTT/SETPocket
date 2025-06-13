@@ -3257,6 +3257,24 @@ abstract class AppLocalizations {
   /// **'Move Up'**
   String get moveUp;
 
+  /// No description provided for @moveToFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to First'**
+  String get moveToFirst;
+
+  /// No description provided for @moveToLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Last'**
+  String get moveToLast;
+
+  /// No description provided for @cardActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Actions'**
+  String get cardActions;
+
   /// No description provided for @lengthUnits.
   ///
   /// In en, this message translates to:
@@ -3844,6 +3862,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'• Mobile: Use zoom out gesture or tap focus icon again'**
   String get focusModeHelpDeactivationMobile;
+
+  /// No description provided for @moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Actions'**
+  String get moreActions;
+
+  /// No description provided for @moreOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Options'**
+  String get moreOptions;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

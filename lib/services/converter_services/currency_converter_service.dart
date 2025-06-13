@@ -58,22 +58,16 @@ class CurrencyConverterService implements ConverterServiceBase {
   bool _isUsingLiveData = false;
 
   @override
-  List<ConverterUnit> get units => _supportedCurrencies;
-
-  static final List<CurrencyUnit> _supportedCurrencies = [
-    CurrencyUnit(id: 'USD', name: 'US Dollar', symbol: '\$'),
-    CurrencyUnit(id: 'EUR', name: 'Euro', symbol: '€'),
-    CurrencyUnit(id: 'GBP', name: 'British Pound', symbol: '£'),
-    CurrencyUnit(id: 'JPY', name: 'Japanese Yen', symbol: '¥'),
-    CurrencyUnit(id: 'VND', name: 'Vietnamese Dong', symbol: '₫'),
-    CurrencyUnit(id: 'CNY', name: 'Chinese Yuan', symbol: '¥'),
-    CurrencyUnit(id: 'THB', name: 'Thai Baht', symbol: '฿'),
-    CurrencyUnit(id: 'SGD', name: 'Singapore Dollar', symbol: 'S\$'),
-    CurrencyUnit(id: 'KRW', name: 'South Korean Won', symbol: '₩'),
-    CurrencyUnit(id: 'AUD', name: 'Australian Dollar', symbol: 'A\$'),
-    CurrencyUnit(id: 'CAD', name: 'Canadian Dollar', symbol: 'C\$'),
-    CurrencyUnit(id: 'CHF', name: 'Swiss Franc', symbol: 'CHF'),
-  ];
+  List<ConverterUnit> get units {
+    // Use CurrencyService to get all 83 supported currencies
+    return CurrencyService.getSupportedCurrencies()
+        .map((currency) => CurrencyUnit(
+              id: currency.code,
+              name: currency.name,
+              symbol: currency.symbol,
+            ))
+        .toList();
+  }
 
   @override
   Set<String> get defaultVisibleUnits =>
@@ -82,7 +76,13 @@ class CurrencyConverterService implements ConverterServiceBase {
   @override
   ConverterUnit? getUnit(String id) {
     try {
-      return _supportedCurrencies.firstWhere((unit) => unit.id == id);
+      final currency = CurrencyService.getSupportedCurrencies()
+          .firstWhere((currency) => currency.code == id);
+      return CurrencyUnit(
+        id: currency.code,
+        name: currency.name,
+        symbol: currency.symbol,
+      );
     } catch (e) {
       return null;
     }

@@ -7,7 +7,7 @@ import 'converters/mass_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
-  final Function(Widget, String)? onToolSelected;
+  final Function(Widget, String, {String? parentCategory})? onToolSelected;
 
   const ConverterToolsScreen({
     super.key,
@@ -125,7 +125,8 @@ class ConverterToolsScreen extends StatelessWidget {
           child: InkWell(
             onTap: () {
               if (isEmbedded && onToolSelected != null) {
-                onToolSelected!(screen, title);
+                onToolSelected!(screen, title,
+                    parentCategory: 'ConverterToolsScreen');
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => screen),

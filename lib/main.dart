@@ -225,8 +225,10 @@ class DesktopLayout extends StatefulWidget {
 class _DesktopLayoutState extends State<DesktopLayout> {
   Widget? currentTool;
   String? selectedToolType;
+  String? parentToolType; // Track parent category for sub-tools
   String? currentToolTitle;
   final GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
+
   void _refreshToolSelection() {
     // Refresh the tool list first
     _toolSelectionKey.currentState?.refreshTools();
@@ -234,6 +236,7 @@ class _DesktopLayoutState extends State<DesktopLayout> {
     setState(() {
       currentTool = null;
       selectedToolType = null;
+      parentToolType = null;
       currentToolTitle = null;
     });
   }
@@ -250,6 +253,7 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                   setState(() {
                     currentTool = null;
                     selectedToolType = null;
+                    parentToolType = null;
                     currentToolTitle = null;
                   });
                 },
@@ -271,11 +275,14 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                   key: _toolSelectionKey,
                   isDesktop: true,
                   selectedToolType: selectedToolType,
+                  parentToolType: parentToolType,
                   onToolVisibilityChanged: _refreshToolSelection,
-                  onToolSelected: (Widget tool, String title) {
+                  onToolSelected: (Widget tool, String title,
+                      {String? parentCategory}) {
                     setState(() {
                       currentTool = tool;
                       selectedToolType = tool.runtimeType.toString();
+                      parentToolType = parentCategory;
                       currentToolTitle = title;
                     });
                   },
@@ -340,8 +347,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
 
 class ToolSelectionScreen extends StatefulWidget {
   final bool isDesktop;
-  final Function(Widget, String)? onToolSelected;
+  final Function(Widget, String, {String? parentCategory})? onToolSelected;
   final String? selectedToolType;
+  final String? parentToolType;
   final VoidCallback? onToolVisibilityChanged;
 
   const ToolSelectionScreen({
@@ -349,6 +357,7 @@ class ToolSelectionScreen extends StatefulWidget {
     this.isDesktop = false,
     this.onToolSelected,
     this.selectedToolType,
+    this.parentToolType,
     this.onToolVisibilityChanged,
   });
 
@@ -387,22 +396,30 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       case 'textTemplate':
         return TemplateListScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: widget.onToolSelected,
+          onToolSelected: (tool, title, {parentCategory}) =>
+              widget.onToolSelected?.call(tool, title,
+                  parentCategory: parentCategory ?? 'TemplateListScreen'),
         );
       case 'randomTools':
         return RandomToolsScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: widget.onToolSelected,
+          onToolSelected: (tool, title, {parentCategory}) =>
+              widget.onToolSelected?.call(tool, title,
+                  parentCategory: parentCategory ?? 'RandomToolsScreen'),
         );
       case 'converterTools':
         return ConverterToolsScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: widget.onToolSelected,
+          onToolSelected: (tool, title, {parentCategory}) =>
+              widget.onToolSelected?.call(tool, title,
+                  parentCategory: parentCategory ?? 'ConverterToolsScreen'),
         );
       case 'calculatorTools':
         return CalculatorToolsScreen(
           isEmbedded: widget.isDesktop,
-          onToolSelected: widget.onToolSelected,
+          onToolSelected: (tool, title, {parentCategory}) =>
+              widget.onToolSelected?.call(tool, title,
+                  parentCategory: parentCategory ?? 'CalculatorToolsScreen'),
         );
       default:
         return const SizedBox.shrink();
@@ -543,12 +560,17 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       children: [
         // Show visible tools
         ..._visibleTools.map((config) {
+          final toolType = _getSelectedToolType(config);
+          final isDirectlySelected = widget.selectedToolType == toolType;
+          final isParentSelected = widget.parentToolType == toolType;
+          final isSelected = isDirectlySelected || isParentSelected;
+
           return ToolCard(
             title: _getLocalizedName(context, config.nameKey),
             description: _getLocalizedDesc(context, config.descKey),
             icon: _getIconData(config.icon),
             iconColor: _getIconColor(config.iconColor),
-            isSelected: widget.selectedToolType == _getSelectedToolType(config),
+            isSelected: isSelected,
             onTap: () {
               final tool = _getToolWidget(config, loc);
               if (widget.isDesktop) {
@@ -577,7 +599,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               onToolVisibilityChanged: widget.onToolVisibilityChanged,
             );
             if (widget.isDesktop) {
-              widget.onToolSelected?.call(tool, loc.settings);
+              widget.onToolSelected?.call(tool, loc.settings,
+                  parentCategory: widget.parentToolType);
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(

@@ -15,11 +15,13 @@ import 'package:setpocket/screens/random_tools/date_time_generator.dart';
 
 class RandomToolsScreen extends StatelessWidget {
   final bool isEmbedded;
-  final Function(Widget, String)?
-      onToolSelected; // Callback để hiển thị công cụ trong desktop mode
+  final Function(Widget, String, {String? parentCategory})? onToolSelected;
 
-  const RandomToolsScreen(
-      {super.key, this.isEmbedded = false, this.onToolSelected});
+  const RandomToolsScreen({
+    super.key,
+    this.isEmbedded = false,
+    this.onToolSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,7 @@ class RandomToolsScreen extends StatelessWidget {
         String title;
         IconData icon;
         Color iconColor;
+
         switch (index) {
           case 0:
             screen = PasswordGeneratorScreen(isEmbedded: isEmbedded);
@@ -127,6 +130,7 @@ class RandomToolsScreen extends StatelessWidget {
             icon = Icons.error;
             iconColor = Colors.grey;
         }
+
         return Card(
           elevation: 2,
           clipBehavior: Clip.antiAlias,
@@ -134,7 +138,8 @@ class RandomToolsScreen extends StatelessWidget {
             onTap: () {
               if (isEmbedded && onToolSelected != null) {
                 // Desktop mode: sử dụng callback để hiển thị công cụ trong main widget
-                onToolSelected!(screen, title);
+                onToolSelected!(screen, title,
+                    parentCategory: 'RandomToolsScreen');
               } else {
                 // Mobile mode: navigation stack bình thường
                 Navigator.of(context).push(

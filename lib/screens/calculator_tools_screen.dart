@@ -9,7 +9,7 @@ import 'calculators/graphing_calculator_screen.dart';
 
 class CalculatorToolsScreen extends StatelessWidget {
   final bool isEmbedded;
-  final Function(Widget, String)? onToolSelected;
+  final Function(Widget, String, {String? parentCategory})? onToolSelected;
 
   const CalculatorToolsScreen({
     super.key,
@@ -128,7 +128,8 @@ class CalculatorToolsScreen extends StatelessWidget {
         onTap: () {
           final screen = calculator['screen'] as Widget;
           if (isEmbedded && onToolSelected != null) {
-            onToolSelected!(screen, title);
+            onToolSelected!(screen, title,
+                parentCategory: 'CalculatorToolsScreen');
           } else {
             Navigator.push(
               context,

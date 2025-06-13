@@ -846,7 +846,7 @@
     "moreOptions": "Tùy chọn khác",
     
     "lengthConverterDetailedInfo": "Bộ Chuyển Đổi Độ Dài - Thông Tin Chi Tiết", 
-    "currencyConverterOverview": "Bộ chuyển đổi độ dài chính xác này hỗ trợ nhiều đơn vị với tính toán độ chính xác cao cho mục đích chuyên nghiệp và khoa học.",
+    "lengthConverterOverview": "Bộ chuyển đổi độ dài chính xác này hỗ trợ nhiều đơn vị với tính toán độ chính xác cao cho mục đích chuyên nghiệp và khoa học.",
     "precisionCalculations": "Tính Toán Chính Xác",
     "precisionCalculationsDesc": "Phép toán chính xác cao với tới 15 chữ số thập phân cho độ chính xác khoa học.",
     "multipleUnits": "Nhiều Đơn Vị Độ Dài",
@@ -876,5 +876,25 @@
     "lengthUnitRange": "Phạm Vi Đơn Vị Hỗ Trợ",
     "lengthUnitRangeDesc": "Từ phép đo dưới nguyên tử (angstrom) đến thiên văn (năm ánh sáng) với độ chính xác được duy trì xuyên suốt.",
     "practicalApplications": "Ứng Dụng Thực Tế",
-    "practicalApplicationsDesc": "Hoàn hảo cho kỹ thuật, khoa học, xây dựng và các phép đo hàng ngày với độ chính xác chuyên nghiệp."
+    "practicalApplicationsDesc": "Hoàn hảo cho kỹ thuật, khoa học, xây dựng và các phép đo hàng ngày với độ chính xác chuyên nghiệp.",
+    
+    "massConverterDetailedInfo": "Bộ Chuyển Đổi Khối Lượng - Thông Tin Chi Tiết",
+    "massConverterOverview": "Bộ chuyển đổi khối lượng chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng khoa học, y tế và thương mại.",
+    "step1Mass": "Bước 1: Thêm Thẻ",
+    "step1MassDesc": "Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị khối lượng khác nhau cùng lúc.",
+    "step2Mass": "Bước 2: Chọn Đơn Vị",
+    "step2MassDesc": "Chọn đơn vị khối lượng nào hiển thị từ hệ mét, hệ Anh, hệ troy và hệ dược sĩ.",
+    "step3Mass": "Bước 3: Nhập Giá Trị",
+    "step3MassDesc": "Nhập bất kỳ giá trị khối lượng nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.",
+    "step4Mass": "Bước 4: Sắp Xếp Bố Cục",
+    "step4MassDesc": "Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.",
+    "tip1Mass": "• Sử dụng ký hiệu khoa học (1.5e-12) cho khối lượng rất nhỏ như đơn vị nguyên tử",
+    "tip2Mass": "• Hệ troy lý tưởng cho tính toán kim loại quý",
+    "tip3Mass": "• Hệ dược sĩ được sử dụng trong dược phẩm và y học",
+    "tip4Mass": "• Chế độ bảng hoàn hảo để so sánh nhiều phép đo",
+    "tip5Mass": "• Chế độ tập trung ẩn các yếu tố gây phân tâm để làm việc chuyển đổi tập trung",
+    "tip6Mass": "• Sử dụng cấu hình để lưu các tổ hợp đơn vị yêu thích",
+    "massUnitSystems": "Hệ Thống Đơn Vị Hỗ Trợ",
+    "massUnitSystemsDesc": "Hệ mét (ng đến tấn), hệ Anh (hạt đến tấn), troy (kim loại quý), dược sĩ (dược phẩm), và đơn vị đặc biệt (carat, slug, đơn vị khối lượng nguyên tử).",
+    "practicalApplicationsMassDesc": "Hoàn hảo cho hóa học, dược phẩm, giao dịch kim loại quý, vận chuyển, nấu ăn và nghiên cứu khoa học với độ chính xác chuyên nghiệp."
 }

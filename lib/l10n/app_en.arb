@@ -878,5 +878,25 @@
     "lengthUnitRange": "Supported Units Range",
     "lengthUnitRangeDesc": "From subatomic (angstroms) to astronomical (light years) measurements with precision maintained throughout.",
     "practicalApplications": "Practical Applications",
-    "practicalApplicationsDesc": "Perfect for engineering, science, construction, and everyday measurements with professional accuracy."
+    "practicalApplicationsDesc": "Perfect for engineering, science, construction, and everyday measurements with professional accuracy.",
+    
+    "massConverterDetailedInfo": "Mass Converter - Detailed Information",
+    "massConverterOverview": "This precise mass converter supports multiple unit systems with high accuracy calculations for scientific, medical, and commercial applications.",
+    "step1Mass": "Step 1: Add Cards",
+    "step1MassDesc": "Add multiple converter cards to work with different mass values simultaneously.",
+    "step2Mass": "Step 2: Select Units",
+    "step2MassDesc": "Choose which mass units to display from metric, imperial, troy, and apothecaries systems.",
+    "step3Mass": "Step 3: Enter Values",
+    "step3MassDesc": "Type any mass value and see instant conversions to all other units.",
+    "step4Mass": "Step 4: Organize Layout",
+    "step4MassDesc": "Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.",
+    "tip1Mass": "• Use scientific notation (1.5e-12) for very small masses like atomic units",
+    "tip2Mass": "• Troy system is ideal for precious metals calculations",
+    "tip3Mass": "• Apothecaries system is used in pharmacy and medicine",
+    "tip4Mass": "• Table view is perfect for comparing multiple measurements",
+    "tip5Mass": "• Focus mode hides distractions for concentrated conversion work",
+    "tip6Mass": "• Use presets to save your favorite unit combinations",
+    "massUnitSystems": "Supported Unit Systems",
+    "massUnitSystemsDesc": "Metric (ng to tonnes), Imperial (grains to tons), Troy (precious metals), Apothecaries (pharmacy), and special units (carats, slugs, atomic mass units).",
+    "practicalApplicationsMassDesc": "Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision."
 }

@@ -19,19 +19,25 @@ class MassCardStateAdapter extends TypeAdapter<MassCardState> {
     return MassCardState(
       unitCode: fields[0] as String,
       amount: fields[1] as double,
-      createdAt: fields[2] as DateTime?,
+      name: fields[2] as String?,
+      visibleUnits: (fields[3] as List?)?.cast<String>(),
+      createdAt: fields[4] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, MassCardState obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.unitCode)
       ..writeByte(1)
       ..write(obj.amount)
       ..writeByte(2)
+      ..write(obj.name)
+      ..writeByte(3)
+      ..write(obj.visibleUnits)
+      ..writeByte(4)
       ..write(obj.createdAt);
   }
 
@@ -60,19 +66,25 @@ class MassStateModelAdapter extends TypeAdapter<MassStateModel> {
       cards: (fields[0] as List).cast<MassCardState>(),
       visibleUnits: (fields[1] as List).cast<String>(),
       lastUpdated: fields[2] as DateTime,
+      isFocusMode: fields[3] as bool,
+      viewMode: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, MassStateModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.cards)
       ..writeByte(1)
       ..write(obj.visibleUnits)
       ..writeByte(2)
-      ..write(obj.lastUpdated);
+      ..write(obj.lastUpdated)
+      ..writeByte(3)
+      ..write(obj.isFocusMode)
+      ..writeByte(4)
+      ..write(obj.viewMode);
   }
 
   @override

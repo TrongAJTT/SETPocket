@@ -4066,6 +4066,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Perfect for engineering, science, construction, and everyday measurements with professional accuracy.'**
   String get practicalApplicationsDesc;
+
+  /// No description provided for @massConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Mass Converter - Detailed Information'**
+  String get massConverterDetailedInfo;
+
+  /// No description provided for @massConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precise mass converter supports multiple unit systems with high accuracy calculations for scientific, medical, and commercial applications.'**
+  String get massConverterOverview;
+
+  /// No description provided for @step1Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Mass;
+
+  /// No description provided for @step1MassDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different mass values simultaneously.'**
+  String get step1MassDesc;
+
+  /// No description provided for @step2Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Mass;
+
+  /// No description provided for @step2MassDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which mass units to display from metric, imperial, troy, and apothecaries systems.'**
+  String get step2MassDesc;
+
+  /// No description provided for @step3Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Mass;
+
+  /// No description provided for @step3MassDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any mass value and see instant conversions to all other units.'**
+  String get step3MassDesc;
+
+  /// No description provided for @step4Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Mass;
+
+  /// No description provided for @step4MassDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4MassDesc;
+
+  /// No description provided for @tip1Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use scientific notation (1.5e-12) for very small masses like atomic units'**
+  String get tip1Mass;
+
+  /// No description provided for @tip2Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'• Troy system is ideal for precious metals calculations'**
+  String get tip2Mass;
+
+  /// No description provided for @tip3Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'• Apothecaries system is used in pharmacy and medicine'**
+  String get tip3Mass;
+
+  /// No description provided for @tip4Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'• Table view is perfect for comparing multiple measurements'**
+  String get tip4Mass;
+
+  /// No description provided for @tip5Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode hides distractions for concentrated conversion work'**
+  String get tip5Mass;
+
+  /// No description provided for @tip6Mass.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use presets to save your favorite unit combinations'**
+  String get tip6Mass;
+
+  /// No description provided for @massUnitSystems.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported Unit Systems'**
+  String get massUnitSystems;
+
+  /// No description provided for @massUnitSystemsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Metric (ng to tonnes), Imperial (grains to tons), Troy (precious metals), Apothecaries (pharmacy), and special units (carats, slugs, atomic mass units).'**
+  String get massUnitSystemsDesc;
+
+  /// No description provided for @practicalApplicationsMassDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.'**
+  String get practicalApplicationsMassDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

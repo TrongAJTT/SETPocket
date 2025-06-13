@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'converters/unit_converter_screen.dart';
-import 'converters/currency_converter_screen.dart';
-import 'converters/length_converter_screen.dart';
-import 'converters/mass_converter_screen.dart';
+import 'package:setpocket/screens/converters/unit_converter_screen.dart';
+import 'package:setpocket/screens/converters/currency_converter_screen.dart';
+import 'package:setpocket/screens/converters/length_converter_screen.dart';
+import 'package:setpocket/screens/converters/mass_converter_new_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -57,7 +57,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.blue;
             break;
           case 2:
-            screen = const MassConverterScreen();
+            screen = const MassConverterNewScreen();
             title = loc.massConverter;
             icon = Icons.balance;
             iconColor = Colors.orange;

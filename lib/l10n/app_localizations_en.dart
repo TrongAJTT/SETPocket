@@ -2129,4 +2129,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get practicalApplicationsDesc => 'Perfect for engineering, science, construction, and everyday measurements with professional accuracy.';
+
+  @override
+  String get massConverterDetailedInfo => 'Mass Converter - Detailed Information';
+
+  @override
+  String get massConverterOverview => 'This precise mass converter supports multiple unit systems with high accuracy calculations for scientific, medical, and commercial applications.';
+
+  @override
+  String get step1Mass => 'Step 1: Add Cards';
+
+  @override
+  String get step1MassDesc => 'Add multiple converter cards to work with different mass values simultaneously.';
+
+  @override
+  String get step2Mass => 'Step 2: Select Units';
+
+  @override
+  String get step2MassDesc => 'Choose which mass units to display from metric, imperial, troy, and apothecaries systems.';
+
+  @override
+  String get step3Mass => 'Step 3: Enter Values';
+
+  @override
+  String get step3MassDesc => 'Type any mass value and see instant conversions to all other units.';
+
+  @override
+  String get step4Mass => 'Step 4: Organize Layout';
+
+  @override
+  String get step4MassDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Mass => '• Use scientific notation (1.5e-12) for very small masses like atomic units';
+
+  @override
+  String get tip2Mass => '• Troy system is ideal for precious metals calculations';
+
+  @override
+  String get tip3Mass => '• Apothecaries system is used in pharmacy and medicine';
+
+  @override
+  String get tip4Mass => '• Table view is perfect for comparing multiple measurements';
+
+  @override
+  String get tip5Mass => '• Focus mode hides distractions for concentrated conversion work';
+
+  @override
+  String get tip6Mass => '• Use presets to save your favorite unit combinations';
+
+  @override
+  String get massUnitSystems => 'Supported Unit Systems';
+
+  @override
+  String get massUnitSystemsDesc => 'Metric (ng to tonnes), Imperial (grains to tons), Troy (precious metals), Apothecaries (pharmacy), and special units (carats, slugs, atomic mass units).';
+
+  @override
+  String get practicalApplicationsMassDesc => 'Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.';
 }

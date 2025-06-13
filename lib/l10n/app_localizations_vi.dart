@@ -1823,7 +1823,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get currencyConverterDetailedInfo => 'Bộ chuyển đổi tiền tệ - Thông tin chi tiết';
 
   @override
-  String get currencyConverterOverview => 'Bộ chuyển đổi độ dài chính xác này hỗ trợ nhiều đơn vị với tính toán độ chính xác cao cho mục đích chuyên nghiệp và khoa học.';
+  String get currencyConverterOverview => 'Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.';
 
   @override
   String get keyFeatures => 'Tính năng chính';
@@ -2038,7 +2038,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get lengthConverterDetailedInfo => 'Bộ Chuyển Đổi Độ Dài - Thông Tin Chi Tiết';
 
   @override
-  String get lengthConverterOverview => 'This precision length converter supports multiple units with high accuracy calculations for professional and scientific use.';
+  String get lengthConverterOverview => 'Bộ chuyển đổi độ dài chính xác này hỗ trợ nhiều đơn vị với tính toán độ chính xác cao cho mục đích chuyên nghiệp và khoa học.';
 
   @override
   String get precisionCalculations => 'Tính Toán Chính Xác';
@@ -2129,4 +2129,61 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get practicalApplicationsDesc => 'Hoàn hảo cho kỹ thuật, khoa học, xây dựng và các phép đo hàng ngày với độ chính xác chuyên nghiệp.';
+
+  @override
+  String get massConverterDetailedInfo => 'Bộ Chuyển Đổi Khối Lượng - Thông Tin Chi Tiết';
+
+  @override
+  String get massConverterOverview => 'Bộ chuyển đổi khối lượng chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng khoa học, y tế và thương mại.';
+
+  @override
+  String get step1Mass => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1MassDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị khối lượng khác nhau cùng lúc.';
+
+  @override
+  String get step2Mass => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2MassDesc => 'Chọn đơn vị khối lượng nào hiển thị từ hệ mét, hệ Anh, hệ troy và hệ dược sĩ.';
+
+  @override
+  String get step3Mass => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3MassDesc => 'Nhập bất kỳ giá trị khối lượng nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Mass => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4MassDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Mass => '• Sử dụng ký hiệu khoa học (1.5e-12) cho khối lượng rất nhỏ như đơn vị nguyên tử';
+
+  @override
+  String get tip2Mass => '• Hệ troy lý tưởng cho tính toán kim loại quý';
+
+  @override
+  String get tip3Mass => '• Hệ dược sĩ được sử dụng trong dược phẩm và y học';
+
+  @override
+  String get tip4Mass => '• Chế độ bảng hoàn hảo để so sánh nhiều phép đo';
+
+  @override
+  String get tip5Mass => '• Chế độ tập trung ẩn các yếu tố gây phân tâm để làm việc chuyển đổi tập trung';
+
+  @override
+  String get tip6Mass => '• Sử dụng cấu hình để lưu các tổ hợp đơn vị yêu thích';
+
+  @override
+  String get massUnitSystems => 'Hệ Thống Đơn Vị Hỗ Trợ';
+
+  @override
+  String get massUnitSystemsDesc => 'Hệ mét (ng đến tấn), hệ Anh (hạt đến tấn), troy (kim loại quý), dược sĩ (dược phẩm), và đơn vị đặc biệt (carat, slug, đơn vị khối lượng nguyên tử).';
+
+  @override
+  String get practicalApplicationsMassDesc => 'Hoàn hảo cho hóa học, dược phẩm, giao dịch kim loại quý, vận chuyển, nấu ăn và nghiên cứu khoa học với độ chính xác chuyên nghiệp.';
 }

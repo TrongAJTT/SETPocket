@@ -1920,7 +1920,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataAttribution => 'Data Attribution';
 
   @override
-  String get apiProviderAttribution => 'Exchange rate data is provided by ExchangeRate-API.com';
+  String get apiProviderAttribution => 'Exchange rate data provided by ExchangeRate-API';
 
   @override
   String get rateLimitReached => 'Rate limit reached';
@@ -2033,4 +2033,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreOptions => 'More Options';
+
+  @override
+  String get lengthConverterDetailedInfo => 'Length Converter - Detailed Information';
+
+  @override
+  String get lengthConverterOverview => 'This precision length converter supports multiple units with high accuracy calculations for professional and scientific use.';
+
+  @override
+  String get precisionCalculations => 'Precision Calculations';
+
+  @override
+  String get precisionCalculationsDesc => 'High-precision arithmetic with up to 15 decimal places for scientific accuracy.';
+
+  @override
+  String get multipleUnits => 'Multiple Length Units';
+
+  @override
+  String get multipleUnitsDesc => 'Support for metric, imperial, and scientific units including nanometers to kilometers.';
+
+  @override
+  String get instantConversion => 'Instant Conversion';
+
+  @override
+  String get instantConversionDesc => 'Real-time conversion across all visible units as you type values.';
+
+  @override
+  String get customizableInterface => 'Customizable Interface';
+
+  @override
+  String get customizableInterfaceDesc => 'Hide or show specific units, arrange cards, and switch between views.';
+
+  @override
+  String get statePersistence => 'State Persistence';
+
+  @override
+  String get statePersistenceDesc => 'Your settings and card configurations are saved automatically.';
+
+  @override
+  String get scientificNotationSupport => 'Scientific Notation';
+
+  @override
+  String get scientificNotationSupportDesc => 'Support for very large and very small values using scientific notation.';
+
+  @override
+  String get step1Length => 'Step 1: Add Cards';
+
+  @override
+  String get step1LengthDesc => 'Add multiple converter cards to work with different length values simultaneously.';
+
+  @override
+  String get step2Length => 'Step 2: Select Units';
+
+  @override
+  String get step2LengthDesc => 'Choose which length units to display by customizing each card\'s visible units.';
+
+  @override
+  String get step3Length => 'Step 3: Enter Values';
+
+  @override
+  String get step3LengthDesc => 'Type any length value and see instant conversions to all other units.';
+
+  @override
+  String get step4Length => 'Step 4: Organize Layout';
+
+  @override
+  String get step4LengthDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Length => '• Use scientific notation (1.5e6) for very large or small measurements';
+
+  @override
+  String get tip2Length => '• Double-tap a unit field to select all text for quick editing';
+
+  @override
+  String get tip3Length => '• Cards remember their individual unit selections and names';
+
+  @override
+  String get tip4Length => '• Table view is ideal for comparing multiple measurements at once';
+
+  @override
+  String get tip5Length => '• Focus mode hides distractions for concentrated conversion work';
+
+  @override
+  String get tip6Length => '• Use the search function to quickly find specific units in customization';
+
+  @override
+  String get lengthUnitRange => 'Supported Units Range';
+
+  @override
+  String get lengthUnitRangeDesc => 'From subatomic (angstroms) to astronomical (light years) measurements with precision maintained throughout.';
+
+  @override
+  String get practicalApplications => 'Practical Applications';
+
+  @override
+  String get practicalApplicationsDesc => 'Perfect for engineering, science, construction, and everyday measurements with professional accuracy.';
 }

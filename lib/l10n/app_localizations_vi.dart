@@ -1823,7 +1823,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get currencyConverterDetailedInfo => 'Bộ chuyển đổi tiền tệ - Thông tin chi tiết';
 
   @override
-  String get currencyConverterOverview => 'Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.';
+  String get currencyConverterOverview => 'Bộ chuyển đổi độ dài chính xác này hỗ trợ nhiều đơn vị với tính toán độ chính xác cao cho mục đích chuyên nghiệp và khoa học.';
 
   @override
   String get keyFeatures => 'Tính năng chính';
@@ -2033,4 +2033,100 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get moreOptions => 'Tùy chọn khác';
+
+  @override
+  String get lengthConverterDetailedInfo => 'Bộ Chuyển Đổi Độ Dài - Thông Tin Chi Tiết';
+
+  @override
+  String get lengthConverterOverview => 'This precision length converter supports multiple units with high accuracy calculations for professional and scientific use.';
+
+  @override
+  String get precisionCalculations => 'Tính Toán Chính Xác';
+
+  @override
+  String get precisionCalculationsDesc => 'Phép toán chính xác cao với tới 15 chữ số thập phân cho độ chính xác khoa học.';
+
+  @override
+  String get multipleUnits => 'Nhiều Đơn Vị Độ Dài';
+
+  @override
+  String get multipleUnitsDesc => 'Hỗ trợ hệ mét, hệ Anh và đơn vị khoa học từ nanomét đến kilomét.';
+
+  @override
+  String get instantConversion => 'Chuyển Đổi Tức Thì';
+
+  @override
+  String get instantConversionDesc => 'Chuyển đổi thời gian thực trên tất cả đơn vị hiển thị khi bạn nhập giá trị.';
+
+  @override
+  String get customizableInterface => 'Giao Diện Tùy Chỉnh';
+
+  @override
+  String get customizableInterfaceDesc => 'Ẩn hoặc hiển thị đơn vị cụ thể, sắp xếp thẻ và chuyển đổi giữa các chế độ xem.';
+
+  @override
+  String get statePersistence => 'Lưu Trạng Thái';
+
+  @override
+  String get statePersistenceDesc => 'Cài đặt và cấu hình thẻ của bạn được lưu tự động.';
+
+  @override
+  String get scientificNotationSupport => 'Ký Hiệu Khoa Học';
+
+  @override
+  String get scientificNotationSupportDesc => 'Hỗ trợ giá trị rất lớn và rất nhỏ sử dụng ký hiệu khoa học.';
+
+  @override
+  String get step1Length => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1LengthDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị độ dài khác nhau cùng lúc.';
+
+  @override
+  String get step2Length => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2LengthDesc => 'Chọn đơn vị độ dài nào hiển thị bằng cách tùy chỉnh đơn vị hiển thị của mỗi thẻ.';
+
+  @override
+  String get step3Length => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3LengthDesc => 'Nhập bất kỳ giá trị độ dài nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Length => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4LengthDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Length => '• Sử dụng ký hiệu khoa học (1.5e6) cho các phép đo rất lớn hoặc rất nhỏ';
+
+  @override
+  String get tip2Length => '• Chạm đôi vào trường đơn vị để chọn tất cả văn bản để chỉnh sửa nhanh';
+
+  @override
+  String get tip3Length => '• Thẻ nhớ lựa chọn đơn vị và tên riêng của chúng';
+
+  @override
+  String get tip4Length => '• Chế độ bảng lý tưởng để so sánh nhiều phép đo cùng lúc';
+
+  @override
+  String get tip5Length => '• Chế độ tập trung ẩn các yếu tố gây phân tâm để làm việc chuyển đổi tập trung';
+
+  @override
+  String get tip6Length => '• Sử dụng chức năng tìm kiếm để nhanh chóng tìm đơn vị cụ thể trong tùy chỉnh';
+
+  @override
+  String get lengthUnitRange => 'Phạm Vi Đơn Vị Hỗ Trợ';
+
+  @override
+  String get lengthUnitRangeDesc => 'Từ phép đo dưới nguyên tử (angstrom) đến thiên văn (năm ánh sáng) với độ chính xác được duy trì xuyên suốt.';
+
+  @override
+  String get practicalApplications => 'Ứng Dụng Thực Tế';
+
+  @override
+  String get practicalApplicationsDesc => 'Hoàn hảo cho kỹ thuật, khoa học, xây dựng và các phép đo hàng ngày với độ chính xác chuyên nghiệp.';
 }

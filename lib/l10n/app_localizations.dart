@@ -3656,7 +3656,7 @@ abstract class AppLocalizations {
   /// No description provided for @apiProviderAttribution.
   ///
   /// In en, this message translates to:
-  /// **'Exchange rate data is provided by ExchangeRate-API.com'**
+  /// **'Exchange rate data provided by ExchangeRate-API'**
   String get apiProviderAttribution;
 
   /// No description provided for @rateLimitReached.
@@ -3874,6 +3874,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More Options'**
   String get moreOptions;
+
+  /// No description provided for @lengthConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Length Converter - Detailed Information'**
+  String get lengthConverterDetailedInfo;
+
+  /// No description provided for @lengthConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision length converter supports multiple units with high accuracy calculations for professional and scientific use.'**
+  String get lengthConverterOverview;
+
+  /// No description provided for @precisionCalculations.
+  ///
+  /// In en, this message translates to:
+  /// **'Precision Calculations'**
+  String get precisionCalculations;
+
+  /// No description provided for @precisionCalculationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'High-precision arithmetic with up to 15 decimal places for scientific accuracy.'**
+  String get precisionCalculationsDesc;
+
+  /// No description provided for @multipleUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Length Units'**
+  String get multipleUnits;
+
+  /// No description provided for @multipleUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support for metric, imperial, and scientific units including nanometers to kilometers.'**
+  String get multipleUnitsDesc;
+
+  /// No description provided for @instantConversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant Conversion'**
+  String get instantConversion;
+
+  /// No description provided for @instantConversionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time conversion across all visible units as you type values.'**
+  String get instantConversionDesc;
+
+  /// No description provided for @customizableInterface.
+  ///
+  /// In en, this message translates to:
+  /// **'Customizable Interface'**
+  String get customizableInterface;
+
+  /// No description provided for @customizableInterfaceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide or show specific units, arrange cards, and switch between views.'**
+  String get customizableInterfaceDesc;
+
+  /// No description provided for @statePersistence.
+  ///
+  /// In en, this message translates to:
+  /// **'State Persistence'**
+  String get statePersistence;
+
+  /// No description provided for @statePersistenceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your settings and card configurations are saved automatically.'**
+  String get statePersistenceDesc;
+
+  /// No description provided for @scientificNotationSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific Notation'**
+  String get scientificNotationSupport;
+
+  /// No description provided for @scientificNotationSupportDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support for very large and very small values using scientific notation.'**
+  String get scientificNotationSupportDesc;
+
+  /// No description provided for @step1Length.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Length;
+
+  /// No description provided for @step1LengthDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different length values simultaneously.'**
+  String get step1LengthDesc;
+
+  /// No description provided for @step2Length.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Length;
+
+  /// No description provided for @step2LengthDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which length units to display by customizing each card\'s visible units.'**
+  String get step2LengthDesc;
+
+  /// No description provided for @step3Length.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Length;
+
+  /// No description provided for @step3LengthDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any length value and see instant conversions to all other units.'**
+  String get step3LengthDesc;
+
+  /// No description provided for @step4Length.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Length;
+
+  /// No description provided for @step4LengthDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4LengthDesc;
+
+  /// No description provided for @tip1Length.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use scientific notation (1.5e6) for very large or small measurements'**
+  String get tip1Length;
+
+  /// No description provided for @tip2Length.
+  ///
+  /// In en, this message translates to:
+  /// **'• Double-tap a unit field to select all text for quick editing'**
+  String get tip2Length;
+
+  /// No description provided for @tip3Length.
+  ///
+  /// In en, this message translates to:
+  /// **'• Cards remember their individual unit selections and names'**
+  String get tip3Length;
+
+  /// No description provided for @tip4Length.
+  ///
+  /// In en, this message translates to:
+  /// **'• Table view is ideal for comparing multiple measurements at once'**
+  String get tip4Length;
+
+  /// No description provided for @tip5Length.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode hides distractions for concentrated conversion work'**
+  String get tip5Length;
+
+  /// No description provided for @tip6Length.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use the search function to quickly find specific units in customization'**
+  String get tip6Length;
+
+  /// No description provided for @lengthUnitRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported Units Range'**
+  String get lengthUnitRange;
+
+  /// No description provided for @lengthUnitRangeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'From subatomic (angstroms) to astronomical (light years) measurements with precision maintained throughout.'**
+  String get lengthUnitRangeDesc;
+
+  /// No description provided for @practicalApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Applications'**
+  String get practicalApplications;
+
+  /// No description provided for @practicalApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for engineering, science, construction, and everyday measurements with professional accuracy.'**
+  String get practicalApplicationsDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

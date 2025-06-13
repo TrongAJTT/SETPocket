@@ -3,6 +3,7 @@ import 'converter_service_base.dart';
 import 'currency_service.dart';
 import 'currency_cache_service.dart';
 import '../app_logger.dart';
+import '../number_format_service.dart';
 
 class CurrencyUnit extends ConverterUnit {
   @override
@@ -20,13 +21,7 @@ class CurrencyUnit extends ConverterUnit {
 
   @override
   String formatValue(double value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(2)}M';
-    } else if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(2)}K';
-    } else {
-      return value.toStringAsFixed(2);
-    }
+    return NumberFormatService.formatCurrency(value);
   }
 
   @override

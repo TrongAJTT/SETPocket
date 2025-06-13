@@ -1,5 +1,6 @@
 import '../../models/converter_models/converter_base.dart';
 import 'converter_service_base.dart';
+import '../number_format_service.dart';
 
 class LengthUnit extends ConverterUnit {
   final String _id;
@@ -30,41 +31,7 @@ class LengthUnit extends ConverterUnit {
 
   @override
   String formatValue(double value) {
-    if (value == value.toInt()) {
-      return value.toInt().toString();
-    } else if (value.abs() >= 1000000000) {
-      // Very large values: use exponential notation
-      return value.toStringAsExponential(6);
-    } else if (value.abs() >= 1000000) {
-      // Large values: show 4 decimal places max
-      return value
-          .toStringAsFixed(4)
-          .replaceAll(RegExp(r'0+$'), '')
-          .replaceAll(RegExp(r'\.$'), '');
-    } else if (value.abs() >= 1000) {
-      // Medium values: show 6 decimal places max
-      return value
-          .toStringAsFixed(6)
-          .replaceAll(RegExp(r'0+$'), '')
-          .replaceAll(RegExp(r'\.$'), '');
-    } else if (value.abs() >= 1) {
-      // Values >= 1: show up to 8 decimal places
-      return value
-          .toStringAsFixed(8)
-          .replaceAll(RegExp(r'0+$'), '')
-          .replaceAll(RegExp(r'\.$'), '');
-    } else if (value.abs() >= 0.0001) {
-      // Small values: show up to 10 decimal places for high precision
-      return value
-          .toStringAsFixed(10)
-          .replaceAll(RegExp(r'0+$'), '')
-          .replaceAll(RegExp(r'\.$'), '');
-    } else if (value.abs() > 0) {
-      // Very small values: use exponential notation with high precision
-      return value.toStringAsExponential(8);
-    } else {
-      return '0';
-    }
+    return NumberFormatService.formatUnit(value);
   }
 
   @override

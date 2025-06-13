@@ -134,6 +134,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get about => 'Giới thiệu';
 
   @override
+  String get add => 'Thêm';
+
+  @override
   String get save => 'Lưu';
 
   @override

@@ -5,6 +5,7 @@ import '../../services/converter_services/mass_state_service.dart';
 import '../../models/converter_models/mass_state_model.dart';
 import '../../widgets/converter_tools/unit_customization_dialog.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/number_format_service.dart';
 
 enum MassViewMode { cards, table }
 
@@ -186,14 +187,7 @@ class _MassConverterScreenState extends State<MassConverterScreen> {
   }
 
   String _formatValue(double value) {
-    if (value == 0) return '0';
-    if (value.abs() >= 1e6 || value.abs() < 1e-3) {
-      return value.toStringAsExponential(3);
-    }
-    return value
-        .toStringAsFixed(6)
-        .replaceAll(RegExp(r'0*$'), '')
-        .replaceAll(RegExp(r'\.$'), '');
+    return NumberFormatService.formatUnit(value);
   }
 
   void _onRowValueChanged(int rowIndex, String unitCode, String value) {

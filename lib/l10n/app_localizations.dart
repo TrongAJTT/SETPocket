@@ -329,6 +329,12 @@ abstract class AppLocalizations {
   /// **'About'**
   String get about;
 
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
   /// No description provided for @save.
   ///
   /// In en, this message translates to:

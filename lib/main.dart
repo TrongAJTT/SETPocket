@@ -11,6 +11,7 @@ import 'package:setpocket/services/quick_actions_service.dart';
 import 'package:setpocket/services/hive_service.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/number_format_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
@@ -141,6 +142,9 @@ class MainApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: settingsController,
       builder: (context, _) {
+        // Initialize number formatting with current locale
+        NumberFormatService.initialize(settingsController.locale);
+
         return MaterialApp(
           title: 'SETPocket',
           debugShowCheckedModeBanner: false,

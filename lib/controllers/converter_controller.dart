@@ -3,6 +3,7 @@ import 'dart:async';
 import '../models/converter_models/converter_base.dart';
 import '../services/converter_services/converter_service_base.dart';
 import '../services/app_logger.dart';
+import '../services/number_format_service.dart';
 
 enum ConverterViewMode { cards, table }
 
@@ -150,7 +151,7 @@ class ConverterController extends ChangeNotifier {
 
   String _formatValue(double value, String unitId) {
     final unit = _converterService.getUnit(unitId);
-    return unit?.formatValue(value) ?? value.toStringAsFixed(2);
+    return unit?.formatValue(value) ?? NumberFormatService.formatNumber(value);
   }
 
   Future<void> _saveState() async {

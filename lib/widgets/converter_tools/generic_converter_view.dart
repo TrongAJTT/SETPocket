@@ -12,6 +12,8 @@ class GenericConverterView extends StatelessWidget {
   final String? title;
   final IconData? titleIcon;
   final VoidCallback? onShowInfo;
+  final VoidCallback? onShowStatus;
+  final VoidCallback? onRefresh;
 
   const GenericConverterView({
     super.key,
@@ -20,6 +22,8 @@ class GenericConverterView extends StatelessWidget {
     this.title,
     this.titleIcon,
     this.onShowInfo,
+    this.onShowStatus,
+    this.onRefresh,
   });
 
   @override
@@ -70,7 +74,8 @@ class GenericConverterView extends StatelessWidget {
           if (controller.requiresRealTimeData) ...[
             ConverterStatusWidget(
               controller: controller,
-              onRefresh: controller.refreshData,
+              onRefresh: onRefresh ?? controller.refreshData,
+              onShowStatus: onShowStatus,
             ),
             const SizedBox(height: 16),
           ],
@@ -98,7 +103,7 @@ class GenericConverterView extends StatelessWidget {
                 onPressed: controller.addCard,
                 icon: const Icon(Icons.add, size: 16),
                 label: Text(
-                  l10n.addCard,
+                  l10n.add,
                   style: const TextStyle(fontSize: 12),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -205,21 +210,35 @@ class GenericConverterView extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: controller.addCard,
-                icon: const Icon(Icons.add),
-                label: Text(l10n.addRow),
+                icon: const Icon(Icons.add, size: 16),
+                label: Text(
+                  l10n.add,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(
                 onPressed: () =>
                     controller.setViewMode(ConverterViewMode.cards),
-                icon: const Icon(Icons.view_agenda),
-                label: Text(l10n.cardView),
+                icon: const Icon(Icons.view_agenda, size: 16),
+                label: Text(
+                  l10n.cardView,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   '${l10n.rows}: ${controller.state.cards.length}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                   overflow: TextOverflow.ellipsis,

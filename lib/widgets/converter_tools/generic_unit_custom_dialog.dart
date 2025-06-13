@@ -361,7 +361,7 @@ class _EnhancedGenericUnitCustomizationDialogState
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: crossAxisCount,
-                            childAspectRatio: isTabletScreen ? 4.5 : 3.5,
+                            mainAxisExtent: 70,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 8,
                           ),

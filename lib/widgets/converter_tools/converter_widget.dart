@@ -5,6 +5,7 @@ import 'package:setpocket/models/converter_models/converter_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/converter_services/currency_service.dart';
 import 'package:setpocket/services/converter_services/currency_cache_service.dart';
+import 'package:setpocket/services/number_format_service.dart';
 
 enum ConverterViewMode { table, list }
 
@@ -758,17 +759,7 @@ class _ConverterWidgetState extends State<ConverterWidget> {
   }
 
   String _formatValue(double value) {
-    if (value == 0) return '0';
-    if (value.abs() >= 1000000) {
-      return value.toStringAsExponential(6);
-    } else if (value.abs() < 0.00001) {
-      return value.toStringAsExponential(6);
-    } else {
-      return value
-          .toStringAsFixed(6)
-          .replaceAll(RegExp(r'0+$'), '')
-          .replaceAll(RegExp(r'\.$'), '');
-    }
+    return NumberFormatService.formatNumber(value);
   }
 
   @override

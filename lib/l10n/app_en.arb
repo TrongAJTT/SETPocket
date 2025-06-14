@@ -937,5 +937,43 @@
     "tip6Mass": "• Use presets to save your favorite unit combinations",
     "massUnitSystems": "Supported Unit Systems",
     "massUnitSystemsDesc": "Metric (ng to tonnes), Imperial (grains to tons), Troy (precious metals), Apothecaries (pharmacy), and special units (carats, slugs, atomic mass units).",
-    "practicalApplicationsMassDesc": "Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision."
+    "practicalApplicationsMassDesc": "Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.",
+    
+    "areaConverter": "Area Converter",
+    "@areaConverter": {
+        "description": "Title for area converter tool"
+    },
+    "areaConverterInfo": "Area Converter Info",
+    "@areaConverterInfo": {
+        "description": "Title for area converter info dialog"
+    },
+    "customizeAreaUnits": "Customize Area Units",
+    "@customizeAreaUnits": {
+        "description": "Title for area unit customization dialog"
+    },
+    "areaConverterDesc": "Convert between area units (m², km², ha, acres, ft²)",
+    "@areaConverterDesc": {
+        "description": "Description for area converter tool"
+    },
+    "areaConverterDetailedInfo": "Area Converter - Detailed Information",
+    "areaConverterOverview": "This precision area converter supports multiple unit systems with high accuracy calculations for real estate, agriculture, engineering, and scientific applications.",
+    "step1Area": "Step 1: Add Cards",
+    "step1AreaDesc": "Add multiple converter cards to work with different area values simultaneously.",
+    "step2Area": "Step 2: Select Units",
+    "step2AreaDesc": "Choose which area units to display by customizing each card's visible units.",
+    "step3Area": "Step 3: Enter Values",
+    "step3AreaDesc": "Type any area value and see instant conversions to all other units.",
+    "step4Area": "Step 4: Organize Layout",
+    "step4AreaDesc": "Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.",
+    "tip1Area": "• Square meter (m²) is the base SI unit for area with highest precision",
+    "tip2Area": "• Hectare is commonly used for large land areas and agriculture",
+    "tip3Area": "• Acre is standard in real estate and land measurement in the US",
+    "tip4Area": "• Use scientific notation for very large or small area values",
+    "tip5Area": "• Square feet and square inches are common in construction and design",
+    "tip6Area": "• Focus mode helps concentrate on complex area calculations",
+    "areaUnitCategories": "Unit Categories",
+    "commonUnitsAreaDesc": "Square meter (m²), Square kilometer (km²), Square centimeter (cm²) - most frequently used metric units.",
+    "lessCommonUnitsAreaDesc": "Hectare (ha), Acre (ac), Square foot (ft²), Square inch (in²) - specialized applications in agriculture and construction.",
+    "uncommonUnitsAreaDesc": "Square yard (yd²), Square mile (mi²), Rood - for specific regional or historical measurements.",
+    "practicalApplicationsAreaDesc": "Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements."
 }

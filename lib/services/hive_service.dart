@@ -1,17 +1,18 @@
+import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import 'package:setpocket/services/app_logger.dart';
-import '../models/converter_models/currency_cache_model.dart';
-import '../models/converter_models/currency_preset_model.dart';
-import '../models/converter_models/currency_state_model.dart';
-import '../models/settings_model.dart';
-import '../models/converter_models/unit_template_model.dart';
-import '../models/converter_models/length_state_model.dart';
-import '../models/converter_models/mass_state_model.dart';
-import '../models/converter_models/length_preset_model.dart';
-import '../models/converter_models/generic_preset_model.dart';
-import '../models/converter_models/weight_state_model.dart';
+import 'package:setpocket/models/converter_models/currency_cache_model.dart';
+import 'package:setpocket/models/converter_models/currency_preset_model.dart';
+import 'package:setpocket/models/converter_models/currency_state_model.dart';
+import 'package:setpocket/models/settings_model.dart';
+import 'package:setpocket/models/converter_models/unit_template_model.dart';
+import 'package:setpocket/models/converter_models/length_state_model.dart';
+import 'package:setpocket/models/converter_models/mass_state_model.dart';
+import 'package:setpocket/models/converter_models/length_preset_model.dart';
+import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/models/converter_models/weight_state_model.dart';
+import 'package:setpocket/models/converter_models/area_state_model.dart';
 
 class HiveService {
   // Box names
@@ -90,6 +91,12 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(21)) {
         Hive.registerAdapter(WeightStateModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(22)) {
+        Hive.registerAdapter(AreaCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(23)) {
+        Hive.registerAdapter(AreaStateModelAdapter());
       }
 
       // Open boxes

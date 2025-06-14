@@ -5,6 +5,7 @@ import 'package:setpocket/screens/converters/currency_converter_screen.dart';
 import 'package:setpocket/screens/converters/length_converter_screen.dart';
 import 'package:setpocket/screens/converters/mass_converter_screen.dart';
 import 'package:setpocket/screens/converters/weight_converter_screen.dart';
+import 'package:setpocket/screens/converters/area_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -70,8 +71,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.deepPurple;
             break;
           case 4:
-            screen = UnitConverterScreen(
-                categoryId: 'area', categoryName: loc.areaConverter);
+            screen = const AreaConverterScreen();
             title = loc.areaConverter;
             icon = Icons.crop_free;
             iconColor = Colors.purple;

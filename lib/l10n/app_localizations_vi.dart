@@ -1409,7 +1409,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get volumeConverterDesc => 'Chuyển đổi giữa các đơn vị thể tích khác nhau';
 
   @override
-  String get areaConverterDesc => 'Chuyển đổi giữa các đơn vị diện tích khác nhau';
+  String get areaConverterDesc => 'Chuyển đổi giữa các đơn vị diện tích (m², km², ha, acres, ft²)';
 
   @override
   String get speedConverterDesc => 'Chuyển đổi giữa các đơn vị tốc độ khác nhau';
@@ -2264,4 +2264,73 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get practicalApplicationsMassDesc => 'Hoàn hảo cho hóa học, dược phẩm, giao dịch kim loại quý, vận chuyển, nấu ăn và nghiên cứu khoa học với độ chính xác chuyên nghiệp.';
+
+  @override
+  String get areaConverterInfo => 'Thông tin Chuyển đổi Diện tích';
+
+  @override
+  String get customizeAreaUnits => 'Tùy chỉnh đơn vị diện tích';
+
+  @override
+  String get areaConverterDetailedInfo => 'Bộ Chuyển Đổi Diện Tích - Thông Tin Chi Tiết';
+
+  @override
+  String get areaConverterOverview => 'Bộ chuyển đổi diện tích chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng bất động sản, nông nghiệp, kỹ thuật và khoa học.';
+
+  @override
+  String get step1Area => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1AreaDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị diện tích khác nhau cùng lúc.';
+
+  @override
+  String get step2Area => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2AreaDesc => 'Chọn đơn vị diện tích nào hiển thị bằng cách tùy chỉnh đơn vị hiển thị của mỗi thẻ.';
+
+  @override
+  String get step3Area => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3AreaDesc => 'Nhập bất kỳ giá trị diện tích nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Area => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4AreaDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Area => '• Mét vuông (m²) là đơn vị SI cơ bản cho diện tích với độ chính xác cao nhất';
+
+  @override
+  String get tip2Area => '• Héc-ta thường được sử dụng cho diện tích đất lớn và nông nghiệp';
+
+  @override
+  String get tip3Area => '• Acre là tiêu chuẩn trong bất động sản và đo đạc đất đai ở Mỹ';
+
+  @override
+  String get tip4Area => '• Sử dụng ký hiệu khoa học cho các giá trị diện tích rất lớn hoặc rất nhỏ';
+
+  @override
+  String get tip5Area => '• Foot vuông và inch vuông phổ biến trong xây dựng và thiết kế';
+
+  @override
+  String get tip6Area => '• Chế độ tập trung giúp tập trung vào các phép tính diện tích phức tạp';
+
+  @override
+  String get areaUnitCategories => 'Danh Mục Đơn Vị';
+
+  @override
+  String get commonUnitsAreaDesc => 'Mét vuông (m²), Kilômét vuông (km²), Centimet vuông (cm²) - các đơn vị hệ mét được sử dụng thường xuyên nhất.';
+
+  @override
+  String get lessCommonUnitsAreaDesc => 'Héc-ta (ha), Acre (ac), Foot vuông (ft²), Inch vuông (in²) - ứng dụng chuyên biệt trong nông nghiệp và xây dựng.';
+
+  @override
+  String get uncommonUnitsAreaDesc => 'Yard vuông (yd²), Mile vuông (mi²), Rood - cho các phép đo khu vực hoặc lịch sử cụ thể.';
+
+  @override
+  String get practicalApplicationsAreaDesc => 'Thiết yếu cho bất động sản, nông nghiệp, xây dựng, quy hoạch đô thị, khảo sát đất đai và bất kỳ ứng dụng nào yêu cầu đo diện tích chính xác.';
 }

@@ -2267,7 +2267,7 @@ abstract class AppLocalizations {
   /// **'Volume Converter'**
   String get volumeConverter;
 
-  /// No description provided for @areaConverter.
+  /// Title for area converter tool
   ///
   /// In en, this message translates to:
   /// **'Area Converter'**
@@ -2711,10 +2711,10 @@ abstract class AppLocalizations {
   /// **'Convert between different units of volume'**
   String get volumeConverterDesc;
 
-  /// No description provided for @areaConverterDesc.
+  /// Description for area converter tool
   ///
   /// In en, this message translates to:
-  /// **'Convert between different units of area'**
+  /// **'Convert between area units (m², km², ha, acres, ft²)'**
   String get areaConverterDesc;
 
   /// No description provided for @speedConverterDesc.
@@ -4336,6 +4336,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.'**
   String get practicalApplicationsMassDesc;
+
+  /// Title for area converter info dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Area Converter Info'**
+  String get areaConverterInfo;
+
+  /// Title for area unit customization dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Area Units'**
+  String get customizeAreaUnits;
+
+  /// No description provided for @areaConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Area Converter - Detailed Information'**
+  String get areaConverterDetailedInfo;
+
+  /// No description provided for @areaConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision area converter supports multiple unit systems with high accuracy calculations for real estate, agriculture, engineering, and scientific applications.'**
+  String get areaConverterOverview;
+
+  /// No description provided for @step1Area.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Area;
+
+  /// No description provided for @step1AreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different area values simultaneously.'**
+  String get step1AreaDesc;
+
+  /// No description provided for @step2Area.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Area;
+
+  /// No description provided for @step2AreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which area units to display by customizing each card\'s visible units.'**
+  String get step2AreaDesc;
+
+  /// No description provided for @step3Area.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Area;
+
+  /// No description provided for @step3AreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any area value and see instant conversions to all other units.'**
+  String get step3AreaDesc;
+
+  /// No description provided for @step4Area.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Area;
+
+  /// No description provided for @step4AreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4AreaDesc;
+
+  /// No description provided for @tip1Area.
+  ///
+  /// In en, this message translates to:
+  /// **'• Square meter (m²) is the base SI unit for area with highest precision'**
+  String get tip1Area;
+
+  /// No description provided for @tip2Area.
+  ///
+  /// In en, this message translates to:
+  /// **'• Hectare is commonly used for large land areas and agriculture'**
+  String get tip2Area;
+
+  /// No description provided for @tip3Area.
+  ///
+  /// In en, this message translates to:
+  /// **'• Acre is standard in real estate and land measurement in the US'**
+  String get tip3Area;
+
+  /// No description provided for @tip4Area.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use scientific notation for very large or small area values'**
+  String get tip4Area;
+
+  /// No description provided for @tip5Area.
+  ///
+  /// In en, this message translates to:
+  /// **'• Square feet and square inches are common in construction and design'**
+  String get tip5Area;
+
+  /// No description provided for @tip6Area.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex area calculations'**
+  String get tip6Area;
+
+  /// No description provided for @areaUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Categories'**
+  String get areaUnitCategories;
+
+  /// No description provided for @commonUnitsAreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Square meter (m²), Square kilometer (km²), Square centimeter (cm²) - most frequently used metric units.'**
+  String get commonUnitsAreaDesc;
+
+  /// No description provided for @lessCommonUnitsAreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hectare (ha), Acre (ac), Square foot (ft²), Square inch (in²) - specialized applications in agriculture and construction.'**
+  String get lessCommonUnitsAreaDesc;
+
+  /// No description provided for @uncommonUnitsAreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Square yard (yd²), Square mile (mi²), Rood - for specific regional or historical measurements.'**
+  String get uncommonUnitsAreaDesc;
+
+  /// No description provided for @practicalApplicationsAreaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements.'**
+  String get practicalApplicationsAreaDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -931,5 +931,43 @@
     "uncommonUnitsWeightDesc": "Tấn-lực (tf) - cho các phép đo lực rất lớn trong công nghiệp nặng.",
     "specialUnits": "Đơn Vị Đặc Biệt",
     "specialUnitsWeightDesc": "Gram-lực (gf), Troy pound-lực - cho các phép đo chính xác và kim loại quý.",
-    "practicalApplicationsWeightDesc": "Thiết yếu cho kỹ thuật cơ khí, phân tích kết cấu, thử nghiệm vật liệu, thí nghiệm vật lý và bất kỳ ứng dụng nào yêu cầu đo lực chính xác."
+    "practicalApplicationsWeightDesc": "Thiết yếu cho kỹ thuật cơ khí, phân tích kết cấu, thử nghiệm vật liệu, thí nghiệm vật lý và bất kỳ ứng dụng nào yêu cầu đo lực chính xác.",
+    
+    "areaConverter": "Chuyển đổi Diện tích",
+    "@areaConverter": {
+        "description": "Tiêu đề cho công cụ chuyển đổi diện tích"
+    },
+    "areaConverterInfo": "Thông tin Chuyển đổi Diện tích",
+    "@areaConverterInfo": {
+        "description": "Tiêu đề cho hộp thoại thông tin chuyển đổi diện tích"
+    },
+    "customizeAreaUnits": "Tùy chỉnh đơn vị diện tích",
+    "@customizeAreaUnits": {
+        "description": "Tiêu đề cho hộp thoại tùy chỉnh đơn vị diện tích"
+    },
+    "areaConverterDesc": "Chuyển đổi giữa các đơn vị diện tích (m², km², ha, acres, ft²)",
+    "@areaConverterDesc": {
+        "description": "Mô tả cho công cụ chuyển đổi diện tích"
+    },
+    "areaConverterDetailedInfo": "Bộ Chuyển Đổi Diện Tích - Thông Tin Chi Tiết",
+    "areaConverterOverview": "Bộ chuyển đổi diện tích chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng bất động sản, nông nghiệp, kỹ thuật và khoa học.",
+    "step1Area": "Bước 1: Thêm Thẻ",
+    "step1AreaDesc": "Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị diện tích khác nhau cùng lúc.",
+    "step2Area": "Bước 2: Chọn Đơn Vị",
+    "step2AreaDesc": "Chọn đơn vị diện tích nào hiển thị bằng cách tùy chỉnh đơn vị hiển thị của mỗi thẻ.",
+    "step3Area": "Bước 3: Nhập Giá Trị",
+    "step3AreaDesc": "Nhập bất kỳ giá trị diện tích nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.",
+    "step4Area": "Bước 4: Sắp Xếp Bố Cục",
+    "step4AreaDesc": "Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.",
+    "tip1Area": "• Mét vuông (m²) là đơn vị SI cơ bản cho diện tích với độ chính xác cao nhất",
+    "tip2Area": "• Héc-ta thường được sử dụng cho diện tích đất lớn và nông nghiệp",
+    "tip3Area": "• Acre là tiêu chuẩn trong bất động sản và đo đạc đất đai ở Mỹ",
+    "tip4Area": "• Sử dụng ký hiệu khoa học cho các giá trị diện tích rất lớn hoặc rất nhỏ",
+    "tip5Area": "• Foot vuông và inch vuông phổ biến trong xây dựng và thiết kế",
+    "tip6Area": "• Chế độ tập trung giúp tập trung vào các phép tính diện tích phức tạp",
+    "areaUnitCategories": "Danh Mục Đơn Vị",
+    "commonUnitsAreaDesc": "Mét vuông (m²), Kilômét vuông (km²), Centimet vuông (cm²) - các đơn vị hệ mét được sử dụng thường xuyên nhất.",
+    "lessCommonUnitsAreaDesc": "Héc-ta (ha), Acre (ac), Foot vuông (ft²), Inch vuông (in²) - ứng dụng chuyên biệt trong nông nghiệp và xây dựng.",
+    "uncommonUnitsAreaDesc": "Yard vuông (yd²), Mile vuông (mi²), Rood - cho các phép đo khu vực hoặc lịch sử cụ thể.",
+    "practicalApplicationsAreaDesc": "Thiết yếu cho bất động sản, nông nghiệp, xây dựng, quy hoạch đô thị, khảo sát đất đai và bất kỳ ứng dụng nào yêu cầu đo diện tích chính xác."
 }

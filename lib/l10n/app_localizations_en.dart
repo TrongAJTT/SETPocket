@@ -1409,7 +1409,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get volumeConverterDesc => 'Convert between different units of volume';
 
   @override
-  String get areaConverterDesc => 'Convert between different units of area';
+  String get areaConverterDesc => 'Convert between area units (m², km², ha, acres, ft²)';
 
   @override
   String get speedConverterDesc => 'Convert between different units of speed';
@@ -2264,4 +2264,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get practicalApplicationsMassDesc => 'Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.';
+
+  @override
+  String get areaConverterInfo => 'Area Converter Info';
+
+  @override
+  String get customizeAreaUnits => 'Customize Area Units';
+
+  @override
+  String get areaConverterDetailedInfo => 'Area Converter - Detailed Information';
+
+  @override
+  String get areaConverterOverview => 'This precision area converter supports multiple unit systems with high accuracy calculations for real estate, agriculture, engineering, and scientific applications.';
+
+  @override
+  String get step1Area => 'Step 1: Add Cards';
+
+  @override
+  String get step1AreaDesc => 'Add multiple converter cards to work with different area values simultaneously.';
+
+  @override
+  String get step2Area => 'Step 2: Select Units';
+
+  @override
+  String get step2AreaDesc => 'Choose which area units to display by customizing each card\'s visible units.';
+
+  @override
+  String get step3Area => 'Step 3: Enter Values';
+
+  @override
+  String get step3AreaDesc => 'Type any area value and see instant conversions to all other units.';
+
+  @override
+  String get step4Area => 'Step 4: Organize Layout';
+
+  @override
+  String get step4AreaDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Area => '• Square meter (m²) is the base SI unit for area with highest precision';
+
+  @override
+  String get tip2Area => '• Hectare is commonly used for large land areas and agriculture';
+
+  @override
+  String get tip3Area => '• Acre is standard in real estate and land measurement in the US';
+
+  @override
+  String get tip4Area => '• Use scientific notation for very large or small area values';
+
+  @override
+  String get tip5Area => '• Square feet and square inches are common in construction and design';
+
+  @override
+  String get tip6Area => '• Focus mode helps concentrate on complex area calculations';
+
+  @override
+  String get areaUnitCategories => 'Unit Categories';
+
+  @override
+  String get commonUnitsAreaDesc => 'Square meter (m²), Square kilometer (km²), Square centimeter (cm²) - most frequently used metric units.';
+
+  @override
+  String get lessCommonUnitsAreaDesc => 'Hectare (ha), Acre (ac), Square foot (ft²), Square inch (in²) - specialized applications in agriculture and construction.';
+
+  @override
+  String get uncommonUnitsAreaDesc => 'Square yard (yd²), Square mile (mi²), Rood - for specific regional or historical measurements.';
+
+  @override
+  String get practicalApplicationsAreaDesc => 'Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements.';
 }

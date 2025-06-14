@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../models/converter_models/converter_models.dart';
-import '../../widgets/converter_tools/converter_widget.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:setpocket/models/converter_models/converter_models.dart';
+import 'package:setpocket/widgets/converter_tools/converter_widget.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class TimeConverterScreen extends StatelessWidget {
   final bool isEmbedded;

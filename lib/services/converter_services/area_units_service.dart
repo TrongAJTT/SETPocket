@@ -137,14 +137,8 @@ class AreaUnitsService {
   static List<String> get categories => ['common', 'less_common', 'uncommon'];
 
   /// Get default visible units
-  static Set<String> get defaultVisibleUnits => {
-        'square_meters',
-        'square_kilometers',
-        'square_centimeters',
-        'hectares',
-        'acres',
-        'square_feet'
-      };
+  static Set<String> get defaultVisibleUnits =>
+      {'square_meters', 'square_feet', 'square_inches'};
 
   /// Check if unit exists
   static bool hasUnit(String unitId) {

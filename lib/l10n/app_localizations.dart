@@ -1379,6 +1379,24 @@ abstract class AppLocalizations {
   /// **'Reset Layout'**
   String get resetLayout;
 
+  /// No description provided for @confirmResetLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Reset Layout'**
+  String get confirmResetLayout;
+
+  /// No description provided for @confirmResetLayoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reset the layout? This will remove all cards and restore default settings.'**
+  String get confirmResetLayoutMessage;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
   /// No description provided for @customizeCurrencies.
   ///
   /// In en, this message translates to:

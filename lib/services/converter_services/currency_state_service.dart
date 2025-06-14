@@ -94,22 +94,58 @@ class CurrencyStateService {
   // Clear saved state
   static Future<void> clearState() async {
     try {
-      await initialize();
-      await _stateBox!.delete(_stateKey);
-      await _stateBox!.flush();
-      logInfo('CurrencyStateService: State cleared');
+      logInfo('CurrencyStateService: Clearing currency converter state');
+
+      Box<CurrencyStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_stateBoxName)) {
+        box = Hive.box<CurrencyStateModel>(_stateBoxName);
+      } else {
+        box = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
+        shouldClose = true;
+      }
+
+      await box.delete(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      logInfo('CurrencyStateService: Successfully cleared state');
     } catch (e) {
       logError('CurrencyStateService: Error clearing state: $e');
+      rethrow;
     }
   }
 
   // Check if state exists
   static Future<bool> hasState() async {
     try {
-      await initialize();
-      return _stateBox!.containsKey(_stateKey);
+      final enabled = await isStateSavingEnabled();
+      if (!enabled) {
+        return false;
+      }
+
+      Box<CurrencyStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_stateBoxName)) {
+        box = Hive.box<CurrencyStateModel>(_stateBoxName);
+      } else {
+        box = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
+        shouldClose = true;
+      }
+
+      final hasData = box.containsKey(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      return hasData;
     } catch (e) {
-      logError('CurrencyStateService: Error checking state: $e');
+      logError('CurrencyStateService: Error checking state existence: $e');
       return false;
     }
   }
@@ -117,16 +153,39 @@ class CurrencyStateService {
   // Get state size for cache management
   static Future<int> getStateSize() async {
     try {
-      await initialize();
-      final state = _stateBox!.get(_stateKey);
+      final enabled = await isStateSavingEnabled();
+      if (!enabled) {
+        return 0;
+      }
+
+      Box<CurrencyStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_stateBoxName)) {
+        box = Hive.box<CurrencyStateModel>(_stateBoxName);
+      } else {
+        box = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
+        shouldClose = true;
+      }
+
+      final state = box.get(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
       if (state != null) {
-        final json = state.toJson();
-        final jsonString = json.toString();
-        return jsonString.length;
+        // Estimate size based on data structure
+        int size = 0;
+        size += state.cards.length * 150; // Approximate size per card
+        size += state.visibleCurrencies.length *
+            10; // Approximate size per currency
+        size += 100; // Base overhead
+        return size;
       }
       return 0;
     } catch (e) {
-      logError('CurrencyStateService: Error getting state size: $e');
+      logError('CurrencyStateService: Error calculating state size: $e');
       return 0;
     }
   }

@@ -73,15 +73,9 @@ class WeightUnitsService {
     },
   };
 
-  // Default visible units
-  static const List<String> defaultVisibleUnits = [
-    'newtons',
-    'kilogram_force',
-    'pound_force',
-    'dyne',
-    'kilopond',
-    'gram_force',
-  ];
+  // Get default visible units
+  static Set<String> get defaultVisibleUnits =>
+      {'newtons', 'kilogram_force', 'pound_force'};
 
   // All available units
   static List<String> get allUnits => _conversionFactors.keys.toList();

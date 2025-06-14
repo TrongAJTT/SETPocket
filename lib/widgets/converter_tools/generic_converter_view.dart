@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../controllers/converter_controller.dart';
-import '../../models/converter_models/converter_base.dart';
-import '../../l10n/app_localizations.dart';
-import '../../services/focus_mode_service.dart';
+import 'package:setpocket/controllers/converter_controller.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/services/focus_mode_service.dart';
 import 'generic_unit_custom_dialog.dart';
 import 'converter_card_widget.dart';
 import 'converter_table_widget.dart';
@@ -63,7 +63,7 @@ class GenericConverterView extends StatelessWidget {
                     _toggleFocusMode(context, controller);
                     break;
                   case 'reset_layout':
-                    controller.resetLayout();
+                    _showResetLayoutConfirmation(context, controller);
                     break;
                   case 'customize_units':
                     _showGlobalUnitsCustomization(context, controller);
@@ -127,7 +127,8 @@ class GenericConverterView extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.restart_alt),
-              onPressed: controller.resetLayout,
+              onPressed: () =>
+                  _showResetLayoutConfirmation(context, controller),
               tooltip: l10n.resetLayout,
             ),
             IconButton(
@@ -407,6 +408,33 @@ class GenericConverterView extends StatelessWidget {
       isEnabled: controller.isFocusMode,
       exitInstruction: exitInstruction,
     );
+  }
+
+  Future<void> _showResetLayoutConfirmation(
+      BuildContext context, ConverterController controller) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.confirmResetLayout),
+        content: Text(l10n.confirmResetLayoutMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      controller.resetLayout();
+    }
   }
 
   Widget _buildDesktopGridLayout(

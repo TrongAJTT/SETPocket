@@ -719,6 +719,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get resetLayout => 'Đặt lại bố cục';
 
   @override
+  String get confirmResetLayout => 'Xác nhận đặt lại bố cục';
+
+  @override
+  String get confirmResetLayoutMessage => 'Bạn có chắc chắn muốn đặt lại bố cục? Điều này sẽ xóa tất cả thẻ và khôi phục cài đặt mặc định.';
+
+  @override
+  String get confirm => 'Xác nhận';
+
+  @override
   String get customizeCurrencies => 'Tùy chỉnh tiền tệ';
 
   @override

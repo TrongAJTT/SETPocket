@@ -113,22 +113,56 @@ class LengthStateService {
   // Clear saved state
   static Future<void> clearState() async {
     try {
-      await initialize();
+      logInfo('LengthStateService: Clearing length converter state');
 
-      await _stateBox!.delete(_stateKey);
-      await _stateBox!.flush();
+      Box<LengthStateModel> box;
+      bool shouldClose = false;
 
-      logInfo('LengthStateService: State cleared');
+      if (Hive.isBoxOpen(_stateBoxName)) {
+        box = Hive.box<LengthStateModel>(_stateBoxName);
+      } else {
+        box = await Hive.openBox<LengthStateModel>(_stateBoxName);
+        shouldClose = true;
+      }
+
+      await box.delete(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      logInfo('LengthStateService: Successfully cleared state');
     } catch (e) {
       logError('LengthStateService: Error clearing state: $e');
+      rethrow;
     }
   }
 
   // Check if state exists
   static Future<bool> hasState() async {
     try {
-      await initialize();
-      return _stateBox!.containsKey(_stateKey);
+      final settings = await SettingsService.getSettings();
+      if (!settings.featureStateSavingEnabled) {
+        return false;
+      }
+
+      Box box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_stateBoxName)) {
+        box = Hive.box(_stateBoxName);
+      } else {
+        box = await Hive.openBox(_stateBoxName);
+        shouldClose = true;
+      }
+
+      final hasData = box.containsKey(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      return hasData;
     } catch (e) {
       logError('LengthStateService: Error checking state existence: $e');
       return false;
@@ -138,10 +172,28 @@ class LengthStateService {
   // Get state size (for cache service)
   static Future<int> getStateSize() async {
     try {
-      await initialize();
+      final settings = await SettingsService.getSettings();
+      if (!settings.featureStateSavingEnabled) {
+        return 0;
+      }
 
-      final state = _stateBox!.get(_stateKey);
-      if (state != null) {
+      Box box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_stateBoxName)) {
+        box = Hive.box(_stateBoxName);
+      } else {
+        box = await Hive.openBox(_stateBoxName);
+        shouldClose = true;
+      }
+
+      final state = box.get(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      if (state != null && state is LengthStateModel) {
         // Estimate size based on data
         final cardsSize = state.cards.length * 50; // Rough estimate per card
         final unitsSize =

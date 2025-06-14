@@ -24,7 +24,7 @@ class AreaStateService {
       final stateData = box.get(_stateKey);
 
       if (stateData == null) {
-        logInfo('AreaStateService: No saved state found, returning default');
+        logInfo('AreaStateService: No saved state found, creating default');
         await box.close();
         return _getDefaultState();
       }
@@ -67,27 +67,36 @@ class AreaStateService {
     }
   }
 
-  /// Save area converter state to Hive
+  /// Save area converter state
   static Future<void> saveState(AreaStateModel state) async {
     try {
-      // Check if feature state saving is enabled
       final settings = await SettingsService.getSettings();
       if (!settings.featureStateSavingEnabled) {
-        logInfo(
-            'AreaStateService: Feature state saving disabled, skipping save');
+        logInfo('AreaStateService: State saving is disabled, skipping save');
         return;
       }
 
       logInfo(
           'AreaStateService: Saving area converter state with ${state.cards.length} cards');
 
-      final box = await Hive.openBox(_boxName);
+      Box<AreaStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<AreaStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<AreaStateModel>(_boxName);
+        shouldClose = true;
+      }
 
       // Update timestamp
       state.lastUpdated = DateTime.now();
 
       await box.put(_stateKey, state);
-      await box.close();
+
+      if (shouldClose) {
+        await box.close();
+      }
 
       logInfo('AreaStateService: Successfully saved state');
     } catch (e) {
@@ -101,9 +110,21 @@ class AreaStateService {
     try {
       logInfo('AreaStateService: Clearing area converter state');
 
-      final box = await Hive.openBox(_boxName);
+      Box<AreaStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<AreaStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<AreaStateModel>(_boxName);
+        shouldClose = true;
+      }
+
       await box.delete(_stateKey);
-      await box.close();
+
+      if (shouldClose) {
+        await box.close();
+      }
 
       logInfo('AreaStateService: Successfully cleared state');
     } catch (e) {
@@ -117,9 +138,21 @@ class AreaStateService {
     try {
       logInfo('AreaStateService: Force clearing all cache data');
 
-      final box = await Hive.openBox(_boxName);
+      Box<AreaStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<AreaStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<AreaStateModel>(_boxName);
+        shouldClose = true;
+      }
+
       await box.clear();
-      await box.close();
+
+      if (shouldClose) {
+        await box.close();
+      }
 
       logInfo('AreaStateService: All cache data cleared successfully');
     } catch (e) {
@@ -136,25 +169,11 @@ class AreaStateService {
           unitCode: 'square_meters',
           amount: 1.0,
           name: 'Card 1',
-          visibleUnits: [
-            'square_meters',
-            'square_kilometers',
-            'square_centimeters',
-            'hectares',
-            'acres',
-            'square_feet'
-          ],
+          visibleUnits: ['square_meters', 'square_feet', 'square_inches'],
           createdAt: DateTime.now(),
         ),
       ],
-      visibleUnits: [
-        'square_meters',
-        'square_kilometers',
-        'square_centimeters',
-        'hectares',
-        'acres',
-        'square_feet'
-      ],
+      visibleUnits: ['square_meters', 'square_feet', 'square_inches'],
       lastUpdated: DateTime.now(),
       isFocusMode: false,
       viewMode: 'cards',
@@ -172,11 +191,8 @@ class AreaStateService {
           if (card.visibleUnits == null || card.visibleUnits!.isEmpty) {
             card.visibleUnits = [
               'square_meters',
-              'square_kilometers',
-              'square_centimeters',
-              'hectares',
-              'acres',
-              'square_feet'
+              'square_feet',
+              'square_inches'
             ];
           }
 
@@ -195,28 +211,14 @@ class AreaStateService {
           unitCode: 'square_meters',
           amount: 1.0,
           name: 'Card 1',
-          visibleUnits: [
-            'square_meters',
-            'square_kilometers',
-            'square_centimeters',
-            'hectares',
-            'acres',
-            'square_feet'
-          ],
+          visibleUnits: ['square_meters', 'square_feet', 'square_inches'],
           createdAt: DateTime.now(),
         ));
       }
 
       // Ensure global visible units
       if (state.visibleUnits.isEmpty) {
-        state.visibleUnits = [
-          'square_meters',
-          'square_kilometers',
-          'square_centimeters',
-          'hectares',
-          'acres',
-          'square_feet'
-        ];
+        state.visibleUnits = ['square_meters', 'square_feet', 'square_inches'];
       }
 
       // Update state with validated data
@@ -228,6 +230,84 @@ class AreaStateService {
     } catch (e) {
       logError('AreaStateService: Error validating state: $e');
       return _getDefaultState();
+    }
+  }
+
+  /// Check if area converter state exists
+  static Future<bool> hasState() async {
+    try {
+      final settings = await SettingsService.getSettings();
+      if (!settings.featureStateSavingEnabled) {
+        return false;
+      }
+
+      Box<AreaStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<AreaStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<AreaStateModel>(_boxName);
+        shouldClose = true;
+      }
+
+      final hasData = box.containsKey(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      return hasData;
+    } catch (e) {
+      logError('AreaStateService: Error checking state existence: $e');
+      return false;
+    }
+  }
+
+  /// Get the size of area converter state data in bytes
+  static Future<int> getStateSize() async {
+    try {
+      final settings = await SettingsService.getSettings();
+      if (!settings.featureStateSavingEnabled) {
+        return 0;
+      }
+
+      Box<AreaStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<AreaStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<AreaStateModel>(_boxName);
+        shouldClose = true;
+      }
+
+      final stateData = box.get(_stateKey);
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      if (stateData == null) {
+        return 0;
+      }
+
+      // Estimate size based on data structure
+      if (stateData is AreaStateModel) {
+        int size = 0;
+        size += stateData.cards.length * 200; // Approximate size per card
+        size += stateData.visibleUnits.length * 20; // Approximate size per unit
+        size += 100; // Base overhead
+        return size;
+      } else if (stateData is Map) {
+        // Rough estimate for Map data
+        return stateData.toString().length * 2; // UTF-16 encoding estimate
+      }
+
+      return 0;
+    } catch (e) {
+      logError('AreaStateService: Error calculating state size: $e');
+      return 0;
     }
   }
 }

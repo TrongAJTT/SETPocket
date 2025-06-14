@@ -8,6 +8,9 @@ import 'converter_services/currency_preset_service.dart';
 import 'converter_services/currency_cache_service.dart';
 import 'converter_services/length_state_service.dart';
 import 'converter_services/mass_state_service.dart';
+import 'converter_services/weight_state_service.dart';
+import 'converter_services/area_state_service.dart';
+import 'converter_services/generic_preset_service.dart';
 
 class CacheInfo {
   final String name;
@@ -119,54 +122,103 @@ class CacheService {
 
     // Converter Tools Cache (includes currency and length states)
     try {
-      final presets = await CurrencyPresetService.loadPresets();
-      final cacheInfo = await CurrencyCacheService.getCacheInfo();
-      final hasState = await CurrencyStateService.hasState();
-      final stateSize = await CurrencyStateService.getStateSize();
-      final hasLengthState = await LengthStateService.hasState();
-      final lengthStateSize = await LengthStateService.getStateSize();
-
       int converterSize = 0;
       int converterCount = 0;
 
-      // Calculate preset size
+      // Currency presets
+      final presets = await CurrencyPresetService.loadPresets();
       for (final preset in presets) {
         converterSize +=
             preset.name.length * 2 + (preset.currencies.length * 6);
-        converterCount++;
+      }
+      if (presets.isNotEmpty) {
+        converterCount++; // Count as 1 item for currency presets
       }
 
-      // Add currency cache size
+      // Currency cache (exchange rates)
+      final cacheInfo = await CurrencyCacheService.getCacheInfo();
       if (cacheInfo != null) {
         converterSize +=
             cacheInfo.rates.length * 12; // Approximate size per rate
-        converterCount++;
+        converterCount++; // Count as 1 item for currency cache
       }
 
-      // Add currency state size
+      // Currency state
+      final hasState = await CurrencyStateService.hasState();
       if (hasState) {
+        final stateSize = await CurrencyStateService.getStateSize();
         converterSize += stateSize;
-        converterCount++;
+        converterCount++; // Count as 1 item for currency state
       }
 
-      // Add length state size
+      // Length state
+      final hasLengthState = await LengthStateService.hasState();
       if (hasLengthState) {
+        final lengthStateSize = await LengthStateService.getStateSize();
         converterSize += lengthStateSize;
-        converterCount++;
+        converterCount++; // Count as 1 item for length state
       }
 
-      // Add mass state size
+      // Length presets
+      final lengthPresets = await GenericPresetService.loadPresets('length');
+      if (lengthPresets.isNotEmpty) {
+        converterSize +=
+            (lengthPresets.length * 50).toInt(); // Approximate size per preset
+        converterCount++; // Count as 1 item for length presets
+      }
+
+      // Mass state
       final hasMassState = await MassStateService.hasState();
-      final massStateSize = await MassStateService.getStateSize();
       if (hasMassState) {
+        final massStateSize = await MassStateService.getStateSize();
         converterSize += massStateSize;
-        converterCount++;
+        converterCount++; // Count as 1 item for mass state
+      }
+
+      // Mass presets
+      final massPresets = await GenericPresetService.loadPresets('mass');
+      if (massPresets.isNotEmpty) {
+        converterSize +=
+            (massPresets.length * 50).toInt(); // Approximate size per preset
+        converterCount++; // Count as 1 item for mass presets
+      }
+
+      // Weight state
+      final hasWeightState = await WeightStateService.hasState();
+      if (hasWeightState) {
+        final weightStateSize = await WeightStateService.getStateSize();
+        converterSize += weightStateSize.toInt();
+        converterCount++; // Count as 1 item for weight state
+      }
+
+      // Weight presets
+      final weightPresets = await GenericPresetService.loadPresets('weight');
+      if (weightPresets.isNotEmpty) {
+        converterSize +=
+            (weightPresets.length * 50).toInt(); // Approximate size per preset
+        converterCount++; // Count as 1 item for weight presets
+      }
+
+      // Area state
+      final hasAreaState = await AreaStateService.hasState();
+      if (hasAreaState) {
+        final areaStateSize = await AreaStateService.getStateSize();
+        converterSize += areaStateSize.toInt();
+        converterCount++; // Count as 1 item for area state
+      }
+
+      // Area presets
+      final areaPresets = await GenericPresetService.loadPresets('area');
+      if (areaPresets.isNotEmpty) {
+        converterSize +=
+            (areaPresets.length * 50).toInt(); // Approximate size per preset
+        converterCount++; // Count as 1 item for area presets
       }
 
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -176,7 +228,7 @@ class CacheService {
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area states, presets and exchange rates cache',
         itemCount: 0,
         sizeBytes: 0,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -203,6 +255,14 @@ class CacheService {
       await CurrencyStateService.clearState();
       await LengthStateService.clearState();
       await MassStateService.clearState();
+      await WeightStateService.clearState();
+      await AreaStateService.clearState();
+
+      // Clear generic presets for all converter types
+      await GenericPresetService.clearAllPresets('length');
+      await GenericPresetService.clearAllPresets('mass');
+      await GenericPresetService.clearAllPresets('weight');
+      await GenericPresetService.clearAllPresets('area');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -220,12 +280,20 @@ class CacheService {
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
 
-    // Clear converter tools cache (includes states)
+    // Clear converter tools cache (includes states and presets)
     await CurrencyPresetService.clearAllPresets();
     await CurrencyCacheService.clearCache();
     await CurrencyStateService.clearState();
     await LengthStateService.clearState();
     await MassStateService.clearState();
+    await WeightStateService.clearState();
+    await AreaStateService.clearState();
+
+    // Clear generic presets for all converter types
+    await GenericPresetService.clearAllPresets('length');
+    await GenericPresetService.clearAllPresets('mass');
+    await GenericPresetService.clearAllPresets('weight');
+    await GenericPresetService.clearAllPresets('area');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};

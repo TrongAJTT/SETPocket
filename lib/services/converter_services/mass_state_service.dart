@@ -197,8 +197,28 @@ class MassStateService {
   /// Check if saved state exists
   static Future<bool> hasState() async {
     try {
-      final box = await _getBox();
-      return box.containsKey('current_state');
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        return false;
+      }
+
+      Box box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box(_boxName);
+      } else {
+        box = await Hive.openBox(_boxName);
+        shouldClose = true;
+      }
+
+      final hasData = box.containsKey('current_state');
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      return hasData;
     } catch (e) {
       logError('MassStateService: Error checking state: $e');
       return false;
@@ -208,16 +228,36 @@ class MassStateService {
   /// Get state size for cache management
   static Future<int> getStateSize() async {
     try {
-      final box = await _getBox();
+      final enabled = await _isFeatureStateSavingEnabled();
+      if (!enabled) {
+        return 0;
+      }
+
+      Box box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box(_boxName);
+      } else {
+        box = await Hive.openBox(_boxName);
+        shouldClose = true;
+      }
+
       final state = box.get('current_state');
-      if (state == null) return 0;
 
-      // Rough estimation: each card = ~100 bytes, each visible unit = ~20 bytes
-      int size = state.cards.length * 100;
-      size += state.visibleUnits.length * 20;
-      size += 50; // metadata overhead
+      if (shouldClose) {
+        await box.close();
+      }
 
-      return size;
+      if (state != null && state is MassStateModel) {
+        // Rough estimation: each card = ~100 bytes, each visible unit = ~20 bytes
+        int size = state.cards.length * 100;
+        size += state.visibleUnits.length * 20;
+        size += 50; // metadata overhead
+        return size;
+      }
+
+      return 0;
     } catch (e) {
       logError('MassStateService: Error calculating state size: $e');
       return 0;

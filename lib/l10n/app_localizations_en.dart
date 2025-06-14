@@ -719,6 +719,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetLayout => 'Reset Layout';
 
   @override
+  String get confirmResetLayout => 'Confirm Reset Layout';
+
+  @override
+  String get confirmResetLayoutMessage => 'Are you sure you want to reset the layout? This will remove all cards and restore default settings.';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
   String get customizeCurrencies => 'Customize Currencies';
 
   @override

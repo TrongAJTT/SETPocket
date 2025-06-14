@@ -182,14 +182,31 @@ class WeightStateService {
     }
   }
 
-  /// Clear saved weight state
+  /// Clear weight converter state
   static Future<void> clearState() async {
     try {
-      final box = await _getBox();
+      logInfo('WeightStateService: Clearing weight converter state');
+
+      Box<WeightStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<WeightStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<WeightStateModel>(_boxName);
+        shouldClose = true;
+      }
+
       await box.delete('current_state');
-      logInfo('WeightStateService: Cleared saved state');
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      logInfo('WeightStateService: Successfully cleared state');
     } catch (e) {
       logError('WeightStateService: Error clearing state: $e');
+      rethrow;
     }
   }
 
@@ -216,6 +233,145 @@ class WeightStateService {
       logInfo('WeightStateService: Force cleared all cache data');
     } catch (e) {
       logError('WeightStateService: Error force clearing cache: $e');
+    }
+  }
+
+  /// Get default weight converter state
+  static WeightStateModel _getDefaultState() {
+    return WeightStateModel(
+      cards: [
+        WeightCardState(
+          unitCode: 'newtons',
+          amount: 1.0,
+          name: 'Card 1',
+          visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
+          createdAt: DateTime.now(),
+        ),
+      ],
+      visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
+      lastUpdated: DateTime.now(),
+      isFocusMode: false,
+      viewMode: 'cards',
+    );
+  }
+
+  /// Validate and migrate state data
+  static WeightStateModel _validateAndMigrateState(WeightStateModel state) {
+    try {
+      // Ensure all cards have required fields
+      final validCards = <WeightCardState>[];
+      for (final card in state.cards) {
+        if (card.unitCode.isNotEmpty && card.amount.isFinite) {
+          // Ensure card has visible units
+          if (card.visibleUnits == null || card.visibleUnits!.isEmpty) {
+            card.visibleUnits = ['newtons', 'kilogram_force', 'pound_force'];
+          }
+
+          // Ensure card has a name
+          if (card.name == null || card.name!.isEmpty) {
+            card.name = 'Card ${validCards.length + 1}';
+          }
+
+          validCards.add(card);
+        }
+      }
+
+      // Ensure at least one card exists
+      if (validCards.isEmpty) {
+        validCards.add(WeightCardState(
+          unitCode: 'newtons',
+          amount: 1.0,
+          name: 'Card 1',
+          visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
+          createdAt: DateTime.now(),
+        ));
+      }
+
+      // Ensure global visible units
+      if (state.visibleUnits.isEmpty) {
+        state.visibleUnits = ['newtons', 'kilogram_force', 'pound_force'];
+      }
+
+      // Update state with validated data
+      state.cards = validCards;
+
+      logInfo(
+          'WeightStateService: State validation completed with ${validCards.length} valid cards');
+      return state;
+    } catch (e) {
+      logError('WeightStateService: Error validating state: $e');
+      return _getDefaultState();
+    }
+  }
+
+  /// Check if weight converter state exists
+  static Future<bool> hasState() async {
+    try {
+      final settings = await SettingsService.getSettings();
+      if (!settings.featureStateSavingEnabled) {
+        return false;
+      }
+
+      Box<WeightStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<WeightStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<WeightStateModel>(_boxName);
+        shouldClose = true;
+      }
+
+      final hasData = box.containsKey('current_state');
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      return hasData;
+    } catch (e) {
+      logError('WeightStateService: Error checking state existence: $e');
+      return false;
+    }
+  }
+
+  /// Get the size of weight converter state data in bytes
+  static Future<int> getStateSize() async {
+    try {
+      final settings = await SettingsService.getSettings();
+      if (!settings.featureStateSavingEnabled) {
+        return 0;
+      }
+
+      Box<WeightStateModel> box;
+      bool shouldClose = false;
+
+      if (Hive.isBoxOpen(_boxName)) {
+        box = Hive.box<WeightStateModel>(_boxName);
+      } else {
+        box = await Hive.openBox<WeightStateModel>(_boxName);
+        shouldClose = true;
+      }
+
+      final stateData = box.get('current_state');
+
+      if (shouldClose) {
+        await box.close();
+      }
+
+      if (stateData == null) {
+        return 0;
+      }
+
+      // Estimate size based on data structure
+      int size = 0;
+      size += stateData.cards.length * 200; // Approximate size per card
+      size += stateData.visibleUnits.length * 20; // Approximate size per unit
+      size += 100; // Base overhead
+      return size;
+    } catch (e) {
+      logError('WeightStateService: Error calculating state size: $e');
+      return 0;
     }
   }
 }

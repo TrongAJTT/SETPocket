@@ -15,6 +15,7 @@ import 'package:setpocket/models/converter_models/weight_state_model.dart';
 import 'package:setpocket/models/converter_models/area_state_model.dart';
 import 'package:setpocket/models/converter_models/time_state_model.dart';
 import 'package:setpocket/models/converter_models/volume_state_model.dart';
+import 'package:setpocket/models/converter_models/number_system_state_model.dart';
 
 class HiveService {
   // Box names
@@ -111,6 +112,12 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(27)) {
         Hive.registerAdapter(VolumeStateModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(28)) {
+        Hive.registerAdapter(NumberSystemCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(29)) {
+        Hive.registerAdapter(NumberSystemStateModelAdapter());
       }
 
       // Open boxes

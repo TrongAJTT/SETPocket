@@ -1368,16 +1368,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bits => 'Bits';
 
   @override
-  String get decimal => 'Decimal';
+  String get decimal => 'Decimal (Base 10)';
 
   @override
-  String get binary => 'Binary';
+  String get binary => 'Binary (Base 2)';
 
   @override
-  String get octal => 'Octal';
+  String get octal => 'Octal (Base 8)';
 
   @override
-  String get hexadecimal => 'Hexadecimal';
+  String get hexadecimal => 'Hexadecimal (Base 16)';
 
   @override
   String get usd => 'US Dollar';
@@ -1428,7 +1428,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataConverterDesc => 'Convert between different units of data storage';
 
   @override
-  String get numberSystemConverterDesc => 'Convert between different number systems';
+  String get numberSystemConverterDesc => 'Convert between number systems (binary, decimal, hexadecimal, etc.)';
 
   @override
   String get fromUnit => 'From Unit';
@@ -2520,4 +2520,91 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get barrel => 'Barrel (Oil)';
+
+  @override
+  String get numberSystemConverterDetailedInfo => 'Number System Converter - Detailed Information';
+
+  @override
+  String get numberSystemConverterOverview => 'This precision number system converter supports multiple base systems with high accuracy calculations for programming, computer science, and mathematical applications.';
+
+  @override
+  String get step1NumberSystem => 'Step 1: Add Cards';
+
+  @override
+  String get step1NumberSystemDesc => 'Add multiple converter cards to work with different number base values simultaneously.';
+
+  @override
+  String get step2NumberSystem => 'Step 2: Select Bases';
+
+  @override
+  String get step2NumberSystemDesc => 'Choose which number bases to display from binary, decimal, hexadecimal, and other systems.';
+
+  @override
+  String get step3NumberSystem => 'Step 3: Enter Values';
+
+  @override
+  String get step3NumberSystemDesc => 'Type any number value and see instant conversions to all other base systems.';
+
+  @override
+  String get step4NumberSystem => 'Step 4: Organize Layout';
+
+  @override
+  String get step4NumberSystemDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1NumberSystem => '• Decimal (Base 10) is the standard counting system with highest precision';
+
+  @override
+  String get tip2NumberSystem => '• Binary (Base 2) is fundamental for computer science and digital electronics';
+
+  @override
+  String get tip3NumberSystem => '• Hexadecimal (Base 16) is commonly used in programming and memory addressing';
+
+  @override
+  String get tip4NumberSystem => '• Octal (Base 8) was historically important in computing systems';
+
+  @override
+  String get tip5NumberSystem => '• Base 32 and Base 64 are used for data encoding and transmission';
+
+  @override
+  String get tip6NumberSystem => '• Focus mode helps concentrate on complex base calculations';
+
+  @override
+  String get numberSystemUnitCategories => 'Base Systems';
+
+  @override
+  String get commonBasesDesc => 'Binary (Base 2), Decimal (Base 10), Hexadecimal (Base 16) - most frequently used in computing and mathematics.';
+
+  @override
+  String get lessCommonBasesDesc => 'Octal (Base 8), Base 32, Base 64 - specialized applications in programming and data encoding.';
+
+  @override
+  String get uncommonBasesDesc => 'Base 128, Base 256 - for advanced data representation and specialized algorithms.';
+
+  @override
+  String get practicalApplicationsNumberSystemDesc => 'Essential for computer programming, digital electronics, cryptography, data encoding, memory addressing, and any application requiring number base conversions.';
+
+  @override
+  String get numberSystemConverterInfo => 'Number System Converter Information';
+
+  @override
+  String get customizeNumberSystemBases => 'Customize Number System Bases';
+
+  @override
+  String get selectNumberSystemBases => 'Select number bases to display';
+
+  @override
+  String get numberSystemBases => 'Number Bases';
+
+  @override
+  String get base32 => 'Base 32';
+
+  @override
+  String get base64 => 'Base 64';
+
+  @override
+  String get base128 => 'Base 128';
+
+  @override
+  String get base256 => 'Base 256';
 }

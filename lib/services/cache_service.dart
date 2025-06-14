@@ -12,6 +12,7 @@ import 'converter_services/weight_state_service.dart';
 import 'converter_services/area_state_service.dart';
 import 'converter_services/time_state_service.dart';
 import 'converter_services/volume_state_service.dart';
+import 'converter_services/number_system_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'package:hive/hive.dart';
 
@@ -315,10 +316,38 @@ class CacheService {
         // Continue without volume presets info
       }
 
+      // Number system state
+      try {
+        final hasNumberSystemState = await NumberSystemStateService.hasState();
+        if (hasNumberSystemState) {
+          final numberSystemStateSize =
+              await NumberSystemStateService.getStateSize();
+          converterSize += numberSystemStateSize;
+          converterCount++; // Count as 1 item for number system state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking number system state: $e');
+        // Continue without number system state info
+      }
+
+      // Number system presets
+      try {
+        final numberSystemPresets =
+            await GenericPresetService.loadPresets('number_system');
+        if (numberSystemPresets.isNotEmpty) {
+          converterSize += (numberSystemPresets.length * 50)
+              .toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for number system presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking number system presets: $e');
+        // Continue without number system presets info
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area/time/volume states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time/volume/number_system states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -366,6 +395,7 @@ class CacheService {
       await AreaStateService.clearState();
       await TimeStateService.clearState();
       await VolumeStateService.clearState();
+      await NumberSystemStateService.clearState();
 
       // Clear generic presets for all converter types
       await GenericPresetService.clearAllPresets('length');
@@ -374,6 +404,7 @@ class CacheService {
       await GenericPresetService.clearAllPresets('area');
       await GenericPresetService.clearAllPresets('time');
       await GenericPresetService.clearAllPresets('volume');
+      await GenericPresetService.clearAllPresets('number_system');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -408,6 +439,7 @@ class CacheService {
     await AreaStateService.clearState();
     await TimeStateService.clearState();
     await VolumeStateService.clearState();
+    await NumberSystemStateService.clearState();
 
     // Clear generic presets for all converter types
     await GenericPresetService.clearAllPresets('length');
@@ -416,6 +448,7 @@ class CacheService {
     await GenericPresetService.clearAllPresets('area');
     await GenericPresetService.clearAllPresets('time');
     await GenericPresetService.clearAllPresets('volume');
+    await GenericPresetService.clearAllPresets('number_system');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
@@ -460,6 +493,7 @@ class CacheService {
       'area_converter_state',
       'time_state',
       'volume_state',
+      'number_system_state',
       'currency_presets',
       'generic_length_presets',
       'generic_mass_presets',
@@ -467,6 +501,7 @@ class CacheService {
       'generic_area_presets',
       'generic_time_presets',
       'generic_volume_presets',
+      'generic_number_system_presets',
       'currency_cache',
     ];
 

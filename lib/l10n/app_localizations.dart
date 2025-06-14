@@ -2636,25 +2636,25 @@ abstract class AppLocalizations {
   /// No description provided for @decimal.
   ///
   /// In en, this message translates to:
-  /// **'Decimal'**
+  /// **'Decimal (Base 10)'**
   String get decimal;
 
   /// No description provided for @binary.
   ///
   /// In en, this message translates to:
-  /// **'Binary'**
+  /// **'Binary (Base 2)'**
   String get binary;
 
   /// No description provided for @octal.
   ///
   /// In en, this message translates to:
-  /// **'Octal'**
+  /// **'Octal (Base 8)'**
   String get octal;
 
   /// No description provided for @hexadecimal.
   ///
   /// In en, this message translates to:
-  /// **'Hexadecimal'**
+  /// **'Hexadecimal (Base 16)'**
   String get hexadecimal;
 
   /// No description provided for @usd.
@@ -2756,7 +2756,7 @@ abstract class AppLocalizations {
   /// No description provided for @numberSystemConverterDesc.
   ///
   /// In en, this message translates to:
-  /// **'Convert between different number systems'**
+  /// **'Convert between number systems (binary, decimal, hexadecimal, etc.)'**
   String get numberSystemConverterDesc;
 
   /// No description provided for @fromUnit.
@@ -4852,6 +4852,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Barrel (Oil)'**
   String get barrel;
+
+  /// No description provided for @numberSystemConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Number System Converter - Detailed Information'**
+  String get numberSystemConverterDetailedInfo;
+
+  /// No description provided for @numberSystemConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision number system converter supports multiple base systems with high accuracy calculations for programming, computer science, and mathematical applications.'**
+  String get numberSystemConverterOverview;
+
+  /// No description provided for @step1NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1NumberSystem;
+
+  /// No description provided for @step1NumberSystemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different number base values simultaneously.'**
+  String get step1NumberSystemDesc;
+
+  /// No description provided for @step2NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Bases'**
+  String get step2NumberSystem;
+
+  /// No description provided for @step2NumberSystemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which number bases to display from binary, decimal, hexadecimal, and other systems.'**
+  String get step2NumberSystemDesc;
+
+  /// No description provided for @step3NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3NumberSystem;
+
+  /// No description provided for @step3NumberSystemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any number value and see instant conversions to all other base systems.'**
+  String get step3NumberSystemDesc;
+
+  /// No description provided for @step4NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4NumberSystem;
+
+  /// No description provided for @step4NumberSystemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4NumberSystemDesc;
+
+  /// No description provided for @tip1NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'• Decimal (Base 10) is the standard counting system with highest precision'**
+  String get tip1NumberSystem;
+
+  /// No description provided for @tip2NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'• Binary (Base 2) is fundamental for computer science and digital electronics'**
+  String get tip2NumberSystem;
+
+  /// No description provided for @tip3NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'• Hexadecimal (Base 16) is commonly used in programming and memory addressing'**
+  String get tip3NumberSystem;
+
+  /// No description provided for @tip4NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'• Octal (Base 8) was historically important in computing systems'**
+  String get tip4NumberSystem;
+
+  /// No description provided for @tip5NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'• Base 32 and Base 64 are used for data encoding and transmission'**
+  String get tip5NumberSystem;
+
+  /// No description provided for @tip6NumberSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex base calculations'**
+  String get tip6NumberSystem;
+
+  /// No description provided for @numberSystemUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Base Systems'**
+  String get numberSystemUnitCategories;
+
+  /// No description provided for @commonBasesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Binary (Base 2), Decimal (Base 10), Hexadecimal (Base 16) - most frequently used in computing and mathematics.'**
+  String get commonBasesDesc;
+
+  /// No description provided for @lessCommonBasesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Octal (Base 8), Base 32, Base 64 - specialized applications in programming and data encoding.'**
+  String get lessCommonBasesDesc;
+
+  /// No description provided for @uncommonBasesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Base 128, Base 256 - for advanced data representation and specialized algorithms.'**
+  String get uncommonBasesDesc;
+
+  /// No description provided for @practicalApplicationsNumberSystemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for computer programming, digital electronics, cryptography, data encoding, memory addressing, and any application requiring number base conversions.'**
+  String get practicalApplicationsNumberSystemDesc;
+
+  /// No description provided for @numberSystemConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Number System Converter Information'**
+  String get numberSystemConverterInfo;
+
+  /// No description provided for @customizeNumberSystemBases.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Number System Bases'**
+  String get customizeNumberSystemBases;
+
+  /// No description provided for @selectNumberSystemBases.
+  ///
+  /// In en, this message translates to:
+  /// **'Select number bases to display'**
+  String get selectNumberSystemBases;
+
+  /// No description provided for @numberSystemBases.
+  ///
+  /// In en, this message translates to:
+  /// **'Number Bases'**
+  String get numberSystemBases;
+
+  /// No description provided for @base32.
+  ///
+  /// In en, this message translates to:
+  /// **'Base 32'**
+  String get base32;
+
+  /// No description provided for @base64.
+  ///
+  /// In en, this message translates to:
+  /// **'Base 64'**
+  String get base64;
+
+  /// No description provided for @base128.
+  ///
+  /// In en, this message translates to:
+  /// **'Base 128'**
+  String get base128;
+
+  /// No description provided for @base256.
+  ///
+  /// In en, this message translates to:
+  /// **'Base 256'**
+  String get base256;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

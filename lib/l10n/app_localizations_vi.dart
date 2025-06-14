@@ -1368,16 +1368,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bits => 'Bit';
 
   @override
-  String get decimal => 'Thập phân';
+  String get decimal => 'Thập phân (Cơ số 10)';
 
   @override
-  String get binary => 'Nhị phân';
+  String get binary => 'Nhị phân (Cơ số 2)';
 
   @override
-  String get octal => 'Bát phân';
+  String get octal => 'Bát phân (Cơ số 8)';
 
   @override
-  String get hexadecimal => 'Thập lục phân';
+  String get hexadecimal => 'Thập lục phân (Cơ số 16)';
 
   @override
   String get usd => 'Đô la Mỹ';
@@ -1428,7 +1428,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dataConverterDesc => 'Chuyển đổi giữa các đơn vị lưu trữ dữ liệu khác nhau';
 
   @override
-  String get numberSystemConverterDesc => 'Chuyển đổi giữa các hệ đếm khác nhau';
+  String get numberSystemConverterDesc => 'Chuyển đổi giữa các hệ cơ số (nhị phân, thập phân, thập lục phân, v.v.)';
 
   @override
   String get fromUnit => 'Từ đơn vị';
@@ -2520,4 +2520,91 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get barrel => 'Thùng (Dầu)';
+
+  @override
+  String get numberSystemConverterDetailedInfo => 'Bộ Chuyển Đổi Hệ Số - Thông Tin Chi Tiết';
+
+  @override
+  String get numberSystemConverterOverview => 'Bộ chuyển đổi hệ số chính xác này hỗ trợ nhiều hệ cơ số với tính toán độ chính xác cao cho ứng dụng lập trình, khoa học máy tính và toán học.';
+
+  @override
+  String get step1NumberSystem => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1NumberSystemDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị hệ cơ số khác nhau cùng lúc.';
+
+  @override
+  String get step2NumberSystem => 'Bước 2: Chọn Hệ Cơ Số';
+
+  @override
+  String get step2NumberSystemDesc => 'Chọn hệ cơ số nào hiển thị từ nhị phân, thập phân, thập lục phân và các hệ khác.';
+
+  @override
+  String get step3NumberSystem => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3NumberSystemDesc => 'Nhập bất kỳ giá trị số nào và xem chuyển đổi tức thì sang tất cả hệ cơ số khác.';
+
+  @override
+  String get step4NumberSystem => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4NumberSystemDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1NumberSystem => '• Thập phân (Cơ số 10) là hệ đếm tiêu chuẩn với độ chính xác cao nhất';
+
+  @override
+  String get tip2NumberSystem => '• Nhị phân (Cơ số 2) là cơ bản cho khoa học máy tính và điện tử số';
+
+  @override
+  String get tip3NumberSystem => '• Thập lục phân (Cơ số 16) thường được sử dụng trong lập trình và địa chỉ bộ nhớ';
+
+  @override
+  String get tip4NumberSystem => '• Bát phân (Cơ số 8) có tầm quan trọng lịch sử trong hệ thống máy tính';
+
+  @override
+  String get tip5NumberSystem => '• Cơ số 32 và Cơ số 64 được sử dụng để mã hóa và truyền dữ liệu';
+
+  @override
+  String get tip6NumberSystem => '• Chế độ tập trung giúp tập trung vào các phép tính cơ số phức tạp';
+
+  @override
+  String get numberSystemUnitCategories => 'Hệ Cơ Số';
+
+  @override
+  String get commonBasesDesc => 'Nhị phân (Cơ số 2), Thập phân (Cơ số 10), Thập lục phân (Cơ số 16) - được sử dụng thường xuyên nhất trong máy tính và toán học.';
+
+  @override
+  String get lessCommonBasesDesc => 'Bát phân (Cơ số 8), Cơ số 32, Cơ số 64 - ứng dụng chuyên biệt trong lập trình và mã hóa dữ liệu.';
+
+  @override
+  String get uncommonBasesDesc => 'Cơ số 128, Cơ số 256 - cho biểu diễn dữ liệu nâng cao và thuật toán chuyên biệt.';
+
+  @override
+  String get practicalApplicationsNumberSystemDesc => 'Thiết yếu cho lập trình máy tính, điện tử số, mật mã học, mã hóa dữ liệu, địa chỉ bộ nhớ và bất kỳ ứng dụng nào yêu cầu chuyển đổi hệ cơ số.';
+
+  @override
+  String get numberSystemConverterInfo => 'Thông tin Chuyển đổi Hệ Số';
+
+  @override
+  String get customizeNumberSystemBases => 'Tùy chỉnh Hệ Cơ Số';
+
+  @override
+  String get selectNumberSystemBases => 'Chọn hệ cơ số để hiển thị';
+
+  @override
+  String get numberSystemBases => 'Hệ Cơ Số';
+
+  @override
+  String get base32 => 'Cơ số 32';
+
+  @override
+  String get base64 => 'Cơ số 64';
+
+  @override
+  String get base128 => 'Cơ số 128';
+
+  @override
+  String get base256 => 'Cơ số 256';
 }

@@ -58,6 +58,7 @@ class MassConverterService extends ConverterServiceBase {
   @override
   Set<String> get defaultVisibleUnits => {
         'kilograms',
+        'grams',
         'pounds',
         'ounces',
       };

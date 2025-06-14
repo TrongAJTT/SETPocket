@@ -29,7 +29,8 @@ class NumberSystemCardState extends HiveObject {
       'unitCode': unitCode,
       'amount': amount,
       'name': name ?? 'Card 1',
-      'visibleUnits': visibleUnits ?? ['binary', 'decimal', 'hexadecimal'],
+      'visibleUnits':
+          visibleUnits ?? ['binary', 'octal', 'decimal', 'hexadecimal'],
     };
   }
 
@@ -42,7 +43,7 @@ class NumberSystemCardState extends HiveObject {
       visibleUnits: (json['visibleUnits'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
-          ['binary', 'decimal', 'hexadecimal'],
+          ['binary', 'octal', 'decimal', 'hexadecimal'],
     );
   }
 
@@ -90,16 +91,14 @@ class NumberSystemStateModel extends HiveObject {
           unitCode: 'decimal',
           amount: 255,
           name: 'Card 1',
-          visibleUnits: ['binary', 'decimal', 'hexadecimal'],
+          visibleUnits: ['binary', 'octal', 'decimal', 'hexadecimal'],
         ),
       ],
       globalVisibleUnits: [
         'binary',
+        'octal',
         'decimal',
         'hexadecimal',
-        'octal',
-        'base32',
-        'base64',
       ],
       isFocusMode: false,
       viewMode: 'cards',
@@ -128,7 +127,7 @@ class NumberSystemStateModel extends HiveObject {
               unitCode: 'decimal',
               amount: 255,
               name: 'Card 1',
-              visibleUnits: ['binary', 'decimal', 'hexadecimal'],
+              visibleUnits: ['binary', 'octal', 'decimal', 'hexadecimal'],
             ),
           ],
       globalVisibleUnits: (json['globalVisibleUnits'] as List<dynamic>?)
@@ -136,11 +135,9 @@ class NumberSystemStateModel extends HiveObject {
               .toList() ??
           [
             'binary',
+            'octal',
             'decimal',
             'hexadecimal',
-            'octal',
-            'base32',
-            'base64',
           ],
       isFocusMode: json['isFocusMode'] ?? false,
       viewMode: json['viewMode'] ?? 'cards',

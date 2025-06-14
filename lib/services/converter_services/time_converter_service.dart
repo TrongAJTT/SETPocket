@@ -10,7 +10,8 @@ class TimeConverterService implements ConverterServiceBase {
   String get displayName => 'Time Converter';
 
   @override
-  Set<String> get defaultVisibleUnits => {'seconds', 'minutes', 'hours'};
+  Set<String> get defaultVisibleUnits =>
+      {'seconds', 'minutes', 'hours', 'days'};
 
   @override
   List<ConverterUnit> get units {

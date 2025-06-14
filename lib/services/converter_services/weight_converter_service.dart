@@ -61,9 +61,6 @@ class WeightConverterService extends ConverterServiceBase {
         'newtons',
         'kilogram_force',
         'pound_force',
-        'dyne',
-        'kilopond',
-        'gram_force',
       };
 
   @override

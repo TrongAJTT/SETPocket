@@ -70,9 +70,6 @@ class WeightStateModel extends HiveObject {
             'newtons',
             'kilogram_force',
             'pound_force',
-            'dyne',
-            'kilopond',
-            'gram_force'
           ],
         ),
       ],
@@ -80,9 +77,6 @@ class WeightStateModel extends HiveObject {
         'newtons',
         'kilogram_force',
         'pound_force',
-        'dyne',
-        'kilopond',
-        'gram_force'
       ],
       lastUpdated: DateTime.now(),
       isFocusMode: false,

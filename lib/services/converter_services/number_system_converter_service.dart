@@ -294,11 +294,9 @@ class NumberSystemConverterService extends ConverterServiceBase {
   @override
   Set<String> get defaultVisibleUnits => {
         'binary',
+        'octal',
         'decimal',
         'hexadecimal',
-        'octal',
-        'base32',
-        'base64',
       };
 
   @override

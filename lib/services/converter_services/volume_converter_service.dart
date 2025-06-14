@@ -59,7 +59,6 @@ class VolumeConverterService extends ConverterServiceBase {
   Set<String> get defaultVisibleUnits => {
         'cubic_meter',
         'liter',
-        'milliliter',
       };
 
   @override

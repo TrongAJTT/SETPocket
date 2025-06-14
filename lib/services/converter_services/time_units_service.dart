@@ -158,7 +158,8 @@ class TimeUnitsService {
   static List<String> get categories => ['common', 'less_common', 'uncommon'];
 
   /// Get default visible units
-  static Set<String> get defaultVisibleUnits => {'seconds', 'minutes', 'hours'};
+  static Set<String> get defaultVisibleUnits =>
+      {'seconds', 'minutes', 'hours', 'days'};
 
   /// Check if unit exists
   static bool hasUnit(String unitId) {

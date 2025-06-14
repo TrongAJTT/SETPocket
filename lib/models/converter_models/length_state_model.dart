@@ -29,8 +29,7 @@ class LengthCardState extends HiveObject {
       'unitCode': unitCode,
       'amount': amount,
       'name': name ?? 'Card 1',
-      'visibleUnits': visibleUnits ??
-          ['meter', 'kilometer', 'centimeter', 'millimeter', 'inch', 'foot'],
+      'visibleUnits': visibleUnits ?? ['meter', 'inch', 'foot', 'yard'],
     };
   }
 
@@ -81,26 +80,18 @@ class LengthStateModel extends HiveObject {
           amount: 1.0,
           name: 'Card 1',
           visibleUnits: [
-            'kilometer',
             'meter',
-            'centimeter',
-            'millimeter',
             'inch',
             'foot',
             'yard',
-            'mile'
           ],
         ),
       ],
       visibleUnits: [
-        'kilometer',
         'meter',
-        'centimeter',
-        'millimeter',
         'inch',
         'foot',
         'yard',
-        'mile'
       ],
       lastUpdated: DateTime.now(),
       isFocusMode: false,

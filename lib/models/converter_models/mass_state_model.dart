@@ -33,7 +33,8 @@ class MassCardState extends HiveObject {
       'unitCode': unitCode,
       'amount': amount,
       'name': name ?? 'Card 1',
-      'visibleUnits': visibleUnits ?? ['kilograms', 'pounds', 'ounces'],
+      'visibleUnits':
+          visibleUnits ?? ['kilograms', 'grams', 'pounds', 'ounces'],
       'createdAt': createdAt?.toIso8601String(),
     };
   }
@@ -94,21 +95,17 @@ class MassStateModel extends HiveObject {
           name: 'Card 1',
           visibleUnits: [
             'kilograms',
+            'grams',
             'pounds',
             'ounces',
-            'grams',
-            'tonnes',
-            'stones'
           ],
         ),
       ],
       visibleUnits: [
         'kilograms',
+        'grams',
         'pounds',
         'ounces',
-        'grams',
-        'tonnes',
-        'stones'
       ],
       lastUpdated: DateTime.now(),
       isFocusMode: false,

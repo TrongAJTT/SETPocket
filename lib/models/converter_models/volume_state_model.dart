@@ -29,7 +29,7 @@ class VolumeCardState extends HiveObject {
       'unitCode': unitCode,
       'amount': amount,
       'name': name ?? 'Card 1',
-      'visibleUnits': visibleUnits ?? ['cubic_meter', 'liter', 'milliliter'],
+      'visibleUnits': visibleUnits ?? ['cubic_meter', 'liter'],
     };
   }
 
@@ -82,24 +82,12 @@ class VolumeStateModel extends HiveObject {
           visibleUnits: [
             'cubic_meter',
             'liter',
-            'milliliter',
-            'cubic_centimeter',
-            'hectoliter',
-            'gallon_us',
-            'gallon_uk',
-            'cubic_foot'
           ],
         ),
       ],
       visibleUnits: [
         'cubic_meter',
         'liter',
-        'milliliter',
-        'cubic_centimeter',
-        'hectoliter',
-        'gallon_us',
-        'gallon_uk',
-        'cubic_foot'
       ],
       lastUpdated: DateTime.now(),
       isFocusMode: false,

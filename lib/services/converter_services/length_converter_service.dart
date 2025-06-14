@@ -57,11 +57,7 @@ class LengthConverterService extends ConverterServiceBase {
 
   @override
   Set<String> get defaultVisibleUnits => {
-        'kilometer',
-        'mile',
         'meter',
-        'centimeter',
-        'millimeter',
         'inch',
         'foot',
         'yard',

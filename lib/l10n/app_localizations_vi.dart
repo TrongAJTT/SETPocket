@@ -883,9 +883,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get presetNameRequired => 'Tên cấu hình là bắt buộc';
 
   @override
-  String presetSaved(String name) {
-    return 'Đã lưu cấu hình: $name';
-  }
+  String get presetSaved => 'Đã lưu cấu hình thành công';
 
   @override
   String get presetLoaded => 'Cấu hình đã được tải thành công';

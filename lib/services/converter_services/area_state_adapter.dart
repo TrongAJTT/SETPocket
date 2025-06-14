@@ -80,7 +80,7 @@ class AreaStateAdapter implements ConverterStateService {
       logError('AreaStateAdapter: Error loading state: $e');
 
       // Return default state on error
-      return ConverterState(
+      return const ConverterState(
         cards: [
           ConverterCardState(
             name: 'Card 1',

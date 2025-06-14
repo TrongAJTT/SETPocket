@@ -4,7 +4,6 @@ import 'dart:async';
 import '../../controllers/converter_controller.dart';
 import '../../models/converter_models/converter_base.dart';
 import '../../l10n/app_localizations.dart';
-import 'unit_customization_dialog.dart' as unit_dialog;
 import 'generic_unit_custom_dialog.dart';
 
 class ConverterCardWidget extends StatefulWidget {

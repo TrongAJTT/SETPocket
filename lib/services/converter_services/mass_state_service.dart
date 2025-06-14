@@ -249,7 +249,7 @@ class MassStateService {
         await box.close();
       }
 
-      if (state != null && state is MassStateModel) {
+      if (state != null) {
         // Rough estimation: each card = ~100 bytes, each visible unit = ~20 bytes
         int size = state.cards.length * 100;
         size += state.visibleUnits.length * 20;

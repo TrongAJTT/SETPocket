@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import 'dart:math' as math;
 
 class ScientificCalculatorScreen extends StatefulWidget {
@@ -163,8 +163,8 @@ class _ScientificCalculatorScreenState
       // Handle special functions and constants
       expression = _preprocessExpression(expression);
 
-      Parser p = Parser();
-      Expression exp = p.parse(expression);
+      ShuntingYardParser parser = ShuntingYardParser();
+      Expression exp = parser.parse(expression);
       ContextModel cm = ContextModel();
 
       double result = exp.evaluate(EvaluationType.REAL, cm);
@@ -210,20 +210,20 @@ class _ScientificCalculatorScreenState
 
   String _convertTrigToRadians(String expression) {
     // Convert degrees to radians for trig functions
-    final degToRad = math.pi / 180;
+    const degToRad = math.pi / 180;
 
     // This is a simplified conversion - in a real app you'd want more robust parsing
     expression = expression.replaceAllMapped(
       RegExp(r'sin\(([^)]+)\)'),
-      (match) => 'sin(${match.group(1)} * ${degToRad})',
+      (match) => 'sin(${match.group(1)} * $degToRad)',
     );
     expression = expression.replaceAllMapped(
       RegExp(r'cos\(([^)]+)\)'),
-      (match) => 'cos(${match.group(1)} * ${degToRad})',
+      (match) => 'cos(${match.group(1)} * $degToRad)',
     );
     expression = expression.replaceAllMapped(
       RegExp(r'tan\(([^)]+)\)'),
-      (match) => 'tan(${match.group(1)} * ${degToRad})',
+      (match) => 'tan(${match.group(1)} * $degToRad)',
     );
 
     return expression;
@@ -313,7 +313,7 @@ class _ScientificCalculatorScreenState
                               .textTheme
                               .bodyMedium
                               ?.color
-                              ?.withOpacity(0.6),
+                              ?.withValues(alpha: 0.6),
                         ),
                   ),
                 Text(
@@ -411,7 +411,7 @@ class _ScientificCalculatorScreenState
       buttonColor = Theme.of(context).primaryColor;
       textColor = Colors.white;
     } else if (_isOperator(text) || ['+', '-', '*', '/', '='].contains(text)) {
-      buttonColor = Theme.of(context).primaryColor.withOpacity(0.1);
+      buttonColor = Theme.of(context).primaryColor.withValues(alpha: 0.1);
       textColor = Theme.of(context).primaryColor;
     } else if (text == '2nd' && _showSecondaryFunctions) {
       buttonColor = Theme.of(context).primaryColor;

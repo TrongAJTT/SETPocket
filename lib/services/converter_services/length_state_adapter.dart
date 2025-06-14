@@ -1,3 +1,5 @@
+import 'package:setpocket/services/app_logger.dart';
+
 import '../converter_services/converter_service_base.dart';
 import '../converter_services/length_state_service.dart';
 import '../../models/converter_models/converter_base.dart';
@@ -7,10 +9,11 @@ import '../../models/converter_models/length_state_model.dart';
 class LengthStateAdapter implements ConverterStateService {
   @override
   Future<void> saveState(String converterType, ConverterState state) async {
-    print('LengthStateAdapter: Saving state with ${state.cards.length} cards');
-    print(
+    logInfo(
+        'LengthStateAdapter: Saving state with ${state.cards.length} cards');
+    logInfo(
         'LengthStateAdapter: Global visible units: ${state.globalVisibleUnits}');
-    print(
+    logInfo(
         'LengthStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
     // Convert ConverterState to LengthStateModel
@@ -29,11 +32,11 @@ class LengthStateAdapter implements ConverterStateService {
       viewMode: state.viewMode.name,
     );
 
-    print(
+    logInfo(
         'LengthStateAdapter: Converted to LengthStateModel with ${lengthState.cards.length} cards');
     for (int i = 0; i < lengthState.cards.length; i++) {
       final card = lengthState.cards[i];
-      print(
+      logInfo(
           'LengthStateAdapter: Card $i - Name: ${card.name}, Unit: ${card.unitCode}, Amount: ${card.amount}, VisibleUnits: ${card.visibleUnits?.length ?? 0}');
     }
 
@@ -43,14 +46,14 @@ class LengthStateAdapter implements ConverterStateService {
   @override
   Future<ConverterState> loadState(String converterType) async {
     try {
-      print('LengthStateAdapter: Loading state for $converterType');
+      logInfo('LengthStateAdapter: Loading state for $converterType');
       final lengthState = await LengthStateService.loadState();
 
-      print(
+      logInfo(
           'LengthStateAdapter: Loaded LengthStateModel with ${lengthState.cards.length} cards');
-      print(
+      logInfo(
           'LengthStateAdapter: Global visible units from loaded state: ${lengthState.visibleUnits}');
-      print(
+      logInfo(
           'LengthStateAdapter: Focus mode: ${lengthState.isFocusMode}, View mode: ${lengthState.viewMode}');
 
       // Convert LengthStateModel to ConverterState
@@ -72,7 +75,7 @@ class LengthStateAdapter implements ConverterStateService {
           values: values,
         );
 
-        print(
+        logInfo(
             'LengthStateAdapter: Converted card - Name: ${convertedCard.name}, BaseUnit: ${convertedCard.baseUnitId}, BaseValue: ${convertedCard.baseValue}, VisibleUnits: ${convertedCard.visibleUnits.length}');
         return convertedCard;
       }).toList();
@@ -91,12 +94,12 @@ class LengthStateAdapter implements ConverterStateService {
         viewMode: viewMode,
       );
 
-      print(
+      logInfo(
           'LengthStateAdapter: Final ConverterState - Cards: ${converterState.cards.length}, GlobalUnits: ${converterState.globalVisibleUnits}, Focus: ${converterState.isFocusMode}, View: ${converterState.viewMode.name}');
 
       return converterState;
     } catch (e) {
-      print('LengthStateAdapter: Error loading state, creating default: $e');
+      logError('LengthStateAdapter: Error loading state, creating default: $e');
 
       // Return proper default state with default length units instead of empty state
       const defaultUnits = {
@@ -120,7 +123,7 @@ class LengthStateAdapter implements ConverterStateService {
         },
       );
 
-      print(
+      logInfo(
           'LengthStateAdapter: Created default state with ${defaultUnits.length} units');
 
       return ConverterState(

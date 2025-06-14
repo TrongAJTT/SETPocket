@@ -883,9 +883,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get presetNameRequired => 'Preset name is required';
 
   @override
-  String presetSaved(String name) {
-    return 'Preset saved: $name';
-  }
+  String get presetSaved => 'Preset saved successfully';
 
   @override
   String get presetLoaded => 'Preset loaded successfully';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../../services/converter_services/currency_service.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:setpocket/services/converter_services/currency_service.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class CurrencyFetchProgressDialog extends StatefulWidget {
   final int timeoutSeconds;
@@ -32,7 +32,7 @@ class _CurrencyFetchProgressDialogState
   final Map<String, CurrencyStatus> _currencyStatuses = {};
   int _completedCount = 0;
   bool _isCompleted = false;
-  bool _isCancelled = false;
+  final bool _isCancelled = false;
 
   @override
   void initState() {
@@ -155,28 +155,28 @@ class _CurrencyFetchProgressDialogState
   }
 
   // Note: This method is kept for potential future use
-  void _cancelFetch() {
-    setState(() {
-      _isCancelled = true;
-    });
+  // void _cancelFetch() {
+  //   setState(() {
+  //     _isCancelled = true;
+  //   });
 
-    // Clear progress callback immediately to prevent background updates
-    CurrencyService.setProgressCallback(null);
-    CurrencyService.cancelFetch();
+  //   // Clear progress callback immediately to prevent background updates
+  //   CurrencyService.setProgressCallback(null);
+  //   CurrencyService.cancelFetch();
 
-    if (widget.onCancel != null) {
-      widget.onCancel!();
-    }
+  //   if (widget.onCancel != null) {
+  //     widget.onCancel!();
+  //   }
 
-    // Safe navigation with context check
-    if (mounted && context.mounted) {
-      try {
-        Navigator.of(context).pop();
-      } catch (e) {
-        debugPrint('Warning: Could not close progress dialog on cancel - $e');
-      }
-    }
-  }
+  //   // Safe navigation with context check
+  //   if (mounted && context.mounted) {
+  //     try {
+  //       Navigator.of(context).pop();
+  //     } catch (e) {
+  //       debugPrint('Warning: Could not close progress dialog on cancel - $e');
+  //     }
+  //   }
+  // }
 
   Color _getStatusColor(CurrencyStatus status) {
     switch (status) {
@@ -252,9 +252,9 @@ class _CurrencyFetchProgressDialogState
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = screenSize.width > 800;
 
-    return WillPopScope(
+    return PopScope(
       // Prevent dialog from closing with back button when not completed
-      onWillPop: () async => _isCompleted,
+      canPop: _isCompleted,
       child: Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: EdgeInsets.symmetric(

@@ -19,9 +19,6 @@ import 'screens/random_tools_screen.dart';
 import 'screens/converter_tools_screen.dart';
 import 'screens/calculator_tools_screen.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -1148,72 +1145,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 
 /// Force clear all Hive cache to resolve DateTime casting errors
-Future<void> _forceClearHiveCache() async {
-  try {
-    // Get application documents directory for Hive data
-    final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final String hivePath = '${appDocDir.path}/hive_data';
+// Future<void> _forceClearHiveCache() async {
+//   try {
+//     // Get application documents directory for Hive data
+//     final Directory appDocDir = await getApplicationDocumentsDirectory();
+//     final String hivePath = '${appDocDir.path}/hive_data';
 
-    // Initialize Hive with custom path
-    Hive.init(hivePath);
-    print('Force clear: Using Hive path: $hivePath');
+//     // Initialize Hive with custom path
+//     Hive.init(hivePath);
+//     logInfo('Force clear: Using Hive path: $hivePath');
 
-    // Clear all existing boxes
-    final boxNames = [
-      'mass_state',
-      'length_states',
-      'currency_state',
-      'currency_cache',
-      'currency_presets',
-      'templates',
-      'generation_history',
-      'generic_presets',
-      'unit_templates',
-    ];
+//     // Clear all existing boxes
+//     final boxNames = [
+//       'mass_state',
+//       'length_states',
+//       'currency_state',
+//       'currency_cache',
+//       'currency_presets',
+//       'templates',
+//       'generation_history',
+//       'generic_presets',
+//       'unit_templates',
+//     ];
 
-    for (final boxName in boxNames) {
-      try {
-        // First try to delete from disk without opening
-        try {
-          await Hive.deleteBoxFromDisk(boxName);
-          print('Deleted box from disk: $boxName');
-          continue;
-        } catch (deleteError) {
-          print(
-              'Could not delete $boxName from disk, trying to open and clear: $deleteError');
-        }
+//     for (final boxName in boxNames) {
+//       try {
+//         // First try to delete from disk without opening
+//         try {
+//           await Hive.deleteBoxFromDisk(boxName);
+//           logInfo('Deleted box from disk: $boxName');
+//           continue;
+//         } catch (deleteError) {
+//           logError(
+//               'Could not delete $boxName from disk, trying to open and clear: $deleteError');
+//         }
 
-        // If deletion failed, try to open and clear
-        if (Hive.isBoxOpen(boxName)) {
-          final box = Hive.box(boxName);
-          await box.clear();
-          await box.close();
-          print('Cleared and closed open box: $boxName');
-        } else {
-          try {
-            final box = await Hive.openBox(boxName);
-            await box.clear();
-            await box.close();
-            print('Opened, cleared and closed box: $boxName');
-          } catch (openError) {
-            print('Could not open box $boxName: $openError');
-            // Try to delete the corrupted file
-            try {
-              await Hive.deleteBoxFromDisk(boxName);
-              print('Deleted corrupted box from disk: $boxName');
-            } catch (finalDeleteError) {
-              print(
-                  'Final delete attempt failed for $boxName: $finalDeleteError');
-            }
-          }
-        }
-      } catch (e) {
-        print('Error processing box $boxName: $e');
-      }
-    }
+//         // If deletion failed, try to open and clear
+//         if (Hive.isBoxOpen(boxName)) {
+//           final box = Hive.box(boxName);
+//           await box.clear();
+//           await box.close();
+//           logInfo('Cleared and closed open box: $boxName');
+//         } else {
+//           try {
+//             final box = await Hive.openBox(boxName);
+//             await box.clear();
+//             await box.close();
+//             logInfo('Opened, cleared and closed box: $boxName');
+//           } catch (openError) {
+//             logError('Could not open box $boxName: $openError');
+//             // Try to delete the corrupted file
+//             try {
+//               await Hive.deleteBoxFromDisk(boxName);
+//               logInfo('Deleted corrupted box from disk: $boxName');
+//             } catch (finalDeleteError) {
+//               logError(
+//                   'Final delete attempt failed for $boxName: $finalDeleteError');
+//             }
+//           }
+//         }
+//       } catch (e) {
+//         logError('Error processing box $boxName: $e');
+//       }
+//     }
 
-    print('Force cleared all Hive cache from: $hivePath');
-  } catch (e) {
-    print('Error in force clear Hive cache: $e');
-  }
-}
+//     logInfo('Force cleared all Hive cache from: $hivePath');
+//   } catch (e) {
+//     logError('Error in force clear Hive cache: $e');
+//   }
+// }

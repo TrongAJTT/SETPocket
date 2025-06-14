@@ -193,7 +193,7 @@ class LengthStateService {
         await box.close();
       }
 
-      if (state != null && state is LengthStateModel) {
+      if (state != null) {
         // Estimate size based on data
         final cardsSize = state.cards.length * 50; // Rough estimate per card
         final unitsSize =

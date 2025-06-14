@@ -106,7 +106,7 @@ class FocusModeService {
         ),
         backgroundColor: isEnabled
             ? theme.colorScheme.primary
-            : theme.colorScheme.surfaceVariant,
+            : theme.colorScheme.surfaceContainerHighest,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../models/converter_models/unit_models.dart';
-import '../../services/unit_conversion_service.dart';
-import '../../services/converter_services/currency_service.dart';
-import '../../services/converter_services/currency_cache_service.dart';
+import 'package:setpocket/models/converter_models/unit_models.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/unit_conversion_service.dart';
+import 'package:setpocket/services/converter_services/currency_service.dart';
+import 'package:setpocket/services/converter_services/currency_cache_service.dart';
 
 class UnitConverterScreen extends StatefulWidget {
   final String categoryId;
@@ -98,7 +99,7 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
           });
         }
       } catch (e) {
-        print('Failed to load exchange rates: $e');
+        logError('Failed to load exchange rates: $e');
         if (mounted) {
           setState(() {
             _lastUpdated = null;
@@ -147,7 +148,7 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
         );
       }
     } catch (e) {
-      print('Failed to refresh currency rates: $e');
+      logError('Failed to refresh currency rates: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -333,7 +334,7 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Theme.of(context).primaryColor),
             ),
@@ -496,10 +497,13 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -546,7 +550,7 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
             children: [
               // Live/Static indicator
               if (_isUsingLiveRates) ...[
-                Icon(
+                const Icon(
                   Icons.wifi,
                   size: 16,
                   color: Colors.green,
@@ -560,7 +564,7 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                       ),
                 ),
               ] else ...[
-                Icon(
+                const Icon(
                   Icons.wifi_off,
                   size: 16,
                   color: Colors.orange,

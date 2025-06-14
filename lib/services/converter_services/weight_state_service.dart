@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:setpocket/models/converter_models/weight_state_model.dart';
 import 'package:setpocket/services/settings_service.dart';
@@ -66,7 +68,7 @@ class WeightStateService {
           }
 
           // Additional validation - check if the structure is complete
-          final state = rawData as WeightStateModel;
+          final state = rawData;
           // Try to access all required fields to trigger any casting errors
           final _ = state.cards;
           final __ = state.visibleUnits;
@@ -237,72 +239,72 @@ class WeightStateService {
   }
 
   /// Get default weight converter state
-  static WeightStateModel _getDefaultState() {
-    return WeightStateModel(
-      cards: [
-        WeightCardState(
-          unitCode: 'newtons',
-          amount: 1.0,
-          name: 'Card 1',
-          visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
-          createdAt: DateTime.now(),
-        ),
-      ],
-      visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
-      lastUpdated: DateTime.now(),
-      isFocusMode: false,
-      viewMode: 'cards',
-    );
-  }
+  // static WeightStateModel _getDefaultState() {
+  //   return WeightStateModel(
+  //     cards: [
+  //       WeightCardState(
+  //         unitCode: 'newtons',
+  //         amount: 1.0,
+  //         name: 'Card 1',
+  //         visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
+  //         createdAt: DateTime.now(),
+  //       ),
+  //     ],
+  //     visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
+  //     lastUpdated: DateTime.now(),
+  //     isFocusMode: false,
+  //     viewMode: 'cards',
+  //   );
+  // }
 
   /// Validate and migrate state data
-  static WeightStateModel _validateAndMigrateState(WeightStateModel state) {
-    try {
-      // Ensure all cards have required fields
-      final validCards = <WeightCardState>[];
-      for (final card in state.cards) {
-        if (card.unitCode.isNotEmpty && card.amount.isFinite) {
-          // Ensure card has visible units
-          if (card.visibleUnits == null || card.visibleUnits!.isEmpty) {
-            card.visibleUnits = ['newtons', 'kilogram_force', 'pound_force'];
-          }
+  // static WeightStateModel _validateAndMigrateState(WeightStateModel state) {
+  //   try {
+  //     // Ensure all cards have required fields
+  //     final validCards = <WeightCardState>[];
+  //     for (final card in state.cards) {
+  //       if (card.unitCode.isNotEmpty && card.amount.isFinite) {
+  //         // Ensure card has visible units
+  //         if (card.visibleUnits == null || card.visibleUnits!.isEmpty) {
+  //           card.visibleUnits = ['newtons', 'kilogram_force', 'pound_force'];
+  //         }
 
-          // Ensure card has a name
-          if (card.name == null || card.name!.isEmpty) {
-            card.name = 'Card ${validCards.length + 1}';
-          }
+  //         // Ensure card has a name
+  //         if (card.name == null || card.name!.isEmpty) {
+  //           card.name = 'Card ${validCards.length + 1}';
+  //         }
 
-          validCards.add(card);
-        }
-      }
+  //         validCards.add(card);
+  //       }
+  //     }
 
-      // Ensure at least one card exists
-      if (validCards.isEmpty) {
-        validCards.add(WeightCardState(
-          unitCode: 'newtons',
-          amount: 1.0,
-          name: 'Card 1',
-          visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
-          createdAt: DateTime.now(),
-        ));
-      }
+  //     // Ensure at least one card exists
+  //     if (validCards.isEmpty) {
+  //       validCards.add(WeightCardState(
+  //         unitCode: 'newtons',
+  //         amount: 1.0,
+  //         name: 'Card 1',
+  //         visibleUnits: ['newtons', 'kilogram_force', 'pound_force'],
+  //         createdAt: DateTime.now(),
+  //       ));
+  //     }
 
-      // Ensure global visible units
-      if (state.visibleUnits.isEmpty) {
-        state.visibleUnits = ['newtons', 'kilogram_force', 'pound_force'];
-      }
+  //     // Ensure global visible units
+  //     if (state.visibleUnits.isEmpty) {
+  //       state.visibleUnits = ['newtons', 'kilogram_force', 'pound_force'];
+  //     }
 
-      // Update state with validated data
-      state.cards = validCards;
+  //     // Update state with validated data
+  //     state.cards = validCards;
 
-      logInfo(
-          'WeightStateService: State validation completed with ${validCards.length} valid cards');
-      return state;
-    } catch (e) {
-      logError('WeightStateService: Error validating state: $e');
-      return _getDefaultState();
-    }
-  }
+  //     logInfo(
+  //         'WeightStateService: State validation completed with ${validCards.length} valid cards');
+  //     return state;
+  //   } catch (e) {
+  //     logError('WeightStateService: Error validating state: $e');
+  //     return _getDefaultState();
+  //   }
+  // }
 
   /// Check if weight converter state exists
   static Future<bool> hasState() async {

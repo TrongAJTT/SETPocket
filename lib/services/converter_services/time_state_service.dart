@@ -34,16 +34,10 @@ class TimeStateService {
       }
 
       TimeStateModel state;
-      if (data is TimeStateModel) {
-        state = data;
-        logInfo(
-            'TimeStateService: Successfully loaded state with ${state.cards.length} cards');
-        return state;
-      } else {
-        logWarning(
-            'TimeStateService: Invalid data format: ${data.runtimeType}, using default');
-        return _getDefaultState();
-      }
+      state = data;
+      logInfo(
+          'TimeStateService: Successfully loaded state with ${state.cards.length} cards');
+      return state;
     } catch (e) {
       logError('TimeStateService: Error loading state: $e');
 

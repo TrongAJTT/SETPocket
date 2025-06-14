@@ -1706,8 +1706,8 @@ abstract class AppLocalizations {
   /// No description provided for @presetSaved.
   ///
   /// In en, this message translates to:
-  /// **'Preset saved: {name}'**
-  String presetSaved(String name);
+  /// **'Preset saved successfully'**
+  String get presetSaved;
 
   /// No description provided for @presetLoaded.
   ///

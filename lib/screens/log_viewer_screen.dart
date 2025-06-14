@@ -731,8 +731,8 @@ class _LogViewerScreenState extends State<LogViewerScreen> {
     final l10n = AppLocalizations.of(context)!;
     return FloatingActionButton(
       onPressed: () => _showActionBottomSheet(),
-      child: const Icon(Icons.more_vert),
       tooltip: l10n.logActions,
+      child: const Icon(Icons.more_vert),
     );
   }
 
@@ -745,24 +745,24 @@ class _LogViewerScreenState extends State<LogViewerScreen> {
         FloatingActionButton.small(
           heroTag: "scrollTop",
           onPressed: _scrollToTop,
-          child: const Icon(Icons.keyboard_arrow_up),
           tooltip: l10n.scrollToTop,
+          child: const Icon(Icons.keyboard_arrow_up),
         ),
         const SizedBox(height: 8),
         // Scroll to bottom button
         FloatingActionButton.small(
           heroTag: "scrollBottom",
           onPressed: _scrollToBottom,
-          child: const Icon(Icons.keyboard_arrow_down),
           tooltip: l10n.scrollToBottom,
+          child: const Icon(Icons.keyboard_arrow_down),
         ),
         const SizedBox(height: 8),
         // Actions menu button
         FloatingActionButton(
           heroTag: "actions",
           onPressed: () => _showActionBottomSheet(),
-          child: const Icon(Icons.more_vert),
           tooltip: l10n.logActions,
+          child: const Icon(Icons.more_vert),
         ),
       ],
     );

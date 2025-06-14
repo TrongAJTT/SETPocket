@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../l10n/app_localizations.dart';
-import '../../models/converter_models/generic_preset_model.dart';
-import '../../services/converter_services/generic_preset_service.dart';
-import '../../services/app_logger.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/generic_preset_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 // Generic Unit Item (replaces UnitItem and LengthUnitItem)
 class GenericUnitItem {
@@ -97,6 +97,7 @@ class _EnhancedGenericUnitCustomizationDialogState
   }
 
   Future<void> _showSavePresetDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final name = await showDialog<String>(
       context: context,
       builder: (context) => _SavePresetDialog(),
@@ -113,7 +114,7 @@ class _EnhancedGenericUnitCustomizationDialogState
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Preset saved successfully'),
+              content: Text(l10n.presetSaved),
               backgroundColor: Colors.green,
             ),
           );
@@ -123,7 +124,7 @@ class _EnhancedGenericUnitCustomizationDialogState
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error saving preset: $e'),
+              content: Text(l10n.errorSavingPreset(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -133,6 +134,7 @@ class _EnhancedGenericUnitCustomizationDialogState
   }
 
   Future<void> _showLoadPresetDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final presets = await GenericPresetService.loadPresets(widget.presetType);
 
@@ -156,7 +158,7 @@ class _EnhancedGenericUnitCustomizationDialogState
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Preset loaded successfully'),
+                content: Text(l10n.presetLoaded),
                 backgroundColor: Colors.green,
               ),
             );
@@ -168,7 +170,7 @@ class _EnhancedGenericUnitCustomizationDialogState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error loading presets: $e'),
+            content: Text(l10n.errorLoadingPresets(e.toString())),
             backgroundColor: Colors.red,
           ),
         );

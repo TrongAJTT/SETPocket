@@ -449,7 +449,7 @@ class CurrencyCacheService {
       // Basic reliability check - can we read/write?
       // Use a separate test box to avoid type conflicts
       final testBox = await Hive.openBox('cache_test');
-      final testKey = 'test_reliability';
+      const testKey = 'test_reliability';
       final testValue = DateTime.now().millisecondsSinceEpoch;
 
       await testBox.put(testKey, testValue);

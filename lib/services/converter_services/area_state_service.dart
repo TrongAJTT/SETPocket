@@ -293,18 +293,11 @@ class AreaStateService {
       }
 
       // Estimate size based on data structure
-      if (stateData is AreaStateModel) {
-        int size = 0;
-        size += stateData.cards.length * 200; // Approximate size per card
-        size += stateData.visibleUnits.length * 20; // Approximate size per unit
-        size += 100; // Base overhead
-        return size;
-      } else if (stateData is Map) {
-        // Rough estimate for Map data
-        return stateData.toString().length * 2; // UTF-16 encoding estimate
-      }
-
-      return 0;
+      int size = 0;
+      size += stateData.cards.length * 200; // Approximate size per card
+      size += stateData.visibleUnits.length * 20; // Approximate size per unit
+      size += 100; // Base overhead
+      return size;
     } catch (e) {
       logError('AreaStateService: Error calculating state size: $e');
       return 0;

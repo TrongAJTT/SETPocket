@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/widgets/cache_details_dialog.dart';
 import 'package:setpocket/widgets/tool_visibility_dialog.dart';
 import 'package:setpocket/widgets/quick_actions_dialog.dart';
@@ -1229,7 +1230,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
     final debugButton = OutlinedButton.icon(
       icon: const Icon(Icons.bug_report_outlined),
-      label: Text('Debug Cache'),
+      label: const Text('Debug Cache'),
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: EdgeInsets.symmetric(
@@ -1690,12 +1691,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
   // Debug function for mobile cache issues
   Future<void> _debugMobileCache() async {
-    final l10n = AppLocalizations.of(context)!;
-
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (context) => const AlertDialog(
         title: Text('Mobile Cache Debug'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1723,7 +1722,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         await CurrencyStateService.loadState();
         currencyStateResult = '✓ Saved';
       } catch (e) {
-        print('Currency state load error: $e');
+        logError('Currency state load error: $e');
         currencyStateResult =
             '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
       }
@@ -1732,7 +1731,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         await LengthStateService.loadState();
         lengthStateResult = '✓ Saved';
       } catch (e) {
-        print('Length state load error: $e');
+        logError('Length state load error: $e');
         lengthStateResult =
             '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
       }
@@ -1741,7 +1740,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         await TimeStateService.loadState();
         timeStateResult = '✓ Saved';
       } catch (e) {
-        print('Time state load error: $e');
+        logError('Time state load error: $e');
         timeStateResult =
             '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
       }
@@ -1754,24 +1753,24 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Cache Diagnostics Results'),
+            title: const Text('Cache Diagnostics Results'),
             content: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Cache Status:',
+                  const Text('Cache Status:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text(
                       '• Reliability: ${isReliable ? "✓ Reliable" : "✗ Unreliable"}'),
                   Text('• Has Cache: ${hasCache ? "✓ Yes" : "✗ No"}'),
-                  SizedBox(height: 12),
-                  Text('Settings:',
+                  const SizedBox(height: 12),
+                  const Text('Settings:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text(
                       '• Feature State Saving: ${settings.featureStateSavingEnabled ? "✓ Enabled" : "✗ Disabled"}'),
-                  SizedBox(height: 12),
-                  Text('State Persistence:',
+                  const SizedBox(height: 12),
+                  const Text('State Persistence:',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text('• Currency State: $currencyStateResult'),
                   Text('• Length State: $lengthStateResult'),
@@ -1779,9 +1778,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                   if (currencyStateResult.contains('Error') ||
                       lengthStateResult.contains('Error') ||
                       timeStateResult.contains('Error')) ...[
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Container(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.orange.shade100,
                         border: Border.all(color: Colors.orange),
@@ -1790,18 +1789,18 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('⚠️ State Loading Issues Detected',
+                          const Text('⚠️ State Loading Issues Detected',
                               style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(height: 4),
-                          Text(
+                          const SizedBox(height: 4),
+                          const Text(
                               'This usually happens after app updates that change data structure.'),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           ElevatedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
                               await _clearAllStateData();
                             },
-                            child: Text('Clear All State Data'),
+                            child: const Text('Clear All State Data'),
                           ),
                         ],
                       ),
@@ -1813,7 +1812,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -1827,12 +1826,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Error'),
+            title: const Text('Error'),
             content: Text('Failed to run diagnostics: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -1845,7 +1844,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (context) => const AlertDialog(
         title: Text('Clearing State Data'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1871,8 +1870,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Success'),
-            content: Text(
+            title: const Text('Success'),
+            content: const Text(
                 'All state data has been cleared. The app will restart to complete the process.'),
             actions: [
               TextButton(
@@ -1882,7 +1881,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil('/', (route) => false);
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           ),
@@ -1895,12 +1894,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Error'),
+            title: const Text('Error'),
             content: Text('Failed to clear state data: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 Future<void> main() async {
   try {
@@ -8,7 +9,7 @@ Future<void> main() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final String hivePath = '${appDocDir.path}/hive_data';
 
-    print('Hive path: $hivePath');
+    logInfo('Hive path: $hivePath');
 
     // Initialize Hive
     Hive.init(hivePath);
@@ -18,23 +19,23 @@ Future<void> main() async {
       final timeStateBox = await Hive.openBox('time_state');
       await timeStateBox.clear();
       await timeStateBox.close();
-      print('✅ Cleared time_state box');
+      logInfo('✅ Cleared time_state box');
     } catch (e) {
-      print('⚠️ Could not clear time_state box: $e');
+      logError('⚠️ Could not clear time_state box: $e');
     }
 
     try {
       final timePresetsBox = await Hive.openBox('time_presets');
       await timePresetsBox.clear();
       await timePresetsBox.close();
-      print('✅ Cleared time_presets box');
+      logInfo('✅ Cleared time_presets box');
     } catch (e) {
-      print('⚠️ Could not clear time_presets box: $e');
+      logError('⚠️ Could not clear time_presets box: $e');
     }
 
-    print('🎉 Time Converter cache cleared successfully!');
-    print('Please restart the app to register adapters properly.');
+    logInfo('🎉 Time Converter cache cleared successfully!');
+    logInfo('Please restart the app to register adapters properly.');
   } catch (e) {
-    print('❌ Error clearing cache: $e');
+    logError('❌ Error clearing cache: $e');
   }
 }

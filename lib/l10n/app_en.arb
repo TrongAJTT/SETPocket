@@ -722,14 +722,7 @@
     },
     "noUnitsSelected": "No units selected",
     "maximumSelectionExceeded": "Maximum selection exceeded",
-    "presetSaved": "Preset saved: {name}",
-    "@presetSaved": {
-        "placeholders": {
-            "name": {
-                "type": "String"
-            }
-        }
-    },
+    "presetSaved": "Preset saved successfully",
     "errorSavingPreset": "Error saving preset: {error}",
     "@errorSavingPreset": {
         "placeholders": {

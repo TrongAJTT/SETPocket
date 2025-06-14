@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../l10n/app_localizations.dart';
-import '../../services/converter_services/currency_preset_service.dart';
-import '../../models/converter_models/currency_preset_model.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/services/converter_services/currency_preset_service.dart';
+import 'package:setpocket/models/converter_models/currency_preset_model.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class UnitItem {
@@ -121,7 +121,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.presetSaved(result)),
+              content: Text(AppLocalizations.of(context)!.presetSaved),
               backgroundColor: Colors.green,
             ),
           );
@@ -771,7 +771,10 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                   try {
                     await CurrencyPresetService.deletePreset(preset.id);
                     if (mounted) {
-                      Navigator.of(context).pop();
+                      if (mounted) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      }
                     }
                   } catch (e) {
                     AppLogger.instance

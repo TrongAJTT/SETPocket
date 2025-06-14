@@ -723,14 +723,7 @@
     },
     "noUnitsSelected": "Chưa chọn đơn vị nào",
     "maximumSelectionExceeded": "Vượt quá giới hạn lựa chọn tối đa",
-    "presetSaved": "Đã lưu cấu hình: {name}",
-    "@presetSaved": {
-        "placeholders": {
-            "name": {
-                "type": "String"
-            }
-        }
-    },
+    "presetSaved": "Đã lưu cấu hình thành công",
     "errorSavingPreset": "Lỗi lưu cấu hình: {error}",
     "@errorSavingPreset": {
         "placeholders": {

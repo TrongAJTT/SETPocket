@@ -2397,4 +2397,127 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get practicalApplicationsTimeDesc => 'Essential for project management, scientific calculations, programming, scheduling, performance analysis, and any application requiring precise time measurements and conversions.';
+
+  @override
+  String get volumeConverterDetailedInfo => 'Volume Converter - Detailed Information';
+
+  @override
+  String get volumeConverterOverview => 'This precision volume converter supports multiple unit systems with high accuracy calculations for cooking, chemistry, engineering, and scientific applications.';
+
+  @override
+  String get step1Volume => 'Step 1: Add Cards';
+
+  @override
+  String get step1VolumeDesc => 'Add multiple converter cards to work with different volume values simultaneously.';
+
+  @override
+  String get step2Volume => 'Step 2: Select Units';
+
+  @override
+  String get step2VolumeDesc => 'Choose which volume units to display from metric, imperial, and US systems.';
+
+  @override
+  String get step3Volume => 'Step 3: Enter Values';
+
+  @override
+  String get step3VolumeDesc => 'Type any volume value and see instant conversions to all other units.';
+
+  @override
+  String get step4Volume => 'Step 4: Organize Layout';
+
+  @override
+  String get step4VolumeDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Volume => '• Cubic meter (m³) is the base SI unit for volume with highest precision';
+
+  @override
+  String get tip2Volume => '• Liter is commonly used for liquid measurements in everyday applications';
+
+  @override
+  String get tip3Volume => '• Milliliter and cubic centimeter are equivalent and interchangeable';
+
+  @override
+  String get tip4Volume => '• US and UK gallons are different units, choose carefully';
+
+  @override
+  String get tip5Volume => '• Use scientific notation for very large or small volume values';
+
+  @override
+  String get tip6Volume => '• Focus mode helps concentrate on complex volume calculations';
+
+  @override
+  String get volumeUnitCategories => 'Unit Categories';
+
+  @override
+  String get commonUnitsVolumeDesc => 'Cubic meter (m³), Liter (L), Milliliter (mL) - most frequently used metric units.';
+
+  @override
+  String get lessCommonUnitsVolumeDesc => 'Gallon (US/UK), Cubic foot (ft³), Quart, Pint - imperial and US customary units.';
+
+  @override
+  String get uncommonUnitsVolumeDesc => 'Hectoliter (hL), Barrel (bbl), Cup, Fluid ounce - specialized applications.';
+
+  @override
+  String get specialUnitsVolumeDesc => 'Cubic centimeter (cm³), Cubic inch (in³), Cubic yard (yd³) - engineering and construction units.';
+
+  @override
+  String get practicalApplicationsVolumeDesc => 'Perfect for cooking, chemistry, fluid mechanics, construction, brewing, and any application requiring precise volume measurements.';
+
+  @override
+  String get volumeConverterInfo => 'Volume Converter Information';
+
+  @override
+  String get customizeVolumeUnits => 'Customize Volume Units';
+
+  @override
+  String get selectVolumeUnits => 'Select volume units to display';
+
+  @override
+  String get volumeUnits => 'Volume Units';
+
+  @override
+  String get cubicMeter => 'Cubic Meter';
+
+  @override
+  String get liter => 'Liter';
+
+  @override
+  String get milliliter => 'Milliliter';
+
+  @override
+  String get cubicCentimeter => 'Cubic Centimeter';
+
+  @override
+  String get hectoliter => 'Hectoliter';
+
+  @override
+  String get gallonUS => 'Gallon (US)';
+
+  @override
+  String get gallonUK => 'Gallon (UK)';
+
+  @override
+  String get quartUS => 'Quart (US)';
+
+  @override
+  String get pintUS => 'Pint (US)';
+
+  @override
+  String get cup => 'Cup';
+
+  @override
+  String get fluidOunceUS => 'Fluid Ounce (US)';
+
+  @override
+  String get cubicInch => 'Cubic Inch';
+
+  @override
+  String get cubicFoot => 'Cubic Foot';
+
+  @override
+  String get cubicYard => 'Cubic Yard';
+
+  @override
+  String get barrel => 'Barrel (Oil)';
 }

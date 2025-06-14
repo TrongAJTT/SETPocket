@@ -2397,4 +2397,127 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get practicalApplicationsTimeDesc => 'Thiết yếu cho quản lý dự án, tính toán khoa học, lập trình, lập lịch, phân tích hiệu suất và bất kỳ ứng dụng nào yêu cầu đo lường và chuyển đổi thời gian chính xác.';
+
+  @override
+  String get volumeConverterDetailedInfo => 'Bộ Chuyển Đổi Thể Tích - Thông Tin Chi Tiết';
+
+  @override
+  String get volumeConverterOverview => 'Bộ chuyển đổi thể tích chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng nấu ăn, hóa học, kỹ thuật và khoa học.';
+
+  @override
+  String get step1Volume => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1VolumeDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị thể tích khác nhau cùng lúc.';
+
+  @override
+  String get step2Volume => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2VolumeDesc => 'Chọn đơn vị thể tích nào hiển thị từ hệ mét, hệ Anh và hệ Mỹ.';
+
+  @override
+  String get step3Volume => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3VolumeDesc => 'Nhập bất kỳ giá trị thể tích nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Volume => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4VolumeDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Volume => '• Mét khối (m³) là đơn vị SI cơ bản cho thể tích với độ chính xác cao nhất';
+
+  @override
+  String get tip2Volume => '• Lít thường được sử dụng để đo chất lỏng trong ứng dụng hàng ngày';
+
+  @override
+  String get tip3Volume => '• Mililít và centimet khối là tương đương và có thể hoán đổi';
+
+  @override
+  String get tip4Volume => '• Gallon Mỹ và gallon Anh là các đơn vị khác nhau, hãy chọn cẩn thận';
+
+  @override
+  String get tip5Volume => '• Sử dụng ký hiệu khoa học cho các giá trị thể tích rất lớn hoặc rất nhỏ';
+
+  @override
+  String get tip6Volume => '• Chế độ tập trung giúp tập trung vào các phép tính thể tích phức tạp';
+
+  @override
+  String get volumeUnitCategories => 'Danh Mục Đơn Vị';
+
+  @override
+  String get commonUnitsVolumeDesc => 'Mét khối (m³), Lít (L), Mililít (mL) - các đơn vị hệ mét được sử dụng thường xuyên nhất.';
+
+  @override
+  String get lessCommonUnitsVolumeDesc => 'Gallon (Mỹ/Anh), Foot khối (ft³), Quart, Pint - đơn vị hệ Anh và Mỹ.';
+
+  @override
+  String get uncommonUnitsVolumeDesc => 'Héc-tô-lít (hL), Thùng (bbl), Cup, Ounce chất lỏng - ứng dụng chuyên biệt.';
+
+  @override
+  String get specialUnitsVolumeDesc => 'Centimet khối (cm³), Inch khối (in³), Yard khối (yd³) - đơn vị kỹ thuật và xây dựng.';
+
+  @override
+  String get practicalApplicationsVolumeDesc => 'Hoàn hảo cho nấu ăn, hóa học, cơ học chất lỏng, xây dựng, pha chế và bất kỳ ứng dụng nào yêu cầu đo thể tích chính xác.';
+
+  @override
+  String get volumeConverterInfo => 'Thông tin Chuyển đổi Thể tích';
+
+  @override
+  String get customizeVolumeUnits => 'Tùy chỉnh đơn vị thể tích';
+
+  @override
+  String get selectVolumeUnits => 'Chọn đơn vị thể tích để hiển thị';
+
+  @override
+  String get volumeUnits => 'Đơn vị Thể tích';
+
+  @override
+  String get cubicMeter => 'Mét khối';
+
+  @override
+  String get liter => 'Lít';
+
+  @override
+  String get milliliter => 'Mililít';
+
+  @override
+  String get cubicCentimeter => 'Centimet khối';
+
+  @override
+  String get hectoliter => 'Héc-tô-lít';
+
+  @override
+  String get gallonUS => 'Gallon (Mỹ)';
+
+  @override
+  String get gallonUK => 'Gallon (Anh)';
+
+  @override
+  String get quartUS => 'Quart (Mỹ)';
+
+  @override
+  String get pintUS => 'Pint (Mỹ)';
+
+  @override
+  String get cup => 'Cup';
+
+  @override
+  String get fluidOunceUS => 'Ounce chất lỏng (Mỹ)';
+
+  @override
+  String get cubicInch => 'Inch khối';
+
+  @override
+  String get cubicFoot => 'Foot khối';
+
+  @override
+  String get cubicYard => 'Yard khối';
+
+  @override
+  String get barrel => 'Thùng (Dầu)';
 }

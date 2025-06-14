@@ -6,6 +6,7 @@ import 'package:setpocket/screens/converters/length_converter_screen.dart';
 import 'package:setpocket/screens/converters/mass_converter_screen.dart';
 import 'package:setpocket/screens/converters/weight_converter_screen.dart';
 import 'package:setpocket/screens/converters/area_converter_screen.dart';
+import 'package:setpocket/screens/converters/volume_converter_screen.dart';
 import 'converters/time_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
@@ -84,8 +85,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.red;
             break;
           case 6:
-            screen = UnitConverterScreen(
-                categoryId: 'volume', categoryName: loc.volumeConverter);
+            screen = const VolumeConverterScreen();
             title = loc.volumeConverter;
             icon = Icons.local_drink;
             iconColor = Colors.cyan;

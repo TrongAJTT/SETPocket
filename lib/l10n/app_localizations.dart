@@ -4606,6 +4606,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Essential for project management, scientific calculations, programming, scheduling, performance analysis, and any application requiring precise time measurements and conversions.'**
   String get practicalApplicationsTimeDesc;
+
+  /// No description provided for @volumeConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume Converter - Detailed Information'**
+  String get volumeConverterDetailedInfo;
+
+  /// No description provided for @volumeConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision volume converter supports multiple unit systems with high accuracy calculations for cooking, chemistry, engineering, and scientific applications.'**
+  String get volumeConverterOverview;
+
+  /// No description provided for @step1Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Volume;
+
+  /// No description provided for @step1VolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different volume values simultaneously.'**
+  String get step1VolumeDesc;
+
+  /// No description provided for @step2Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Volume;
+
+  /// No description provided for @step2VolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which volume units to display from metric, imperial, and US systems.'**
+  String get step2VolumeDesc;
+
+  /// No description provided for @step3Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Volume;
+
+  /// No description provided for @step3VolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any volume value and see instant conversions to all other units.'**
+  String get step3VolumeDesc;
+
+  /// No description provided for @step4Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Volume;
+
+  /// No description provided for @step4VolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4VolumeDesc;
+
+  /// No description provided for @tip1Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'• Cubic meter (m³) is the base SI unit for volume with highest precision'**
+  String get tip1Volume;
+
+  /// No description provided for @tip2Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'• Liter is commonly used for liquid measurements in everyday applications'**
+  String get tip2Volume;
+
+  /// No description provided for @tip3Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'• Milliliter and cubic centimeter are equivalent and interchangeable'**
+  String get tip3Volume;
+
+  /// No description provided for @tip4Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'• US and UK gallons are different units, choose carefully'**
+  String get tip4Volume;
+
+  /// No description provided for @tip5Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use scientific notation for very large or small volume values'**
+  String get tip5Volume;
+
+  /// No description provided for @tip6Volume.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex volume calculations'**
+  String get tip6Volume;
+
+  /// No description provided for @volumeUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Categories'**
+  String get volumeUnitCategories;
+
+  /// No description provided for @commonUnitsVolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic meter (m³), Liter (L), Milliliter (mL) - most frequently used metric units.'**
+  String get commonUnitsVolumeDesc;
+
+  /// No description provided for @lessCommonUnitsVolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallon (US/UK), Cubic foot (ft³), Quart, Pint - imperial and US customary units.'**
+  String get lessCommonUnitsVolumeDesc;
+
+  /// No description provided for @uncommonUnitsVolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hectoliter (hL), Barrel (bbl), Cup, Fluid ounce - specialized applications.'**
+  String get uncommonUnitsVolumeDesc;
+
+  /// No description provided for @specialUnitsVolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic centimeter (cm³), Cubic inch (in³), Cubic yard (yd³) - engineering and construction units.'**
+  String get specialUnitsVolumeDesc;
+
+  /// No description provided for @practicalApplicationsVolumeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for cooking, chemistry, fluid mechanics, construction, brewing, and any application requiring precise volume measurements.'**
+  String get practicalApplicationsVolumeDesc;
+
+  /// No description provided for @volumeConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume Converter Information'**
+  String get volumeConverterInfo;
+
+  /// No description provided for @customizeVolumeUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Volume Units'**
+  String get customizeVolumeUnits;
+
+  /// No description provided for @selectVolumeUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Select volume units to display'**
+  String get selectVolumeUnits;
+
+  /// No description provided for @volumeUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume Units'**
+  String get volumeUnits;
+
+  /// No description provided for @cubicMeter.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic Meter'**
+  String get cubicMeter;
+
+  /// No description provided for @liter.
+  ///
+  /// In en, this message translates to:
+  /// **'Liter'**
+  String get liter;
+
+  /// No description provided for @milliliter.
+  ///
+  /// In en, this message translates to:
+  /// **'Milliliter'**
+  String get milliliter;
+
+  /// No description provided for @cubicCentimeter.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic Centimeter'**
+  String get cubicCentimeter;
+
+  /// No description provided for @hectoliter.
+  ///
+  /// In en, this message translates to:
+  /// **'Hectoliter'**
+  String get hectoliter;
+
+  /// No description provided for @gallonUS.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallon (US)'**
+  String get gallonUS;
+
+  /// No description provided for @gallonUK.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallon (UK)'**
+  String get gallonUK;
+
+  /// No description provided for @quartUS.
+  ///
+  /// In en, this message translates to:
+  /// **'Quart (US)'**
+  String get quartUS;
+
+  /// No description provided for @pintUS.
+  ///
+  /// In en, this message translates to:
+  /// **'Pint (US)'**
+  String get pintUS;
+
+  /// No description provided for @cup.
+  ///
+  /// In en, this message translates to:
+  /// **'Cup'**
+  String get cup;
+
+  /// No description provided for @fluidOunceUS.
+  ///
+  /// In en, this message translates to:
+  /// **'Fluid Ounce (US)'**
+  String get fluidOunceUS;
+
+  /// No description provided for @cubicInch.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic Inch'**
+  String get cubicInch;
+
+  /// No description provided for @cubicFoot.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic Foot'**
+  String get cubicFoot;
+
+  /// No description provided for @cubicYard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cubic Yard'**
+  String get cubicYard;
+
+  /// No description provided for @barrel.
+  ///
+  /// In en, this message translates to:
+  /// **'Barrel (Oil)'**
+  String get barrel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

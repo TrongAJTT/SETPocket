@@ -11,6 +11,7 @@ import 'converter_services/mass_state_service.dart';
 import 'converter_services/weight_state_service.dart';
 import 'converter_services/area_state_service.dart';
 import 'converter_services/time_state_service.dart';
+import 'converter_services/volume_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'package:hive/hive.dart';
 
@@ -291,7 +292,7 @@ class CacheService {
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area/time states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time/volume states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -338,6 +339,7 @@ class CacheService {
       await WeightStateService.clearState();
       await AreaStateService.clearState();
       await TimeStateService.clearState();
+      await VolumeStateService.clearState();
 
       // Clear generic presets for all converter types
       await GenericPresetService.clearAllPresets('length');
@@ -345,6 +347,7 @@ class CacheService {
       await GenericPresetService.clearAllPresets('weight');
       await GenericPresetService.clearAllPresets('area');
       await GenericPresetService.clearAllPresets('time');
+      await GenericPresetService.clearAllPresets('volume');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -378,6 +381,7 @@ class CacheService {
     await WeightStateService.clearState();
     await AreaStateService.clearState();
     await TimeStateService.clearState();
+    await VolumeStateService.clearState();
 
     // Clear generic presets for all converter types
     await GenericPresetService.clearAllPresets('length');
@@ -385,6 +389,7 @@ class CacheService {
     await GenericPresetService.clearAllPresets('weight');
     await GenericPresetService.clearAllPresets('area');
     await GenericPresetService.clearAllPresets('time');
+    await GenericPresetService.clearAllPresets('volume');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
@@ -428,12 +433,14 @@ class CacheService {
       'weight_state',
       'area_converter_state',
       'time_state',
+      'volume_state',
       'currency_presets',
       'generic_length_presets',
       'generic_mass_presets',
       'generic_weight_presets',
       'generic_area_presets',
       'generic_time_presets',
+      'generic_volume_presets',
       'currency_cache',
     ];
 

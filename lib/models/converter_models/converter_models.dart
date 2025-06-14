@@ -1,4 +1,4 @@
-import '../../services/converter_services/currency_service.dart';
+import 'package:setpocket/services/converter_services/currency_service.dart';
 import 'package:decimal/decimal.dart';
 
 /// Base class for all conversion units
@@ -520,92 +520,12 @@ class TemperatureConverter extends BaseConverter {
   }
 }
 
-/// Volume units and converter
-class VolumeUnit extends ConversionUnit {
-  final double toLiters;
-
-  const VolumeUnit({
-    required super.id,
-    required super.name,
-    required super.symbol,
-    required this.toLiters,
-    super.description,
-  });
-}
-
-class VolumeConverter extends BaseConverter {
-  @override
-  String get name => 'Volume';
-
-  @override
-  String get description => 'Convert between different volume units';
-
-  @override
-  VolumeUnit get baseUnit => liters;
-
-  static const liters = VolumeUnit(
-    id: 'liters',
-    name: 'Liters',
-    symbol: 'L',
-    toLiters: 1.0,
-  );
-
-  static const milliliters = VolumeUnit(
-    id: 'milliliters',
-    name: 'Milliliters',
-    symbol: 'ml',
-    toLiters: 0.001,
-  );
-
-  static const gallons = VolumeUnit(
-    id: 'gallons',
-    name: 'Gallons (US)',
-    symbol: 'gal',
-    toLiters: 3.78541,
-  );
-
-  static const quarts = VolumeUnit(
-    id: 'quarts',
-    name: 'Quarts',
-    symbol: 'qt',
-    toLiters: 0.946353,
-  );
-
-  static const pints = VolumeUnit(
-    id: 'pints',
-    name: 'Pints',
-    symbol: 'pt',
-    toLiters: 0.473176,
-  );
-
-  static const cups = VolumeUnit(
-    id: 'cups',
-    name: 'Cups',
-    symbol: 'cup',
-    toLiters: 0.236588,
-  );
-
-  @override
-  List<VolumeUnit> get units => [
-        liters,
-        milliliters,
-        gallons,
-        quarts,
-        pints,
-        cups,
-      ];
-
-  @override
-  double convert(double value, String fromUnit, String toUnit) {
-    if (fromUnit == toUnit) return value;
-
-    final from = units.firstWhere((unit) => unit.id == fromUnit);
-    final to = units.firstWhere((unit) => unit.id == toUnit);
-
-    final inLiters = value * from.toLiters;
-    return inLiters / to.toLiters;
-  }
-}
+/// Volume units and converter (DEPRECATED - Use VolumeConverterScreen instead)
+// Removed old VolumeConverter and VolumeUnit classes to avoid conflicts
+// New Volume Converter implementation is in:
+// - VolumeConverterScreen (UI)
+// - VolumeConverterService (Logic)
+// - VolumeConverterController (State Management)
 
 /// Area units and converter
 class AreaUnit extends ConversionUnit {

@@ -8,6 +8,7 @@ import 'package:setpocket/screens/converters/weight_converter_screen.dart';
 import 'package:setpocket/screens/converters/area_converter_screen.dart';
 import 'package:setpocket/screens/converters/volume_converter_screen.dart';
 import 'package:setpocket/screens/converters/number_system_converter_screen.dart';
+import 'package:setpocket/screens/converters/speed_converter_screen.dart';
 import 'converters/time_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
@@ -98,8 +99,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.indigo;
             break;
           case 8:
-            screen = UnitConverterScreen(
-                categoryId: 'speed', categoryName: loc.speedConverter);
+            screen = const SpeedConverterScreen();
             title = loc.speedConverter;
             icon = Icons.speed;
             iconColor = Colors.teal;

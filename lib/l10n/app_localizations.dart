@@ -5026,6 +5026,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Base 256'**
   String get base256;
+
+  /// No description provided for @speedConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Converter - Detailed Information'**
+  String get speedConverterDetailedInfo;
+
+  /// No description provided for @speedConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision speed converter supports multiple unit systems with high accuracy calculations for automotive, aviation, maritime, and scientific applications.'**
+  String get speedConverterOverview;
+
+  /// No description provided for @step1Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Speed;
+
+  /// No description provided for @step1SpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different speed values simultaneously.'**
+  String get step1SpeedDesc;
+
+  /// No description provided for @step2Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Speed;
+
+  /// No description provided for @step2SpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which speed units to display from metric, imperial, maritime, and aviation systems.'**
+  String get step2SpeedDesc;
+
+  /// No description provided for @step3Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Speed;
+
+  /// No description provided for @step3SpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any speed value and see instant conversions to all other units.'**
+  String get step3SpeedDesc;
+
+  /// No description provided for @step4Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Speed;
+
+  /// No description provided for @step4SpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4SpeedDesc;
+
+  /// No description provided for @tip1Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'• Meters per second (m/s) is the base SI unit for speed with highest precision'**
+  String get tip1Speed;
+
+  /// No description provided for @tip2Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'• Kilometers per hour (km/h) is commonly used for vehicle speeds'**
+  String get tip2Speed;
+
+  /// No description provided for @tip3Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'• Miles per hour (mph) is standard in the US for road speeds'**
+  String get tip3Speed;
+
+  /// No description provided for @tip4Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'• Knots are standard for maritime and aviation navigation'**
+  String get tip4Speed;
+
+  /// No description provided for @tip5Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'• Mach number represents speed relative to sound (343 m/s at sea level)'**
+  String get tip5Speed;
+
+  /// No description provided for @tip6Speed.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex speed calculations'**
+  String get tip6Speed;
+
+  /// No description provided for @speedUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Categories'**
+  String get speedUnitCategories;
+
+  /// No description provided for @multipleSpeedUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Speed Units'**
+  String get multipleSpeedUnits;
+
+  /// No description provided for @multipleSpeedUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support for metric, imperial, maritime, and aviation units including m/s to Mach numbers.'**
+  String get multipleSpeedUnitsDesc;
+
+  /// No description provided for @speedUnitRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported Speed Range'**
+  String get speedUnitRange;
+
+  /// No description provided for @speedUnitRangeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'From millimeters per second to supersonic speeds (Mach numbers) with precision maintained throughout the range.'**
+  String get speedUnitRangeDesc;
+
+  /// No description provided for @commonUnitsSpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilometers per hour (km/h), Meters per second (m/s), Miles per hour (mph) - most frequently used for ground transportation.'**
+  String get commonUnitsSpeedDesc;
+
+  /// No description provided for @lessCommonUnitsSpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Knots (kn), Feet per second (ft/s) - specialized for maritime, aviation, and ballistics applications.'**
+  String get lessCommonUnitsSpeedDesc;
+
+  /// No description provided for @uncommonUnitsSpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mach (M) - for supersonic and hypersonic speeds in aerospace applications.'**
+  String get uncommonUnitsSpeedDesc;
+
+  /// No description provided for @practicalApplicationsSpeedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for automotive engineering, aviation, maritime navigation, physics calculations, sports analysis, and any application requiring precise speed measurements.'**
+  String get practicalApplicationsSpeedDesc;
+
+  /// No description provided for @speedConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Converter Information'**
+  String get speedConverterInfo;
+
+  /// No description provided for @customizeSpeedUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Speed Units'**
+  String get customizeSpeedUnits;
+
+  /// No description provided for @selectSpeedUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Select speed units to display'**
+  String get selectSpeedUnits;
+
+  /// No description provided for @speedUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Units'**
+  String get speedUnits;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -2607,4 +2607,91 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get base256 => 'Cơ số 256';
+
+  @override
+  String get speedConverterDetailedInfo => 'Chuyển Đổi Tốc Độ - Thông Tin Chi Tiết';
+
+  @override
+  String get speedConverterOverview => 'Bộ chuyển đổi tốc độ chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng ô tô, hàng không, hàng hải và khoa học.';
+
+  @override
+  String get step1Speed => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1SpeedDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị tốc độ khác nhau cùng lúc.';
+
+  @override
+  String get step2Speed => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2SpeedDesc => 'Chọn đơn vị tốc độ nào hiển thị từ ô tô, hàng không, hàng hải và khoa học.';
+
+  @override
+  String get step3Speed => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3SpeedDesc => 'Nhập bất kỳ giá trị tốc độ nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Speed => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4SpeedDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Speed => '• Mét trên giây (m/s) là đơn vị SI cơ bản cho tốc độ với độ chính xác cao nhất';
+
+  @override
+  String get tip2Speed => '• Kilometer per hour (km/h) thường được sử dụng cho tốc độ xe cộ và giao thông';
+
+  @override
+  String get tip3Speed => '• Miles per hour (mph) là tiêu chuẩn ở Mỹ và Anh cho tốc độ đường bộ';
+
+  @override
+  String get tip4Speed => '• Knots (hải lý/giờ) là tiêu chuẩn trong hàng không và hàng hải';
+
+  @override
+  String get tip5Speed => '• Feet per second (ft/s) hữu ích cho tính toán kỹ thuật và vật lý';
+
+  @override
+  String get tip6Speed => '• Mach biểu thị tốc độ âm thanh, quan trọng trong hàng không siêu âm';
+
+  @override
+  String get speedUnitCategories => 'Danh Mục Đơn Vị Tốc Độ';
+
+  @override
+  String get multipleSpeedUnits => 'Nhiều đơn vị tốc độ';
+
+  @override
+  String get multipleSpeedUnitsDesc => 'Hỗ trợ chuyển đổi giữa m/s, km/h, mph, knots, ft/s và Mach với độ chính xác cao';
+
+  @override
+  String get speedUnitRange => 'Phạm Vi Đơn Vị Hỗ Trợ';
+
+  @override
+  String get speedUnitRangeDesc => 'Từ tốc độ vi mô (mm/s) đến siêu âm (Mach) với độ chính xác được duy trì cho mọi ứng dụng.';
+
+  @override
+  String get commonUnitsSpeedDesc => 'Mét/giây (m/s), Kilômét/giờ (km/h), Dặm/giờ (mph) - các đơn vị được sử dụng thường xuyên nhất trong giao thông và đo lường hàng ngày.';
+
+  @override
+  String get lessCommonUnitsSpeedDesc => 'Knots (hải lý/giờ), Feet/giây (ft/s) - ứng dụng chuyên biệt trong hàng không, hàng hải và kỹ thuật.';
+
+  @override
+  String get uncommonUnitsSpeedDesc => 'Mach (tốc độ âm thanh) - cho các ứng dụng hàng không siêu âm và nghiên cứu vận tốc cao.';
+
+  @override
+  String get practicalApplicationsSpeedDesc => 'Hoàn hảo cho ô tô, hàng không, hàng hải, thể thao, khoa học và bất kỳ ứng dụng nào yêu cầu đo tốc độ chính xác.';
+
+  @override
+  String get speedConverterInfo => 'Thông tin Chuyển Đổi Tốc Độ';
+
+  @override
+  String get customizeSpeedUnits => 'Tùy chỉnh đơn vị tốc độ';
+
+  @override
+  String get selectSpeedUnits => 'Chọn đơn vị tốc độ để hiển thị';
+
+  @override
+  String get speedUnits => 'Đơn vị Tốc độ';
 }

@@ -2607,4 +2607,91 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get base256 => 'Base 256';
+
+  @override
+  String get speedConverterDetailedInfo => 'Speed Converter - Detailed Information';
+
+  @override
+  String get speedConverterOverview => 'This precision speed converter supports multiple unit systems with high accuracy calculations for automotive, aviation, maritime, and scientific applications.';
+
+  @override
+  String get step1Speed => 'Step 1: Add Cards';
+
+  @override
+  String get step1SpeedDesc => 'Add multiple converter cards to work with different speed values simultaneously.';
+
+  @override
+  String get step2Speed => 'Step 2: Select Units';
+
+  @override
+  String get step2SpeedDesc => 'Choose which speed units to display from metric, imperial, maritime, and aviation systems.';
+
+  @override
+  String get step3Speed => 'Step 3: Enter Values';
+
+  @override
+  String get step3SpeedDesc => 'Type any speed value and see instant conversions to all other units.';
+
+  @override
+  String get step4Speed => 'Step 4: Organize Layout';
+
+  @override
+  String get step4SpeedDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Speed => '• Meters per second (m/s) is the base SI unit for speed with highest precision';
+
+  @override
+  String get tip2Speed => '• Kilometers per hour (km/h) is commonly used for vehicle speeds';
+
+  @override
+  String get tip3Speed => '• Miles per hour (mph) is standard in the US for road speeds';
+
+  @override
+  String get tip4Speed => '• Knots are standard for maritime and aviation navigation';
+
+  @override
+  String get tip5Speed => '• Mach number represents speed relative to sound (343 m/s at sea level)';
+
+  @override
+  String get tip6Speed => '• Focus mode helps concentrate on complex speed calculations';
+
+  @override
+  String get speedUnitCategories => 'Unit Categories';
+
+  @override
+  String get multipleSpeedUnits => 'Multiple Speed Units';
+
+  @override
+  String get multipleSpeedUnitsDesc => 'Support for metric, imperial, maritime, and aviation units including m/s to Mach numbers.';
+
+  @override
+  String get speedUnitRange => 'Supported Speed Range';
+
+  @override
+  String get speedUnitRangeDesc => 'From millimeters per second to supersonic speeds (Mach numbers) with precision maintained throughout the range.';
+
+  @override
+  String get commonUnitsSpeedDesc => 'Kilometers per hour (km/h), Meters per second (m/s), Miles per hour (mph) - most frequently used for ground transportation.';
+
+  @override
+  String get lessCommonUnitsSpeedDesc => 'Knots (kn), Feet per second (ft/s) - specialized for maritime, aviation, and ballistics applications.';
+
+  @override
+  String get uncommonUnitsSpeedDesc => 'Mach (M) - for supersonic and hypersonic speeds in aerospace applications.';
+
+  @override
+  String get practicalApplicationsSpeedDesc => 'Essential for automotive engineering, aviation, maritime navigation, physics calculations, sports analysis, and any application requiring precise speed measurements.';
+
+  @override
+  String get speedConverterInfo => 'Speed Converter Information';
+
+  @override
+  String get customizeSpeedUnits => 'Customize Speed Units';
+
+  @override
+  String get selectSpeedUnits => 'Select speed units to display';
+
+  @override
+  String get speedUnits => 'Speed Units';
 }

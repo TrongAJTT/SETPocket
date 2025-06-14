@@ -300,102 +300,129 @@ class _DesktopLayoutState extends State<DesktopLayout> {
     }
   }
 
-  Widget _buildBreadcrumbBar() {
-    if (breadcrumbs.isEmpty) return const SizedBox.shrink();
+  // Compact breadcrumb widget for AppBar
+  Widget _buildCompactBreadcrumb() {
+    if (breadcrumbs.isEmpty || breadcrumbs.length <= 1) {
+      return const SizedBox.shrink();
+    }
 
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer.withValues(alpha: 0.8),
-        border: Border(
-          bottom: BorderSide(
-            color: theme.colorScheme.outline.withValues(alpha: 0.2),
-          ),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.navigation,
-            size: 16,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (int i = 0; i < breadcrumbs.length; i++) ...[
-                    if (i > 0) ...[
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.chevron_right,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 8),
-                    ],
+          Container(
+            height: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? theme.colorScheme.surface.withValues(alpha: 0.3)
+                  : theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark
+                    ? theme.colorScheme.outline.withValues(alpha: 0.4)
+                    : theme.colorScheme.outline.withValues(alpha: 0.3),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (int i = 0; i < breadcrumbs.length; i++) ...[
+                  if (i > 0) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 12,
+                      color: isDark
+                          ? theme.colorScheme.onSurface.withValues(alpha: 0.8)
+                          : theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.9),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  if (i < breadcrumbs.length - 1)
                     InkWell(
-                      onTap: i < breadcrumbs.length - 1
-                          ? () {
-                              // Navigate to this breadcrumb level
-                              final targetBreadcrumb = breadcrumbs[i];
-                              // Remove all breadcrumbs after this one
-                              breadcrumbs = breadcrumbs.sublist(0, i + 1);
-                              setState(() {
-                                currentTool = targetBreadcrumb.tool;
-                                selectedToolType = targetBreadcrumb.toolType;
-                                currentToolTitle = targetBreadcrumb.title;
-                                parentToolType =
-                                    i > 0 ? breadcrumbs[i - 1].toolType : null;
-                              });
-                            }
-                          : null,
-                      borderRadius: BorderRadius.circular(4),
-                      child: Container(
+                      onTap: () {
+                        // Navigate to this breadcrumb level
+                        final targetBreadcrumb = breadcrumbs[i];
+                        // Remove all breadcrumbs after this one
+                        breadcrumbs = breadcrumbs.sublist(0, i + 1);
+                        setState(() {
+                          currentTool = targetBreadcrumb.tool;
+                          selectedToolType = targetBreadcrumb.toolType;
+                          currentToolTitle = targetBreadcrumb.title;
+                          parentToolType =
+                              i > 0 ? breadcrumbs[i - 1].toolType : null;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: i == breadcrumbs.length - 1
-                              ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                              : null,
-                        ),
+                            horizontal: 4, vertical: 2),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (breadcrumbs[i].icon != null) ...[
                               Icon(
                                 breadcrumbs[i].icon,
-                                size: 14,
-                                color: i == breadcrumbs.length - 1
-                                    ? theme.colorScheme.primary
+                                size: 10,
+                                color: isDark
+                                    ? theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.9)
                                     : theme.colorScheme.onSurfaceVariant,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 2),
                             ],
                             Text(
                               breadcrumbs[i].title,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: i == breadcrumbs.length - 1
-                                    ? theme.colorScheme.primary
+                                color: isDark
+                                    ? theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.9)
                                     : theme.colorScheme.onSurfaceVariant,
-                                fontWeight: i == breadcrumbs.length - 1
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
+                    )
+                  else
+                    // Current page (not clickable)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (breadcrumbs[i].icon != null) ...[
+                          Icon(
+                            breadcrumbs[i].icon,
+                            size: 10,
+                            color: isDark
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 2),
+                        ],
+                        Text(
+                          breadcrumbs[i].title,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: isDark
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.primary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
                 ],
-              ),
+              ],
             ),
           ),
         ],
@@ -407,7 +434,15 @@ class _DesktopLayoutState extends State<DesktopLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(currentToolTitle ?? AppLocalizations.of(context)!.title),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(currentToolTitle ?? AppLocalizations.of(context)!.title),
+            // Add compact breadcrumb after title on desktop
+            if (MediaQuery.of(context).size.width > 800) // Desktop only
+              _buildCompactBreadcrumb(),
+          ],
+        ),
         leading: currentTool != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -420,7 +455,6 @@ class _DesktopLayoutState extends State<DesktopLayout> {
       ),
       body: Column(
         children: [
-          _buildBreadcrumbBar(),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {

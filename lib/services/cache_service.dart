@@ -289,6 +289,32 @@ class CacheService {
         // Continue without time presets info
       }
 
+      // Volume state
+      try {
+        final hasVolumeState = await VolumeStateService.hasState();
+        if (hasVolumeState) {
+          final volumeStateSize = await VolumeStateService.getStateSize();
+          converterSize += volumeStateSize;
+          converterCount++; // Count as 1 item for volume state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking volume state: $e');
+        // Continue without volume state info
+      }
+
+      // Volume presets
+      try {
+        final volumePresets = await GenericPresetService.loadPresets('volume');
+        if (volumePresets.isNotEmpty) {
+          converterSize += (volumePresets.length * 50)
+              .toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for volume presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking volume presets: $e');
+        // Continue without volume presets info
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??

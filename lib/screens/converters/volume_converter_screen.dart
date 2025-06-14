@@ -523,9 +523,6 @@ class _VolumeConverterScreenState extends State<VolumeConverterScreen> {
     }
 
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    logInfo(
-        'VolumeConverterScreen: Screen width: $screenWidth, Mobile: ${screenWidth < 600}');
 
     return ListenableBuilder(
       listenable: _controller,

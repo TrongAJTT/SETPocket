@@ -85,6 +85,26 @@ class VolumeStateService {
     }
   }
 
+  // Get state size in bytes (for cache management)
+  static Future<int> getStateSize() async {
+    try {
+      final box = await Hive.openBox(_boxName);
+      int size = 0;
+
+      final state = box.get(_stateKey);
+      if (state != null) {
+        // Rough estimate of memory usage for the state
+        size += state.toString().length * 2; // UTF-16 encoding
+      }
+
+      await box.close();
+      return size;
+    } catch (e) {
+      logError('VolumeStateService: Error getting state size: $e');
+      return 0;
+    }
+  }
+
   // Get cached data size (for cache management)
   static Future<int> getCacheSize() async {
     try {

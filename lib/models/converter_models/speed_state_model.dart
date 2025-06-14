@@ -84,9 +84,6 @@ class SpeedStateModel extends HiveObject {
             'kilometers_per_hour',
             'meters_per_second',
             'miles_per_hour',
-            'knots',
-            'feet_per_second',
-            'mach'
           ],
         ),
       ],
@@ -94,9 +91,6 @@ class SpeedStateModel extends HiveObject {
         'kilometers_per_hour',
         'meters_per_second',
         'miles_per_hour',
-        'knots',
-        'feet_per_second',
-        'mach'
       ],
       lastUpdated: DateTime.now(),
       isFocusMode: false,

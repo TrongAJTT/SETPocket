@@ -13,6 +13,7 @@ import 'converter_services/area_state_service.dart';
 import 'converter_services/time_state_service.dart';
 import 'converter_services/volume_state_service.dart';
 import 'converter_services/number_system_state_service.dart';
+import 'converter_services/speed_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'package:hive/hive.dart';
 
@@ -344,10 +345,36 @@ class CacheService {
         // Continue without number system presets info
       }
 
+      // Speed state
+      try {
+        final hasSpeedState = await SpeedStateService.hasState();
+        if (hasSpeedState) {
+          final speedStateSize = await SpeedStateService.getStateSize();
+          converterSize += speedStateSize;
+          converterCount++; // Count as 1 item for speed state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking speed state: $e');
+        // Continue without speed state info
+      }
+
+      // Speed presets
+      try {
+        final speedPresets = await GenericPresetService.loadPresets('speed');
+        if (speedPresets.isNotEmpty) {
+          converterSize +=
+              (speedPresets.length * 50).toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for speed presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking speed presets: $e');
+        // Continue without speed presets info
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area/time/volume/number_system states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time/volume/number_system/speed states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -357,7 +384,7 @@ class CacheService {
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area/time states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time/volume/number_system/speed states, presets and exchange rates cache',
         itemCount: 0,
         sizeBytes: 0,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -396,6 +423,7 @@ class CacheService {
       await TimeStateService.clearState();
       await VolumeStateService.clearState();
       await NumberSystemStateService.clearState();
+      await SpeedStateService.clearState();
 
       // Clear generic presets for all converter types
       await GenericPresetService.clearAllPresets('length');
@@ -405,6 +433,7 @@ class CacheService {
       await GenericPresetService.clearAllPresets('time');
       await GenericPresetService.clearAllPresets('volume');
       await GenericPresetService.clearAllPresets('number_system');
+      await GenericPresetService.clearAllPresets('speed');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -440,6 +469,7 @@ class CacheService {
     await TimeStateService.clearState();
     await VolumeStateService.clearState();
     await NumberSystemStateService.clearState();
+    await SpeedStateService.clearState();
 
     // Clear generic presets for all converter types
     await GenericPresetService.clearAllPresets('length');
@@ -449,6 +479,7 @@ class CacheService {
     await GenericPresetService.clearAllPresets('time');
     await GenericPresetService.clearAllPresets('volume');
     await GenericPresetService.clearAllPresets('number_system');
+    await GenericPresetService.clearAllPresets('speed');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
@@ -494,6 +525,7 @@ class CacheService {
       'time_state',
       'volume_state',
       'number_system_state',
+      'speed_state',
       'currency_presets',
       'generic_length_presets',
       'generic_mass_presets',
@@ -502,6 +534,7 @@ class CacheService {
       'generic_time_presets',
       'generic_volume_presets',
       'generic_number_system_presets',
+      'generic_speed_presets',
       'currency_cache',
     ];
 

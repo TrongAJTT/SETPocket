@@ -11,6 +11,7 @@ import '../models/converter_models/length_state_model.dart';
 import '../models/converter_models/mass_state_model.dart';
 import '../models/converter_models/length_preset_model.dart';
 import '../models/converter_models/generic_preset_model.dart';
+import '../models/converter_models/weight_state_model.dart';
 
 class HiveService {
   // Box names
@@ -83,6 +84,12 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(19)) {
         Hive.registerAdapter(GenericPresetModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(20)) {
+        Hive.registerAdapter(WeightCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(21)) {
+        Hive.registerAdapter(WeightStateModelAdapter());
       }
 
       // Open boxes

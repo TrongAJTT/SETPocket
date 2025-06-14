@@ -3,7 +3,8 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/screens/converters/unit_converter_screen.dart';
 import 'package:setpocket/screens/converters/currency_converter_screen.dart';
 import 'package:setpocket/screens/converters/length_converter_screen.dart';
-import 'package:setpocket/screens/converters/mass_converter_new_screen.dart';
+import 'package:setpocket/screens/converters/mass_converter_screen.dart';
+import 'package:setpocket/screens/converters/weight_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -37,7 +38,7 @@ class ConverterToolsScreen extends StatelessWidget {
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
       ),
-      itemCount: 10, // Number of converter tools
+      itemCount: 11, // Number of converter tools (increased by 1)
       itemBuilder: (context, index) {
         Widget screen;
         String title;
@@ -63,27 +64,33 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.orange;
             break;
           case 3:
+            screen = const WeightConverterScreen();
+            title = loc.weightConverter;
+            icon = Icons.fitness_center;
+            iconColor = Colors.deepPurple;
+            break;
+          case 4:
             screen = UnitConverterScreen(
                 categoryId: 'area', categoryName: loc.areaConverter);
             title = loc.areaConverter;
             icon = Icons.crop_free;
             iconColor = Colors.purple;
             break;
-          case 4:
+          case 5:
             screen = UnitConverterScreen(
                 categoryId: 'time', categoryName: loc.timeConverter);
             title = loc.timeConverter;
             icon = Icons.schedule;
             iconColor = Colors.red;
             break;
-          case 5:
+          case 6:
             screen = UnitConverterScreen(
                 categoryId: 'volume', categoryName: loc.volumeConverter);
             title = loc.volumeConverter;
             icon = Icons.local_drink;
             iconColor = Colors.cyan;
             break;
-          case 6:
+          case 7:
             screen = UnitConverterScreen(
                 categoryId: 'number_systems',
                 categoryName: loc.numberSystemConverter);
@@ -91,14 +98,14 @@ class ConverterToolsScreen extends StatelessWidget {
             icon = Icons.calculate;
             iconColor = Colors.indigo;
             break;
-          case 7:
+          case 8:
             screen = UnitConverterScreen(
                 categoryId: 'speed', categoryName: loc.speedConverter);
             title = loc.speedConverter;
             icon = Icons.speed;
             iconColor = Colors.teal;
             break;
-          case 8:
+          case 9:
             screen = UnitConverterScreen(
                 categoryId: 'temperature',
                 categoryName: loc.temperatureConverter);
@@ -106,7 +113,7 @@ class ConverterToolsScreen extends StatelessWidget {
             icon = Icons.thermostat;
             iconColor = Colors.amber;
             break;
-          case 9:
+          case 10:
             screen = UnitConverterScreen(
                 categoryId: 'data_storage', categoryName: loc.dataConverter);
             title = loc.dataConverter;
@@ -210,18 +217,20 @@ class ConverterToolsScreen extends StatelessWidget {
       case 2:
         return loc.massConverterDesc;
       case 3:
-        return loc.areaConverterDesc;
+        return loc.weightConverterDesc;
       case 4:
-        return loc.timeConverterDesc;
+        return loc.areaConverterDesc;
       case 5:
-        return loc.volumeConverterDesc;
+        return loc.timeConverterDesc;
       case 6:
-        return loc.numberSystemConverterDesc;
+        return loc.volumeConverterDesc;
       case 7:
-        return loc.speedConverterDesc;
+        return loc.numberSystemConverterDesc;
       case 8:
-        return loc.temperatureConverterDesc;
+        return loc.speedConverterDesc;
       case 9:
+        return loc.temperatureConverterDesc;
+      case 10:
         return loc.dataConverterDesc;
       default:
         return "";

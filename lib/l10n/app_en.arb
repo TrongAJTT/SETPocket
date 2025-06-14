@@ -687,6 +687,18 @@
     "@massConverterDesc": {
         "description": "Description for mass converter tool"
     },
+    "weightConverter": "Weight Converter",
+    "@weightConverter": {
+        "description": "Title for weight converter tool"
+    },
+    "weightConverterInfo": "Weight Converter Info",
+    "@weightConverterInfo": {
+        "description": "Title for weight converter info dialog"
+    },
+    "weightConverterDesc": "Convert between force/weight units (N, kgf, lbf)",
+    "@weightConverterDesc": {
+        "description": "Description for weight converter tool"
+    },
     "customizeMassUnits": "Customize Mass Units",
     "@customizeMassUnits": {
         "description": "Title for mass unit customization dialog"
@@ -877,6 +889,33 @@
     "tip6Length": "• Use the search function to quickly find specific units in customization",
     "lengthUnitRange": "Supported Units Range",
     "lengthUnitRangeDesc": "From subatomic (angstroms) to astronomical (light years) measurements with precision maintained throughout.",
+    
+    "weightConverterDetailedInfo": "Weight Converter - Detailed Information",
+    "weightConverterOverview": "This precision weight/force converter supports multiple unit systems with high accuracy calculations for engineering, physics, and scientific applications.",
+    "step1Weight": "Step 1: Add Cards",
+    "step1WeightDesc": "Add multiple converter cards to work with different force/weight values simultaneously.",
+    "step2Weight": "Step 2: Select Units",
+    "step2WeightDesc": "Choose which force/weight units to display by customizing each card's visible units.",
+    "step3Weight": "Step 3: Enter Values",
+    "step3WeightDesc": "Type any force/weight value and see instant conversions to all other units.",
+    "step4Weight": "Step 4: Organize Layout",
+    "step4WeightDesc": "Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.",
+    "tip1Weight": "• Newton (N) is the base SI unit for force with highest precision",
+    "tip2Weight": "• Kilogram-force (kgf) represents gravitational force on 1 kg mass",
+    "tip3Weight": "• Use scientific notation for very large or small force values",
+    "tip4Weight": "• Dyne is useful for small forces in CGS system calculations",
+    "tip5Weight": "• Troy units are specialized for precious metals and jewelry",
+    "tip6Weight": "• Focus mode helps concentrate on complex force calculations",
+    "weightUnitCategories": "Unit Categories",
+    "commonUnits": "Common Units",
+    "commonUnitsWeightDesc": "Newton (N), Kilogram-force (kgf), Pound-force (lbf) - most frequently used in engineering and physics.",
+    "lessCommonUnits": "Less Common Units", 
+    "lessCommonUnitsWeightDesc": "Dyne (dyn), Kilopond (kp) - specialized scientific and technical applications.",
+    "uncommonUnits": "Uncommon Units",
+    "uncommonUnitsWeightDesc": "Ton-force (tf) - for very large force measurements in heavy industry.",
+    "specialUnits": "Special Units",
+    "specialUnitsWeightDesc": "Gram-force (gf), Troy pound-force - for precision measurements and precious metals.",
+    "practicalApplicationsWeightDesc": "Essential for mechanical engineering, structural analysis, material testing, physics experiments, and any application requiring precise force measurements.",
     "practicalApplications": "Practical Applications",
     "practicalApplicationsDesc": "Perfect for engineering, science, construction, and everyday measurements with professional accuracy.",
     

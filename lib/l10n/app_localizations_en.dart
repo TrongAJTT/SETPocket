@@ -1400,7 +1400,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lengthConverterDesc => 'Convert between different units of length';
 
   @override
-  String get weightConverterDesc => 'Convert between different units of weight';
+  String get weightConverterDesc => 'Convert between force/weight units (N, kgf, lbf)';
 
   @override
   String get temperatureConverterDesc => 'Convert between different temperature scales';
@@ -2123,6 +2123,84 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lengthUnitRangeDesc => 'From subatomic (angstroms) to astronomical (light years) measurements with precision maintained throughout.';
+
+  @override
+  String get weightConverterDetailedInfo => 'Weight Converter - Detailed Information';
+
+  @override
+  String get weightConverterOverview => 'This precision weight/force converter supports multiple unit systems with high accuracy calculations for engineering, physics, and scientific applications.';
+
+  @override
+  String get step1Weight => 'Step 1: Add Cards';
+
+  @override
+  String get step1WeightDesc => 'Add multiple converter cards to work with different force/weight values simultaneously.';
+
+  @override
+  String get step2Weight => 'Step 2: Select Units';
+
+  @override
+  String get step2WeightDesc => 'Choose which force/weight units to display by customizing each card\'s visible units.';
+
+  @override
+  String get step3Weight => 'Step 3: Enter Values';
+
+  @override
+  String get step3WeightDesc => 'Type any force/weight value and see instant conversions to all other units.';
+
+  @override
+  String get step4Weight => 'Step 4: Organize Layout';
+
+  @override
+  String get step4WeightDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Weight => '• Newton (N) is the base SI unit for force with highest precision';
+
+  @override
+  String get tip2Weight => '• Kilogram-force (kgf) represents gravitational force on 1 kg mass';
+
+  @override
+  String get tip3Weight => '• Use scientific notation for very large or small force values';
+
+  @override
+  String get tip4Weight => '• Dyne is useful for small forces in CGS system calculations';
+
+  @override
+  String get tip5Weight => '• Troy units are specialized for precious metals and jewelry';
+
+  @override
+  String get tip6Weight => '• Focus mode helps concentrate on complex force calculations';
+
+  @override
+  String get weightUnitCategories => 'Unit Categories';
+
+  @override
+  String get commonUnits => 'Common Units';
+
+  @override
+  String get commonUnitsWeightDesc => 'Newton (N), Kilogram-force (kgf), Pound-force (lbf) - most frequently used in engineering and physics.';
+
+  @override
+  String get lessCommonUnits => 'Less Common Units';
+
+  @override
+  String get lessCommonUnitsWeightDesc => 'Dyne (dyn), Kilopond (kp) - specialized scientific and technical applications.';
+
+  @override
+  String get uncommonUnits => 'Uncommon Units';
+
+  @override
+  String get uncommonUnitsWeightDesc => 'Ton-force (tf) - for very large force measurements in heavy industry.';
+
+  @override
+  String get specialUnits => 'Special Units';
+
+  @override
+  String get specialUnitsWeightDesc => 'Gram-force (gf), Troy pound-force - for precision measurements and precious metals.';
+
+  @override
+  String get practicalApplicationsWeightDesc => 'Essential for mechanical engineering, structural analysis, material testing, physics experiments, and any application requiring precise force measurements.';
 
   @override
   String get practicalApplications => 'Practical Applications';

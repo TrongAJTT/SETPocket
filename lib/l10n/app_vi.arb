@@ -401,9 +401,17 @@
     "@weightConverterInfo": {
         "description": "Tiêu đề cho hộp thoại thông tin chuyển đổi trọng lượng"
     },
-    "customizeWeightUnits": "Tùy chỉnh đơn vị Trọng lượng",
+    "customizeWeightUnits": "Tùy chỉnh đơn vị trọng lượng",
     "@customizeWeightUnits": {
         "description": "Tiêu đề cho hộp thoại tùy chỉnh đơn vị trọng lượng"
+    },
+    "weightConverterDesc": "Chuyển đổi giữa các đơn vị lực/trọng lượng (N, kgf, lbf)",
+    "@weightConverterDesc": {
+        "description": "Mô tả cho công cụ chuyển đổi trọng lượng"
+    },
+    "customizeMassUnits": "Tùy chỉnh đơn vị Khối lượng",
+    "@customizeMassUnits": {
+        "description": "Tiêu đề cho hộp thoại tùy chỉnh đơn vị khối lượng"
     },
     "massConverter": "Chuyển đổi Khối lượng",
     "@massConverter": {
@@ -750,7 +758,7 @@
     "presetRenamedSuccessfully": "Đã đổi tên cấu hình thành công",
     "chooseFromSavedPresets": "Chọn từ các cấu hình đã lưu",
     
-    "currencyConverterDetailedInfo": "Bộ chuyển đổi tiền tệ - Thông tin chi tiết",
+    "currencyConverterDetailedInfo": "Bộ chuyển đổi tiền tệ - Thông Tin Chi Tiết",
     "currencyConverterOverview": "Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.",
     "keyFeatures": "Tính năng chính",
     "multipleCards": "Nhiều thẻ chuyển đổi",
@@ -896,5 +904,32 @@
     "tip6Mass": "• Sử dụng cấu hình để lưu các tổ hợp đơn vị yêu thích",
     "massUnitSystems": "Hệ Thống Đơn Vị Hỗ Trợ",
     "massUnitSystemsDesc": "Hệ mét (ng đến tấn), hệ Anh (hạt đến tấn), troy (kim loại quý), dược sĩ (dược phẩm), và đơn vị đặc biệt (carat, slug, đơn vị khối lượng nguyên tử).",
-    "practicalApplicationsMassDesc": "Hoàn hảo cho hóa học, dược phẩm, giao dịch kim loại quý, vận chuyển, nấu ăn và nghiên cứu khoa học với độ chính xác chuyên nghiệp."
+    "practicalApplicationsMassDesc": "Hoàn hảo cho hóa học, dược phẩm, giao dịch kim loại quý, vận chuyển, nấu ăn và nghiên cứu khoa học với độ chính xác chuyên nghiệp.",
+    
+    "weightConverterDetailedInfo": "Bộ Chuyển Đổi Trọng Lượng - Thông Tin Chi Tiết",
+    "weightConverterOverview": "Bộ chuyển đổi trọng lượng/lực chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng kỹ thuật, vật lý và khoa học.",
+    "step1Weight": "Bước 1: Thêm Thẻ",
+    "step1WeightDesc": "Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị lực/trọng lượng khác nhau cùng lúc.",
+    "step2Weight": "Bước 2: Chọn Đơn Vị",
+    "step2WeightDesc": "Chọn đơn vị lực/trọng lượng nào hiển thị bằng cách tùy chỉnh đơn vị hiển thị của mỗi thẻ.",
+    "step3Weight": "Bước 3: Nhập Giá Trị",
+    "step3WeightDesc": "Nhập bất kỳ giá trị lực/trọng lượng nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.",
+    "step4Weight": "Bước 4: Sắp Xếp Bố Cục",
+    "step4WeightDesc": "Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.",
+    "tip1Weight": "• Newton (N) là đơn vị SI cơ bản cho lực với độ chính xác cao nhất",
+    "tip2Weight": "• Kilogram-lực (kgf) biểu thị lực hấp dẫn tác dụng lên khối lượng 1 kg",
+    "tip3Weight": "• Sử dụng ký hiệu khoa học cho các giá trị lực rất lớn hoặc rất nhỏ",
+    "tip4Weight": "• Dyne hữu ích cho các lực nhỏ trong tính toán hệ CGS",
+    "tip5Weight": "• Đơn vị troy chuyên dụng cho kim loại quý và trang sức",
+    "tip6Weight": "• Chế độ tập trung giúp tập trung vào các phép tính lực phức tạp",
+    "weightUnitCategories": "Danh Mục Đơn Vị",
+    "commonUnits": "Đơn Vị Phổ Biến",
+    "commonUnitsWeightDesc": "Newton (N), Kilogram-lực (kgf), Pound-lực (lbf) - được sử dụng thường xuyên nhất trong kỹ thuật và vật lý.",
+    "lessCommonUnits": "Đơn Vị Ít Phổ Biến",
+    "lessCommonUnitsWeightDesc": "Dyne (dyn), Kilopond (kp) - ứng dụng khoa học và kỹ thuật chuyên biệt.",
+    "uncommonUnits": "Đơn Vị Không Phổ Biến",
+    "uncommonUnitsWeightDesc": "Tấn-lực (tf) - cho các phép đo lực rất lớn trong công nghiệp nặng.",
+    "specialUnits": "Đơn Vị Đặc Biệt",
+    "specialUnitsWeightDesc": "Gram-lực (gf), Troy pound-lực - cho các phép đo chính xác và kim loại quý.",
+    "practicalApplicationsWeightDesc": "Thiết yếu cho kỹ thuật cơ khí, phân tích kết cấu, thử nghiệm vật liệu, thí nghiệm vật lý và bất kỳ ứng dụng nào yêu cầu đo lực chính xác."
 }

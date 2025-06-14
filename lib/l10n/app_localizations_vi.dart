@@ -1749,7 +1749,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weightConverterInfo => 'Thông tin Chuyển đổi Trọng lượng';
 
   @override
-  String get customizeWeightUnits => 'Tùy chỉnh đơn vị Trọng lượng';
+  String get customizeWeightUnits => 'Tùy chỉnh đơn vị trọng lượng';
 
   @override
   String get massConverter => 'Chuyển đổi Khối lượng';
@@ -1820,7 +1820,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get chooseFromSavedPresets => 'Chọn từ các cấu hình đã lưu';
 
   @override
-  String get currencyConverterDetailedInfo => 'Bộ chuyển đổi tiền tệ - Thông tin chi tiết';
+  String get currencyConverterDetailedInfo => 'Bộ chuyển đổi tiền tệ - Thông Tin Chi Tiết';
 
   @override
   String get currencyConverterOverview => 'Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.';
@@ -2123,6 +2123,84 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get lengthUnitRangeDesc => 'Từ phép đo dưới nguyên tử (angstrom) đến thiên văn (năm ánh sáng) với độ chính xác được duy trì xuyên suốt.';
+
+  @override
+  String get weightConverterDetailedInfo => 'Bộ Chuyển Đổi Trọng Lượng - Thông Tin Chi Tiết';
+
+  @override
+  String get weightConverterOverview => 'Bộ chuyển đổi trọng lượng/lực chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng kỹ thuật, vật lý và khoa học.';
+
+  @override
+  String get step1Weight => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1WeightDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị lực/trọng lượng khác nhau cùng lúc.';
+
+  @override
+  String get step2Weight => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2WeightDesc => 'Chọn đơn vị lực/trọng lượng nào hiển thị bằng cách tùy chỉnh đơn vị hiển thị của mỗi thẻ.';
+
+  @override
+  String get step3Weight => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3WeightDesc => 'Nhập bất kỳ giá trị lực/trọng lượng nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Weight => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4WeightDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Weight => '• Newton (N) là đơn vị SI cơ bản cho lực với độ chính xác cao nhất';
+
+  @override
+  String get tip2Weight => '• Kilogram-lực (kgf) biểu thị lực hấp dẫn tác dụng lên khối lượng 1 kg';
+
+  @override
+  String get tip3Weight => '• Sử dụng ký hiệu khoa học cho các giá trị lực rất lớn hoặc rất nhỏ';
+
+  @override
+  String get tip4Weight => '• Dyne hữu ích cho các lực nhỏ trong tính toán hệ CGS';
+
+  @override
+  String get tip5Weight => '• Đơn vị troy chuyên dụng cho kim loại quý và trang sức';
+
+  @override
+  String get tip6Weight => '• Chế độ tập trung giúp tập trung vào các phép tính lực phức tạp';
+
+  @override
+  String get weightUnitCategories => 'Danh Mục Đơn Vị';
+
+  @override
+  String get commonUnits => 'Đơn Vị Phổ Biến';
+
+  @override
+  String get commonUnitsWeightDesc => 'Newton (N), Kilogram-lực (kgf), Pound-lực (lbf) - được sử dụng thường xuyên nhất trong kỹ thuật và vật lý.';
+
+  @override
+  String get lessCommonUnits => 'Đơn Vị Ít Phổ Biến';
+
+  @override
+  String get lessCommonUnitsWeightDesc => 'Dyne (dyn), Kilopond (kp) - ứng dụng khoa học và kỹ thuật chuyên biệt.';
+
+  @override
+  String get uncommonUnits => 'Đơn Vị Không Phổ Biến';
+
+  @override
+  String get uncommonUnitsWeightDesc => 'Tấn-lực (tf) - cho các phép đo lực rất lớn trong công nghiệp nặng.';
+
+  @override
+  String get specialUnits => 'Đơn Vị Đặc Biệt';
+
+  @override
+  String get specialUnitsWeightDesc => 'Gram-lực (gf), Troy pound-lực - cho các phép đo chính xác và kim loại quý.';
+
+  @override
+  String get practicalApplicationsWeightDesc => 'Thiết yếu cho kỹ thuật cơ khí, phân tích kết cấu, thử nghiệm vật liệu, thí nghiệm vật lý và bất kỳ ứng dụng nào yêu cầu đo lực chính xác.';
 
   @override
   String get practicalApplications => 'Ứng Dụng Thực Tế';

@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../models/settings_model.dart';
-import '../models/converter_models/currency_cache_model.dart';
+import 'package:setpocket/models/settings_model.dart';
+import 'package:setpocket/models/converter_models/currency_cache_model.dart';
 
 class SettingsService {
   static const String _settingsBoxName = 'settings';

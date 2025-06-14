@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../controllers/converter_controller.dart';
-import '../../models/converter_models/converter_base.dart';
-import '../../l10n/app_localizations.dart';
-import 'unit_customization_dialog.dart' as unit_dialog;
-import 'generic_unit_custom_dialog.dart';
+import 'package:setpocket/controllers/converter_controller.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/widgets/converter_tools/generic_unit_custom_dialog.dart';
 
 class ConverterTableWidget extends StatelessWidget {
   final ConverterController controller;

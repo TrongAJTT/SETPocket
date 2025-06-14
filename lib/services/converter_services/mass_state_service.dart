@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:setpocket/models/converter_models/mass_state_model.dart';
 import 'package:setpocket/services/settings_service.dart';
@@ -66,7 +68,7 @@ class MassStateService {
           }
 
           // Additional validation - check if the structure is complete
-          final state = rawData as MassStateModel;
+          final state = rawData;
           // Try to access all required fields to trigger any casting errors
           final _ = state.cards;
           final __ = state.visibleUnits;

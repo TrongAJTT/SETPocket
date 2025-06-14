@@ -2693,10 +2693,10 @@ abstract class AppLocalizations {
   /// **'Convert between different units of length'**
   String get lengthConverterDesc;
 
-  /// No description provided for @weightConverterDesc.
+  /// Description for weight converter tool
   ///
   /// In en, this message translates to:
-  /// **'Convert between different units of weight'**
+  /// **'Convert between force/weight units (N, kgf, lbf)'**
   String get weightConverterDesc;
 
   /// No description provided for @temperatureConverterDesc.
@@ -4054,6 +4054,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'From subatomic (angstroms) to astronomical (light years) measurements with precision maintained throughout.'**
   String get lengthUnitRangeDesc;
+
+  /// No description provided for @weightConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Converter - Detailed Information'**
+  String get weightConverterDetailedInfo;
+
+  /// No description provided for @weightConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision weight/force converter supports multiple unit systems with high accuracy calculations for engineering, physics, and scientific applications.'**
+  String get weightConverterOverview;
+
+  /// No description provided for @step1Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Weight;
+
+  /// No description provided for @step1WeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different force/weight values simultaneously.'**
+  String get step1WeightDesc;
+
+  /// No description provided for @step2Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Weight;
+
+  /// No description provided for @step2WeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which force/weight units to display by customizing each card\'s visible units.'**
+  String get step2WeightDesc;
+
+  /// No description provided for @step3Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Weight;
+
+  /// No description provided for @step3WeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any force/weight value and see instant conversions to all other units.'**
+  String get step3WeightDesc;
+
+  /// No description provided for @step4Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Weight;
+
+  /// No description provided for @step4WeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4WeightDesc;
+
+  /// No description provided for @tip1Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'• Newton (N) is the base SI unit for force with highest precision'**
+  String get tip1Weight;
+
+  /// No description provided for @tip2Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'• Kilogram-force (kgf) represents gravitational force on 1 kg mass'**
+  String get tip2Weight;
+
+  /// No description provided for @tip3Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use scientific notation for very large or small force values'**
+  String get tip3Weight;
+
+  /// No description provided for @tip4Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'• Dyne is useful for small forces in CGS system calculations'**
+  String get tip4Weight;
+
+  /// No description provided for @tip5Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'• Troy units are specialized for precious metals and jewelry'**
+  String get tip5Weight;
+
+  /// No description provided for @tip6Weight.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex force calculations'**
+  String get tip6Weight;
+
+  /// No description provided for @weightUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Categories'**
+  String get weightUnitCategories;
+
+  /// No description provided for @commonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Units'**
+  String get commonUnits;
+
+  /// No description provided for @commonUnitsWeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Newton (N), Kilogram-force (kgf), Pound-force (lbf) - most frequently used in engineering and physics.'**
+  String get commonUnitsWeightDesc;
+
+  /// No description provided for @lessCommonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Less Common Units'**
+  String get lessCommonUnits;
+
+  /// No description provided for @lessCommonUnitsWeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dyne (dyn), Kilopond (kp) - specialized scientific and technical applications.'**
+  String get lessCommonUnitsWeightDesc;
+
+  /// No description provided for @uncommonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncommon Units'**
+  String get uncommonUnits;
+
+  /// No description provided for @uncommonUnitsWeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ton-force (tf) - for very large force measurements in heavy industry.'**
+  String get uncommonUnitsWeightDesc;
+
+  /// No description provided for @specialUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Special Units'**
+  String get specialUnits;
+
+  /// No description provided for @specialUnitsWeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gram-force (gf), Troy pound-force - for precision measurements and precious metals.'**
+  String get specialUnitsWeightDesc;
+
+  /// No description provided for @practicalApplicationsWeightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for mechanical engineering, structural analysis, material testing, physics experiments, and any application requiring precise force measurements.'**
+  String get practicalApplicationsWeightDesc;
 
   /// No description provided for @practicalApplications.
   ///

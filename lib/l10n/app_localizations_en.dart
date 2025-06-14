@@ -2342,4 +2342,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get practicalApplicationsAreaDesc => 'Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements.';
+
+  @override
+  String get timeConverterDetailedInfo => 'Time Converter - Detailed Information';
+
+  @override
+  String get timeConverterOverview => 'Comprehensive time unit conversion with precision calculations and multiple unit support.';
+
+  @override
+  String get step1Time => 'Step 1: Select Time Units';
+
+  @override
+  String get step1TimeDesc => 'Choose from seconds, minutes, hours, days, weeks, months, years, and specialized units like milliseconds and nanoseconds.';
+
+  @override
+  String get step2Time => 'Step 2: Enter Time Value';
+
+  @override
+  String get step2TimeDesc => 'Input the time duration you want to convert. Supports decimal values and scientific notation for precise calculations.';
+
+  @override
+  String get step3Time => 'Step 3: View Conversions';
+
+  @override
+  String get step3TimeDesc => 'See instant conversions across all selected time units with high precision calculations.';
+
+  @override
+  String get step4Time => 'Step 4: Customize & Save';
+
+  @override
+  String get step4TimeDesc => 'Add multiple cards, customize visible units, and save your preferred layout for future use.';
+
+  @override
+  String get tip1Time => '• Use scientific notation for very small or large time values';
+
+  @override
+  String get tip2Time => '• Milliseconds and nanoseconds are perfect for technical calculations';
+
+  @override
+  String get tip3Time => '• Years and months use average values for consistency';
+
+  @override
+  String get tip4Time => '• Add multiple cards to compare different time scales';
+
+  @override
+  String get tip5Time => '• Customize visible units to show only what you need';
+
+  @override
+  String get tip6Time => '• Focus mode helps concentrate on complex time calculations';
+
+  @override
+  String get timeUnitSystems => 'Time Unit Systems';
+
+  @override
+  String get timeUnitSystemsDesc => 'Supports standard time units (s, min, h, d, wk, mo, yr), precision units (ms, μs, ns), and extended units (decades, centuries, millennia) for comprehensive time measurement across all scales.';
+
+  @override
+  String get practicalApplicationsTimeDesc => 'Essential for project management, scientific calculations, programming, scheduling, performance analysis, and any application requiring precise time measurements and conversions.';
 }

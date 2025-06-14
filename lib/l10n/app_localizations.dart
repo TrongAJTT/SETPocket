@@ -4492,6 +4492,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements.'**
   String get practicalApplicationsAreaDesc;
+
+  /// No description provided for @timeConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Converter - Detailed Information'**
+  String get timeConverterDetailedInfo;
+
+  /// No description provided for @timeConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive time unit conversion with precision calculations and multiple unit support.'**
+  String get timeConverterOverview;
+
+  /// No description provided for @step1Time.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Select Time Units'**
+  String get step1Time;
+
+  /// No description provided for @step1TimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from seconds, minutes, hours, days, weeks, months, years, and specialized units like milliseconds and nanoseconds.'**
+  String get step1TimeDesc;
+
+  /// No description provided for @step2Time.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Enter Time Value'**
+  String get step2Time;
+
+  /// No description provided for @step2TimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Input the time duration you want to convert. Supports decimal values and scientific notation for precise calculations.'**
+  String get step2TimeDesc;
+
+  /// No description provided for @step3Time.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: View Conversions'**
+  String get step3Time;
+
+  /// No description provided for @step3TimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See instant conversions across all selected time units with high precision calculations.'**
+  String get step3TimeDesc;
+
+  /// No description provided for @step4Time.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Customize & Save'**
+  String get step4Time;
+
+  /// No description provided for @step4TimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple cards, customize visible units, and save your preferred layout for future use.'**
+  String get step4TimeDesc;
+
+  /// No description provided for @tip1Time.
+  ///
+  /// In en, this message translates to:
+  /// **'• Use scientific notation for very small or large time values'**
+  String get tip1Time;
+
+  /// No description provided for @tip2Time.
+  ///
+  /// In en, this message translates to:
+  /// **'• Milliseconds and nanoseconds are perfect for technical calculations'**
+  String get tip2Time;
+
+  /// No description provided for @tip3Time.
+  ///
+  /// In en, this message translates to:
+  /// **'• Years and months use average values for consistency'**
+  String get tip3Time;
+
+  /// No description provided for @tip4Time.
+  ///
+  /// In en, this message translates to:
+  /// **'• Add multiple cards to compare different time scales'**
+  String get tip4Time;
+
+  /// No description provided for @tip5Time.
+  ///
+  /// In en, this message translates to:
+  /// **'• Customize visible units to show only what you need'**
+  String get tip5Time;
+
+  /// No description provided for @tip6Time.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex time calculations'**
+  String get tip6Time;
+
+  /// No description provided for @timeUnitSystems.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Unit Systems'**
+  String get timeUnitSystems;
+
+  /// No description provided for @timeUnitSystemsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports standard time units (s, min, h, d, wk, mo, yr), precision units (ms, μs, ns), and extended units (decades, centuries, millennia) for comprehensive time measurement across all scales.'**
+  String get timeUnitSystemsDesc;
+
+  /// No description provided for @practicalApplicationsTimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for project management, scientific calculations, programming, scheduling, performance analysis, and any application requiring precise time measurements and conversions.'**
+  String get practicalApplicationsTimeDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

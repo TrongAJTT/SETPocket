@@ -2342,4 +2342,61 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get practicalApplicationsAreaDesc => 'Thiết yếu cho bất động sản, nông nghiệp, xây dựng, quy hoạch đô thị, khảo sát đất đai và bất kỳ ứng dụng nào yêu cầu đo diện tích chính xác.';
+
+  @override
+  String get timeConverterDetailedInfo => 'Chuyển đổi Thời gian - Thông tin Chi tiết';
+
+  @override
+  String get timeConverterOverview => 'Chuyển đổi đơn vị thời gian toàn diện với tính toán chính xác và hỗ trợ nhiều đơn vị.';
+
+  @override
+  String get step1Time => 'Bước 1: Chọn Đơn vị Thời gian';
+
+  @override
+  String get step1TimeDesc => 'Chọn từ giây, phút, giờ, ngày, tuần, tháng, năm và các đơn vị chuyên biệt như mili giây và nano giây.';
+
+  @override
+  String get step2Time => 'Bước 2: Nhập Giá trị Thời gian';
+
+  @override
+  String get step2TimeDesc => 'Nhập khoảng thời gian bạn muốn chuyển đổi. Hỗ trợ giá trị thập phân và ký hiệu khoa học cho tính toán chính xác.';
+
+  @override
+  String get step3Time => 'Bước 3: Xem Chuyển đổi';
+
+  @override
+  String get step3TimeDesc => 'Xem chuyển đổi tức thì trên tất cả các đơn vị thời gian đã chọn với tính toán độ chính xác cao.';
+
+  @override
+  String get step4Time => 'Bước 4: Tùy chỉnh & Lưu';
+
+  @override
+  String get step4TimeDesc => 'Thêm nhiều thẻ, tùy chỉnh đơn vị hiển thị và lưu bố cục ưa thích cho lần sử dụng sau.';
+
+  @override
+  String get tip1Time => '• Sử dụng ký hiệu khoa học cho giá trị thời gian rất nhỏ hoặc rất lớn';
+
+  @override
+  String get tip2Time => '• Mili giây và nano giây hoàn hảo cho tính toán kỹ thuật';
+
+  @override
+  String get tip3Time => '• Năm và tháng sử dụng giá trị trung bình để đảm bảo tính nhất quán';
+
+  @override
+  String get tip4Time => '• Thêm nhiều thẻ để so sánh các thang thời gian khác nhau';
+
+  @override
+  String get tip5Time => '• Tùy chỉnh đơn vị hiển thị để chỉ hiện những gì bạn cần';
+
+  @override
+  String get tip6Time => '• Chế độ tập trung giúp tập trung vào các phép tính thời gian phức tạp';
+
+  @override
+  String get timeUnitSystems => 'Hệ Thống Đơn vị Thời gian';
+
+  @override
+  String get timeUnitSystemsDesc => 'Hỗ trợ đơn vị thời gian tiêu chuẩn (s, min, h, d, wk, mo, yr), đơn vị chính xác (ms, μs, ns), và đơn vị mở rộng (thập kỷ, thế kỷ, thiên niên kỷ) để đo thời gian toàn diện trên mọi quy mô.';
+
+  @override
+  String get practicalApplicationsTimeDesc => 'Thiết yếu cho quản lý dự án, tính toán khoa học, lập trình, lập lịch, phân tích hiệu suất và bất kỳ ứng dụng nào yêu cầu đo lường và chuyển đổi thời gian chính xác.';
 }

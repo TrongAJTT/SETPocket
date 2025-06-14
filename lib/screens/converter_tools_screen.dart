@@ -6,6 +6,7 @@ import 'package:setpocket/screens/converters/length_converter_screen.dart';
 import 'package:setpocket/screens/converters/mass_converter_screen.dart';
 import 'package:setpocket/screens/converters/weight_converter_screen.dart';
 import 'package:setpocket/screens/converters/area_converter_screen.dart';
+import 'converters/time_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -77,8 +78,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.purple;
             break;
           case 5:
-            screen = UnitConverterScreen(
-                categoryId: 'time', categoryName: loc.timeConverter);
+            screen = const TimeConverterScreen();
             title = loc.timeConverter;
             icon = Icons.schedule;
             iconColor = Colors.red;

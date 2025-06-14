@@ -8,10 +8,29 @@ class MassStateService {
 
   /// Get the mass state box
   static Future<Box<MassStateModel>> _getBox() async {
-    if (!Hive.isBoxOpen(_boxName)) {
-      return await Hive.openBox<MassStateModel>(_boxName);
+    try {
+      if (!Hive.isBoxOpen(_boxName)) {
+        return await Hive.openBox<MassStateModel>(_boxName);
+      }
+      return Hive.box<MassStateModel>(_boxName);
+    } catch (e) {
+      logError('MassStateService: Error opening box: $e');
+
+      // If box is corrupted, try to delete and recreate
+      try {
+        if (Hive.isBoxOpen(_boxName)) {
+          final box = Hive.box<MassStateModel>(_boxName);
+          await box.close();
+        }
+        await Hive.deleteBoxFromDisk(_boxName);
+        logInfo('MassStateService: Deleted corrupted box, creating new one');
+        return await Hive.openBox<MassStateModel>(_boxName);
+      } catch (deleteError) {
+        logError(
+            'MassStateService: Error deleting corrupted box: $deleteError');
+        rethrow;
+      }
     }
-    return Hive.box<MassStateModel>(_boxName);
   }
 
   // Check if feature state saving is enabled
@@ -35,18 +54,18 @@ class MassStateService {
 
       // Check if there's old incompatible data
       if (box.containsKey('current_state')) {
-        final dynamic rawData = box.get('current_state');
-
-        // If raw data is not of expected type, clear it
-        if (rawData is! MassStateModel) {
-          logInfo(
-              'MassStateService: Found incompatible data structure, clearing cache');
-          await box.delete('current_state');
-          return;
-        }
-
-        // Additional validation - check if the structure is complete
         try {
+          final dynamic rawData = box.get('current_state');
+
+          // If raw data is not of expected type, clear it
+          if (rawData is! MassStateModel) {
+            logInfo(
+                'MassStateService: Found incompatible data structure, clearing cache');
+            await box.delete('current_state');
+            return;
+          }
+
+          // Additional validation - check if the structure is complete
           final state = rawData as MassStateModel;
           // Try to access all required fields to trigger any casting errors
           final _ = state.cards;
@@ -61,26 +80,43 @@ class MassStateService {
             final _______ = card.amount;
             final ________ = card.name;
             final _________ = card.visibleUnits;
-            final __________ = card.createdAt;
+            final __________ =
+                card.createdAt; // This might trigger the casting error
           }
 
           logInfo('MassStateService: Data structure validation passed');
         } catch (e) {
           logError('MassStateService: Data structure validation failed: $e');
           logInfo('MassStateService: Clearing incompatible cache data');
-          await box.delete('current_state');
+          try {
+            await box.delete('current_state');
+          } catch (clearError) {
+            logError('MassStateService: Error clearing cache: $clearError');
+            // If we can't clear, try to delete the entire box
+            try {
+              await box.close();
+              await Hive.deleteBoxFromDisk(_boxName);
+              logInfo('MassStateService: Deleted corrupted box file');
+            } catch (deleteBoxError) {
+              logError('MassStateService: Error deleting box: $deleteBoxError');
+            }
+          }
         }
       }
     } catch (e) {
       logError('MassStateService: Error during data migration: $e');
-      // If migration fails, clear the cache to prevent further errors
+      // If migration fails, try to delete the corrupted box file
       try {
-        final box = await _getBox();
-        await box.clear();
+        if (Hive.isBoxOpen(_boxName)) {
+          final box = Hive.box<MassStateModel>(_boxName);
+          await box.close();
+        }
+        await Hive.deleteBoxFromDisk(_boxName);
         logInfo(
-            'MassStateService: Cleared all cache data due to migration error');
-      } catch (clearError) {
-        logError('MassStateService: Error clearing cache: $clearError');
+            'MassStateService: Deleted corrupted box file due to migration error');
+      } catch (deleteError) {
+        logError(
+            'MassStateService: Error deleting corrupted box: $deleteError');
       }
     }
   }
@@ -186,11 +222,26 @@ class MassStateService {
     }
   }
 
+  /// Force delete corrupted box file (for emergency recovery)
+  static Future<void> forceDeleteCorruptedBox() async {
+    try {
+      if (Hive.isBoxOpen(_boxName)) {
+        final box = Hive.box<MassStateModel>(_boxName);
+        await box.close();
+        logInfo('MassStateService: Closed open box before deletion');
+      }
+
+      await Hive.deleteBoxFromDisk(_boxName);
+      logInfo('MassStateService: Force deleted corrupted box file');
+    } catch (e) {
+      logError('MassStateService: Error force deleting box: $e');
+    }
+  }
+
   /// Force clear all cache (for debugging/recovery)
   static Future<void> forceClearAllCache() async {
     try {
-      final box = await _getBox();
-      await box.clear();
+      await forceDeleteCorruptedBox();
       logInfo('MassStateService: Force cleared all cache data');
     } catch (e) {
       logError('MassStateService: Error force clearing cache: $e');

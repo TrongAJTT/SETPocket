@@ -17,7 +17,7 @@ class MassCardState extends HiveObject {
   List<String>? visibleUnits;
 
   @HiveField(4)
-  DateTime createdAt;
+  DateTime? createdAt;
 
   MassCardState({
     required this.unitCode,
@@ -34,7 +34,7 @@ class MassCardState extends HiveObject {
       'amount': amount,
       'name': name ?? 'Card 1',
       'visibleUnits': visibleUnits ?? ['kilograms', 'pounds', 'ounces'],
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
     };
   }
 

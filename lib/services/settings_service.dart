@@ -13,7 +13,9 @@ class SettingsService {
   static Future<void> initialize() async {
     try {
       if (_settingsBox == null || !_settingsBox!.isOpen) {
+        // Note: Hive should already be initialized by HiveService with custom path
         _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
+        logInfo('SettingsService: Settings box opened successfully');
       }
     } catch (e) {
       // If there's a type error (backward compatibility issue), clear the box and recreate
@@ -29,6 +31,7 @@ class SettingsService {
           rethrow;
         }
       } else {
+        logError('SettingsService: Error opening settings box: $e');
         rethrow;
       }
     }

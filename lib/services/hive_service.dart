@@ -1,4 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'package:setpocket/services/app_logger.dart';
 import '../models/converter_models/currency_cache_model.dart';
 import '../models/converter_models/currency_preset_model.dart';
@@ -21,10 +23,23 @@ class HiveService {
   static Box? _templatesBox;
   static Box? _historyBox;
 
-  /// Initialize Hive database
+  /// Initialize Hive database with custom path
   static Future<void> initialize() async {
     try {
-      await Hive.initFlutter();
+      // Get application documents directory for storing Hive data
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final String hivePath = '${appDocDir.path}/hive_data';
+
+      // Create directory if it doesn't exist
+      final Directory hiveDir = Directory(hivePath);
+      if (!await hiveDir.exists()) {
+        await hiveDir.create(recursive: true);
+        logInfo('HiveService: Created Hive data directory at $hivePath');
+      }
+
+      // Initialize Hive with custom path
+      Hive.init(hivePath);
+      logInfo('HiveService: Initialized Hive with path: $hivePath');
 
       // Register type adapters
       if (!Hive.isAdapterRegistered(1)) {
@@ -74,9 +89,9 @@ class HiveService {
       _templatesBox = await Hive.openBox(templatesBoxName);
       _historyBox = await Hive.openBox(historyBoxName);
 
-      logInfo('Hive initialized successfully');
+      logInfo('HiveService: Initialized successfully with custom path');
     } catch (e) {
-      logFatal('Failed to initialize Hive: $e');
+      logFatal('HiveService: Failed to initialize: $e');
       rethrow;
     }
   }
@@ -207,5 +222,49 @@ class HiveService {
         _historyBox != null &&
         _templatesBox!.isOpen &&
         _historyBox!.isOpen;
+  }
+
+  /// Get current Hive storage path
+  static Future<String> getHivePath() async {
+    try {
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      return '${appDocDir.path}/hive_data';
+    } catch (e) {
+      logError('HiveService: Error getting Hive path: $e');
+      return 'Unknown';
+    }
+  }
+
+  /// Get storage info for debugging
+  static Future<Map<String, dynamic>> getStorageInfo() async {
+    try {
+      final hivePath = await getHivePath();
+      final hiveDir = Directory(hivePath);
+
+      Map<String, dynamic> info = {
+        'path': hivePath,
+        'exists': await hiveDir.exists(),
+        'files': <String>[],
+        'totalSize': 0,
+      };
+
+      if (await hiveDir.exists()) {
+        final files = await hiveDir.list().toList();
+        info['files'] = files.map((f) => f.path.split('/').last).toList();
+
+        int totalSize = 0;
+        for (final file in files) {
+          if (file is File) {
+            totalSize += await file.length();
+          }
+        }
+        info['totalSize'] = totalSize;
+      }
+
+      return info;
+    } catch (e) {
+      logError('HiveService: Error getting storage info: $e');
+      return {'error': e.toString()};
+    }
   }
 }

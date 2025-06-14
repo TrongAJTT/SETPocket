@@ -85,9 +85,17 @@ class TimeStateModel extends HiveObject {
 
   factory TimeStateModel.fromJson(Map<String, dynamic> json) {
     return TimeStateModel(
-      cards: (json['cards'] as List<dynamic>?)
-              ?.map((cardJson) => TimeCardState.fromJson(cardJson))
-              .toList() ??
+      cards: (json['cards'] as List<dynamic>?)?.map((cardJson) {
+            if (cardJson is TimeCardState) {
+              return cardJson;
+            } else if (cardJson is Map<String, dynamic>) {
+              return TimeCardState.fromJson(cardJson);
+            } else {
+              // Handle Map<dynamic, dynamic> case
+              return TimeCardState.fromJson(
+                  Map<String, dynamic>.from(cardJson));
+            }
+          }).toList() ??
           [],
       visibleUnits: List<String>.from(json['visibleUnits'] ?? []),
       lastUpdated: json['lastUpdated'] != null

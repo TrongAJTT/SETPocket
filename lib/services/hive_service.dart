@@ -13,6 +13,7 @@ import 'package:setpocket/models/converter_models/length_preset_model.dart';
 import 'package:setpocket/models/converter_models/generic_preset_model.dart';
 import 'package:setpocket/models/converter_models/weight_state_model.dart';
 import 'package:setpocket/models/converter_models/area_state_model.dart';
+import 'package:setpocket/models/converter_models/time_state_model.dart';
 
 class HiveService {
   // Box names
@@ -97,6 +98,12 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(23)) {
         Hive.registerAdapter(AreaStateModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(24)) {
+        Hive.registerAdapter(TimeCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(25)) {
+        Hive.registerAdapter(TimeStateModelAdapter());
       }
 
       // Open boxes

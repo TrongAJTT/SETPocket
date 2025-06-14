@@ -12,13 +12,13 @@ class TimeStateService {
     try {
       logInfo('TimeStateService: Loading time converter state');
 
-      Box box;
+      Box<TimeStateModel> box;
       bool shouldClose = false;
 
       if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box(_boxName);
+        box = Hive.box<TimeStateModel>(_boxName);
       } else {
-        box = await Hive.openBox(_boxName);
+        box = await Hive.openBox<TimeStateModel>(_boxName);
         shouldClose = true;
       }
 
@@ -36,17 +36,14 @@ class TimeStateService {
       TimeStateModel state;
       if (data is TimeStateModel) {
         state = data;
-      } else if (data is Map) {
-        // Handle legacy data format
-        state = TimeStateModel.fromJson(Map<String, dynamic>.from(data));
+        logInfo(
+            'TimeStateService: Successfully loaded state with ${state.cards.length} cards');
+        return state;
       } else {
-        logWarning('TimeStateService: Invalid data format, using default');
+        logWarning(
+            'TimeStateService: Invalid data format: ${data.runtimeType}, using default');
         return _getDefaultState();
       }
-
-      logInfo(
-          'TimeStateService: Successfully loaded state with ${state.cards.length} cards');
-      return state;
     } catch (e) {
       logError('TimeStateService: Error loading state: $e');
 
@@ -134,7 +131,7 @@ class TimeStateService {
       logInfo('TimeStateService: Force clearing all time converter cache');
 
       if (Hive.isBoxOpen(_boxName)) {
-        final box = Hive.box(_boxName);
+        final box = Hive.box<TimeStateModel>(_boxName);
         await box.clear();
         await box.close();
       }

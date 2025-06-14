@@ -10,7 +10,9 @@ import 'converter_services/length_state_service.dart';
 import 'converter_services/mass_state_service.dart';
 import 'converter_services/weight_state_service.dart';
 import 'converter_services/area_state_service.dart';
+import 'converter_services/time_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
+import 'package:hive/hive.dart';
 
 class CacheInfo {
   final String name;
@@ -144,81 +146,152 @@ class CacheService {
       }
 
       // Currency state
-      final hasState = await CurrencyStateService.hasState();
-      if (hasState) {
-        final stateSize = await CurrencyStateService.getStateSize();
-        converterSize += stateSize;
-        converterCount++; // Count as 1 item for currency state
+      try {
+        final hasState = await CurrencyStateService.hasState();
+        if (hasState) {
+          final stateSize = await CurrencyStateService.getStateSize();
+          converterSize += stateSize;
+          converterCount++; // Count as 1 item for currency state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking currency state: $e');
+        // Continue without currency state info
       }
 
       // Length state
-      final hasLengthState = await LengthStateService.hasState();
-      if (hasLengthState) {
-        final lengthStateSize = await LengthStateService.getStateSize();
-        converterSize += lengthStateSize;
-        converterCount++; // Count as 1 item for length state
+      try {
+        final hasLengthState = await LengthStateService.hasState();
+        if (hasLengthState) {
+          final lengthStateSize = await LengthStateService.getStateSize();
+          converterSize += lengthStateSize;
+          converterCount++; // Count as 1 item for length state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking length state: $e');
+        // Continue without length state info
       }
 
       // Length presets
-      final lengthPresets = await GenericPresetService.loadPresets('length');
-      if (lengthPresets.isNotEmpty) {
-        converterSize +=
-            (lengthPresets.length * 50).toInt(); // Approximate size per preset
-        converterCount++; // Count as 1 item for length presets
+      try {
+        final lengthPresets = await GenericPresetService.loadPresets('length');
+        if (lengthPresets.isNotEmpty) {
+          converterSize += (lengthPresets.length * 50)
+              .toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for length presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking length presets: $e');
+        // Continue without length presets info
       }
 
       // Mass state
-      final hasMassState = await MassStateService.hasState();
-      if (hasMassState) {
-        final massStateSize = await MassStateService.getStateSize();
-        converterSize += massStateSize;
-        converterCount++; // Count as 1 item for mass state
+      try {
+        final hasMassState = await MassStateService.hasState();
+        if (hasMassState) {
+          final massStateSize = await MassStateService.getStateSize();
+          converterSize += massStateSize;
+          converterCount++; // Count as 1 item for mass state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking mass state: $e');
+        // Continue without mass state info
       }
 
       // Mass presets
-      final massPresets = await GenericPresetService.loadPresets('mass');
-      if (massPresets.isNotEmpty) {
-        converterSize +=
-            (massPresets.length * 50).toInt(); // Approximate size per preset
-        converterCount++; // Count as 1 item for mass presets
+      try {
+        final massPresets = await GenericPresetService.loadPresets('mass');
+        if (massPresets.isNotEmpty) {
+          converterSize +=
+              (massPresets.length * 50).toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for mass presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking mass presets: $e');
+        // Continue without mass presets info
       }
 
       // Weight state
-      final hasWeightState = await WeightStateService.hasState();
-      if (hasWeightState) {
-        final weightStateSize = await WeightStateService.getStateSize();
-        converterSize += weightStateSize.toInt();
-        converterCount++; // Count as 1 item for weight state
+      try {
+        final hasWeightState = await WeightStateService.hasState();
+        if (hasWeightState) {
+          final weightStateSize = await WeightStateService.getStateSize();
+          converterSize += weightStateSize.toInt();
+          converterCount++; // Count as 1 item for weight state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking weight state: $e');
+        // Continue without weight state info
       }
 
       // Weight presets
-      final weightPresets = await GenericPresetService.loadPresets('weight');
-      if (weightPresets.isNotEmpty) {
-        converterSize +=
-            (weightPresets.length * 50).toInt(); // Approximate size per preset
-        converterCount++; // Count as 1 item for weight presets
+      try {
+        final weightPresets = await GenericPresetService.loadPresets('weight');
+        if (weightPresets.isNotEmpty) {
+          converterSize += (weightPresets.length * 50)
+              .toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for weight presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking weight presets: $e');
+        // Continue without weight presets info
       }
 
       // Area state
-      final hasAreaState = await AreaStateService.hasState();
-      if (hasAreaState) {
-        final areaStateSize = await AreaStateService.getStateSize();
-        converterSize += areaStateSize.toInt();
-        converterCount++; // Count as 1 item for area state
+      try {
+        final hasAreaState = await AreaStateService.hasState();
+        if (hasAreaState) {
+          final areaStateSize = await AreaStateService.getStateSize();
+          converterSize += areaStateSize.toInt();
+          converterCount++; // Count as 1 item for area state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking area state: $e');
+        // Continue without area state info
       }
 
       // Area presets
-      final areaPresets = await GenericPresetService.loadPresets('area');
-      if (areaPresets.isNotEmpty) {
-        converterSize +=
-            (areaPresets.length * 50).toInt(); // Approximate size per preset
-        converterCount++; // Count as 1 item for area presets
+      try {
+        final areaPresets = await GenericPresetService.loadPresets('area');
+        if (areaPresets.isNotEmpty) {
+          converterSize +=
+              (areaPresets.length * 50).toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for area presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking area presets: $e');
+        // Continue without area presets info
+      }
+
+      // Time state
+      try {
+        final hasTimeState = await TimeStateService.hasState();
+        if (hasTimeState) {
+          final timeStateSize = await TimeStateService.getStateSize();
+          converterSize += timeStateSize.toInt();
+          converterCount++; // Count as 1 item for time state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking time state: $e');
+        // Continue without time state info
+      }
+
+      // Time presets
+      try {
+        final timePresets = await GenericPresetService.loadPresets('time');
+        if (timePresets.isNotEmpty) {
+          converterSize +=
+              (timePresets.length * 50).toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for time presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking time presets: $e');
+        // Continue without time presets info
       }
 
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -228,7 +301,7 @@ class CacheService {
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time states, presets and exchange rates cache',
         itemCount: 0,
         sizeBytes: 0,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -249,6 +322,13 @@ class CacheService {
       // Clear templates cache from Hive
       await HiveService.clearBox(HiveService.templatesBoxName);
     } else if (cacheType == 'converter_tools') {
+      // Close all converter boxes first to avoid type conflicts
+      try {
+        await _closeConverterBoxes();
+      } catch (e) {
+        logError('CacheService: Error closing converter boxes: $e');
+      }
+
       // Clear currency presets, exchange rates cache, and converter states
       await CurrencyPresetService.clearAllPresets();
       await CurrencyCacheService.clearCache();
@@ -257,12 +337,14 @@ class CacheService {
       await MassStateService.clearState();
       await WeightStateService.clearState();
       await AreaStateService.clearState();
+      await TimeStateService.clearState();
 
       // Clear generic presets for all converter types
       await GenericPresetService.clearAllPresets('length');
       await GenericPresetService.clearAllPresets('mass');
       await GenericPresetService.clearAllPresets('weight');
       await GenericPresetService.clearAllPresets('area');
+      await GenericPresetService.clearAllPresets('time');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -280,6 +362,13 @@ class CacheService {
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
 
+    // Close all converter boxes first to avoid type conflicts
+    try {
+      await _closeConverterBoxes();
+    } catch (e) {
+      logError('CacheService: Error closing converter boxes: $e');
+    }
+
     // Clear converter tools cache (includes states and presets)
     await CurrencyPresetService.clearAllPresets();
     await CurrencyCacheService.clearCache();
@@ -288,12 +377,14 @@ class CacheService {
     await MassStateService.clearState();
     await WeightStateService.clearState();
     await AreaStateService.clearState();
+    await TimeStateService.clearState();
 
     // Clear generic presets for all converter types
     await GenericPresetService.clearAllPresets('length');
     await GenericPresetService.clearAllPresets('mass');
     await GenericPresetService.clearAllPresets('weight');
     await GenericPresetService.clearAllPresets('area');
+    await GenericPresetService.clearAllPresets('time');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
@@ -326,5 +417,37 @@ class CacheService {
   // Method to add cache tracking for other features in the future
   static Future<void> addCacheKey(String cacheType, String key) async {
     // This can be used to dynamically add cache keys for new features
+  }
+
+  static Future<void> _closeConverterBoxes() async {
+    // Close all converter state boxes to avoid type conflicts
+    final boxNames = [
+      'currency_state',
+      'length_states',
+      'mass_state',
+      'weight_state',
+      'area_converter_state',
+      'time_state',
+      'currency_presets',
+      'generic_length_presets',
+      'generic_mass_presets',
+      'generic_weight_presets',
+      'generic_area_presets',
+      'generic_time_presets',
+      'currency_cache',
+    ];
+
+    for (final boxName in boxNames) {
+      try {
+        if (Hive.isBoxOpen(boxName)) {
+          final box = Hive.box(boxName);
+          await box.close();
+          logInfo('CacheService: Closed box: $boxName');
+        }
+      } catch (e) {
+        logError('CacheService: Error closing box $boxName: $e');
+        // Continue with other boxes even if one fails
+      }
+    }
   }
 }

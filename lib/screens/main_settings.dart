@@ -9,6 +9,7 @@ import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/converter_services/currency_cache_service.dart';
 import 'package:setpocket/services/converter_services/currency_state_service.dart';
 import 'package:setpocket/services/converter_services/length_state_service.dart';
+import 'package:setpocket/services/converter_services/time_state_service.dart';
 import 'package:setpocket/screens/log_viewer_screen.dart';
 
 import 'package:setpocket/models/converter_models/currency_cache_model.dart';
@@ -1716,6 +1717,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       // Test state loading with error handling
       String currencyStateResult = '✗ Error';
       String lengthStateResult = '✗ Error';
+      String timeStateResult = '✗ Error';
 
       try {
         await CurrencyStateService.loadState();
@@ -1732,6 +1734,15 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       } catch (e) {
         print('Length state load error: $e');
         lengthStateResult =
+            '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
+      }
+
+      try {
+        await TimeStateService.loadState();
+        timeStateResult = '✓ Saved';
+      } catch (e) {
+        print('Time state load error: $e');
+        timeStateResult =
             '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
       }
 
@@ -1764,8 +1775,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   Text('• Currency State: $currencyStateResult'),
                   Text('• Length State: $lengthStateResult'),
+                  Text('• Time State: $timeStateResult'),
                   if (currencyStateResult.contains('Error') ||
-                      lengthStateResult.contains('Error')) ...[
+                      lengthStateResult.contains('Error') ||
+                      timeStateResult.contains('Error')) ...[
                     SizedBox(height: 12),
                     Container(
                       padding: EdgeInsets.all(8),

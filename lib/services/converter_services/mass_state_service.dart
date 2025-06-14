@@ -202,13 +202,13 @@ class MassStateService {
         return false;
       }
 
-      Box box;
+      Box<MassStateModel> box;
       bool shouldClose = false;
 
       if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box(_boxName);
+        box = Hive.box<MassStateModel>(_boxName);
       } else {
-        box = await Hive.openBox(_boxName);
+        box = await Hive.openBox<MassStateModel>(_boxName);
         shouldClose = true;
       }
 
@@ -233,13 +233,13 @@ class MassStateService {
         return 0;
       }
 
-      Box box;
+      Box<MassStateModel> box;
       bool shouldClose = false;
 
       if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box(_boxName);
+        box = Hive.box<MassStateModel>(_boxName);
       } else {
-        box = await Hive.openBox(_boxName);
+        box = await Hive.openBox<MassStateModel>(_boxName);
         shouldClose = true;
       }
 

@@ -146,13 +146,13 @@ class LengthStateService {
         return false;
       }
 
-      Box box;
+      Box<LengthStateModel> box;
       bool shouldClose = false;
 
       if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box(_stateBoxName);
+        box = Hive.box<LengthStateModel>(_stateBoxName);
       } else {
-        box = await Hive.openBox(_stateBoxName);
+        box = await Hive.openBox<LengthStateModel>(_stateBoxName);
         shouldClose = true;
       }
 
@@ -177,13 +177,13 @@ class LengthStateService {
         return 0;
       }
 
-      Box box;
+      Box<LengthStateModel> box;
       bool shouldClose = false;
 
       if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box(_stateBoxName);
+        box = Hive.box<LengthStateModel>(_stateBoxName);
       } else {
-        box = await Hive.openBox(_stateBoxName);
+        box = await Hive.openBox<LengthStateModel>(_stateBoxName);
         shouldClose = true;
       }
 

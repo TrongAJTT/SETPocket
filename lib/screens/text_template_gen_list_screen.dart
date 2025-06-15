@@ -324,35 +324,62 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   }
 
   Future<void> _navigateToCreateTemplate() async {
-    final result = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const TemplateEditScreen(),
-      ),
+    final editScreen = TemplateEditScreen(
+      isEmbedded: widget.isEmbedded,
+      onToolSelected: widget.onToolSelected,
     );
 
-    if (result == true) {
-      _loadTemplates();
+    if (widget.isEmbedded && widget.onToolSelected != null) {
+      // Desktop mode: callback để hiển thị trong main widget
+      widget.onToolSelected!(editScreen, 'Create Template',
+          parentCategory: 'TemplateListScreen', icon: Icons.create);
+    } else {
+      // Mobile mode: navigation bình thường
+      final result = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => editScreen,
+        ),
+      );
+
+      if (result == true) {
+        _loadTemplates();
+      }
     }
   }
 
   Future<void> _navigateToEditTemplate(Template template) async {
-    final result = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TemplateEditScreen(
-          template: template,
-        ),
-      ),
+    final editScreen = TemplateEditScreen(
+      template: template,
+      isEmbedded: widget.isEmbedded,
+      onToolSelected: widget.onToolSelected,
     );
 
-    if (result == true) {
-      _loadTemplates();
+    if (widget.isEmbedded && widget.onToolSelected != null) {
+      // Desktop mode: callback để hiển thị trong main widget
+      widget.onToolSelected!(editScreen, 'Edit Template: ${template.title}',
+          parentCategory: 'TemplateListScreen', icon: Icons.edit);
+    } else {
+      // Mobile mode: navigation bình thường
+      final result = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => editScreen,
+        ),
+      );
+
+      if (result == true) {
+        _loadTemplates();
+      }
     }
   }
 
   Future<void> _navigateToUseTemplate(Template template) async {
-    final useScreen = TemplateUseScreen(template: template);
+    final useScreen = TemplateUseScreen(
+      template: template,
+      isEmbedded: widget.isEmbedded,
+      onToolSelected: widget.onToolSelected,
+    );
 
     if (widget.isEmbedded && widget.onToolSelected != null) {
       // Desktop mode: callback để hiển thị trong main widget

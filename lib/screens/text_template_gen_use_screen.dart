@@ -6,10 +6,15 @@ import 'package:setpocket/models/text_template.dart';
 
 class TemplateUseScreen extends StatefulWidget {
   final Template template;
+  final bool isEmbedded;
+  final Function(Widget, String, {String? parentCategory, IconData? icon})?
+      onToolSelected;
 
   const TemplateUseScreen({
     super.key,
     required this.template,
+    this.isEmbedded = false,
+    this.onToolSelected,
   });
 
   @override
@@ -154,21 +159,80 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
     });
   }
 
+  bool get _isEmbeddedInDesktop {
+    return widget.isEmbedded || MediaQuery.of(context).size.width >= 1000;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final loops =
         TemplateManager.findDataLoopsInContent(widget.template.content);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1000;
+
+    // Build the main content
+    Widget content;
+
+    if (isDesktop) {
+      // Desktop layout: Side by side 1:1 (Fill Data : Preview)
+      content = _buildDesktopLayout(l10n, loops);
+    } else {
+      // Mobile layout: Tab view
+      content = _buildMobileLayout(l10n, loops);
+    }
+
+    if (_isEmbeddedInDesktop) {
+      // Desktop embedded view - no AppBar, just content with header
+      return Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Removed back button - navigation is handled by sidebar
+                Expanded(
+                  child: Text(
+                    l10n.generateDocumentTitle(widget.template.title),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.description),
+                  tooltip: l10n.showDocument,
+                  onPressed: _showFinalDocument,
+                ),
+              ],
+            ),
+          ),
+          Expanded(child: content),
+        ],
+      );
+    }
+
+    // Mobile view - normal Scaffold with AppBar
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.generateDocumentTitle(widget.template.title)),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(icon: const Icon(Icons.edit), text: l10n.fillDataTab),
-            Tab(icon: const Icon(Icons.visibility), text: l10n.previewTab),
-          ],
-        ),
+        bottom: !isDesktop
+            ? TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(icon: const Icon(Icons.edit), text: l10n.fillDataTab),
+                  Tab(
+                      icon: const Icon(Icons.visibility),
+                      text: l10n.previewTab),
+                ],
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.description),
@@ -177,85 +241,118 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
           ),
         ],
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: content,
+    );
+  }
+
+  Widget _buildDesktopLayout(AppLocalizations l10n, List<DataLoop> loops) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tab 1: Fill Data
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    l10n.fillInformation,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  ..._buildFieldInputs(l10n),
-                  if (loops.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.dataLoops,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    ...loops
-                        .map((loop) => _buildDataLoopSection(loop, l10n))
-                        .toList(),
-                  ],
-                  const SizedBox(height: 32),
-                  FilledButton.icon(
-                    onPressed: _showFinalDocument,
-                    icon: const Icon(Icons.text_snippet),
-                    label: Text(l10n.generateDocument),
-                  ),
-                ],
-              ),
-            ),
+          // Fill Data panel: 50% width (1/2)
+          Expanded(
+            flex: 1,
+            child: _buildFillDataPanel(l10n, loops),
           ),
-          // Tab 2: Preview
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            l10n.preview,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          TextButton.icon(
-                            icon: const Icon(Icons.copy),
-                            label: Text(l10n.copy),
-                            onPressed: () => _copyPreviewText(l10n),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      Text(
-                        _previewText,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          const SizedBox(width: 24),
+          // Preview panel: 50% width (1/2)
+          Expanded(
+            flex: 1,
+            child: _buildPreviewPanel(l10n),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(AppLocalizations l10n, List<DataLoop> loops) {
+    return TabBarView(
+      controller: _tabController,
+      children: [
+        // Tab 1: Fill Data
+        _buildFillDataPanel(l10n, loops),
+        // Tab 2: Preview
+        _buildPreviewPanel(l10n),
+      ],
+    );
+  }
+
+  Widget _buildFillDataPanel(AppLocalizations l10n, List<DataLoop> loops) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.fillInformation,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ..._buildFieldInputs(l10n),
+            if (loops.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Text(
+                l10n.dataLoops,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              ...loops
+                  .map((loop) => _buildDataLoopSection(loop, l10n))
+                  .toList(),
+            ],
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: _showFinalDocument,
+              icon: const Icon(Icons.text_snippet),
+              label: Text(l10n.generateDocument),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreviewPanel(AppLocalizations l10n) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.preview,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.copy),
+                      label: Text(l10n.copy),
+                      onPressed: () => _copyPreviewText(l10n),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                Text(
+                  _previewText,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

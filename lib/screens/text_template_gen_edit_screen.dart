@@ -6,8 +6,16 @@ import 'package:setpocket/services/template_service.dart';
 
 class TemplateEditScreen extends StatefulWidget {
   final Template? template; // Null for create new, non-null for edit
+  final bool isEmbedded;
+  final Function(Widget, String, {String? parentCategory, IconData? icon})?
+      onToolSelected;
 
-  const TemplateEditScreen({super.key, this.template});
+  const TemplateEditScreen({
+    super.key,
+    this.template,
+    this.isEmbedded = false,
+    this.onToolSelected,
+  });
 
   @override
   State<TemplateEditScreen> createState() => _TemplateEditScreenState();
@@ -26,6 +34,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   TextSelection? _savedCursorPosition;
   // Tab controller
   late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
@@ -64,105 +73,323 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     });
   }
 
+  bool get _isEmbeddedInDesktop {
+    return widget.isEmbedded || MediaQuery.of(context).size.width >= 1000;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.template != null;
+    final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1000;
 
+    // Build the main content
+    Widget content;
+
+    if (isDesktop) {
+      // Desktop layout with responsive ratio
+      content = _buildDesktopLayout(l10n, isEditing);
+    } else {
+      // Mobile layout: Tab view
+      content = _buildMobileLayout(l10n, isEditing);
+    }
+
+    if (_isEmbeddedInDesktop) {
+      // Desktop embedded view - no AppBar, just content with header
+      return Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Removed back button - navigation is handled by sidebar
+                Expanded(
+                  child: Text(
+                    isEditing ? l10n.editTemplate : l10n.createTemplate,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                if (!_isLoading)
+                  TextButton.icon(
+                    icon: const Icon(Icons.save),
+                    label: Text(l10n.save),
+                    onPressed: _saveTemplate,
+                  ),
+              ],
+            ),
+          ),
+          Expanded(child: content),
+        ],
+      );
+    }
+
+    // Mobile view - normal Scaffold with AppBar
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing
-            ? AppLocalizations.of(context)!.editTemplate
-            : AppLocalizations.of(context)!.createTemplate),
+        title: Text(isEditing ? l10n.editTemplate : l10n.createTemplate),
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.save),
-            label: Text(AppLocalizations.of(context)!.save),
+            label: Text(l10n.save),
             onPressed: _isLoading ? null : _saveTemplate,
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.edit_document),
-              text: AppLocalizations.of(context)!.contentTab,
+        bottom: !isDesktop
+            ? TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(
+                    icon: const Icon(Icons.edit_document),
+                    text: l10n.contentTab,
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.view_module),
+                    text: l10n.structureTab,
+                  ),
+                ],
+              )
+            : null,
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : content,
+    );
+  }
+
+  Widget _buildDesktopLayout(AppLocalizations l10n, bool isEditing) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Responsive ratio based on screen width
+    // Small desktop (1000-1400px): 3:2 ratio (60%:40%)
+    // Large desktop (>1400px): 3:1 ratio (75%:25%)
+    final isLargeDesktop = screenWidth > 1400;
+    final contentFlex = isLargeDesktop ? 3 : 3;
+    final structureFlex = isLargeDesktop ? 1 : 2;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Title field
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                labelText: l10n.templateTitleLabel,
+                border: const OutlineInputBorder(),
+                hintText: l10n.templateTitleHint,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.pleaseEnterTitle;
+                }
+                return null;
+              },
             ),
-            Tab(
-              icon: const Icon(Icons.view_module),
-              text: AppLocalizations.of(context)!.structureTab,
+            const SizedBox(height: 16),
+
+            // Buttons for adding fields and loops
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _showAddFieldDialog,
+                    icon: const Icon(Icons.add_circle_outline),
+                    label: Text(l10n.addDataField),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showAddLoopDialog(),
+                    icon: const Icon(Icons.refresh),
+                    label: Text(l10n.addDataLoop),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Desktop: Side by side layout with responsive ratio
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Content panel: responsive width
+                  Expanded(
+                    flex: contentFlex,
+                    child: _buildContentPanel(l10n),
+                  ),
+                  const SizedBox(width: 24),
+                  // Structure panel: responsive width
+                  Expanded(
+                    flex: structureFlex,
+                    child: _buildStructurePanel(l10n),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Title field
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.templateTitleLabel,
-                        border: const OutlineInputBorder(),
-                        hintText:
-                            AppLocalizations.of(context)!.templateTitleHint,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return AppLocalizations.of(context)!.pleaseEnterTitle;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
+    );
+  }
 
-                    // Buttons for adding fields and loops
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _showAddFieldDialog,
-                            icon: const Icon(Icons.add_circle_outline),
-                            label: Text(
-                                AppLocalizations.of(context)!.addDataField),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () => _showAddLoopDialog(),
-                            icon: const Icon(Icons.refresh),
-                            label:
-                                Text(AppLocalizations.of(context)!.addDataLoop),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
+  Widget _buildMobileLayout(AppLocalizations l10n, bool isEditing) {
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Title field
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                labelText: l10n.templateTitleLabel,
+                border: const OutlineInputBorder(),
+                hintText: l10n.templateTitleHint,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.pleaseEnterTitle;
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
 
-                    // TabBarView for content and structure
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          // Tab 1: Content
-                          _buildContentTab(),
-
-                          // Tab 2: Structure
-                          _buildStructureTab(),
-                        ],
-                      ),
-                    ),
-                  ],
+            // Buttons for adding fields and loops
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _showAddFieldDialog,
+                    icon: const Icon(Icons.add_circle_outline),
+                    label: Text(l10n.addDataField),
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showAddLoopDialog(),
+                    icon: const Icon(Icons.refresh),
+                    label: Text(l10n.addDataLoop),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // TabBarView for content and structure
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Tab 1: Content
+                  _buildContentPanel(l10n),
+
+                  // Tab 2: Structure
+                  _buildStructurePanel(l10n),
+                ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentPanel(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          l10n.templateContentLabel,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: TextFormField(
+              controller: _contentController,
+              focusNode: _contentFocusNode,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(16),
+                hintText: l10n.templateContentHint,
+              ),
+              maxLines: null,
+              expands: true,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.pleaseEnterTemplateContent;
+                }
+                return null;
+              },
+              onChanged: (_) => _refreshElements(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStructurePanel(AppLocalizations l10n) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.templateStructure,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.templateStructureOverview,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const Divider(),
+                  _buildElementSummary(),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Detailed field list
+          if (_elements.isNotEmpty) _buildStructureDetails(),
+        ],
+      ),
     );
   }
 
@@ -549,9 +776,13 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     String selectedType = 'text';
     final titleController = TextEditingController();
 
-    // Lưu vị trí con trỏ trước khi hiển thị dialog
-    _savedCursorPosition =
-        _contentFocusNode.hasFocus ? _contentController.selection : null;
+    // Lưu vị trí con trỏ hiện tại, ưu tiên selection hiện tại hơn saved position
+    final currentSelection = _contentController.selection;
+    if (currentSelection.isValid && currentSelection.start >= 0) {
+      _savedCursorPosition = currentSelection;
+    } else if (_contentFocusNode.hasFocus) {
+      _savedCursorPosition = _contentController.selection;
+    }
 
     showDialog<void>(
       context: context,
@@ -637,42 +868,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Hủy'),
-              ),
-              TextButton.icon(
-                onPressed: () {
-                  final title = titleController.text.trim();
-                  if (title.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(AppLocalizations.of(context)!
-                              .pleaseEnterFieldTitle)),
-                    );
-                    return;
-                  }
-
-                  final id = _generateElementId();
-                  final element = TemplateElement(
-                    type: selectedType,
-                    title: title,
-                    id: id,
-                  );
-
-                  // Copy to clipboard and close dialog
-                  Clipboard.setData(
-                          ClipboardData(text: element.toElementString()))
-                      .then((_) {
-                    if (!mounted) return;
-                    // ignore: use_build_context_synchronously
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Đã sao chép vào clipboard')),
-                    );
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).pop();
-                  });
-                },
-                icon: const Icon(Icons.copy),
-                label: Text(AppLocalizations.of(context)!.copyAndClose),
               ),
               FilledButton.icon(
                 onPressed: () {
@@ -761,26 +956,52 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void _insertElementAtCursor(TemplateElement element) {
     final elementString = element.toElementString();
     final text = _contentController.text;
-    final selection = _savedCursorPosition ??
-        (_contentFocusNode.hasFocus
-            ? _contentController.selection
-            : const TextSelection.collapsed(offset: -1));
 
-    if (selection.start >= 0) {
-      // Insert at cursor position
-      final newText =
-          text.replaceRange(selection.start, selection.end, elementString);
+    // Ưu tiên sử dụng saved position, fallback to current selection
+    TextSelection? targetSelection = _savedCursorPosition;
+    if (targetSelection == null ||
+        !targetSelection.isValid ||
+        targetSelection.start < 0) {
+      targetSelection = _contentController.selection;
+    }
+
+    if (targetSelection.isValid &&
+        targetSelection.start >= 0 &&
+        targetSelection.start <= text.length) {
+      // Insert at target cursor position
+      final newText = text.replaceRange(
+          targetSelection.start, targetSelection.end, elementString);
       _contentController.value = TextEditingValue(
         text: newText,
         selection: TextSelection.collapsed(
-            offset: selection.start + elementString.length),
+            offset: targetSelection.start + elementString.length),
       );
+
+      // Focus back to content field after insertion
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _contentFocusNode.requestFocus();
+        }
+      });
     } else {
-      // Append to end
+      // Fallback: Append to end
       final newText = text.isEmpty ? elementString : '$text $elementString';
       _contentController.text = newText;
+
+      // Set cursor to end
+      _contentController.selection =
+          TextSelection.collapsed(offset: newText.length);
+
+      // Focus back to content field
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _contentFocusNode.requestFocus();
+        }
+      });
     }
 
+    // Clear saved position after use
+    _savedCursorPosition = null;
     _refreshElements();
   }
 
@@ -798,9 +1019,13 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void _showAddLoopDialog() {
     final titleController = TextEditingController();
 
-    // Lưu vị trí con trỏ trước khi hiển thị dialog
-    _savedCursorPosition =
-        _contentFocusNode.hasFocus ? _contentController.selection : null;
+    // Lưu vị trí con trỏ hiện tại, ưu tiên selection hiện tại hơn saved position
+    final currentSelection = _contentController.selection;
+    if (currentSelection.isValid && currentSelection.start >= 0) {
+      _savedCursorPosition = currentSelection;
+    } else if (_contentFocusNode.hasFocus) {
+      _savedCursorPosition = _contentController.selection;
+    }
 
     showDialog<void>(
       context: context,
@@ -829,39 +1054,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Hủy'),
-          ),
-          TextButton.icon(
-            onPressed: () {
-              final title = titleController.text.trim();
-              if (title.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text(
-                          AppLocalizations.of(context)!.pleaseEnterFieldTitle)),
-                );
-                return;
-              }
-
-              final id = _generateLoopId();
-              final loop = DataLoop(
-                title: title,
-                id: id,
-              );
-              // Copy to clipboard and close dialog
-              final loopString =
-                  '${loop.toLoopStartString()}\n${AppLocalizations.of(context)!.loopContent}\n${loop.toLoopEndString()}';
-              Clipboard.setData(ClipboardData(text: loopString)).then((_) {
-                if (!mounted) return;
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã sao chép vào clipboard')),
-                );
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-              });
-            },
-            icon: const Icon(Icons.copy),
-            label: Text(AppLocalizations.of(context)!.copyAndClose),
           ),
           FilledButton.icon(
             onPressed: () {
@@ -928,26 +1120,52 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     final loopString = '$loopStartString$defaultContent$loopEndString';
 
     final text = _contentController.text;
-    final selection = _savedCursorPosition ??
-        (_contentFocusNode.hasFocus
-            ? _contentController.selection
-            : const TextSelection.collapsed(offset: -1));
 
-    if (selection.start >= 0) {
-      // Insert at cursor position
-      final newText =
-          text.replaceRange(selection.start, selection.end, loopString);
+    // Ưu tiên sử dụng saved position, fallback to current selection
+    TextSelection? targetSelection = _savedCursorPosition;
+    if (targetSelection == null ||
+        !targetSelection.isValid ||
+        targetSelection.start < 0) {
+      targetSelection = _contentController.selection;
+    }
+
+    if (targetSelection.isValid &&
+        targetSelection.start >= 0 &&
+        targetSelection.start <= text.length) {
+      // Insert at target cursor position
+      final newText = text.replaceRange(
+          targetSelection.start, targetSelection.end, loopString);
       _contentController.value = TextEditingValue(
         text: newText,
         selection: TextSelection.collapsed(
-            offset: selection.start + loopString.length),
+            offset: targetSelection.start + loopString.length),
       );
+
+      // Focus back to content field after insertion
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _contentFocusNode.requestFocus();
+        }
+      });
     } else {
-      // Append to end
+      // Fallback: Append to end
       final newText = text.isEmpty ? loopString : '$text\n$loopString';
       _contentController.text = newText;
+
+      // Set cursor to end
+      _contentController.selection =
+          TextSelection.collapsed(offset: newText.length);
+
+      // Focus back to content field
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _contentFocusNode.requestFocus();
+        }
+      });
     }
 
+    // Clear saved position after use
+    _savedCursorPosition = null;
     _refreshElements();
   }
 
@@ -1014,88 +1232,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
         );
       }
     }
-  }
-
-  Widget _buildContentTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.templateContentLabel,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: TextFormField(
-              controller: _contentController,
-              focusNode: _contentFocusNode,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(16),
-                hintText: AppLocalizations.of(context)!.templateContentHint,
-              ),
-              maxLines: null,
-              expands: true,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return AppLocalizations.of(context)!
-                      .pleaseEnterTemplateContent;
-                }
-                return null;
-              },
-              onChanged: (_) => _refreshElements(),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStructureTab() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.templateStructure,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppLocalizations.of(context)!.templateStructureOverview,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  const Divider(),
-                  _buildElementSummary(),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Detailed field list
-          if (_elements.isNotEmpty) _buildStructureDetails(),
-        ],
-      ),
-    );
   }
 
   Widget _buildStructureDetails() {

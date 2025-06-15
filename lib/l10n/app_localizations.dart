@@ -5368,6 +5368,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Temperature Scales'**
   String get temperatureUnits;
+
+  /// No description provided for @dataConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Storage Converter - Detailed Information'**
+  String get dataConverterDetailedInfo;
+
+  /// No description provided for @dataConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision data storage converter supports multiple data units with high accuracy calculations for computer science, IT management, file handling, and digital storage applications.'**
+  String get dataConverterOverview;
+
+  /// No description provided for @step1Data.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Data;
+
+  /// No description provided for @step1DataDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different data storage values simultaneously.'**
+  String get step1DataDesc;
+
+  /// No description provided for @step2Data.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Units'**
+  String get step2Data;
+
+  /// No description provided for @step2DataDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which data storage units to display from bytes, kilobytes, gigabytes, and other systems.'**
+  String get step2DataDesc;
+
+  /// No description provided for @step3Data.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Data;
+
+  /// No description provided for @step3DataDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any data storage value and see instant conversions to all other units.'**
+  String get step3DataDesc;
+
+  /// No description provided for @step4Data.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Data;
+
+  /// No description provided for @step4DataDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4DataDesc;
+
+  /// No description provided for @tip1Data.
+  ///
+  /// In en, this message translates to:
+  /// **'• Byte (B) is the fundamental unit of digital information storage'**
+  String get tip1Data;
+
+  /// No description provided for @tip2Data.
+  ///
+  /// In en, this message translates to:
+  /// **'• Kilobyte (KB), Megabyte (MB), Gigabyte (GB) are standard for file sizes'**
+  String get tip2Data;
+
+  /// No description provided for @tip3Data.
+  ///
+  /// In en, this message translates to:
+  /// **'• Terabyte (TB) and Petabyte (PB) are used for large-scale storage systems'**
+  String get tip3Data;
+
+  /// No description provided for @tip4Data.
+  ///
+  /// In en, this message translates to:
+  /// **'• Bit units (Kbit, Mbit, Gbit) are commonly used for network speeds'**
+  String get tip4Data;
+
+  /// No description provided for @tip5Data.
+  ///
+  /// In en, this message translates to:
+  /// **'• Binary prefixes (1024-based) provide more accurate computer calculations'**
+  String get tip5Data;
+
+  /// No description provided for @tip6Data.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex data storage calculations'**
+  String get tip6Data;
+
+  /// No description provided for @dataUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Storage Unit Categories'**
+  String get dataUnitCategories;
+
+  /// No description provided for @dataCommonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Units'**
+  String get dataCommonUnits;
+
+  /// No description provided for @dataCommonUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilobyte (KB), Megabyte (MB), Gigabyte (GB) - most frequently used storage units for everyday file sizes and device capacities.'**
+  String get dataCommonUnitsDesc;
+
+  /// No description provided for @dataLessCommonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Storage Units'**
+  String get dataLessCommonUnits;
+
+  /// No description provided for @dataLessCommonUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Terabyte (TB), Petabyte (PB), and basic Byte (B) units for specialized storage applications and very large or very small data measurements.'**
+  String get dataLessCommonUnitsDesc;
+
+  /// No description provided for @dataRareUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Units'**
+  String get dataRareUnits;
+
+  /// No description provided for @dataRareUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bit, Kilobit (Kbit), Megabit (Mbit), Gigabit (Gbit) are primarily used for network speeds and data transmission rates.'**
+  String get dataRareUnitsDesc;
+
+  /// No description provided for @dataPracticalApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for IT professionals, software developers, network administrators, file management, storage planning, bandwidth calculations, and understanding device specifications.'**
+  String get dataPracticalApplicationsDesc;
+
+  /// No description provided for @dataConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Storage Converter Information'**
+  String get dataConverterInfo;
+
+  /// No description provided for @customizeDataUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Data Storage Units'**
+  String get customizeDataUnits;
+
+  /// No description provided for @selectDataUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Select data storage units to display'**
+  String get selectDataUnits;
+
+  /// No description provided for @dataUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Storage Units'**
+  String get dataUnits;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

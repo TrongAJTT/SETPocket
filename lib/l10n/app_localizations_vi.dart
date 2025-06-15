@@ -2778,4 +2778,88 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get temperatureUnits => 'Thang Đo Nhiệt Độ';
+
+  @override
+  String get dataConverterDetailedInfo => 'Chuyển Đổi Dung Lượng Lưu Trữ - Thông Tin Chi Tiết';
+
+  @override
+  String get dataConverterOverview => 'Bộ chuyển đổi dung lượng lưu trữ chính xác này hỗ trợ nhiều đơn vị dữ liệu với tính toán độ chính xác cao cho ứng dụng khoa học máy tính, quản lý IT, xử lý file và lưu trữ kỹ thuật số.';
+
+  @override
+  String get step1Data => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1DataDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị dung lượng lưu trữ khác nhau cùng lúc.';
+
+  @override
+  String get step2Data => 'Bước 2: Chọn Đơn Vị';
+
+  @override
+  String get step2DataDesc => 'Chọn đơn vị dung lượng lưu trữ nào hiển thị từ byte, kilobyte, gigabyte và các hệ khác.';
+
+  @override
+  String get step3Data => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3DataDesc => 'Nhập bất kỳ giá trị dung lượng lưu trữ nào và xem chuyển đổi tức thì sang tất cả đơn vị khác.';
+
+  @override
+  String get step4Data => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4DataDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Data => '• Byte (B) là đơn vị cơ bản của thông tin lưu trữ kỹ thuật số';
+
+  @override
+  String get tip2Data => '• Kilobyte (KB), Megabyte (MB), Gigabyte (GB) là tiêu chuẩn cho kích thước file';
+
+  @override
+  String get tip3Data => '• Terabyte (TB) và Petabyte (PB) được sử dụng cho hệ thống lưu trữ quy mô lớn';
+
+  @override
+  String get tip4Data => '• Đơn vị bit (Kbit, Mbit, Gbit) thường được sử dụng cho tốc độ mạng';
+
+  @override
+  String get tip5Data => '• Tiền tố nhị phân (cơ số 1024) cung cấp tính toán máy tính chính xác hơn';
+
+  @override
+  String get tip6Data => '• Chế độ tập trung giúp tập trung vào các phép tính dung lượng lưu trữ phức tạp';
+
+  @override
+  String get dataUnitCategories => 'Danh Mục Đơn Vị Dung Lượng Lưu Trữ';
+
+  @override
+  String get dataCommonUnits => 'Đơn Vị Phổ Biến';
+
+  @override
+  String get dataCommonUnitsDesc => 'Kilobyte (KB), Megabyte (MB), Gigabyte (GB) - đơn vị lưu trữ được sử dụng thường xuyên nhất cho kích thước file hàng ngày và dung lượng thiết bị.';
+
+  @override
+  String get dataLessCommonUnits => 'Đơn Vị Lưu Trữ Lớn';
+
+  @override
+  String get dataLessCommonUnitsDesc => 'Terabyte (TB), Petabyte (PB), và đơn vị Byte (B) cơ bản cho ứng dụng lưu trữ chuyên biệt và đo lường dữ liệu rất lớn hoặc rất nhỏ.';
+
+  @override
+  String get dataRareUnits => 'Đơn Vị Mạng';
+
+  @override
+  String get dataRareUnitsDesc => 'Bit, Kilobit (Kbit), Megabit (Mbit), Gigabit (Gbit) chủ yếu được sử dụng cho tốc độ mạng và tốc độ truyền dữ liệu.';
+
+  @override
+  String get dataPracticalApplicationsDesc => 'Thiết yếu cho chuyên gia IT, nhà phát triển phần mềm, quản trị viên mạng, quản lý file, lập kế hoạch lưu trữ, tính toán băng thông và hiểu thông số kỹ thuật thiết bị.';
+
+  @override
+  String get dataConverterInfo => 'Thông Tin Chuyển Đổi Dung Lượng Lưu Trữ';
+
+  @override
+  String get customizeDataUnits => 'Tùy Chỉnh Đơn Vị Dung Lượng Lưu Trữ';
+
+  @override
+  String get selectDataUnits => 'Chọn đơn vị dung lượng lưu trữ để hiển thị';
+
+  @override
+  String get dataUnits => 'Đơn Vị Dung Lượng Lưu Trữ';
 }

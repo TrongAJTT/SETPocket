@@ -2778,4 +2778,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get temperatureUnits => 'Temperature Scales';
+
+  @override
+  String get dataConverterDetailedInfo => 'Data Storage Converter - Detailed Information';
+
+  @override
+  String get dataConverterOverview => 'This precision data storage converter supports multiple data units with high accuracy calculations for computer science, IT management, file handling, and digital storage applications.';
+
+  @override
+  String get step1Data => 'Step 1: Add Cards';
+
+  @override
+  String get step1DataDesc => 'Add multiple converter cards to work with different data storage values simultaneously.';
+
+  @override
+  String get step2Data => 'Step 2: Select Units';
+
+  @override
+  String get step2DataDesc => 'Choose which data storage units to display from bytes, kilobytes, gigabytes, and other systems.';
+
+  @override
+  String get step3Data => 'Step 3: Enter Values';
+
+  @override
+  String get step3DataDesc => 'Type any data storage value and see instant conversions to all other units.';
+
+  @override
+  String get step4Data => 'Step 4: Organize Layout';
+
+  @override
+  String get step4DataDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Data => '• Byte (B) is the fundamental unit of digital information storage';
+
+  @override
+  String get tip2Data => '• Kilobyte (KB), Megabyte (MB), Gigabyte (GB) are standard for file sizes';
+
+  @override
+  String get tip3Data => '• Terabyte (TB) and Petabyte (PB) are used for large-scale storage systems';
+
+  @override
+  String get tip4Data => '• Bit units (Kbit, Mbit, Gbit) are commonly used for network speeds';
+
+  @override
+  String get tip5Data => '• Binary prefixes (1024-based) provide more accurate computer calculations';
+
+  @override
+  String get tip6Data => '• Focus mode helps concentrate on complex data storage calculations';
+
+  @override
+  String get dataUnitCategories => 'Data Storage Unit Categories';
+
+  @override
+  String get dataCommonUnits => 'Common Units';
+
+  @override
+  String get dataCommonUnitsDesc => 'Kilobyte (KB), Megabyte (MB), Gigabyte (GB) - most frequently used storage units for everyday file sizes and device capacities.';
+
+  @override
+  String get dataLessCommonUnits => 'Large Storage Units';
+
+  @override
+  String get dataLessCommonUnitsDesc => 'Terabyte (TB), Petabyte (PB), and basic Byte (B) units for specialized storage applications and very large or very small data measurements.';
+
+  @override
+  String get dataRareUnits => 'Network Units';
+
+  @override
+  String get dataRareUnitsDesc => 'Bit, Kilobit (Kbit), Megabit (Mbit), Gigabit (Gbit) are primarily used for network speeds and data transmission rates.';
+
+  @override
+  String get dataPracticalApplicationsDesc => 'Essential for IT professionals, software developers, network administrators, file management, storage planning, bandwidth calculations, and understanding device specifications.';
+
+  @override
+  String get dataConverterInfo => 'Data Storage Converter Information';
+
+  @override
+  String get customizeDataUnits => 'Customize Data Storage Units';
+
+  @override
+  String get selectDataUnits => 'Select data storage units to display';
+
+  @override
+  String get dataUnits => 'Data Storage Units';
 }

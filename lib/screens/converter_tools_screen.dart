@@ -10,6 +10,7 @@ import 'package:setpocket/screens/converters/volume_converter_screen.dart';
 import 'package:setpocket/screens/converters/number_system_converter_screen.dart';
 import 'package:setpocket/screens/converters/speed_converter_screen.dart';
 import 'package:setpocket/screens/converters/temperature_converter_screen.dart';
+import 'package:setpocket/screens/converters/data_converter_screen.dart';
 import 'converters/time_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
@@ -112,8 +113,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.amber;
             break;
           case 10:
-            screen = UnitConverterScreen(
-                categoryId: 'data_storage', categoryName: loc.dataConverter);
+            screen = const DataConverterScreen();
             title = loc.dataConverter;
             icon = Icons.storage;
             iconColor = Colors.deepOrange;

@@ -15,6 +15,7 @@ import 'converter_services/volume_state_service.dart';
 import 'converter_services/number_system_state_service.dart';
 import 'converter_services/speed_state_service.dart';
 import 'converter_services/temperature_state_service.dart';
+import 'converter_services/data_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'package:hive/hive.dart';
 
@@ -400,6 +401,33 @@ class CacheService {
         // Continue without temperature presets info
       }
 
+      // Data Storage state
+      try {
+        final hasDataState = await DataStateService.hasState();
+        if (hasDataState) {
+          final dataStateSize = await DataStateService.getCacheSize();
+          converterSize += dataStateSize;
+          converterCount++; // Count as 1 item for data storage state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking data storage state: $e');
+        // Continue without data storage state info
+      }
+
+      // Data Storage presets
+      try {
+        final dataPresets =
+            await GenericPresetService.loadPresets('data_storage');
+        if (dataPresets.isNotEmpty) {
+          converterSize +=
+              (dataPresets.length * 50).toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for data storage presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking data storage presets: $e');
+        // Continue without data storage presets info
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
@@ -454,6 +482,7 @@ class CacheService {
       await NumberSystemStateService.clearState();
       await SpeedStateService.clearState();
       await TemperatureStateService.clearState();
+      await DataStateService.clearState();
 
       // Clear generic presets for all converter types
       await GenericPresetService.clearAllPresets('length');
@@ -465,6 +494,7 @@ class CacheService {
       await GenericPresetService.clearAllPresets('number_system');
       await GenericPresetService.clearAllPresets('speed');
       await GenericPresetService.clearAllPresets('temperature');
+      await GenericPresetService.clearAllPresets('data_storage');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -502,6 +532,7 @@ class CacheService {
     await NumberSystemStateService.clearState();
     await SpeedStateService.clearState();
     await TemperatureStateService.clearState();
+    await DataStateService.clearState();
 
     // Clear generic presets for all converter types
     await GenericPresetService.clearAllPresets('length');
@@ -513,6 +544,7 @@ class CacheService {
     await GenericPresetService.clearAllPresets('number_system');
     await GenericPresetService.clearAllPresets('speed');
     await GenericPresetService.clearAllPresets('temperature');
+    await GenericPresetService.clearAllPresets('data_storage');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};

@@ -185,6 +185,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createTemplate => 'Create New Template';
 
   @override
+  String get templateEditSuccessMessage => 'Template saved successfully! You can now navigate back.';
+
+  @override
   String get contentTab => 'Content';
 
   @override
@@ -295,6 +298,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String confirmDeleteTemplateMsg(Object title) {
     return 'Are you sure you want to delete \"$title\"?';
   }
+
+  @override
+  String get holdToDeleteInstruction => 'Hold the delete button for 5 seconds to confirm';
+
+  @override
+  String get holdToDelete => 'Hold to delete...';
+
+  @override
+  String get deleting => 'Deleting...';
+
+  @override
+  String get holdToClearCache => 'Hold to clear...';
+
+  @override
+  String get clearingCache => 'Clearing cache...';
+
+  @override
+  String get holdToClearCacheInstruction => 'Hold the clear button for 10 seconds to confirm';
 
   @override
   String get templateDeleted => 'Template deleted.';

@@ -185,6 +185,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get createTemplate => 'Tạo mẫu mới';
 
   @override
+  String get templateEditSuccessMessage => 'Mẫu đã được lưu thành công! Bạn có thể thoát màn hình này.';
+
+  @override
   String get contentTab => 'Nội dung';
 
   @override
@@ -295,6 +298,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String confirmDeleteTemplateMsg(Object title) {
     return 'Bạn có chắc muốn xóa \"$title\"?';
   }
+
+  @override
+  String get holdToDeleteInstruction => 'Nhấn giữ nút xóa trong 5 giây để xác nhận';
+
+  @override
+  String get holdToDelete => 'Nhấn giữ để xóa...';
+
+  @override
+  String get deleting => 'Đang xóa...';
+
+  @override
+  String get holdToClearCache => 'Nhấn giữ để xóa...';
+
+  @override
+  String get clearingCache => 'Đang xóa cache...';
+
+  @override
+  String get holdToClearCacheInstruction => 'Nhấn giữ nút xóa trong 10 giây để xác nhận';
 
   @override
   String get templateDeleted => 'Đã xóa mẫu.';

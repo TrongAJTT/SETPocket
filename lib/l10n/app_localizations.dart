@@ -431,6 +431,12 @@ abstract class AppLocalizations {
   /// **'Create New Template'**
   String get createTemplate;
 
+  /// No description provided for @templateEditSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Template saved successfully! You can now navigate back.'**
+  String get templateEditSuccessMessage;
+
   /// No description provided for @contentTab.
   ///
   /// In en, this message translates to:
@@ -646,6 +652,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete \"{title}\"?'**
   String confirmDeleteTemplateMsg(Object title);
+
+  /// No description provided for @holdToDeleteInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the delete button for 5 seconds to confirm'**
+  String get holdToDeleteInstruction;
+
+  /// No description provided for @holdToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to delete...'**
+  String get holdToDelete;
+
+  /// No description provided for @deleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting...'**
+  String get deleting;
+
+  /// No description provided for @holdToClearCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to clear...'**
+  String get holdToClearCache;
+
+  /// No description provided for @clearingCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing cache...'**
+  String get clearingCache;
+
+  /// No description provided for @holdToClearCacheInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the clear button for 10 seconds to confirm'**
+  String get holdToClearCacheInstruction;
 
   /// No description provided for @templateDeleted.
   ///

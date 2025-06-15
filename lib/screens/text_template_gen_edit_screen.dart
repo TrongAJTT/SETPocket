@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template.dart';
 import 'package:setpocket/services/template_service.dart';
@@ -1218,7 +1217,23 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       await TemplateService.saveTemplate(template);
 
       if (mounted) {
-        Navigator.pop(context, true); // Return true to indicate success
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.templateEditSuccessMessage),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Handle navigation based on mode
+        if (!_isEmbeddedInDesktop) {
+          // Mobile mode: Use normal navigation
+          Navigator.pop(context, true); // Return true to indicate success
+        }
+        // Desktop embedded mode: Just show success message
+        // User can navigate back using breadcrumb/back button
       }
     } catch (e) {
       setState(() {

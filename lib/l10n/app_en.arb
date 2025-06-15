@@ -63,6 +63,7 @@
     "textTemplateGenDesc": "Create documents from templates. You can create reusable templates with fields like text, number, date.",
     "editTemplate": "Edit Template",
     "createTemplate": "Create New Template",
+    "templateEditSuccessMessage": "Template saved successfully! You can now navigate back.",
     "contentTab": "Content",
     "structureTab": "Structure",
     "templateTitleLabel": "Template Title *",
@@ -99,6 +100,12 @@
     "exportToJson": "Export to JSON",
     "confirmDeletion": "Confirm Deletion",
     "confirmDeleteTemplateMsg": "Are you sure you want to delete \"{title}\"?",
+    "holdToDeleteInstruction": "Hold the delete button for 5 seconds to confirm",
+    "holdToDelete": "Hold to delete...",
+    "deleting": "Deleting...",
+    "holdToClearCache": "Hold to clear...",
+    "clearingCache": "Clearing cache...",
+    "holdToClearCacheInstruction": "Hold the clear button for 10 seconds to confirm",
     "templateDeleted": "Template deleted.",
     "errorDeletingTemplate": "Error deleting template: {error}",
     "help": "Help",
@@ -1161,5 +1168,8 @@
     "dataConverterInfo": "Data Storage Converter Information",
     "customizeDataUnits": "Customize Data Storage Units",
     "selectDataUnits": "Select data storage units to display",
-    "dataUnits": "Data Storage Units"
+    "dataUnits": "Data Storage Units",
+    "holdToClearCache": "Hold to clear...",
+    "clearingCache": "Clearing cache...",
+    "holdToClearCacheInstruction": "Hold the clear button for 10 seconds to confirm"
 }

@@ -59,6 +59,7 @@
     "textTemplateGenDesc": "Tạo văn bản theo biểu mẫu có sẵn. Bạn có thể tạo các mẫu văn bản với các trường thông tin cần điền như văn bản, số, ngày tháng để sử dụng lại nhiều lần.",
     "editTemplate": "Sửa mẫu",
     "createTemplate": "Tạo mẫu mới",
+    "templateEditSuccessMessage": "Mẫu đã được lưu thành công! Bạn có thể thoát màn hình này.",
     "contentTab": "Nội dung",
     "structureTab": "Cấu trúc",
     "templateTitleLabel": "Tiêu đề mẫu *",
@@ -94,6 +95,9 @@
     "exportToJson": "Xuất ra JSON",
     "confirmDeletion": "Xác nhận xóa",
     "confirmDeleteTemplateMsg": "Bạn có chắc muốn xóa \"{title}\"?",
+    "holdToDeleteInstruction": "Nhấn giữ nút xóa trong 5 giây để xác nhận",
+    "holdToDelete": "Nhấn giữ để xóa...",
+    "deleting": "Đang xóa...",
     "templateDeleted": "Đã xóa mẫu.",
     "errorDeletingTemplate": "Lỗi khi xóa mẫu: {error}",
     "help": "Trợ giúp",
@@ -1159,5 +1163,9 @@
     "dataUnits": "Đơn Vị Dung Lượng Lưu Trữ",
     "randomResult": "Kết quả",
     "skipAnimation": "Bỏ qua hoạt ảnh",
-    "skipAnimationDesc": "Tắt hoạt ảnh để có kết quả nhanh hơn"
+    "skipAnimationDesc": "Tắt hoạt ảnh để có kết quả nhanh hơn",
+    "deleting": "Đang xóa...",
+    "holdToClearCache": "Nhấn giữ để xóa...",
+    "clearingCache": "Đang xóa cache...",
+    "holdToClearCacheInstruction": "Nhấn giữ nút xóa trong 10 giây để xác nhận"
 }

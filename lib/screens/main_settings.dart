@@ -5,6 +5,7 @@ import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/widgets/cache_details_dialog.dart';
 import 'package:setpocket/widgets/tool_visibility_dialog.dart';
 import 'package:setpocket/widgets/quick_actions_dialog.dart';
+import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/services/settings_service.dart';
@@ -119,9 +120,29 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Future<void> _clearCache() async {
-    final confirmed = await _showConfirmDialog();
-    if (confirmed != true) return;
+    final l10n = AppLocalizations.of(context)!;
 
+    await showDialog(
+      context: context,
+      builder: (context) => HoldToConfirmDialog(
+        title: l10n.clearAllCache,
+        content: l10n.confirmClearAllCache,
+        actionText: l10n.clearCache,
+        holdText: l10n.holdToClearCache,
+        processingText: l10n.clearingCache,
+        instructionText: l10n.holdToClearCacheInstruction,
+        onConfirmed: () async {
+          Navigator.of(context).pop();
+          await _performClearCache();
+        },
+        holdDuration: const Duration(seconds: 10),
+        actionIcon: Icons.delete_forever,
+        l10n: l10n,
+      ),
+    );
+  }
+
+  Future<void> _performClearCache() async {
     setState(() {
       _clearing = true;
     });
@@ -219,59 +240,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             widget.onToolVisibilityChanged!();
           }
         },
-      ),
-    );
-  }
-
-  Future<bool?> _showConfirmDialog() async {
-    final loc = AppLocalizations.of(context)!;
-    final textController = TextEditingController();
-
-    return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text(loc.clearAllCache),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(loc.confirmClearAllCache),
-              const SizedBox(height: 16),
-              Text(
-                loc.typeConfirmToProceed,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                  hintText: loc.confirmText,
-                  border: const OutlineInputBorder(),
-                ),
-                onChanged: (value) => setState(() {}),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(loc.cancel),
-            ),
-            FilledButton(
-              onPressed: textController.text.toLowerCase() ==
-                      loc.confirmText.toLowerCase()
-                  ? () => Navigator.of(context).pop(true)
-                  : null,
-              style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(loc.clearAllCache),
-            ),
-          ],
-        ),
       ),
     );
   }

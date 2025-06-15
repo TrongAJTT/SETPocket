@@ -408,13 +408,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
             child: Text(l10n.cancel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
             onPressed: () async {
               Navigator.of(context).pop();
               await _deleteTemplate(template.id, l10n);
             },
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.delete),
           ),
         ],

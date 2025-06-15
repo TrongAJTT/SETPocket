@@ -12,7 +12,9 @@ import 'package:setpocket/services/hive_service.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
+import 'package:setpocket/services/draft_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:window_manager/window_manager.dart';
 import 'screens/text_template_gen_list_screen.dart';
 import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
@@ -39,6 +41,16 @@ class BreadcrumbData {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Setup window manager for desktop platforms
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.linux)) {
+    await windowManager.ensureInitialized();
+    // Don't prevent close - just trigger emergency save
+    await windowManager.setPreventClose(false);
+  }
 
   // Temporarily disable force clear cache - let services handle migration
   // await _forceClearHiveCache();
@@ -208,8 +220,33 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with WindowListener {
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowClose() async {
+    // Trigger emergency save before window closes
+    DraftService.triggerEmergencySave();
+    // Allow window to close
+    await windowManager.destroy();
+  }
 
   @override
   Widget build(BuildContext context) {

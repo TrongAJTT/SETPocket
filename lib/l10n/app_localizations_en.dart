@@ -2895,4 +2895,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataUnits => 'Data Storage Units';
+
+  @override
+  String get drafts => 'Drafts';
+
+  @override
+  String get noDraftsYet => 'No drafts yet';
+
+  @override
+  String get createDraftsHint => 'Drafts are temporary saves of your work. They\'re automatically created when you exit editing without saving.';
+
+  @override
+  String get draftSaved => 'Draft saved';
+
+  @override
+  String get draftDeleted => 'Draft deleted';
+
+  @override
+  String get saveDraft => 'Save Draft';
+
+  @override
+  String get stayHere => 'Stay Here';
+
+  @override
+  String get exitWithoutSaving => 'Exit Without Saving';
+
+  @override
+  String get unsavedChanges => 'Unsaved Changes';
+
+  @override
+  String get unsavedChangesMessage => 'You have unsaved changes. What would you like to do?';
+
+  @override
+  String get continueDraft => 'Continue Draft';
+
+  @override
+  String get publishDraft => 'Publish Draft';
+
+  @override
+  String get deleteDraft => 'Delete Draft';
+
+  @override
+  String get confirmDeleteDraft => 'Delete Draft?';
+
+  @override
+  String get confirmDeleteDraftMessage => 'Are you sure you want to delete this draft? This action cannot be undone.';
+
+  @override
+  String get draftPublished => 'Draft published as template';
+
+  @override
+  String get newDraft => 'New Draft';
+
+  @override
+  String get editDraft => 'Edit Draft';
+
+  @override
+  String draftCreatedOn(Object date) {
+    return 'Created on $date';
+  }
+
+  @override
+  String draftUpdatedOn(Object date) {
+    return 'Updated on $date';
+  }
+
+  @override
+  String get autoSaved => 'Auto-saved';
+
+  @override
+  String get viewDrafts => 'View Drafts';
+
+  @override
+  String get manageDrafts => 'Manage Drafts';
+
+  @override
+  String get draftsExpireAfter => 'Drafts expire after 7 days';
+
+  @override
+  String get expiredDraft => 'Expired';
+
+  @override
+  String draftCount(Object count) {
+    return '$count drafts';
+  }
 }

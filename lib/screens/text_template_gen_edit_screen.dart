@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template.dart';
 import 'package:setpocket/services/template_service.dart';
+import 'package:setpocket/services/draft_service.dart';
+import 'package:setpocket/screens/text_template_gen_list_screen.dart';
+import 'dart:async';
 
 class TemplateEditScreen extends StatefulWidget {
   final Template? template; // Null for create new, non-null for edit
+  final TemplateDraft? draft; // For continuing a draft
   final bool isEmbedded;
   final Function(Widget, String, {String? parentCategory, IconData? icon})?
       onToolSelected;
@@ -12,6 +16,7 @@ class TemplateEditScreen extends StatefulWidget {
   const TemplateEditScreen({
     super.key,
     this.template,
+    this.draft,
     this.isEmbedded = false,
     this.onToolSelected,
   });
@@ -21,7 +26,7 @@ class TemplateEditScreen extends StatefulWidget {
 }
 
 class _TemplateEditScreenState extends State<TemplateEditScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
@@ -34,9 +39,17 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   // Tab controller
   late TabController _tabController;
 
+  // Draft-related state
+  String? _currentDraftId;
+  Timer? _autoSaveTimer;
+  bool _hasUnsavedChanges = false;
+  String _initialTitle = '';
+  String _initialContent = '';
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
@@ -47,15 +60,179 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       }
     });
 
-    if (widget.template != null) {
+    // Initialize from template or draft
+    if (widget.draft != null) {
+      // Continue from draft
+      _currentDraftId = widget.draft!.id;
+      _titleController.text = widget.draft!.title;
+      _contentController.text = widget.draft!.content;
+      _initialTitle = widget.draft!.title;
+      _initialContent = widget.draft!.content;
+    } else if (widget.template != null) {
+      // Edit existing template
       _titleController.text = widget.template!.title;
       _contentController.text = widget.template!.content;
-      _refreshElements();
+      _initialTitle = widget.template!.title;
+      _initialContent = widget.template!.content;
+      _currentDraftId = DraftService.generateDraftId();
+    } else {
+      // Create new template
+      _currentDraftId = DraftService.generateDraftId();
+    }
+
+    _refreshElements();
+    _setupAutoSave();
+    _registerEmergencySave();
+  }
+
+  void _setupAutoSave() {
+    // Listen to text changes for auto-save
+    _titleController.addListener(_onContentChanged);
+    _contentController.addListener(_onContentChanged);
+
+    // Auto-save every 30 seconds
+    _autoSaveTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (widget.isEmbedded) {
+        _autoSaveDraftWithNotification();
+      } else {
+        _autoSaveDraft();
+      }
+    });
+  }
+
+  void _onContentChanged() {
+    final hasChanges = _titleController.text != _initialTitle ||
+        _contentController.text != _initialContent;
+    if (hasChanges != _hasUnsavedChanges) {
+      setState(() {
+        _hasUnsavedChanges = hasChanges;
+      });
+    }
+  }
+
+  Future<void> _autoSaveDraft() async {
+    if (!_hasUnsavedChanges || _currentDraftId == null) return;
+
+    try {
+      await DraftService.autoSaveDraft(
+        draftId: _currentDraftId!,
+        type: widget.template != null ? DraftType.edit : DraftType.create,
+        originalTemplateId: widget.template?.id,
+        title: _titleController.text,
+        content: _contentController.text,
+      );
+
+      // Debug: Show auto-save success
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.autoSaved),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Colors.green.withOpacity(0.8),
+          ),
+        );
+      }
+    } catch (e) {
+      // Auto-save failures should be silent in production
+      // But show error in debug mode
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Auto-save failed: ${e.toString()}'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  void _registerEmergencySave() {
+    // Register callback for emergency saves (window close, etc.)
+    DraftService.registerEmergencySaveCallback(_emergencySave);
+  }
+
+  void _emergencySave() {
+    if (_hasUnsavedChanges && _currentDraftId != null) {
+      _autoSaveDraftSync();
+    }
+  }
+
+  @override
+  void deactivate() {
+    // Save draft when widget is deactivated (before dispose)
+    // This happens when user navigates away via sidebar in desktop mode
+    if (_hasUnsavedChanges && _currentDraftId != null) {
+      _autoSaveDraftSync();
+    }
+    super.deactivate();
+  }
+
+  Future<void> _autoSaveDraftWithNotification() async {
+    if (!_hasUnsavedChanges || _currentDraftId == null) return;
+
+    try {
+      await DraftService.autoSaveDraft(
+        draftId: _currentDraftId!,
+        type: widget.template != null ? DraftType.edit : DraftType.create,
+        originalTemplateId: widget.template?.id,
+        title: _titleController.text,
+        content: _contentController.text,
+      );
+
+      // Show subtle notification for desktop auto-save
+      if (mounted && widget.isEmbedded) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text(AppLocalizations.of(context)!.draftSaved),
+              ],
+            ),
+            backgroundColor: Colors.green.shade600,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+    } catch (e) {
+      // Auto-save failures should be silent in production
+    }
+  }
+
+  void _autoSaveDraftSync() {
+    if (!_hasUnsavedChanges || _currentDraftId == null) return;
+
+    try {
+      // Use synchronous version for critical saves
+      final draft = TemplateDraft(
+        id: _currentDraftId!,
+        type: widget.template != null ? DraftType.edit : DraftType.create,
+        originalTemplateId: widget.template?.id,
+        title: _titleController.text,
+        content: _contentController.text,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      // For critical saves, use immediate save
+      DraftService.saveDraft(draft);
+    } catch (e) {
+      // Even critical saves should be silent
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _autoSaveTimer?.cancel();
+
+    // Unregister emergency save callback
+    DraftService.unregisterEmergencySaveCallback(_emergencySave);
+
     _titleController.dispose();
     _contentController.dispose();
     _contentFocusNode.dispose();
@@ -110,7 +287,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
             ),
             child: Row(
               children: [
-                // Removed back button - navigation is handled by sidebar
                 Expanded(
                   child: Text(
                     isEditing ? l10n.editTemplate : l10n.createTemplate,
@@ -132,35 +308,38 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     }
 
     // Mobile view - normal Scaffold with AppBar
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? l10n.editTemplate : l10n.createTemplate),
-        actions: [
-          TextButton.icon(
-            icon: const Icon(Icons.save),
-            label: Text(l10n.save),
-            onPressed: _isLoading ? null : _saveTemplate,
-          ),
-        ],
-        bottom: !isDesktop
-            ? TabBar(
-                controller: _tabController,
-                tabs: [
-                  Tab(
-                    icon: const Icon(Icons.edit_document),
-                    text: l10n.contentTab,
-                  ),
-                  Tab(
-                    icon: const Icon(Icons.view_module),
-                    text: l10n.structureTab,
-                  ),
-                ],
-              )
-            : null,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(isEditing ? l10n.editTemplate : l10n.createTemplate),
+          actions: [
+            TextButton.icon(
+              icon: const Icon(Icons.save),
+              label: Text(l10n.save),
+              onPressed: _isLoading ? null : _saveTemplate,
+            ),
+          ],
+          bottom: !isDesktop
+              ? TabBar(
+                  controller: _tabController,
+                  tabs: [
+                    Tab(
+                      icon: const Icon(Icons.edit_document),
+                      text: l10n.contentTab,
+                    ),
+                    Tab(
+                      icon: const Icon(Icons.view_module),
+                      text: l10n.structureTab,
+                    ),
+                  ],
+                )
+              : null,
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : content,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : content,
     );
   }
 
@@ -1216,6 +1395,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
 
       await TemplateService.saveTemplate(template);
 
+      // Delete draft after successful save
+      if (_currentDraftId != null && widget.draft != null) {
+        await DraftService.deleteDraft(_currentDraftId!);
+      }
+
+      // Update initial values to prevent unsaved changes dialog
+      _initialTitle = title;
+      _initialContent = content;
+      _hasUnsavedChanges = false;
+
       if (mounted) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1393,5 +1582,107 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
         ),
       ],
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    if (!_hasUnsavedChanges) {
+      return true;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.unsavedChanges),
+        content: Text(l10n.unsavedChangesMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('stay'),
+            child: Text(l10n.stayHere),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('draft'),
+            child: Text(l10n.saveDraft),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('exit'),
+            child: Text(l10n.exitWithoutSaving),
+          ),
+        ],
+      ),
+    );
+
+    switch (result) {
+      case 'draft':
+        await _saveDraft();
+        return true;
+      case 'exit':
+        return true;
+      case 'stay':
+      default:
+        return false;
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    if (_currentDraftId == null) return;
+
+    try {
+      final draft = TemplateDraft(
+        id: _currentDraftId!,
+        type: widget.template != null ? DraftType.edit : DraftType.create,
+        originalTemplateId: widget.template?.id,
+        title: _titleController.text,
+        content: _contentController.text,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      await DraftService.saveDraft(draft);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.draftSaved),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving draft: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Save draft on various app state changes
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+        // App is being minimized, closed, or switched away from
+        if (_hasUnsavedChanges && _currentDraftId != null) {
+          _autoSaveDraftSync();
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App is resuming - no action needed
+        break;
+      case AppLifecycleState.hidden:
+        // App is hidden (desktop platforms)
+        if (_hasUnsavedChanges && _currentDraftId != null) {
+          _autoSaveDraftSync();
+        }
+        break;
+    }
   }
 }

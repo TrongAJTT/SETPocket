@@ -2895,4 +2895,88 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dataUnits => 'Đơn Vị Dung Lượng Lưu Trữ';
+
+  @override
+  String get drafts => 'Bản nháp';
+
+  @override
+  String get noDraftsYet => 'Chưa có bản nháp nào';
+
+  @override
+  String get createDraftsHint => 'Bản nháp là bản lưu tạm thời công việc của bạn. Chúng được tạo tự động khi bạn thoát khỏi chế độ chỉnh sửa mà không lưu.';
+
+  @override
+  String get draftSaved => 'Đã lưu bản nháp';
+
+  @override
+  String get draftDeleted => 'Đã xóa bản nháp';
+
+  @override
+  String get saveDraft => 'Lưu nháp';
+
+  @override
+  String get stayHere => 'Ở lại';
+
+  @override
+  String get exitWithoutSaving => 'Thoát không lưu';
+
+  @override
+  String get unsavedChanges => 'Thay đổi chưa lưu';
+
+  @override
+  String get unsavedChangesMessage => 'Bạn có thay đổi chưa được lưu. Bạn muốn làm gì?';
+
+  @override
+  String get continueDraft => 'Tiếp tục nháp';
+
+  @override
+  String get publishDraft => 'Xuất bản nháp';
+
+  @override
+  String get deleteDraft => 'Xóa nháp';
+
+  @override
+  String get confirmDeleteDraft => 'Xóa bản nháp?';
+
+  @override
+  String get confirmDeleteDraftMessage => 'Bạn có chắc chắn muốn xóa bản nháp này? Hành động này không thể hoàn tác.';
+
+  @override
+  String get draftPublished => 'Đã xuất bản nháp thành mẫu';
+
+  @override
+  String get newDraft => 'Nháp mới';
+
+  @override
+  String get editDraft => 'Nháp chỉnh sửa';
+
+  @override
+  String draftCreatedOn(Object date) {
+    return 'Tạo vào $date';
+  }
+
+  @override
+  String draftUpdatedOn(Object date) {
+    return 'Cập nhật vào $date';
+  }
+
+  @override
+  String get autoSaved => 'Tự động lưu';
+
+  @override
+  String get viewDrafts => 'Xem nháp';
+
+  @override
+  String get manageDrafts => 'Quản lý nháp';
+
+  @override
+  String get draftsExpireAfter => 'Bản nháp hết hạn sau 7 ngày';
+
+  @override
+  String get expiredDraft => 'Đã hết hạn';
+
+  @override
+  String draftCount(Object count) {
+    return '$count bản nháp';
+  }
 }

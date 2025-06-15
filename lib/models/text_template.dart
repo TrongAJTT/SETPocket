@@ -1,4 +1,5 @@
 import 'package:logger/logger.dart';
+import 'package:setpocket/services/template_service.dart';
 
 class Template {
   final String id;
@@ -310,5 +311,101 @@ class TemplateManager {
       idGroups[element.id]!.add(element);
     }
     return idGroups;
+  }
+}
+
+enum DraftType {
+  create,
+  edit,
+}
+
+class TemplateDraft {
+  final String id;
+  final DraftType type;
+  final String? originalTemplateId; // For edit drafts
+  final String title;
+  final String content;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  TemplateDraft({
+    required this.id,
+    required this.type,
+    this.originalTemplateId,
+    required this.title,
+    required this.content,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory TemplateDraft.fromJson(Map<String, dynamic> json) {
+    return TemplateDraft(
+      id: json['id'] as String,
+      type: DraftType.values[json['type'] as int],
+      originalTemplateId: json['originalTemplateId'] as String?,
+      title: json['title'] as String,
+      content: json['content'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type.index,
+      'originalTemplateId': originalTemplateId,
+      'title': title,
+      'content': content,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  TemplateDraft copyWith({
+    String? id,
+    DraftType? type,
+    String? originalTemplateId,
+    String? title,
+    String? content,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return TemplateDraft(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      originalTemplateId: originalTemplateId ?? this.originalTemplateId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  // Check if draft is older than 7 days
+  bool get isExpired {
+    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+    return createdAt.isBefore(sevenDaysAgo);
+  }
+
+  // Check if draft has meaningful content
+  bool get hasContent {
+    return title.trim().isNotEmpty || content.trim().isNotEmpty;
+  }
+
+  // Convert draft to template
+  Template toTemplate() {
+    return Template(
+      id: originalTemplateId ?? TemplateService.generateTemplateId(),
+      title: title.trim().isEmpty ? 'Untitled Template' : title,
+      content: content,
+    );
+  }
+
+  String get displayTitle {
+    if (title.trim().isNotEmpty) {
+      return title;
+    }
+    return type == DraftType.create ? 'New Draft' : 'Edit Draft';
   }
 }

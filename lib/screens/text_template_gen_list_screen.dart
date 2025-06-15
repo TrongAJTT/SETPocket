@@ -5,9 +5,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template.dart';
 import 'package:setpocket/services/template_service.dart';
+import 'package:setpocket/services/draft_service.dart';
 import 'package:setpocket/widgets/import_status_dialog.dart';
 import 'package:setpocket/widgets/batch_export_dialog.dart';
 import 'package:setpocket/widgets/batch_delete_dialog.dart';
+import 'package:setpocket/widgets/drafts_dialog.dart';
 import 'text_template_gen_edit_screen.dart';
 import 'text_template_gen_use_screen.dart';
 
@@ -103,6 +105,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                   ),
                 ] else ...[
                   IconButton(
+                    icon: const Icon(Icons.drafts),
+                    tooltip: l10n.viewDrafts,
+                    onPressed: _showDraftsDialog,
+                  ),
+                  IconButton(
                     icon: const Icon(Icons.info_outline),
                     tooltip: l10n.help,
                     onPressed: () {
@@ -167,6 +174,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                   ),
               ]
             : [
+                IconButton(
+                  icon: const Icon(Icons.drafts),
+                  tooltip: l10n.viewDrafts,
+                  onPressed: _showDraftsDialog,
+                ),
                 IconButton(
                   icon: const Icon(Icons.info_outline),
                   tooltip: l10n.help,
@@ -324,54 +336,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   }
 
   Future<void> _navigateToCreateTemplate() async {
-    final editScreen = TemplateEditScreen(
-      isEmbedded: widget.isEmbedded,
-      onToolSelected: widget.onToolSelected,
-    );
-
-    if (widget.isEmbedded && widget.onToolSelected != null) {
-      // Desktop mode: callback để hiển thị trong main widget
-      widget.onToolSelected!(editScreen, 'Create Template',
-          parentCategory: 'TemplateListScreen', icon: Icons.create);
-    } else {
-      // Mobile mode: navigation bình thường
-      final result = await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(
-          builder: (context) => editScreen,
-        ),
-      );
-
-      if (result == true) {
-        _loadTemplates();
-      }
-    }
+    _navigateToEditScreen(template: null, draft: null);
   }
 
   Future<void> _navigateToEditTemplate(Template template) async {
-    final editScreen = TemplateEditScreen(
-      template: template,
-      isEmbedded: widget.isEmbedded,
-      onToolSelected: widget.onToolSelected,
-    );
-
-    if (widget.isEmbedded && widget.onToolSelected != null) {
-      // Desktop mode: callback để hiển thị trong main widget
-      widget.onToolSelected!(editScreen, 'Edit Template: ${template.title}',
-          parentCategory: 'TemplateListScreen', icon: Icons.edit);
-    } else {
-      // Mobile mode: navigation bình thường
-      final result = await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(
-          builder: (context) => editScreen,
-        ),
-      );
-
-      if (result == true) {
-        _loadTemplates();
-      }
-    }
+    _navigateToEditScreen(template: template);
   }
 
   Future<void> _navigateToUseTemplate(Template template) async {
@@ -485,7 +454,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           SimpleDialogOption(
             onPressed: () {
               Navigator.pop(context);
-              _navigateToCreateTemplate();
+              _navigateToEditScreen();
             },
             child: ListTile(
               leading: const Icon(Icons.create),
@@ -852,6 +821,52 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           ),
         );
       }
+    }
+  }
+
+  void _showDraftsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => DraftsDialog(
+        onDraftSelected: (draft) {
+          // Navigate to edit screen with draft
+          _navigateToEditScreen(draft: draft);
+        },
+      ),
+    );
+  }
+
+  void _navigateToEditScreen({Template? template, TemplateDraft? draft}) {
+    if (widget.isEmbedded && widget.onToolSelected != null) {
+      // Desktop embedded view
+      widget.onToolSelected!(
+        TemplateEditScreen(
+          template: template,
+          draft: draft,
+          isEmbedded: true,
+          onToolSelected: widget.onToolSelected,
+        ),
+        draft != null
+            ? (draft.type == DraftType.create ? 'Continue Draft' : 'Edit Draft')
+            : (template != null ? 'Edit Template' : 'Create Template'),
+        parentCategory: 'Text Templates',
+        icon: Icons.edit,
+      );
+    } else {
+      // Mobile view
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TemplateEditScreen(
+            template: template,
+            draft: draft,
+          ),
+        ),
+      ).then((result) {
+        if (result == true) {
+          _loadTemplates();
+        }
+      });
     }
   }
 }

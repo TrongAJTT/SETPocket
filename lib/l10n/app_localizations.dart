@@ -5602,6 +5602,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data Storage Units'**
   String get dataUnits;
+
+  /// No description provided for @drafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get drafts;
+
+  /// No description provided for @noDraftsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No drafts yet'**
+  String get noDraftsYet;
+
+  /// No description provided for @createDraftsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts are temporary saves of your work. They\'re automatically created when you exit editing without saving.'**
+  String get createDraftsHint;
+
+  /// No description provided for @draftSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved'**
+  String get draftSaved;
+
+  /// No description provided for @draftDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft deleted'**
+  String get draftDeleted;
+
+  /// No description provided for @saveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Draft'**
+  String get saveDraft;
+
+  /// No description provided for @stayHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay Here'**
+  String get stayHere;
+
+  /// No description provided for @exitWithoutSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Without Saving'**
+  String get exitWithoutSaving;
+
+  /// No description provided for @unsavedChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved Changes'**
+  String get unsavedChanges;
+
+  /// No description provided for @unsavedChangesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. What would you like to do?'**
+  String get unsavedChangesMessage;
+
+  /// No description provided for @continueDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Draft'**
+  String get continueDraft;
+
+  /// No description provided for @publishDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish Draft'**
+  String get publishDraft;
+
+  /// No description provided for @deleteDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Draft'**
+  String get deleteDraft;
+
+  /// No description provided for @confirmDeleteDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Draft?'**
+  String get confirmDeleteDraft;
+
+  /// No description provided for @confirmDeleteDraftMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this draft? This action cannot be undone.'**
+  String get confirmDeleteDraftMessage;
+
+  /// No description provided for @draftPublished.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft published as template'**
+  String get draftPublished;
+
+  /// No description provided for @newDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'New Draft'**
+  String get newDraft;
+
+  /// No description provided for @editDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Draft'**
+  String get editDraft;
+
+  /// No description provided for @draftCreatedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Created on {date}'**
+  String draftCreatedOn(Object date);
+
+  /// No description provided for @draftUpdatedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated on {date}'**
+  String draftUpdatedOn(Object date);
+
+  /// No description provided for @autoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-saved'**
+  String get autoSaved;
+
+  /// No description provided for @viewDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'View Drafts'**
+  String get viewDrafts;
+
+  /// No description provided for @manageDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Drafts'**
+  String get manageDrafts;
+
+  /// No description provided for @draftsExpireAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts expire after 7 days'**
+  String get draftsExpireAfter;
+
+  /// No description provided for @expiredDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expiredDraft;
+
+  /// No description provided for @draftCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} drafts'**
+  String draftCount(Object count);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

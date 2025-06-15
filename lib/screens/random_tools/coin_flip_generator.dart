@@ -48,15 +48,18 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       vsync: this,
     );
 
-    // Listen to animation to alternate sides in real-time
+    // Optimize animation listener to reduce unnecessary rebuilds
     _flipAnimation.addListener(() {
       if (_isFlipping) {
         int halfRotations = (_flipAnimation.value / math.pi).floor();
         bool newSide = halfRotations.isEven;
         if (newSide != _currentSide) {
-          setState(() {
-            _currentSide = newSide;
-          });
+          // Only setState if the side actually changed
+          if (mounted) {
+            setState(() {
+              _currentSide = newSide;
+            });
+          }
         }
       }
     });
@@ -283,7 +286,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.flipCoin,
     );

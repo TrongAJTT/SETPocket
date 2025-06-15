@@ -633,7 +633,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get allowDuplicates => 'Cho phép trùng lặp';
 
   @override
-  String get generatedNumbers => 'Các số đã tạo';
+  String get includeSeconds => 'Hiển thị số giây';
+
+  @override
+  String get generatedNumbers => 'Số đã tạo';
 
   @override
   String get other => 'Khác';

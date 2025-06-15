@@ -18,11 +18,16 @@ class DateTimeGeneratorScreen extends StatefulWidget {
 
 class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
     with SingleTickerProviderStateMixin {
+  // Static DateFormat instances for better performance
+  static final _dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm');
+  static final _dateTimeFormatWithSeconds = DateFormat('yyyy-MM-dd HH:mm:ss');
+
   DateTime _startDateTime = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDateTime = DateTime.now().add(const Duration(days: 30));
   int _dateTimeCount = 5;
   double _dateTimeCountSlider = 5.0;
   bool _allowDuplicates = true;
+  bool _includeSeconds = false;
   List<DateTime> _generatedDateTimes = [];
   bool _copied = false;
   late AnimationController _animationController;
@@ -71,7 +76,8 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
 
       // Save to history if enabled
       if (_historyEnabled && generatedDateTimes.isNotEmpty) {
-        final dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+        final dateTimeFormat =
+            _includeSeconds ? _dateTimeFormatWithSeconds : _dateTimeFormat;
         final dateTimeStrings = generatedDateTimes
             .map((dateTime) => dateTimeFormat.format(dateTime))
             .toList();
@@ -93,7 +99,8 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   void _copyToClipboard() {
     if (_generatedDateTimes.isEmpty) return;
 
-    final dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    final dateTimeFormat =
+        _includeSeconds ? _dateTimeFormatWithSeconds : _dateTimeFormat;
     String dateTimesText = _generatedDateTimes.map((dateTime) {
       return dateTimeFormat.format(dateTime);
     }).join('\n');
@@ -211,172 +218,75 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
     }
   }
 
-  Widget _buildDateTimeSelectors(AppLocalizations loc) {
-    final dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm');
+  Widget _buildDateTimeField(
+      String label, DateTime dateTime, bool isStartDate) {
+    final dateTimeFormat =
+        _includeSeconds ? _dateTimeFormatWithSeconds : _dateTimeFormat;
 
-    return MediaQuery.of(context).size.width > 600
-        ? Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      loc.startDate,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectStartDateTime,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              dateTimeFormat.format(_startDateTime),
-                              style: const TextStyle(fontFamily: 'monospace'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () =>
+              isStartDate ? _selectStartDateTime() : _selectEndDateTime(),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      loc.endDate,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectEndDateTime,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              dateTimeFormat.format(_endDateTime),
-                              style: const TextStyle(fontFamily: 'monospace'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 8),
+                Text(
+                  dateTimeFormat.format(dateTime),
+                  style: const TextStyle(fontFamily: 'monospace'),
                 ),
-              ),
-            ],
-          )
-        : Column(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateTimeSelectors(AppLocalizations loc) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return constraints.maxWidth > 800
+            ? Row(
                 children: [
-                  Text(
-                    loc.startDate,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  InkWell(
-                    onTap: _selectStartDateTime,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            dateTimeFormat.format(_startDateTime),
-                            style: const TextStyle(fontFamily: 'monospace'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Expanded(
+                      child: _buildDateTimeField(
+                          loc.startDate, _startDateTime, true)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                      child: _buildDateTimeField(
+                          loc.endDate, _endDateTime, false)),
                 ],
-              ),
-              const SizedBox(height: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              )
+            : Column(
                 children: [
-                  Text(
-                    loc.endDate,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  InkWell(
-                    onTap: _selectEndDateTime,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            dateTimeFormat.format(_endDateTime),
-                            style: const TextStyle(fontFamily: 'monospace'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildDateTimeField(loc.startDate, _startDateTime, true),
+                  const SizedBox(height: 16),
+                  _buildDateTimeField(loc.endDate, _endDateTime, false),
                 ],
-              ),
-            ],
-          );
+              );
+      },
+    );
   }
 
   Widget _buildCountSlider(AppLocalizations loc) {
@@ -435,17 +345,67 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
       children: [
         Text(
           loc.options,
-          style: Theme.of(context).textTheme.titleSmall,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
-        SwitchListTile(
-          title: Text(loc.allowDuplicates),
-          value: _allowDuplicates,
-          onChanged: (value) {
-            setState(() {
-              _allowDuplicates = value;
-            });
+        const SizedBox(height: 8),
+
+        // Responsive layout for options using LayoutBuilder
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return constraints.maxWidth > 800
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: CheckboxListTile(
+                          title: Text(loc.includeSeconds),
+                          value: _includeSeconds,
+                          onChanged: (value) {
+                            setState(() {
+                              _includeSeconds = value ?? false;
+                            });
+                          },
+                          dense: true,
+                        ),
+                      ),
+                      Expanded(
+                        child: CheckboxListTile(
+                          title: Text(loc.allowDuplicates),
+                          value: _allowDuplicates,
+                          onChanged: (value) {
+                            setState(() {
+                              _allowDuplicates = value ?? true;
+                            });
+                          },
+                          dense: true,
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      CheckboxListTile(
+                        title: Text(loc.includeSeconds),
+                        value: _includeSeconds,
+                        onChanged: (value) {
+                          setState(() {
+                            _includeSeconds = value ?? false;
+                          });
+                        },
+                        dense: true,
+                      ),
+                      CheckboxListTile(
+                        title: Text(loc.allowDuplicates),
+                        value: _allowDuplicates,
+                        onChanged: (value) {
+                          setState(() {
+                            _allowDuplicates = value ?? true;
+                          });
+                        },
+                        dense: true,
+                      ),
+                    ],
+                  );
           },
-          contentPadding: EdgeInsets.zero,
         ),
       ],
     );
@@ -454,7 +414,8 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    final dateTimeFormat =
+        _includeSeconds ? _dateTimeFormatWithSeconds : _dateTimeFormat;
 
     final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -471,23 +432,13 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
 
                 const SizedBox(height: 16),
 
-                // Count slider and Options section (responsive layout)
-                MediaQuery.of(context).size.width > 600
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 3, child: _buildCountSlider(loc)),
-                          const SizedBox(width: 32),
-                          Expanded(flex: 2, child: _buildOptionsSection(loc)),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          _buildCountSlider(loc),
-                          const SizedBox(height: 16),
-                          _buildOptionsSection(loc),
-                        ],
-                      ),
+                // Count slider
+                _buildCountSlider(loc),
+
+                const SizedBox(height: 16),
+
+                // Options section
+                _buildOptionsSection(loc),
 
                 const SizedBox(height: 16),
 
@@ -540,6 +491,8 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: _generatedDateTimes.map((dateTime) {
+                        final formattedDateTime =
+                            dateTimeFormat.format(dateTime);
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Container(
@@ -551,18 +504,39 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                                   .primaryContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Text(
-                              dateTimeFormat.format(dateTime),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context)
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    formattedDateTime,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer,
+                                          fontFamily: 'monospace',
+                                        ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.copy, size: 18),
+                                  onPressed: () {
+                                    Clipboard.setData(
+                                        ClipboardData(text: formattedDateTime));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(loc.copied)),
+                                    );
+                                  },
+                                  tooltip: loc.copyToClipboard,
+                                  style: IconButton.styleFrom(
+                                    foregroundColor: Theme.of(context)
                                         .colorScheme
                                         .onPrimaryContainer,
-                                    fontFamily: 'monospace',
                                   ),
-                              textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
                         );
@@ -580,7 +554,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.dateTimeGenerator,
     );

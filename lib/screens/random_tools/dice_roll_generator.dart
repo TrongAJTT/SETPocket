@@ -296,7 +296,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.rollDice,
     );

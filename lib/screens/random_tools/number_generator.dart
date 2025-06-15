@@ -140,80 +140,84 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   }
 
   Widget _buildMinMaxInputs(BuildContext context, AppLocalizations loc) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 800; // Desktop threshold
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >
+            800; // Use LayoutBuilder instead of MediaQuery
 
-    if (isDesktop) {
-      // Desktop layout: Min and Max in same row
-      return Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _minValueController,
-              decoration: InputDecoration(
-                labelText: loc.minValue,
-                border: const OutlineInputBorder(),
+        if (isDesktop) {
+          // Desktop layout: side by side
+          return Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _minValueController,
+                  decoration: InputDecoration(
+                    labelText: loc.minValue,
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    _isInteger
+                        ? FilteringTextInputFormatter.digitsOnly
+                        : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                  ],
+                ),
               ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                _isInteger
-                    ? FilteringTextInputFormatter.digitsOnly
-                    : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: TextField(
-              controller: _maxValueController,
-              decoration: InputDecoration(
-                labelText: loc.maxValue,
-                border: const OutlineInputBorder(),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextField(
+                  controller: _maxValueController,
+                  decoration: InputDecoration(
+                    labelText: loc.maxValue,
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    _isInteger
+                        ? FilteringTextInputFormatter.digitsOnly
+                        : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                  ],
+                ),
               ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                _isInteger
-                    ? FilteringTextInputFormatter.digitsOnly
-                    : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-              ],
-            ),
-          ),
-        ],
-      );
-    } else {
-      // Mobile layout: Min and Max in separate rows
-      return Column(
-        children: [
-          TextField(
-            controller: _minValueController,
-            decoration: InputDecoration(
-              labelText: loc.minValue,
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              _isInteger
-                  ? FilteringTextInputFormatter.digitsOnly
-                  : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
             ],
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _maxValueController,
-            decoration: InputDecoration(
-              labelText: loc.maxValue,
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              _isInteger
-                  ? FilteringTextInputFormatter.digitsOnly
-                  : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+          );
+        } else {
+          // Mobile layout: stacked
+          return Column(
+            children: [
+              TextField(
+                controller: _minValueController,
+                decoration: InputDecoration(
+                  labelText: loc.minValue,
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  _isInteger
+                      ? FilteringTextInputFormatter.digitsOnly
+                      : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _maxValueController,
+                decoration: InputDecoration(
+                  labelText: loc.maxValue,
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  _isInteger
+                      ? FilteringTextInputFormatter.digitsOnly
+                      : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                ],
+              ),
             ],
-          ),
-        ],
-      );
-    }
+          );
+        }
+      },
+    );
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
@@ -342,47 +346,45 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
         // Result card
         if (_generatedNumbers.isNotEmpty) ...[
           const SizedBox(height: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                loc.generatedNumbers,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _generatedNumbers.map((number) {
-                          return Chip(
-                            label: Text(_formatNumber(number)),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            labelStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          );
-                        }).toList(),
+                      Text(
+                        loc.generatedNumbers,
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: _copyToClipboard,
+                      IconButton(
                         icon: Icon(_copied ? Icons.check : Icons.copy),
-                        label: Text(_copied ? loc.copied : loc.copyToClipboard),
+                        onPressed: _copyToClipboard,
+                        tooltip: loc.copyToClipboard,
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _generatedNumbers.map((number) {
+                      return Chip(
+                        label: Text(_formatNumber(number)),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        labelStyle: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ],
@@ -392,7 +394,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.numberGenerator,
     );

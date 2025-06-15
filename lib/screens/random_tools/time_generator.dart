@@ -22,6 +22,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   double _timeCountSlider = 5.0;
   bool _allowDuplicates = true;
   List<TimeOfDay> _generatedTimes = [];
+  List<int> _generatedSeconds = []; // Store seconds separately
   bool _copied = false;
   late AnimationController _animationController;
   List<GenerationHistoryItem> _history = [];
@@ -62,6 +63,16 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
           count: _timeCount,
           allowDuplicates: _allowDuplicates,
         );
+        // Generate random seconds if needed
+        if (_includeSeconds) {
+          final random = DateTime.now().millisecondsSinceEpoch;
+          _generatedSeconds = List.generate(
+              _generatedTimes.length,
+              (index) =>
+                  (random + index * 17) % 60); // Use different seed for each
+        } else {
+          _generatedSeconds = List.filled(_generatedTimes.length, 0);
+        }
         _copied = false;
       });
       _animationController.forward(from: 0.0);
@@ -69,8 +80,10 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
       // Save to history if enabled
       if (_historyEnabled && _generatedTimes.isNotEmpty) {
         final timesText = _generatedTimes
-            .map((time) =>
-                '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}')
+            .asMap()
+            .entries
+            .map((entry) => _formatTimeWithSeconds(
+                _generatedTimes[entry.key], _generatedSeconds[entry.key]))
             .join(', ');
         GenerationHistoryService.addHistoryItem(
           timesText,
@@ -88,8 +101,11 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   }
 
   void _copyToClipboard() {
-    String timesText = _generatedTimes.map((time) {
-      return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    String timesText = _generatedTimes.asMap().entries.map((entry) {
+      return _includeSeconds
+          ? _formatTimeWithSeconds(
+              _generatedTimes[entry.key], _generatedSeconds[entry.key])
+          : _formatTimeOfDay(_generatedTimes[entry.key]);
     }).join('\n');
 
     Clipboard.setData(ClipboardData(text: timesText));
@@ -125,6 +141,13 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     final hours = tod.hour.toString().padLeft(2, '0');
     final minutes = tod.minute.toString().padLeft(2, '0');
     return '$hours:$minutes';
+  }
+
+  String _formatTimeWithSeconds(TimeOfDay time, int seconds) {
+    final hours = time.hour.toString().padLeft(2, '0');
+    final minutes = time.minute.toString().padLeft(2, '0');
+    final secs = seconds.toString().padLeft(2, '0');
+    return '$hours:$minutes:$secs';
   }
 
   Widget _buildTimeField(String label, TimeOfDay time, bool isStartTime) {
@@ -233,60 +256,64 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
         ),
         const SizedBox(height: 8),
 
-        // Responsive layout for options
-        MediaQuery.of(context).size.width > 600
-            ? Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: const Text('Include Seconds'),
-                      value: _includeSeconds,
-                      onChanged: (value) {
-                        setState(() {
-                          _includeSeconds = value ?? false;
-                        });
-                      },
-                      dense: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: Text(loc.allowDuplicates),
-                      value: _allowDuplicates,
-                      onChanged: (value) {
-                        setState(() {
-                          _allowDuplicates = value ?? true;
-                        });
-                      },
-                      dense: true,
-                    ),
-                  ),
-                ],
-              )
-            : Column(
-                children: [
-                  CheckboxListTile(
-                    title: const Text('Include Seconds'),
-                    value: _includeSeconds,
-                    onChanged: (value) {
-                      setState(() {
-                        _includeSeconds = value ?? false;
-                      });
-                    },
-                    dense: true,
-                  ),
-                  CheckboxListTile(
-                    title: Text(loc.allowDuplicates),
-                    value: _allowDuplicates,
-                    onChanged: (value) {
-                      setState(() {
-                        _allowDuplicates = value ?? true;
-                      });
-                    },
-                    dense: true,
-                  ),
-                ],
-              ),
+        // Responsive layout for options using LayoutBuilder
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return constraints.maxWidth > 800
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: CheckboxListTile(
+                          title: Text(loc.includeSeconds),
+                          value: _includeSeconds,
+                          onChanged: (value) {
+                            setState(() {
+                              _includeSeconds = value ?? false;
+                            });
+                          },
+                          dense: true,
+                        ),
+                      ),
+                      Expanded(
+                        child: CheckboxListTile(
+                          title: Text(loc.allowDuplicates),
+                          value: _allowDuplicates,
+                          onChanged: (value) {
+                            setState(() {
+                              _allowDuplicates = value ?? true;
+                            });
+                          },
+                          dense: true,
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      CheckboxListTile(
+                        title: Text(loc.includeSeconds),
+                        value: _includeSeconds,
+                        onChanged: (value) {
+                          setState(() {
+                            _includeSeconds = value ?? false;
+                          });
+                        },
+                        dense: true,
+                      ),
+                      CheckboxListTile(
+                        title: Text(loc.allowDuplicates),
+                        value: _allowDuplicates,
+                        onChanged: (value) {
+                          setState(() {
+                            _allowDuplicates = value ?? true;
+                          });
+                        },
+                        dense: true,
+                      ),
+                    ],
+                  );
+          },
+        ),
       ],
     );
   }
@@ -306,25 +333,29 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Time range (responsive layout)
-                MediaQuery.of(context).size.width > 600
-                    ? Row(
-                        children: [
-                          Expanded(
-                              child: _buildTimeField(
-                                  loc.startTime, _startTime, true)),
-                          const SizedBox(width: 16),
-                          Expanded(
-                              child: _buildTimeField(
-                                  loc.endTime, _endTime, false)),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          _buildTimeField(loc.startTime, _startTime, true),
-                          const SizedBox(height: 16),
-                          _buildTimeField(loc.endTime, _endTime, false),
-                        ],
-                      ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    return constraints.maxWidth > 800
+                        ? Row(
+                            children: [
+                              Expanded(
+                                  child: _buildTimeField(
+                                      loc.startTime, _startTime, true)),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                  child: _buildTimeField(
+                                      loc.endTime, _endTime, false)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              _buildTimeField(loc.startTime, _startTime, true),
+                              const SizedBox(height: 16),
+                              _buildTimeField(loc.endTime, _endTime, false),
+                            ],
+                          );
+                  },
+                ),
 
                 const SizedBox(height: 16),
 
@@ -356,37 +387,83 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
 
         // Results
         if (_generatedTimes.isNotEmpty) ...[
-          Text(
-            loc.randomResult,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _generatedTimes.map((time) {
-                      return Chip(
-                        label: Text(_formatTimeOfDay(time)),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        labelStyle: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        loc.randomResult,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        icon: Icon(_copied ? Icons.check : Icons.copy),
+                        onPressed: _copyToClipboard,
+                        tooltip: loc.copyToClipboard,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _generatedTimes.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final time = entry.value;
+                      final formattedTime = _includeSeconds
+                          ? _formatTimeWithSeconds(
+                              time, _generatedSeconds[index])
+                          : _formatTimeOfDay(time);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  formattedTime,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                        fontFamily: 'monospace',
+                                      ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy, size: 18),
+                                onPressed: () {
+                                  Clipboard.setData(
+                                      ClipboardData(text: formattedTime));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(loc.copied)),
+                                  );
+                                },
+                                tooltip: loc.copyToClipboard,
+                                style: IconButton.styleFrom(
+                                  foregroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: _copyToClipboard,
-                    icon: Icon(_copied ? Icons.check : Icons.copy),
-                    label: Text(_copied ? loc.copied : loc.copyToClipboard),
                   ),
                 ],
               ),
@@ -400,7 +477,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.timeGenerator,
     );

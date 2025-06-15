@@ -104,6 +104,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
     final loc = AppLocalizations.of(context)!;
 
     final generatorContent = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Skip animation option
         Card(
@@ -125,9 +126,10 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
         const SizedBox(height: 24),
 
         // Result display
-        Expanded(
+        Flexible(
           child: Center(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (_result != null)
@@ -207,7 +209,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.yesNo,
     );

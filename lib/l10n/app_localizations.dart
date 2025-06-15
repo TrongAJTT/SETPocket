@@ -1211,6 +1211,12 @@ abstract class AppLocalizations {
   /// **'Allow Duplicates'**
   String get allowDuplicates;
 
+  /// No description provided for @includeSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Include Seconds'**
+  String get includeSeconds;
+
   /// No description provided for @generatedNumbers.
   ///
   /// In en, this message translates to:

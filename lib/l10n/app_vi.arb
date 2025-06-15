@@ -187,7 +187,8 @@
     "minValue": "Giá trị tối thiểu",
     "maxValue": "Giá trị tối đa",
     "quantity": "Số lượng",    "allowDuplicates": "Cho phép trùng lặp",
-    "generatedNumbers": "Các số đã tạo",
+    "generatedNumbers": "Số đã tạo",
+    "includeSeconds": "Hiển thị số giây",
     
     "other": "Khác",
     

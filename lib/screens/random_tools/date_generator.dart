@@ -25,6 +25,8 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   bool _copied = false;
   List<GenerationHistoryItem> _history = [];
   bool _historyEnabled = false;
+  final _dateFormat = DateFormat('yyyy-MM-dd');
+
   @override
   void initState() {
     super.initState();
@@ -54,9 +56,8 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
 
       // Save to history if enabled
       if (_historyEnabled && _generatedDates.isNotEmpty) {
-        final formatter = DateFormat('yyyy-MM-dd');
         final datesText =
-            _generatedDates.map((date) => formatter.format(date)).join(', ');
+            _generatedDates.map((date) => _dateFormat.format(date)).join(', ');
         GenerationHistoryService.addHistoryItem(
           datesText,
           'date',
@@ -226,36 +227,40 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   }
 
   Widget _buildOtherSection(AppLocalizations loc) {
-    final isWideScreen = MediaQuery.of(context).size.width > 600;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWideScreen = constraints.maxWidth > 600;
 
-    final duplicatesCheckbox = CheckboxListTile(
-      title: Text(loc.allowDuplicates),
-      value: _allowDuplicates,
-      onChanged: (value) {
-        setState(() {
-          _allowDuplicates = value ?? true;
-        });
+        final duplicatesCheckbox = CheckboxListTile(
+          title: Text(loc.allowDuplicates),
+          value: _allowDuplicates,
+          onChanged: (value) {
+            setState(() {
+              _allowDuplicates = value ?? true;
+            });
+          },
+          contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+        );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              loc.other,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            if (isWideScreen)
+              // Center vertically on PC
+              Center(
+                child: duplicatesCheckbox,
+              )
+            else
+              // Normal layout on mobile
+              duplicatesCheckbox,
+          ],
+        );
       },
-      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.other,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        if (isWideScreen)
-          // Center vertically on PC
-          Center(
-            child: duplicatesCheckbox,
-          )
-        else
-          // Normal layout on mobile
-          duplicatesCheckbox,
-      ],
     );
   }
 
@@ -354,48 +359,78 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
 
         // Results
         if (_generatedDates.isNotEmpty) ...[
-          Text(
-            loc.randomResult,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _generatedDates.length,
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final date = _generatedDates[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          child: Text('${index + 1}'),
-                        ),
-                        title: Text(
-                          dateFormat.format(date),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          DateFormat('EEEE').format(date),
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary),
-                        ),
-                        trailing: Text(
-                          DateFormat.yMMMMd().format(date),
-                        ),
-                      );
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        loc.randomResult,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        icon: Icon(_copied ? Icons.check : Icons.copy),
+                        onPressed: _copyToClipboard,
+                        tooltip: loc.copyToClipboard,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: _copyToClipboard,
-                    icon: Icon(_copied ? Icons.check : Icons.copy),
-                    label: Text(_copied ? loc.copied : loc.copyToClipboard),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _generatedDates.map((date) {
+                      final formattedDate = dateFormat.format(date);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  formattedDate,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                        fontFamily: 'monospace',
+                                      ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy, size: 18),
+                                onPressed: () {
+                                  Clipboard.setData(
+                                      ClipboardData(text: formattedDate));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(loc.copied)),
+                                  );
+                                },
+                                tooltip: loc.copyToClipboard,
+                                style: IconButton.styleFrom(
+                                  foregroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
@@ -409,7 +444,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.dateGenerator,
     );

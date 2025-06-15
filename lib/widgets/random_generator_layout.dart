@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 /// Generic layout widget for all random generators to ensure consistency
 class RandomGeneratorLayout extends StatefulWidget {
@@ -183,6 +184,28 @@ class RandomGeneratorHistoryWidget extends StatelessWidget {
       return customItemBuilder!(item, context);
     }
 
+    final loc = AppLocalizations.of(context)!;
+
+    // Format timestamp based on locale
+    String formattedTimestamp;
+    try {
+      final timestamp = item.timestamp as DateTime;
+      final locale = Localizations.localeOf(context);
+
+      if (locale.languageCode == 'vi') {
+        // Vietnamese format: dd/MM/yyyy HH:mm
+        formattedTimestamp =
+            DateFormat('dd/MM/yyyy HH:mm', 'vi').format(timestamp);
+      } else {
+        // International format: yyyy-MM-dd HH:mm
+        formattedTimestamp =
+            DateFormat('yyyy-MM-dd HH:mm', 'en').format(timestamp);
+      }
+    } catch (e) {
+      // Fallback if timestamp parsing fails
+      formattedTimestamp = item.timestamp.toString().substring(0, 19);
+    }
+
     // Default item builder
     return ListTile(
       dense: true,
@@ -196,13 +219,13 @@ class RandomGeneratorHistoryWidget extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        'Generated at: ${item.timestamp.toString().substring(0, 19)}',
+        '${loc.generatedAt}: $formattedTimestamp',
         style: Theme.of(context).textTheme.bodySmall,
       ),
       trailing: IconButton(
         icon: const Icon(Icons.copy, size: 18),
         onPressed: () => onCopyItem(item.value.toString()),
-        tooltip: 'Copy to Clipboard',
+        tooltip: loc.copyToClipboard,
       ),
     );
   }

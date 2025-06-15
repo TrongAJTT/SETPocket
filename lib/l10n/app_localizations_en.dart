@@ -633,6 +633,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allowDuplicates => 'Allow Duplicates';
 
   @override
+  String get includeSeconds => 'Include Seconds';
+
+  @override
   String get generatedNumbers => 'Generated Numbers';
 
   @override

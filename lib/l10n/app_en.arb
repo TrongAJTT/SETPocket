@@ -196,6 +196,7 @@
     "maxValue": "Maximum Value",
     "quantity": "Quantity",
     "allowDuplicates": "Allow Duplicates",
+    "includeSeconds": "Include Seconds",
     "generatedNumbers": "Generated Numbers",
     
     "other": "Other",

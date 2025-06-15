@@ -163,6 +163,20 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          loc.randomResult,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        IconButton(
+                          icon: Icon(_copied ? Icons.check : Icons.copy),
+                          onPressed: _copyToClipboard,
+                          tooltip: loc.copyToClipboard,
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -210,12 +224,6 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: _copyToClipboard,
-                      icon: Icon(_copied ? Icons.check : Icons.copy),
-                      label: Text(_copied ? loc.copied : loc.copyToClipboard),
-                    ),
                   ],
                 ),
               ),
@@ -229,7 +237,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
       generatorContent: generatorContent,
       historyWidget: _buildHistoryWidget(loc),
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: loc.latinLetters,
     );

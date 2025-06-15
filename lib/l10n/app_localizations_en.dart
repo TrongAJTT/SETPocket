@@ -2694,4 +2694,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speedUnits => 'Speed Units';
+
+  @override
+  String get temperatureConverterDetailedInfo => 'Temperature Converter - Detailed Information';
+
+  @override
+  String get temperatureConverterOverview => 'This precision temperature converter supports multiple temperature scales with high accuracy calculations for scientific, engineering, cooking, and everyday applications.';
+
+  @override
+  String get step1Temperature => 'Step 1: Add Cards';
+
+  @override
+  String get step1TemperatureDesc => 'Add multiple converter cards to work with different temperature values simultaneously.';
+
+  @override
+  String get step2Temperature => 'Step 2: Select Scales';
+
+  @override
+  String get step2TemperatureDesc => 'Choose which temperature scales to display from Celsius, Fahrenheit, Kelvin, and other systems.';
+
+  @override
+  String get step3Temperature => 'Step 3: Enter Values';
+
+  @override
+  String get step3TemperatureDesc => 'Type any temperature value and see instant conversions to all other scales.';
+
+  @override
+  String get step4Temperature => 'Step 4: Organize Layout';
+
+  @override
+  String get step4TemperatureDesc => 'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.';
+
+  @override
+  String get tip1Temperature => '• Celsius (°C) is the most widely used temperature scale globally';
+
+  @override
+  String get tip2Temperature => '• Fahrenheit (°F) is commonly used in the United States';
+
+  @override
+  String get tip3Temperature => '• Kelvin (K) is the absolute temperature scale used in science';
+
+  @override
+  String get tip4Temperature => '• Rankine (°R) is the absolute Fahrenheit scale';
+
+  @override
+  String get tip5Temperature => '• Réaumur (°Ré) is historically used in some European countries';
+
+  @override
+  String get tip6Temperature => '• Focus mode helps concentrate on complex temperature calculations';
+
+  @override
+  String get temperatureUnitCategories => 'Temperature Scale Categories';
+
+  @override
+  String get temperatureCommonUnits => 'Common Scales';
+
+  @override
+  String get temperatureCommonUnitsDesc => 'Celsius (°C), Fahrenheit (°F) - most frequently used for weather, cooking, and everyday temperature measurements.';
+
+  @override
+  String get temperatureLessCommonUnits => 'Scientific Scale';
+
+  @override
+  String get temperatureLessCommonUnitsDesc => 'Kelvin (K) - absolute temperature scale used in scientific and engineering applications.';
+
+  @override
+  String get temperatureRareUnits => 'Specialized Scales';
+
+  @override
+  String get temperatureRareUnitsDesc => 'Rankine (°R), Réaumur (°Ré), Delisle (°De) - historical and specialized temperature scales for specific applications.';
+
+  @override
+  String get temperaturePracticalApplicationsDesc => 'Essential for cooking, weather monitoring, scientific research, engineering, HVAC systems, and any application requiring precise temperature measurements and conversions.';
+
+  @override
+  String get temperatureConverterInfo => 'Temperature Converter Information';
+
+  @override
+  String get customizeTemperatureUnits => 'Customize Temperature Scales';
+
+  @override
+  String get selectTemperatureUnits => 'Select temperature scales to display';
+
+  @override
+  String get temperatureUnits => 'Temperature Scales';
 }

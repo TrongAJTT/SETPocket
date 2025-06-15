@@ -2694,4 +2694,88 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get speedUnits => 'Đơn vị Tốc độ';
+
+  @override
+  String get temperatureConverterDetailedInfo => 'Chuyển Đổi Nhiệt Độ - Thông Tin Chi Tiết';
+
+  @override
+  String get temperatureConverterOverview => 'Bộ chuyển đổi nhiệt độ chính xác này hỗ trợ nhiều thang đo nhiệt độ với tính toán độ chính xác cao cho ứng dụng khoa học, kỹ thuật, nấu ăn và hàng ngày.';
+
+  @override
+  String get step1Temperature => 'Bước 1: Thêm Thẻ';
+
+  @override
+  String get step1TemperatureDesc => 'Thêm nhiều thẻ chuyển đổi để làm việc với các giá trị nhiệt độ khác nhau cùng lúc.';
+
+  @override
+  String get step2Temperature => 'Bước 2: Chọn Thang Đo';
+
+  @override
+  String get step2TemperatureDesc => 'Chọn thang đo nhiệt độ nào hiển thị từ Celsius, Fahrenheit, Kelvin và các hệ khác.';
+
+  @override
+  String get step3Temperature => 'Bước 3: Nhập Giá Trị';
+
+  @override
+  String get step3TemperatureDesc => 'Nhập bất kỳ giá trị nhiệt độ nào và xem chuyển đổi tức thì sang tất cả thang đo khác.';
+
+  @override
+  String get step4Temperature => 'Bước 4: Sắp Xếp Bố Cục';
+
+  @override
+  String get step4TemperatureDesc => 'Kéo thẻ để sắp xếp lại, chuyển sang chế độ bảng hoặc dùng chế độ tập trung để làm việc không bị phân tâm.';
+
+  @override
+  String get tip1Temperature => '• Celsius (°C) là thang đo nhiệt độ được sử dụng rộng rãi nhất trên toàn cầu';
+
+  @override
+  String get tip2Temperature => '• Fahrenheit (°F) thường được sử dụng ở Hoa Kỳ';
+
+  @override
+  String get tip3Temperature => '• Kelvin (K) là thang đo nhiệt độ tuyệt đối được sử dụng trong khoa học';
+
+  @override
+  String get tip4Temperature => '• Rankine (°R) là thang đo Fahrenheit tuyệt đối';
+
+  @override
+  String get tip5Temperature => '• Réaumur (°Ré) được sử dụng trong lịch sử ở một số nước châu Âu';
+
+  @override
+  String get tip6Temperature => '• Chế độ tập trung giúp tập trung vào các phép tính nhiệt độ phức tạp';
+
+  @override
+  String get temperatureUnitCategories => 'Danh Mục Thang Đo Nhiệt Độ';
+
+  @override
+  String get temperatureCommonUnits => 'Thang Đo Phổ Biến';
+
+  @override
+  String get temperatureCommonUnitsDesc => 'Celsius (°C), Fahrenheit (°F) - được sử dụng thường xuyên nhất cho thời tiết, nấu ăn và đo nhiệt độ hàng ngày.';
+
+  @override
+  String get temperatureLessCommonUnits => 'Thang Đo Khoa Học';
+
+  @override
+  String get temperatureLessCommonUnitsDesc => 'Kelvin (K) - thang đo nhiệt độ tuyệt đối được sử dụng trong ứng dụng khoa học và kỹ thuật.';
+
+  @override
+  String get temperatureRareUnits => 'Thang Đo Chuyên Biệt';
+
+  @override
+  String get temperatureRareUnitsDesc => 'Rankine (°R), Réaumur (°Ré), Delisle (°De) - thang đo nhiệt độ lịch sử và chuyên biệt cho các ứng dụng cụ thể.';
+
+  @override
+  String get temperaturePracticalApplicationsDesc => 'Thiết yếu cho nấu ăn, giám sát thời tiết, nghiên cứu khoa học, kỹ thuật, hệ thống HVAC và bất kỳ ứng dụng nào yêu cầu đo lường và chuyển đổi nhiệt độ chính xác.';
+
+  @override
+  String get temperatureConverterInfo => 'Thông Tin Chuyển Đổi Nhiệt Độ';
+
+  @override
+  String get customizeTemperatureUnits => 'Tùy Chỉnh Thang Đo Nhiệt Độ';
+
+  @override
+  String get selectTemperatureUnits => 'Chọn thang đo nhiệt độ để hiển thị';
+
+  @override
+  String get temperatureUnits => 'Thang Đo Nhiệt Độ';
 }

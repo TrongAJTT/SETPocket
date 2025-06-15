@@ -5200,6 +5200,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Speed Units'**
   String get speedUnits;
+
+  /// No description provided for @temperatureConverterDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Converter - Detailed Information'**
+  String get temperatureConverterDetailedInfo;
+
+  /// No description provided for @temperatureConverterOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This precision temperature converter supports multiple temperature scales with high accuracy calculations for scientific, engineering, cooking, and everyday applications.'**
+  String get temperatureConverterOverview;
+
+  /// No description provided for @step1Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Add Cards'**
+  String get step1Temperature;
+
+  /// No description provided for @step1TemperatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple converter cards to work with different temperature values simultaneously.'**
+  String get step1TemperatureDesc;
+
+  /// No description provided for @step2Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Select Scales'**
+  String get step2Temperature;
+
+  /// No description provided for @step2TemperatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which temperature scales to display from Celsius, Fahrenheit, Kelvin, and other systems.'**
+  String get step2TemperatureDesc;
+
+  /// No description provided for @step3Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Enter Values'**
+  String get step3Temperature;
+
+  /// No description provided for @step3TemperatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type any temperature value and see instant conversions to all other scales.'**
+  String get step3TemperatureDesc;
+
+  /// No description provided for @step4Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Organize Layout'**
+  String get step4Temperature;
+
+  /// No description provided for @step4TemperatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag cards to reorder, switch to table view, or use focus mode for distraction-free work.'**
+  String get step4TemperatureDesc;
+
+  /// No description provided for @tip1Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'• Celsius (°C) is the most widely used temperature scale globally'**
+  String get tip1Temperature;
+
+  /// No description provided for @tip2Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'• Fahrenheit (°F) is commonly used in the United States'**
+  String get tip2Temperature;
+
+  /// No description provided for @tip3Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'• Kelvin (K) is the absolute temperature scale used in science'**
+  String get tip3Temperature;
+
+  /// No description provided for @tip4Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'• Rankine (°R) is the absolute Fahrenheit scale'**
+  String get tip4Temperature;
+
+  /// No description provided for @tip5Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'• Réaumur (°Ré) is historically used in some European countries'**
+  String get tip5Temperature;
+
+  /// No description provided for @tip6Temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'• Focus mode helps concentrate on complex temperature calculations'**
+  String get tip6Temperature;
+
+  /// No description provided for @temperatureUnitCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Scale Categories'**
+  String get temperatureUnitCategories;
+
+  /// No description provided for @temperatureCommonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Scales'**
+  String get temperatureCommonUnits;
+
+  /// No description provided for @temperatureCommonUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Celsius (°C), Fahrenheit (°F) - most frequently used for weather, cooking, and everyday temperature measurements.'**
+  String get temperatureCommonUnitsDesc;
+
+  /// No description provided for @temperatureLessCommonUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific Scale'**
+  String get temperatureLessCommonUnits;
+
+  /// No description provided for @temperatureLessCommonUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Kelvin (K) - absolute temperature scale used in scientific and engineering applications.'**
+  String get temperatureLessCommonUnitsDesc;
+
+  /// No description provided for @temperatureRareUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized Scales'**
+  String get temperatureRareUnits;
+
+  /// No description provided for @temperatureRareUnitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rankine (°R), Réaumur (°Ré), Delisle (°De) - historical and specialized temperature scales for specific applications.'**
+  String get temperatureRareUnitsDesc;
+
+  /// No description provided for @temperaturePracticalApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential for cooking, weather monitoring, scientific research, engineering, HVAC systems, and any application requiring precise temperature measurements and conversions.'**
+  String get temperaturePracticalApplicationsDesc;
+
+  /// No description provided for @temperatureConverterInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Converter Information'**
+  String get temperatureConverterInfo;
+
+  /// No description provided for @customizeTemperatureUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Temperature Scales'**
+  String get customizeTemperatureUnits;
+
+  /// No description provided for @selectTemperatureUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Select temperature scales to display'**
+  String get selectTemperatureUnits;
+
+  /// No description provided for @temperatureUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Scales'**
+  String get temperatureUnits;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

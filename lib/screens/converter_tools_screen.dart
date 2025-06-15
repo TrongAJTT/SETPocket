@@ -9,6 +9,7 @@ import 'package:setpocket/screens/converters/area_converter_screen.dart';
 import 'package:setpocket/screens/converters/volume_converter_screen.dart';
 import 'package:setpocket/screens/converters/number_system_converter_screen.dart';
 import 'package:setpocket/screens/converters/speed_converter_screen.dart';
+import 'package:setpocket/screens/converters/temperature_converter_screen.dart';
 import 'converters/time_converter_screen.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
@@ -105,9 +106,7 @@ class ConverterToolsScreen extends StatelessWidget {
             iconColor = Colors.teal;
             break;
           case 9:
-            screen = UnitConverterScreen(
-                categoryId: 'temperature',
-                categoryName: loc.temperatureConverter);
+            screen = const TemperatureConverterScreen();
             title = loc.temperatureConverter;
             icon = Icons.thermostat;
             iconColor = Colors.amber;

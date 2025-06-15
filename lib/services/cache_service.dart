@@ -14,6 +14,7 @@ import 'converter_services/time_state_service.dart';
 import 'converter_services/volume_state_service.dart';
 import 'converter_services/number_system_state_service.dart';
 import 'converter_services/speed_state_service.dart';
+import 'converter_services/temperature_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'package:hive/hive.dart';
 
@@ -371,10 +372,38 @@ class CacheService {
         // Continue without speed presets info
       }
 
+      // Temperature state
+      try {
+        final hasTemperatureState = await TemperatureStateService.hasState();
+        if (hasTemperatureState) {
+          final temperatureStateSize =
+              await TemperatureStateService.getStateSize();
+          converterSize += temperatureStateSize;
+          converterCount++; // Count as 1 item for temperature state
+        }
+      } catch (e) {
+        logError('CacheService: Error checking temperature state: $e');
+        // Continue without temperature state info
+      }
+
+      // Temperature presets
+      try {
+        final temperaturePresets =
+            await GenericPresetService.loadPresets('temperature');
+        if (temperaturePresets.isNotEmpty) {
+          converterSize += (temperaturePresets.length * 50)
+              .toInt(); // Approximate size per preset
+          converterCount++; // Count as 1 item for temperature presets
+        }
+      } catch (e) {
+        logError('CacheService: Error checking temperature presets: $e');
+        // Continue without temperature presets info
+      }
+
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area/time/volume/number_system/speed states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time/volume/number_system/speed/temperature states, presets and exchange rates cache',
         itemCount: converterCount,
         sizeBytes: converterSize,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -384,7 +413,7 @@ class CacheService {
       cacheInfoMap['converter_tools'] = CacheInfo(
         name: converterToolsName ?? 'Converter Tools',
         description: converterToolsDesc ??
-            'Currency/length/mass/weight/area/time/volume/number_system/speed states, presets and exchange rates cache',
+            'Currency/length/mass/weight/area/time/volume/number_system/speed/temperature states, presets and exchange rates cache',
         itemCount: 0,
         sizeBytes: 0,
         keys: _cacheKeys['converter_tools'] ?? [],
@@ -424,6 +453,7 @@ class CacheService {
       await VolumeStateService.clearState();
       await NumberSystemStateService.clearState();
       await SpeedStateService.clearState();
+      await TemperatureStateService.clearState();
 
       // Clear generic presets for all converter types
       await GenericPresetService.clearAllPresets('length');
@@ -434,6 +464,7 @@ class CacheService {
       await GenericPresetService.clearAllPresets('volume');
       await GenericPresetService.clearAllPresets('number_system');
       await GenericPresetService.clearAllPresets('speed');
+      await GenericPresetService.clearAllPresets('temperature');
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -470,6 +501,7 @@ class CacheService {
     await VolumeStateService.clearState();
     await NumberSystemStateService.clearState();
     await SpeedStateService.clearState();
+    await TemperatureStateService.clearState();
 
     // Clear generic presets for all converter types
     await GenericPresetService.clearAllPresets('length');
@@ -480,6 +512,7 @@ class CacheService {
     await GenericPresetService.clearAllPresets('volume');
     await GenericPresetService.clearAllPresets('number_system');
     await GenericPresetService.clearAllPresets('speed');
+    await GenericPresetService.clearAllPresets('temperature');
 
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
@@ -526,6 +559,7 @@ class CacheService {
       'volume_state',
       'number_system_state',
       'speed_state',
+      'temperature_states',
       'currency_presets',
       'generic_length_presets',
       'generic_mass_presets',
@@ -535,6 +569,7 @@ class CacheService {
       'generic_volume_presets',
       'generic_number_system_presets',
       'generic_speed_presets',
+      'generic_temperature_presets',
       'currency_cache',
     ];
 

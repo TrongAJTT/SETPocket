@@ -17,6 +17,7 @@ import 'package:setpocket/models/converter_models/time_state_model.dart';
 import 'package:setpocket/models/converter_models/volume_state_model.dart';
 import 'package:setpocket/models/converter_models/number_system_state_model.dart';
 import 'package:setpocket/models/converter_models/speed_state_model.dart';
+import 'package:setpocket/models/converter_models/temperature_state_model.dart';
 
 class HiveService {
   // Box names
@@ -125,6 +126,12 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(31)) {
         Hive.registerAdapter(SpeedStateModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(32)) {
+        Hive.registerAdapter(TemperatureCardStateAdapter());
+      }
+      if (!Hive.isAdapterRegistered(33)) {
+        Hive.registerAdapter(TemperatureStateModelAdapter());
       }
 
       // Open boxes

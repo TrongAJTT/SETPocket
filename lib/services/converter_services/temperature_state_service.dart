@@ -201,7 +201,7 @@ class TemperatureStateService {
         final cardsSize = state.cards.length * 50; // Rough estimate per card
         final unitsSize =
             state.visibleUnits.length * 20; // Rough estimate per unit
-        final baseSize = 100; // Base size for metadata
+        const baseSize = 100; // Base size for metadata
         return cardsSize + unitsSize + baseSize;
       }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/screens/converters/unit_converter_screen.dart';
 import 'package:setpocket/screens/converters/currency_converter_screen.dart';
 import 'package:setpocket/screens/converters/length_converter_screen.dart';
 import 'package:setpocket/screens/converters/mass_converter_screen.dart';

@@ -1,9 +1,9 @@
-import '../controllers/converter_controller.dart';
-import '../services/converter_services/temperature_converter_service.dart';
-import '../services/converter_services/temperature_state_adapter.dart';
-import '../services/converter_services/generic_preset_service.dart';
-import '../models/converter_models/generic_preset_model.dart';
-import '../services/app_logger.dart';
+import 'package:setpocket/controllers/converter_controller.dart';
+import 'package:setpocket/services/converter_services/temperature_converter_service.dart';
+import 'package:setpocket/services/converter_services/temperature_state_adapter.dart';
+import 'package:setpocket/services/converter_services/generic_preset_service.dart';
+import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class TemperatureConverterController extends ConverterController {
   TemperatureConverterController()

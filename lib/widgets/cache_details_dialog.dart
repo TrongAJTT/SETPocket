@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import '../services/cache_service.dart';
-import '../services/app_logger.dart';
-import '../l10n/app_localizations.dart';
+import 'package:setpocket/services/cache_service.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class CacheDetailsDialog extends StatefulWidget {
   const CacheDetailsDialog({super.key});

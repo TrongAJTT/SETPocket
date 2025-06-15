@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -15,9 +16,9 @@ import 'package:setpocket/screens/log_viewer_screen.dart';
 
 import 'package:setpocket/models/converter_models/currency_cache_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../main.dart';
+import 'package:setpocket/main.dart';
 import 'package:hive/hive.dart';
-import '../services/hive_service.dart';
+import 'package:setpocket/services/hive_service.dart';
 
 class MainSettingsScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -567,7 +568,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           Padding(
             padding: EdgeInsets.fromLTRB(
               isDesktop ? 24 : 20,
-              isDesktop ? 8 : 4,
+              isDesktop ? 10 : 10,
               isDesktop ? 24 : 20,
               isDesktop ? 24 : 20,
             ),
@@ -1228,20 +1229,25 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       onPressed: _showCacheDetails,
     );
 
-    final debugButton = OutlinedButton.icon(
-      icon: const Icon(Icons.bug_report_outlined),
-      label: const Text('Debug Cache'),
-      style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: EdgeInsets.symmetric(
-          horizontal: isDesktop ? 20 : 16,
-          vertical: isDesktop ? 14 : 12,
+    late final Widget debugButton;
+
+    // Only show debug button in debug mode
+    if (kDebugMode) {
+      debugButton = OutlinedButton.icon(
+        icon: const Icon(Icons.bug_report_outlined),
+        label: const Text('Debug Cache'),
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 20 : 16,
+            vertical: isDesktop ? 14 : 12,
+          ),
+          minimumSize:
+              isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
         ),
-        minimumSize:
-            isMobile ? const Size(double.infinity, 44) : const Size(120, 44),
-      ),
-      onPressed: _debugMobileCache,
-    );
+        onPressed: _debugMobileCache,
+      );
+    }
 
     // Use Column layout on mobile, Row layout on desktop
     if (isMobile) {
@@ -1251,8 +1257,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           clearButton,
           const SizedBox(height: 12),
           detailsButton,
-          const SizedBox(height: 12),
-          debugButton,
+          // Only show debug button in debug mode
+          if (kDebugMode) ...[
+            const SizedBox(height: 12),
+            debugButton,
+          ],
         ],
       );
     } else {
@@ -1267,11 +1276,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: debugButton),
-            ],
-          ),
+          // Only show debug button in debug mode
+          if (kDebugMode) ...[
+            Row(
+              children: [
+                Expanded(child: debugButton),
+              ],
+            ),
+          ],
         ],
       );
     }

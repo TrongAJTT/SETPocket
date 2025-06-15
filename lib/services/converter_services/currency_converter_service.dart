@@ -1,9 +1,9 @@
-import '../../models/converter_models/converter_base.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'converter_service_base.dart';
 import 'currency_service.dart';
 import 'currency_cache_service.dart';
-import '../app_logger.dart';
-import '../number_format_service.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/number_format_service.dart';
 
 class CurrencyUnit extends ConverterUnit {
   @override

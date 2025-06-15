@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import '../models/text_template.dart';
-import '../services/template_service.dart';
+import 'package:setpocket/models/text_template.dart';
+import 'package:setpocket/services/template_service.dart';
 
 class TemplateEditScreen extends StatefulWidget {
   final Template? template; // Null for create new, non-null for edit

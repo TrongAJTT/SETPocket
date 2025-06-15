@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../controllers/currency_converter_controller.dart';
-import '../../widgets/converter_tools/generic_converter_view.dart';
-import '../../widgets/converter_tools/currency_fetch_status_dialog.dart';
-import '../../widgets/converter_tools/currency_fetch_progress_dialog.dart';
-import '../../services/converter_services/currency_cache_service.dart';
-import '../../services/converter_services/currency_service.dart';
-import '../../services/settings_service.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:setpocket/controllers/currency_converter_controller.dart';
+import 'package:setpocket/widgets/converter_tools/generic_converter_view.dart';
+import 'package:setpocket/widgets/converter_tools/currency_fetch_status_dialog.dart';
+import 'package:setpocket/widgets/converter_tools/currency_fetch_progress_dialog.dart';
+import 'package:setpocket/services/converter_services/currency_cache_service.dart';
+import 'package:setpocket/services/converter_services/currency_service.dart';
+import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class CurrencyConverterScreen extends StatefulWidget {
   final bool isEmbedded;

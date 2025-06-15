@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../models/converter_models/converter_base.dart';
-import '../services/converter_services/converter_service_base.dart';
-import '../services/app_logger.dart';
-import '../services/number_format_service.dart';
-import '../services/settings_service.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart';
+import 'package:setpocket/services/converter_services/converter_service_base.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/number_format_service.dart';
+import 'package:setpocket/services/settings_service.dart';
 
 class ConverterController extends ChangeNotifier {
   final ConverterServiceBase _converterService;

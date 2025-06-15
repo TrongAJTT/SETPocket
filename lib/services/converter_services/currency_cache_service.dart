@@ -1,8 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../../models/converter_models/currency_cache_model.dart';
+import 'package:setpocket/models/converter_models/currency_cache_model.dart';
 import 'currency_service.dart';
-import '../settings_service.dart';
+import 'package:setpocket/services/settings_service.dart';
 
 class CurrencyCacheService {
   static const String _cacheBoxName = 'currency_cache';

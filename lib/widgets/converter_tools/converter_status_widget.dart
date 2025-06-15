@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../controllers/converter_controller.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:setpocket/controllers/converter_controller.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class ConverterStatusWidget extends StatelessWidget {
   final ConverterController controller;

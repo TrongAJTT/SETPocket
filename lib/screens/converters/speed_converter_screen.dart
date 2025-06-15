@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../controllers/speed_converter_controller.dart';
-import '../../widgets/converter_tools/generic_converter_view.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:setpocket/controllers/speed_converter_controller.dart';
+import 'package:setpocket/widgets/converter_tools/generic_converter_view.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class SpeedConverterScreen extends StatefulWidget {
   final bool isEmbedded;

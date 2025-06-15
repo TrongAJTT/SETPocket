@@ -1,6 +1,6 @@
-import '../../models/converter_models/data_state_model.dart';
-import '../../services/app_logger.dart';
-import '../../services/hive_service.dart';
+import 'package:setpocket/models/converter_models/data_state_model.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/hive_service.dart';
 
 class DataStateService {
   static const String _boxName = 'data_converter_state';

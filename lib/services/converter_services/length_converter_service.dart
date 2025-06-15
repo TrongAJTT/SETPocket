@@ -1,6 +1,6 @@
-import '../../models/converter_models/converter_base.dart';
-import 'converter_service_base.dart';
-import '../number_format_service.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart';
+import 'package:setpocket/services/converter_services/converter_service_base.dart';
+import 'package:setpocket/services/number_format_service.dart';
 
 class LengthUnit extends ConverterUnit {
   final String _id;

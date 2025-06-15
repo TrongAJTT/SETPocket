@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class FocusModeService {
   static const double _zoomInThreshold = 1.2;

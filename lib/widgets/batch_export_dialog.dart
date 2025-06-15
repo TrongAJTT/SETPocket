@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import '../models/text_template.dart';
+import 'package:setpocket/models/text_template.dart';
 
 class BatchExportDialog extends StatefulWidget {
   final List<Template> templates;

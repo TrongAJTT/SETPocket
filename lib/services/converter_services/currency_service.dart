@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:setpocket/services/app_logger.dart';
-import '../settings_service.dart';
+import 'package:setpocket/services/settings_service.dart';
 
 enum CurrencyStatus {
   success,

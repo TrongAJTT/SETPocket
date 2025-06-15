@@ -1,5 +1,5 @@
 import 'dart:convert';
-import '../models/text_template.dart';
+import 'package:setpocket/models/text_template.dart';
 import 'hive_service.dart';
 
 class TemplateService {

@@ -1,9 +1,9 @@
 import 'package:setpocket/services/app_logger.dart';
 
-import '../converter_services/converter_service_base.dart';
-import '../converter_services/data_state_service.dart';
-import '../../models/converter_models/converter_base.dart';
-import '../../models/converter_models/data_state_model.dart';
+import 'package:setpocket/services/converter_services/converter_service_base.dart';
+import 'package:setpocket/services/converter_services/data_state_service.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart';
+import 'package:setpocket/models/converter_models/data_state_model.dart';
 
 /// Adapter để bridge DataStateService với ConverterStateService
 class DataStateAdapter implements ConverterStateService {

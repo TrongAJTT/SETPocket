@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import '../models/text_template.dart';
-import '../services/template_service.dart';
-import '../widgets/import_status_dialog.dart';
-import '../widgets/batch_export_dialog.dart';
-import '../widgets/batch_delete_dialog.dart';
+import 'package:setpocket/models/text_template.dart';
+import 'package:setpocket/services/template_service.dart';
+import 'package:setpocket/widgets/import_status_dialog.dart';
+import 'package:setpocket/widgets/batch_export_dialog.dart';
+import 'package:setpocket/widgets/batch_delete_dialog.dart';
 import 'text_template_gen_edit_screen.dart';
 import 'text_template_gen_use_screen.dart';
 

@@ -1,8 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:setpocket/services/app_logger.dart';
-import '../../models/converter_models/generic_preset_model.dart';
-import '../../models/converter_models/currency_preset_model.dart';
-import '../../models/converter_models/length_preset_model.dart';
+import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/models/converter_models/currency_preset_model.dart';
+import 'package:setpocket/models/converter_models/length_preset_model.dart';
 
 enum PresetSortOrder { name, date }
 

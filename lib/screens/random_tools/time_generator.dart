@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class TimeGeneratorScreen extends StatefulWidget {
@@ -36,6 +38,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+    _loadState();
     _loadHistory();
   }
 
@@ -43,6 +46,41 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getTimeGeneratorState();
+      if (mounted) {
+        setState(() {
+          _startTime =
+              TimeOfDay(hour: state.startHour, minute: state.startMinute);
+          _endTime = TimeOfDay(hour: state.endHour, minute: state.endMinute);
+          _timeCount = state.timeCount;
+          _timeCountSlider = state.timeCount.toDouble();
+          _allowDuplicates = state.allowDuplicates;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = TimeGeneratorState(
+        startHour: _startTime.hour,
+        startMinute: _startTime.minute,
+        endHour: _endTime.hour,
+        endMinute: _endTime.minute,
+        timeCount: _timeCount,
+        allowDuplicates: _allowDuplicates,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveTimeGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -173,6 +211,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                   _endTime = picked;
                 }
               });
+              _saveState();
             }
           },
           child: Container(
@@ -221,6 +260,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                     _timeCountSlider = value;
                     _timeCount = value.round();
                   });
+                  _saveState();
                 },
               ),
             ),
@@ -270,6 +310,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                             setState(() {
                               _includeSeconds = value ?? false;
                             });
+                            _saveState();
                           },
                           dense: true,
                         ),
@@ -282,6 +323,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                             setState(() {
                               _allowDuplicates = value ?? true;
                             });
+                            _saveState();
                           },
                           dense: true,
                         ),
@@ -297,6 +339,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                           setState(() {
                             _includeSeconds = value ?? false;
                           });
+                          _saveState();
                         },
                         dense: true,
                       ),
@@ -307,6 +350,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                           setState(() {
                             _allowDuplicates = value ?? true;
                           });
+                          _saveState();
                         },
                         dense: true,
                       ),

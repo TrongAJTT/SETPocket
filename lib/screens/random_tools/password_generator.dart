@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class PasswordGeneratorScreen extends StatefulWidget {
@@ -29,7 +31,41 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
   @override
   void initState() {
     super.initState();
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getPasswordGeneratorState();
+      if (mounted) {
+        setState(() {
+          _passwordLength = state.passwordLength;
+          _includeLowercase = state.includeLowercase;
+          _includeUppercase = state.includeUppercase;
+          _includeNumbers = state.includeNumbers;
+          _includeSpecial = state.includeSpecial;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = PasswordGeneratorState(
+        passwordLength: _passwordLength,
+        includeLowercase: _includeLowercase,
+        includeUppercase: _includeUppercase,
+        includeNumbers: _includeNumbers,
+        includeSpecial: _includeSpecial,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.savePasswordGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -116,6 +152,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
               setState(() {
                 _includeLowercase = value ?? true;
               });
+              _saveState();
             },
           },
           {
@@ -125,6 +162,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
               setState(() {
                 _includeUppercase = value ?? true;
               });
+              _saveState();
             },
           },
           {
@@ -134,6 +172,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
               setState(() {
                 _includeNumbers = value ?? true;
               });
+              _saveState();
             },
           },
           {
@@ -143,6 +182,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
               setState(() {
                 _includeSpecial = value ?? true;
               });
+              _saveState();
             },
           },
         ];
@@ -253,6 +293,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
                     setState(() {
                       _passwordLength = value.round();
                     });
+                    _saveState();
                   },
                 ),
                 const SizedBox(height: 16),

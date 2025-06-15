@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class NumberGeneratorScreen extends StatefulWidget {
@@ -34,6 +36,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   void initState() {
     super.initState();
     _loadHistory();
+    _loadState(); // Load saved state
   }
 
   Future<void> _loadHistory() async {
@@ -43,6 +46,45 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
       _historyEnabled = enabled;
       _history = history;
     });
+  }
+
+  // Load saved state from storage
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getNumberGeneratorState();
+      setState(() {
+        _isInteger = state.isInteger;
+        _minValue = state.minValue;
+        _maxValue = state.maxValue;
+        _quantity = state.quantity;
+        _allowDuplicates = state.allowDuplicates;
+
+        // Update text controllers
+        _minValueController.text = _minValue.toString();
+        _maxValueController.text = _maxValue.toString();
+      });
+    } catch (e) {
+      // Error loading state, use defaults
+      debugPrint('Error loading number generator state: $e');
+    }
+  }
+
+  // Save current state to storage
+  Future<void> _saveState() async {
+    try {
+      final state = NumberGeneratorState(
+        isInteger: _isInteger,
+        minValue: _minValue,
+        maxValue: _maxValue,
+        quantity: _quantity,
+        allowDuplicates: _allowDuplicates,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveNumberGeneratorState(state);
+    } catch (e) {
+      // Error saving state
+      debugPrint('Error saving number generator state: $e');
+    }
   }
 
   @override
@@ -80,7 +122,12 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
           allowDuplicates: _allowDuplicates,
         );
         _copied = false;
-      }); // Save to history if enabled
+      });
+
+      // Save state after generating
+      await _saveState();
+
+      // Save to history if enabled
       if (_historyEnabled && _generatedNumbers.isNotEmpty) {
         String numbersText = _generatedNumbers.map((number) {
           if (_isInteger) {
@@ -96,6 +143,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
         ).then((_) => _loadHistory()); // Refresh history
       }
     } catch (e) {
+      if (!mounted) return; // Check mounted before using context
       final messenger = ScaffoldMessenger.of(context);
       messenger.showSnackBar(
         SnackBar(
@@ -162,6 +210,10 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                         ? FilteringTextInputFormatter.digitsOnly
                         : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                   ],
+                  onChanged: (value) {
+                    _minValue = double.tryParse(value) ?? _minValue;
+                    _saveState(); // Save state when value changes
+                  },
                 ),
               ),
               const SizedBox(width: 16),
@@ -178,6 +230,10 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                         ? FilteringTextInputFormatter.digitsOnly
                         : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                   ],
+                  onChanged: (value) {
+                    _maxValue = double.tryParse(value) ?? _maxValue;
+                    _saveState(); // Save state when value changes
+                  },
                 ),
               ),
             ],
@@ -198,6 +254,10 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                       ? FilteringTextInputFormatter.digitsOnly
                       : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 ],
+                onChanged: (value) {
+                  _minValue = double.tryParse(value) ?? _minValue;
+                  _saveState(); // Save state when value changes
+                },
               ),
               const SizedBox(height: 16),
               TextField(
@@ -212,6 +272,10 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                       ? FilteringTextInputFormatter.digitsOnly
                       : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 ],
+                onChanged: (value) {
+                  _maxValue = double.tryParse(value) ?? _maxValue;
+                  _saveState(); // Save state when value changes
+                },
               ),
             ],
           );
@@ -262,6 +326,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                           setState(() {
                             _isInteger = value ?? true;
                           });
+                          _saveState(); // Save state when value changes
                         },
                       ),
                     ),
@@ -274,6 +339,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                           setState(() {
                             _isInteger = value ?? true;
                           });
+                          _saveState(); // Save state when value changes
                         },
                       ),
                     ),
@@ -313,6 +379,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                     setState(() {
                       _quantity = value.round();
                     });
+                    _saveState(); // Save state when value changes
                   },
                 ),
 
@@ -324,6 +391,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                     setState(() {
                       _allowDuplicates = value ?? true;
                     });
+                    _saveState(); // Save state when value changes
                   },
                 ),
 

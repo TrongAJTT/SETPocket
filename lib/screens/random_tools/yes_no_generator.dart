@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class YesNoGeneratorScreen extends StatefulWidget {
@@ -16,7 +18,7 @@ class YesNoGeneratorScreen extends StatefulWidget {
 
 class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
     with SingleTickerProviderStateMixin {
-  bool? _result;
+  String _result = '';
   bool _skipAnimation = false;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -27,7 +29,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     _scaleAnimation = TweenSequence<double>([
@@ -40,7 +42,33 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
         weight: 1,
       ),
     ]).animate(_controller);
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getYesNoGeneratorState();
+      if (mounted) {
+        setState(() {
+          _skipAnimation = state.skipAnimation;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = SimpleGeneratorState(
+        skipAnimation: _skipAnimation,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveYesNoGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -60,7 +88,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
 
   void _generateResult() async {
     setState(() {
-      _result = RandomGenerator.generateYesNo();
+      _result = RandomGenerator.generateYesNo() ? 'YES' : 'NO';
     });
 
     if (!_skipAnimation) {
@@ -69,10 +97,9 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
     }
 
     // Save to history if enabled
-    if (_historyEnabled && _result != null) {
-      String resultText = _result! ? 'YES' : 'NO';
+    if (_historyEnabled && _result.isNotEmpty) {
       await GenerationHistoryService.addHistoryItem(
-        resultText,
+        _result,
         'yes_no',
       );
       await _loadHistory(); // Refresh history
@@ -118,6 +145,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
                 setState(() {
                   _skipAnimation = value ?? false;
                 });
+                _saveState();
               },
             ),
           ),
@@ -132,7 +160,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (_result != null)
+                if (_result.isNotEmpty)
                   AnimatedBuilder(
                     animation: _skipAnimation
                         ? const AlwaysStoppedAnimation(1.0)
@@ -145,13 +173,13 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
                           height: 200,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: _result!
+                            color: _result == 'YES'
                                 ? Colors.green.withValues(alpha: 0.8)
                                 : Colors.red.withValues(alpha: 0.8),
                           ),
                           child: Center(
                             child: Text(
-                              _result! ? 'YES' : 'NO',
+                              _result,
                               style: const TextStyle(
                                 fontSize: 36,
                                 fontWeight: FontWeight.bold,
@@ -190,7 +218,7 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
                     onPressed: _generateResult,
                     icon: const Icon(Icons.help_outline),
                     label:
-                        Text(_result == null ? loc.generate : loc.randomResult),
+                        Text(_result.isEmpty ? loc.generate : loc.randomResult),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),

@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class DateTimeGeneratorScreen extends StatefulWidget {
@@ -41,6 +43,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+    _loadState();
     _loadHistory();
   }
 
@@ -48,6 +51,38 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getDateTimeGeneratorState();
+      if (mounted) {
+        setState(() {
+          _startDateTime = state.startDateTime;
+          _endDateTime = state.endDateTime;
+          _dateTimeCount = state.dateTimeCount;
+          _dateTimeCountSlider = state.dateTimeCount.toDouble();
+          _allowDuplicates = state.allowDuplicates;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = DateTimeGeneratorState(
+        startDateTime: _startDateTime,
+        endDateTime: _endDateTime,
+        dateTimeCount: _dateTimeCount,
+        allowDuplicates: _allowDuplicates,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveDateTimeGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -182,6 +217,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
               _endDateTime = _startDateTime.add(const Duration(hours: 1));
             }
           });
+          _saveState();
         }
       }
     }
@@ -213,6 +249,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
               _startDateTime = _endDateTime.subtract(const Duration(hours: 1));
             }
           });
+          _saveState();
         }
       }
     }
@@ -312,6 +349,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                     _dateTimeCountSlider = value;
                     _dateTimeCount = value.round();
                   });
+                  _saveState();
                 },
               ),
             ),
@@ -363,6 +401,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                             setState(() {
                               _includeSeconds = value ?? false;
                             });
+                            _saveState();
                           },
                           dense: true,
                         ),
@@ -375,6 +414,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                             setState(() {
                               _allowDuplicates = value ?? true;
                             });
+                            _saveState();
                           },
                           dense: true,
                         ),
@@ -390,6 +430,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                           setState(() {
                             _includeSeconds = value ?? false;
                           });
+                          _saveState();
                         },
                         dense: true,
                       ),
@@ -400,6 +441,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                           setState(() {
                             _allowDuplicates = value ?? true;
                           });
+                          _saveState();
                         },
                         dense: true,
                       ),

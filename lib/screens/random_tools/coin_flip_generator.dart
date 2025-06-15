@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class CoinFlipGeneratorScreen extends StatefulWidget {
@@ -63,7 +65,33 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
         }
       }
     });
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getCoinFlipGeneratorState();
+      if (mounted) {
+        setState(() {
+          _skipAnimation = state.skipAnimation;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = SimpleGeneratorState(
+        skipAnimation: _skipAnimation,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveCoinFlipGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -166,6 +194,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
                 setState(() {
                   _skipAnimation = value;
                 });
+                _saveState();
               },
             ),
           ),

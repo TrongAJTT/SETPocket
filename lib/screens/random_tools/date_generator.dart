@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class DateGeneratorScreen extends StatefulWidget {
@@ -30,7 +32,40 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   @override
   void initState() {
     super.initState();
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getDateGeneratorState();
+      if (mounted) {
+        setState(() {
+          _startDate = state.startDate;
+          _endDate = state.endDate;
+          _dateCount = state.dateCount;
+          _dateCountSlider = state.dateCount.toDouble();
+          _allowDuplicates = state.allowDuplicates;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = DateGeneratorState(
+        startDate: _startDate,
+        endDate: _endDate,
+        dateCount: _dateCount,
+        allowDuplicates: _allowDuplicates,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveDateGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -149,6 +184,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
               _endDate = _startDate.add(const Duration(days: 1));
             }
           });
+          _saveState();
         }
       },
     );
@@ -167,9 +203,10 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
           setState(() {
             _endDate = date;
           });
+          _saveState();
         }
       },
-    ); // Always use vertical layout for Start Date and End Date
+    );
     return Column(
       children: [
         startDateSelector,
@@ -202,6 +239,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
                     _dateCountSlider = value;
                     _dateCount = value.toInt();
                   });
+                  _saveState();
                 },
               ),
             ),
@@ -238,6 +276,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
             setState(() {
               _allowDuplicates = value ?? true;
             });
+            _saveState();
           },
           contentPadding: const EdgeInsets.symmetric(horizontal: 0),
         );

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class RockPaperScissorsGeneratorScreen extends StatefulWidget {
@@ -45,7 +47,34 @@ class _RockPaperScissorsGeneratorScreenState
       parent: _controller,
       curve: Curves.easeInOut,
     ));
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state =
+          await RandomStateService.getRockPaperScissorsGeneratorState();
+      if (mounted) {
+        setState(() {
+          _skipAnimation = state.skipAnimation;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = SimpleGeneratorState(
+        skipAnimation: _skipAnimation,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveRockPaperScissorsGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -168,6 +197,7 @@ class _RockPaperScissorsGeneratorScreenState
                 setState(() {
                   _skipAnimation = value;
                 });
+                _saveState();
               },
             ),
           ),

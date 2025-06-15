@@ -17,6 +17,7 @@ import 'converter_services/speed_state_service.dart';
 import 'converter_services/temperature_state_service.dart';
 import 'converter_services/data_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
+import 'random_services/random_state_service.dart';
 import 'package:hive/hive.dart';
 
 class CacheInfo {
@@ -113,18 +114,33 @@ class CacheService {
       keys: settingsKeys,
     );
 
-    // Random Generators Cache - Get actual history data (now using Hive)
+    // Random Generators Cache - Get actual history data and random states
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
     final historyCount = await GenerationHistoryService.getTotalHistoryCount();
     final historySize = await GenerationHistoryService.getHistoryDataSize();
 
+    // Add random states to cache calculation
+    int randomStateSize = 0;
+    int randomStateCount = 0;
+    try {
+      final hasRandomState = await RandomStateService.hasState();
+      if (hasRandomState) {
+        randomStateSize = await RandomStateService.getStateSize();
+        final stateKeys = RandomStateService.getAllStateKeys();
+        randomStateCount = stateKeys.length;
+      }
+    } catch (e) {
+      logError('CacheService: Error checking random states: $e');
+    }
+
     cacheInfoMap['random_generators'] = CacheInfo(
       name: randomGeneratorsName ?? 'Random Generators',
-      description: randomGeneratorsDesc ?? 'Generation history and settings',
-      itemCount:
-          historyCount + (historyEnabled ? 1 : 0), // +1 for the enabled setting
-      sizeBytes: historySize + (historyEnabled ? 4 : 0), // +4 bytes for boolean
-      keys: _cacheKeys['random_generators'] ?? [],
+      description: randomGeneratorsDesc ??
+          'Generation history, settings, and random tool states',
+      itemCount: historyCount + (historyEnabled ? 1 : 0) + randomStateCount,
+      sizeBytes: historySize + (historyEnabled ? 4 : 0) + randomStateSize,
+      keys: (_cacheKeys['random_generators'] ?? []) +
+          RandomStateService.getAllStateKeys(),
     );
 
     // Converter Tools Cache (includes currency and length states)

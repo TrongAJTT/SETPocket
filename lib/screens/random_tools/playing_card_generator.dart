@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
+import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
-import 'dart:math';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -17,30 +19,64 @@ class PlayingCardGeneratorScreen extends StatefulWidget {
 
 class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     with SingleTickerProviderStateMixin {
-  int _cardCount = 5;
-  double _cardCountSlider = 5.0;
-  bool _includeJokers = false;
-  bool _allowDuplicates = true;
   List<PlayingCard> _generatedCards = [];
+  int _cardCount = 5;
+  bool _includeJokers = false;
+  bool _allowDuplicates = false;
   bool _copied = false;
-  late AnimationController _animationController;
+  late AnimationController _controller;
+  late Animation<double> _animation;
   List<GenerationHistoryItem> _history = [];
   bool _historyEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
       vsync: this,
-      duration: const Duration(milliseconds: 800),
     );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack,
+    );
+    _loadState();
     _loadHistory();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getPlayingCardGeneratorState();
+      if (mounted) {
+        setState(() {
+          _includeJokers = state.includeJokers;
+          _cardCount = state.cardCount;
+          _allowDuplicates = state.allowDuplicates;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = PlayingCardGeneratorState(
+        includeJokers: _includeJokers,
+        cardCount: _cardCount,
+        allowDuplicates: _allowDuplicates,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.savePlayingCardGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -53,88 +89,36 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
   }
 
   void _generateCards() {
-    final random = Random();
-    final cards = <PlayingCard>[];
-    final availableCards = _createDeck();
+    try {
+      final cards = RandomGenerator.generatePlayingCards(
+        count: _cardCount,
+        includeJokers: _includeJokers,
+        allowDuplicates: _allowDuplicates,
+      );
 
-    if (!_allowDuplicates && _cardCount > availableCards.length) {
+      setState(() {
+        _generatedCards = cards;
+        _copied = false;
+      });
+
+      _controller.forward(from: 0);
+
+      // Save to history if enabled
+      if (_historyEnabled && cards.isNotEmpty) {
+        final cardStrings = cards.map((card) => card.toString()).toList();
+        GenerationHistoryService.addHistoryItem(
+          cardStrings.join(', '),
+          'playing_cards',
+        ).then((_) => _loadHistory());
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Cannot generate $_cardCount cards. Only ${availableCards.length} are available.'),
+          content: Text(e.toString()),
           backgroundColor: Colors.red,
         ),
       );
-      return;
     }
-
-    final usedCards = <PlayingCard>{};
-
-    for (int i = 0; i < _cardCount; i++) {
-      PlayingCard selectedCard;
-
-      if (_allowDuplicates) {
-        selectedCard = availableCards[random.nextInt(availableCards.length)];
-      } else {
-        final availableForSelection =
-            availableCards.where((card) => !usedCards.contains(card)).toList();
-        if (availableForSelection.isEmpty) break;
-        selectedCard =
-            availableForSelection[random.nextInt(availableForSelection.length)];
-        usedCards.add(selectedCard);
-      }
-
-      cards.add(selectedCard);
-    }
-
-    setState(() {
-      _generatedCards = cards;
-      _copied = false;
-    });
-
-    _animationController.forward(from: 0);
-
-    // Save to history if enabled
-    if (_historyEnabled) {
-      final cardStrings = cards.map((card) => card.toString()).toList();
-      GenerationHistoryService.addHistoryItem(
-        cardStrings.join(', '),
-        'playing_cards',
-      ).then((_) => _loadHistory());
-    }
-  }
-
-  List<PlayingCard> _createDeck() {
-    final cards = <PlayingCard>[];
-
-    // Standard 52 cards
-    for (final suit in ['♠', '♥', '♦', '♣']) {
-      for (final rank in [
-        'A',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        '10',
-        'J',
-        'Q',
-        'K'
-      ]) {
-        cards.add(PlayingCard(suit: suit, rank: rank));
-      }
-    }
-
-    // Add jokers if enabled
-    if (_includeJokers) {
-      cards.add(PlayingCard(suit: '🃏', rank: 'Joker'));
-      cards.add(PlayingCard(suit: '��', rank: 'Joker'));
-    }
-
-    return cards;
   }
 
   void _copyToClipboard() {
@@ -192,16 +176,16 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
               children: [
                 Expanded(
                   child: Slider(
-                    value: _cardCountSlider,
+                    value: _cardCount.toDouble(),
                     min: 1,
                     max: _includeJokers ? 54 : 52,
                     divisions: _includeJokers ? 53 : 51,
                     label: _cardCount.toString(),
                     onChanged: (value) {
                       setState(() {
-                        _cardCountSlider = value;
                         _cardCount = value.round();
                       });
+                      _saveState();
                     },
                   ),
                 ),
@@ -236,9 +220,9 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
                   _includeJokers = value;
                   if (!value && _cardCount > 52) {
                     _cardCount = 52;
-                    _cardCountSlider = 52.0;
                   }
                 });
+                _saveState();
               },
             ),
             SwitchListTile(
@@ -248,6 +232,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
                 setState(() {
                   _allowDuplicates = value;
                 });
+                _saveState();
               },
             ),
           ],
@@ -313,12 +298,14 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
               )
             else
               AnimatedBuilder(
-                animation: _animationController,
+                animation: _animation,
                 builder: (context, child) {
+                  // Clamp animation value to ensure opacity is between 0.0 and 1.0
+                  final clampedValue = _animation.value.clamp(0.0, 1.0);
                   return Opacity(
-                    opacity: _animationController.value,
+                    opacity: clampedValue,
                     child: Transform.scale(
-                      scale: 0.8 + (0.2 * _animationController.value),
+                      scale: 0.8 + (0.2 * clampedValue),
                       child: Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -427,25 +414,4 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
       title: loc.playingCards,
     );
   }
-}
-
-class PlayingCard {
-  final String suit;
-  final String rank;
-
-  PlayingCard({required this.suit, required this.rank});
-
-  @override
-  String toString() => '$rank$suit';
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PlayingCard &&
-          runtimeType == other.runtimeType &&
-          suit == other.suit &&
-          rank == other.rank;
-
-  @override
-  int get hashCode => suit.hashCode ^ rank.hashCode;
 }

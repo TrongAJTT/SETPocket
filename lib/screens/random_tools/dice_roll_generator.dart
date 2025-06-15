@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 import 'dart:math' as math;
 
@@ -44,6 +46,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
     50,
     100
   ];
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +58,35 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
       parent: _rollController,
       curve: Curves.easeOutBack,
     );
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getDiceRollGeneratorState();
+      if (mounted) {
+        setState(() {
+          _diceCount = state.diceCount;
+          _diceSides = state.diceSides;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = DiceRollGeneratorState(
+        diceCount: _diceCount,
+        diceSides: _diceSides,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveDiceRollGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -184,6 +215,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                     setState(() {
                       _diceCount = value.round();
                     });
+                    _saveState();
                   },
                 ),
 
@@ -209,6 +241,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                           setState(() {
                             _diceSides = sides;
                           });
+                          _saveState();
                         }
                       },
                     );

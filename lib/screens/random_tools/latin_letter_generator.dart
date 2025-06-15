@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 import 'package:setpocket/widgets/quantity_selector.dart';
 
@@ -18,8 +20,11 @@ class LatinLetterGeneratorScreen extends StatefulWidget {
 
 class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
     with SingleTickerProviderStateMixin {
-  String _generatedLetters = '';
-  int _letterCount = 10;
+  bool _includeUppercase = true;
+  bool _includeLowercase = true;
+  int _letterCount = 5;
+  bool _allowDuplicates = true;
+  List<String> _generatedLetters = [];
   bool _copied = false;
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -37,8 +42,39 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
       parent: _controller,
       curve: Curves.elasticOut,
     );
-    _generateLetters();
+    _loadState();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getLatinLetterGeneratorState();
+      if (mounted) {
+        setState(() {
+          _includeUppercase = state.includeUppercase;
+          _includeLowercase = state.includeLowercase;
+          _letterCount = state.letterCount;
+          _allowDuplicates = state.allowDuplicates;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = LatinLetterGeneratorState(
+        includeUppercase: _includeUppercase,
+        includeLowercase: _includeLowercase,
+        letterCount: _letterCount,
+        allowDuplicates: _allowDuplicates,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveLatinLetterGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -61,21 +97,27 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
     _controller.forward();
 
     setState(() {
-      _generatedLetters = RandomGenerator.generateLatinLetters(_letterCount);
+      final lettersString = RandomGenerator.generateLatinLetters(
+        _letterCount,
+        includeUppercase: _includeUppercase,
+        includeLowercase: _includeLowercase,
+        allowDuplicates: _allowDuplicates,
+      );
+      _generatedLetters = lettersString.split('');
       _copied = false;
     });
 
     // Save to history if enabled
     if (_historyEnabled && _generatedLetters.isNotEmpty) {
       GenerationHistoryService.addHistoryItem(
-        _generatedLetters,
+        _generatedLetters.join(''),
         'latin_letter',
       ).then((_) => _loadHistory()); // Refresh history
     }
   }
 
   void _copyToClipboard() {
-    Clipboard.setData(ClipboardData(text: _generatedLetters));
+    Clipboard.setData(ClipboardData(text: _generatedLetters.join('')));
     setState(() {
       _copied = true;
     });
@@ -117,6 +159,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
           setState(() {
             _letterCount = newValue;
           });
+          _saveState();
         },
         showBorder: false,
         highlightValue: true,
@@ -133,6 +176,60 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
       children: [
         // Quantity selector - moved to top and centered
         _buildQuantitySelector(loc),
+        const SizedBox(height: 24),
+
+        // Options card
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  loc.options,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                CheckboxListTile(
+                  title: Text(loc.includeUppercase),
+                  value: _includeUppercase,
+                  onChanged: (value) {
+                    setState(() {
+                      _includeUppercase = value ?? true;
+                    });
+                    _saveState();
+                  },
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: Text(loc.includeLowercase),
+                  value: _includeLowercase,
+                  onChanged: (value) {
+                    setState(() {
+                      _includeLowercase = value ?? true;
+                    });
+                    _saveState();
+                  },
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: Text(loc.allowDuplicates),
+                  value: _allowDuplicates,
+                  onChanged: (value) {
+                    setState(() {
+                      _allowDuplicates = value ?? true;
+                    });
+                    _saveState();
+                  },
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 24),
 
         // Generate button
@@ -182,7 +279,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
                       spacing: 8,
                       runSpacing: 8,
                       alignment: WrapAlignment.center,
-                      children: _generatedLetters.split('').map((letter) {
+                      children: _generatedLetters.map((letter) {
                         return Container(
                           width: 40,
                           height: 40,
@@ -212,7 +309,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: SelectableText(
-                          _generatedLetters,
+                          _generatedLetters.join(''),
                           style: TextStyle(
                             fontSize: 18,
                             fontFamily: 'monospace',

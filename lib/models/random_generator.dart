@@ -1,6 +1,28 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+/// Playing card representation
+class PlayingCard {
+  final String suit;
+  final String rank;
+
+  PlayingCard({required this.suit, required this.rank});
+
+  @override
+  String toString() => '$rank$suit';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlayingCard &&
+          runtimeType == other.runtimeType &&
+          suit == other.suit &&
+          rank == other.rank;
+
+  @override
+  int get hashCode => suit.hashCode ^ rank.hashCode;
+}
+
 /// Utility class for all random generation functionality
 class RandomGenerator {
   static final Random _random = Random();
@@ -149,28 +171,61 @@ class RandomGenerator {
   }
 
   // Latin letter generator
-  static String generateLatinLetters(int count) {
+  static String generateLatinLetters(
+    int count, {
+    bool includeUppercase = true,
+    bool includeLowercase = true,
+    bool allowDuplicates = true,
+  }) {
     if (count <= 0) {
       return '';
     }
 
-    const String letters =
-        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    StringBuffer result = StringBuffer();
-
-    for (int i = 0; i < count; i++) {
-      result.write(letters[_random.nextInt(letters.length)]);
+    String letters = '';
+    if (includeLowercase) {
+      letters += 'abcdefghijklmnopqrstuvwxyz';
+    }
+    if (includeUppercase) {
+      letters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     }
 
-    return result.toString();
+    if (letters.isEmpty) {
+      throw ArgumentError('At least one letter case must be included');
+    }
+
+    if (!allowDuplicates && count > letters.length) {
+      throw ArgumentError(
+          'Cannot generate $count unique letters from available set');
+    }
+
+    if (allowDuplicates) {
+      StringBuffer result = StringBuffer();
+      for (int i = 0; i < count; i++) {
+        result.write(letters[_random.nextInt(letters.length)]);
+      }
+      return result.toString();
+    } else {
+      // Generate unique letters
+      List<String> availableLetters = letters.split('');
+      availableLetters.shuffle(_random);
+      return availableLetters.take(count).join('');
+    }
   }
 
   // Playing cards generator
-  static List<String> generatePlayingCards(int count) {
+  static List<PlayingCard> generatePlayingCards({
+    required int count,
+    required bool includeJokers,
+    required bool allowDuplicates,
+  }) {
     if (count <= 0) {
       return [];
     }
 
+    // Create deck
+    List<PlayingCard> deck = [];
+
+    // Standard 52 cards
     final suits = ['♠', '♥', '♦', '♣'];
     final ranks = [
       'A',
@@ -188,20 +243,39 @@ class RandomGenerator {
       'K'
     ];
 
-    // Create standard deck of 52 cards
-    List<String> deck = [];
     for (var suit in suits) {
       for (var rank in ranks) {
-        deck.add('$rank$suit');
+        deck.add(PlayingCard(suit: suit, rank: rank));
       }
     }
 
-    // Shuffle the deck
-    deck.shuffle(_random);
+    // Add jokers if requested
+    if (includeJokers) {
+      deck.add(PlayingCard(suit: '🃏', rank: 'Joker'));
+      deck.add(PlayingCard(suit: '🃏', rank: 'Joker'));
+    }
 
-    // Return requested number of cards, but limit to 52 (standard deck)
-    count = count > 52 ? 52 : count;
-    return deck.sublist(0, count);
+    // Check if we can generate enough unique cards
+    if (!allowDuplicates && count > deck.length) {
+      throw ArgumentError(
+          'Cannot generate $count unique cards. Only ${deck.length} cards available.');
+    }
+
+    List<PlayingCard> result = [];
+
+    if (allowDuplicates) {
+      // Allow duplicates - simply pick random cards
+      for (int i = 0; i < count; i++) {
+        result.add(deck[_random.nextInt(deck.length)]);
+      }
+    } else {
+      // No duplicates - shuffle and take first N cards
+      List<PlayingCard> shuffledDeck = List.from(deck);
+      shuffledDeck.shuffle(_random);
+      result = shuffledDeck.take(count).toList();
+    }
+
+    return result;
   }
 
   // Date generator

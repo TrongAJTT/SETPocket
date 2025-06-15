@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class ColorGeneratorScreen extends StatefulWidget {
@@ -22,6 +24,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
   late Animation<double> _animation;
   List<GenerationHistoryItem> _history = [];
   bool _historyEnabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -33,8 +36,34 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
       parent: _controller,
       curve: Curves.easeInOut,
     );
+    _loadState();
     _generateColor();
     _loadHistory();
+  }
+
+  Future<void> _loadState() async {
+    try {
+      final state = await RandomStateService.getColorGeneratorState();
+      if (mounted) {
+        setState(() {
+          _withAlpha = state.withAlpha;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = ColorGeneratorState(
+        withAlpha: _withAlpha,
+        lastUpdated: DateTime.now(),
+      );
+      await RandomStateService.saveColorGeneratorState(state);
+    } catch (e) {
+      // Error is already logged in service
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -233,6 +262,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
                         _withAlpha = value ?? false;
                         _generateColor();
                       });
+                      _saveState();
                     },
                     dense: true,
                   ),
@@ -247,6 +277,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
                         _withAlpha = value ?? true;
                         _generateColor();
                       });
+                      _saveState();
                     },
                     dense: true,
                   ),

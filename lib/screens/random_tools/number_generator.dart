@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class NumberGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -216,216 +217,132 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory(
-                                'number');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory('number');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    return RandomGeneratorHistoryWidget(
+      historyType: 'number',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('number');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 1200;
 
-    final generatorCard = Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Number type selector
-            Row(
-              children: [
-                Expanded(
-                  child: RadioListTile<bool>(
-                    title: Text(loc.integers),
-                    value: true,
-                    groupValue: _isInteger,
-                    onChanged: (value) {
-                      setState(() {
-                        _isInteger = value ?? true;
-                      });
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: RadioListTile<bool>(
-                    title: Text(loc.floatingPoint),
-                    value: false,
-                    groupValue: _isInteger,
-                    onChanged: (value) {
-                      setState(() {
-                        _isInteger = value ?? true;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Min and Max value input
-            _buildMinMaxInputs(context, loc),
-
-            const SizedBox(height: 16),
-
-            // Quantity
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final generatorContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Settings card
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  loc.quantity,
+                  'Number Type',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                Text(
-                  '$_quantity',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        title: Text(loc.integers),
+                        value: true,
+                        groupValue: _isInteger,
+                        onChanged: (value) {
+                          setState(() {
+                            _isInteger = value ?? true;
+                          });
+                        },
                       ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        title: Text(loc.floatingPoint),
+                        value: false,
+                        groupValue: _isInteger,
+                        onChanged: (value) {
+                          setState(() {
+                            _isInteger = value ?? true;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Min and Max value input
+                _buildMinMaxInputs(context, loc),
+
+                const SizedBox(height: 16),
+
+                // Quantity
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      loc.quantity,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      '$_quantity',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
+                ),
+                Slider(
+                  value: _quantity.toDouble(),
+                  min: 1,
+                  max: 30,
+                  divisions: 29,
+                  label: _quantity.toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      _quantity = value.round();
+                    });
+                  },
+                ),
+
+                // Allow duplicates
+                CheckboxListTile(
+                  title: Text(loc.allowDuplicates),
+                  value: _allowDuplicates,
+                  onChanged: (value) {
+                    setState(() {
+                      _allowDuplicates = value ?? true;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                // Generate button
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _generateNumbers,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(loc.generate),
+                  ),
                 ),
               ],
             ),
-            Slider(
-              value: _quantity.toDouble(),
-              min: 1,
-              max: 30,
-              divisions: 29,
-              label: _quantity.toString(),
-              onChanged: (double value) {
-                setState(() {
-                  _quantity = value.round();
-                });
-              },
-            ),
-
-            // Allow duplicates
-            CheckboxListTile(
-              title: Text(loc.allowDuplicates),
-              value: _allowDuplicates,
-              onChanged: (value) {
-                setState(() {
-                  _allowDuplicates = value ?? true;
-                });
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            // Generate button
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _generateNumbers,
-                icon: const Icon(Icons.refresh),
-                label: Text(loc.generate),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
 
-    final resultCard = _generatedNumbers.isNotEmpty
-        ? Column(
+        // Result card
+        if (_generatedNumbers.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -466,72 +383,18 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                 ),
               ),
             ],
-          )
-        : const SizedBox.shrink();
+          ),
+        ],
+      ],
+    );
 
-    final historyWidget = _buildHistoryWidget(loc);
-
-    Widget content;
-    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
-      // Large screen layout: generator and result on left, history on right
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  generatorCard,
-                  if (_generatedNumbers.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    resultCard,
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: 1,
-              child: historyWidget,
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen layout: vertical stack
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            generatorCard,
-            if (_generatedNumbers.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              resultCard,
-            ],
-            if (_historyEnabled && _history.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              historyWidget,
-            ],
-          ],
-        ),
-      );
-    }
-
-    // Return either the content directly (if embedded) or wrapped in a Scaffold
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.numberGenerator),
-          elevation: 0,
-        ),
-        body: content,
-      );
-    }
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.numberGenerator,
+    );
   }
 }

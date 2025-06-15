@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class RockPaperScissorsGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -18,10 +19,12 @@ class _RockPaperScissorsGeneratorScreenState
     extends State<RockPaperScissorsGeneratorScreen>
     with SingleTickerProviderStateMixin {
   int? _result;
+  bool _skipAnimation = false;
   late AnimationController _controller;
-  late Animation<double> _animation;
+  late Animation<double> _scaleAnimation;
   List<GenerationHistoryItem> _history = [];
   bool _historyEnabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -29,10 +32,19 @@ class _RockPaperScissorsGeneratorScreenState
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _animation = CurvedAnimation(
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.2),
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.2, end: 1.0),
+        weight: 1,
+      ),
+    ]).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    );
+    ));
     _loadHistory();
   }
 
@@ -53,20 +65,28 @@ class _RockPaperScissorsGeneratorScreenState
   }
 
   Future<void> _generateResult() async {
-    _controller.reset();
-    await _controller.forward();
+    // Generate result first for better UX
+    final newResult = RandomGenerator.generateRockPaperScissors();
 
     setState(() {
-      _result = RandomGenerator.generateRockPaperScissors();
-    }); // Save to history if enabled
+      _result = newResult;
+    });
+
+    // Then run animation if not skipped
+    if (!_skipAnimation) {
+      _controller.reset();
+      await _controller.forward();
+    }
+
+    // Save to history if enabled
     if (_historyEnabled && _result != null) {
       if (!mounted) return;
       final loc = AppLocalizations.of(context)!;
-      String resultText = _getResultText(loc);
+      String resultText = _getResultText(_result!, loc);
       GenerationHistoryService.addHistoryItem(
         resultText,
         'rock_paper_scissors',
-      ).then((_) => _loadHistory()); // Refresh history
+      ).then((_) => _loadHistory());
     }
   }
 
@@ -78,113 +98,20 @@ class _RockPaperScissorsGeneratorScreenState
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory(
-                                'rock_paper_scissors');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory(
-                              'rock_paper_scissors');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    return RandomGeneratorHistoryWidget(
+      historyType: 'rock_paper_scissors',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('rock_paper_scissors');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
     );
   }
 
-  IconData _getIcon() {
-    if (_result == null) {
-      return Icons.help_outline;
-    }
-    switch (_result) {
+  IconData _getResultIcon(int result) {
+    switch (result) {
       case 0:
         return Icons.sports_mma; // Rock
       case 1:
@@ -196,11 +123,8 @@ class _RockPaperScissorsGeneratorScreenState
     }
   }
 
-  String _getResultText(AppLocalizations loc) {
-    if (_result == null) {
-      return '?';
-    }
-    switch (_result) {
+  String _getResultText(int result, AppLocalizations loc) {
+    switch (result) {
       case 0:
         return loc.rock;
       case 1:
@@ -212,11 +136,8 @@ class _RockPaperScissorsGeneratorScreenState
     }
   }
 
-  Color _getResultColor() {
-    if (_result == null) {
-      return Colors.grey.shade400;
-    }
-    switch (_result) {
+  Color _getResultColor(int result) {
+    switch (result) {
       case 0:
         return Colors.brown.shade700; // Rock
       case 1:
@@ -231,174 +152,109 @@ class _RockPaperScissorsGeneratorScreenState
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 1200;
 
-    final generatorCard = Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          AnimatedBuilder(
-            animation: _animation,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: 1 + _animation.value * 0.3,
-                child: Opacity(
-                  opacity: 0.7 + (_animation.value * 0.3),
-                  child: Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _getResultColor().withValues(alpha: 0.2),
-                      border: Border.all(
-                        color: _getResultColor(),
-                        width: 4,
+    final generatorContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Skip animation option
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SwitchListTile(
+              title: Text(loc.skipAnimation),
+              subtitle: Text(loc.skipAnimationDesc),
+              value: _skipAnimation,
+              onChanged: (value) {
+                setState(() {
+                  _skipAnimation = value;
+                });
+              },
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Result display
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: _scaleAnimation,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _skipAnimation ? 1.0 : _scaleAnimation.value,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _result == null
+                            ? Colors.grey.withValues(alpha: 0.3)
+                            : _getResultColor(_result!).withValues(alpha: 0.8),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _result == null
+                                  ? Icons.help_outline
+                                  : _getResultIcon(_result!),
+                              size: 80,
+                              color: _result == null
+                                  ? Colors.grey[600]
+                                  : Colors.white,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _result == null
+                                  ? '?'
+                                  : _getResultText(_result!, loc),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: _result == null
+                                    ? Colors.grey[600]
+                                    : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _getIcon(),
-                          size: 80,
-                          color: _getResultColor(),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _getResultText(loc),
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: _getResultColor(),
-                          ),
-                        ),
-                      ],
+                  );
+                },
+              ),
+              const SizedBox(height: 48),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: FilledButton.icon(
+                  onPressed: _generateResult,
+                  icon: const Icon(Icons.sports_mma),
+                  label: Text(loc.generate),
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
                     ),
                   ),
                 ),
-              );
-            },
-          ),
-          const SizedBox(height: 48),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildOptionButton(
-                  Icons.sports_mma, loc.rock, 0, Colors.brown.shade700),
-              const SizedBox(width: 16),
-              _buildOptionButton(
-                  Icons.article, loc.paper, 1, Colors.blue.shade700),
-              const SizedBox(width: 16),
-              _buildOptionButton(
-                  Icons.content_cut, loc.scissors, 2, Colors.red.shade700),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: 200,
-            height: 50,
-            child: FilledButton(
-              onPressed: _generateResult,
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-              ),
-              child: Text(loc.generate),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
 
-    final historyWidget = _buildHistoryWidget(loc);
-
-    Widget content;
-    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
-      // Large screen layout: generator on left, history on right
-      content = Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: generatorCard,
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: 1,
-              child: historyWidget,
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen layout: vertical stack
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.7,
-              child: generatorCard,
-            ),
-            if (_historyEnabled && _history.isNotEmpty) ...[
-              const SizedBox(height: 32),
-              historyWidget,
-            ],
-          ],
-        ),
-      );
-    }
-
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.rockPaperScissors),
-        ),
-        body: content,
-      );
-    }
-  }
-
-  Widget _buildOptionButton(
-      IconData icon, String label, int value, Color color) {
-    bool isSelected = _result == value;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        color: isSelected ? color.withValues(alpha: 0.2) : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isSelected ? color : Colors.transparent,
-          width: 2,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? color : Colors.grey,
-            size: 32,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? color : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.rockPaperScissors,
     );
   }
 }

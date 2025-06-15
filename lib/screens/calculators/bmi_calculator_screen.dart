@@ -191,7 +191,7 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: _categoryColor.withOpacity(0.1),
+                        color: _categoryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: _categoryColor),
                       ),
@@ -257,7 +257,7 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isCurrentCategory ? color.withOpacity(0.1) : null,
+        color: isCurrentCategory ? color.withValues(alpha: 0.1) : null,
         borderRadius: BorderRadius.circular(8),
         border: isCurrentCategory ? Border.all(color: color) : null,
       ),

@@ -52,7 +52,7 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen> {
       expression = _preprocessExpression(expression);
 
       List<FlSpot> points = [];
-      Parser parser = Parser();
+      GrammarParser parser = GrammarParser();
       Expression exp = parser.parse(expression);
 
       double step = (_maxX - _minX) / 200; // 200 points for smooth curve
@@ -242,7 +242,7 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen> {
                             return FlLine(
                               color: Theme.of(context)
                                   .dividerColor
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                               strokeWidth: 1,
                             );
                           },
@@ -250,7 +250,7 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen> {
                             return FlLine(
                               color: Theme.of(context)
                                   .dividerColor
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                               strokeWidth: 1,
                             );
                           },

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class TimeGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -25,6 +26,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   late AnimationController _animationController;
   List<GenerationHistoryItem> _history = [];
   bool _historyEnabled = false;
+  bool _includeSeconds = false;
 
   @override
   void initState() {
@@ -107,105 +109,15 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory('time');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory('time');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    return RandomGeneratorHistoryWidget(
+      historyType: 'time',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('time');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
     );
   }
 
@@ -215,95 +127,50 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     return '$hours:$minutes';
   }
 
-  Widget _buildTimeSelectors(AppLocalizations loc) {
-    final startTimeSelector = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.startTime,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: _startTime,
-            );
-            if (picked != null) {
-              setState(() {
-                _startTime = picked;
-              });
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.outline),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.access_time,
-                    color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  _formatTimeOfDay(_startTime),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-
-    final endTimeSelector = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.endTime,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: _endTime,
-            );
-            if (picked != null) {
-              setState(() {
-                _endTime = picked;
-              });
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.outline),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.access_time,
-                    color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  _formatTimeOfDay(_endTime),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ); // Always use vertical layout for Start Time and End Time
+  Widget _buildTimeField(String label, TimeOfDay time, bool isStartTime) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        startTimeSelector,
-        const SizedBox(height: 16),
-        endTimeSelector,
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: time,
+            );
+            if (picked != null) {
+              setState(() {
+                if (isStartTime) {
+                  _startTime = picked;
+                } else {
+                  _endTime = picked;
+                }
+              });
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.access_time,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  _formatTimeOfDay(time),
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -323,7 +190,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
               child: Slider(
                 value: _timeCountSlider,
                 min: 1.0,
-                max: 50.0,
+                max: 10.0,
                 divisions: 49,
                 label: _timeCount.toString(),
                 onChanged: (value) {
@@ -356,7 +223,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     );
   }
 
-  Widget _buildOtherSection(AppLocalizations loc) {
+  Widget _buildOptionsSection(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -365,22 +232,70 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
-        SwitchListTile(
-          title: Text(loc.allowDuplicates),
-          value: _allowDuplicates,
-          onChanged: (value) {
-            setState(() {
-              _allowDuplicates = value;
-            });
-          },
-          contentPadding: EdgeInsets.zero,
-        ),
+
+        // Responsive layout for options
+        MediaQuery.of(context).size.width > 600
+            ? Row(
+                children: [
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: const Text('Include Seconds'),
+                      value: _includeSeconds,
+                      onChanged: (value) {
+                        setState(() {
+                          _includeSeconds = value ?? false;
+                        });
+                      },
+                      dense: true,
+                    ),
+                  ),
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: Text(loc.allowDuplicates),
+                      value: _allowDuplicates,
+                      onChanged: (value) {
+                        setState(() {
+                          _allowDuplicates = value ?? true;
+                        });
+                      },
+                      dense: true,
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  CheckboxListTile(
+                    title: const Text('Include Seconds'),
+                    value: _includeSeconds,
+                    onChanged: (value) {
+                      setState(() {
+                        _includeSeconds = value ?? false;
+                      });
+                    },
+                    dense: true,
+                  ),
+                  CheckboxListTile(
+                    title: Text(loc.allowDuplicates),
+                    value: _allowDuplicates,
+                    onChanged: (value) {
+                      setState(() {
+                        _allowDuplicates = value ?? true;
+                      });
+                    },
+                    dense: true,
+                  ),
+                ],
+              ),
       ],
     );
   }
 
-  Widget _buildMainContent(AppLocalizations loc) {
-    return Column(
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Configuration card
@@ -390,28 +305,36 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Time selectors (responsive layout)
-                _buildTimeSelectors(loc),
-
-                const SizedBox(height: 16),
-
-                // Count slider and Other section (responsive layout)
+                // Time range (responsive layout)
                 MediaQuery.of(context).size.width > 600
                     ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(flex: 3, child: _buildCountSlider(loc)),
-                          const SizedBox(width: 32),
-                          Expanded(flex: 2, child: _buildOtherSection(loc)),
+                          Expanded(
+                              child: _buildTimeField(
+                                  loc.startTime, _startTime, true)),
+                          const SizedBox(width: 16),
+                          Expanded(
+                              child: _buildTimeField(
+                                  loc.endTime, _endTime, false)),
                         ],
                       )
                     : Column(
                         children: [
-                          _buildCountSlider(loc),
+                          _buildTimeField(loc.startTime, _startTime, true),
                           const SizedBox(height: 16),
-                          _buildOtherSection(loc),
+                          _buildTimeField(loc.endTime, _endTime, false),
                         ],
                       ),
+
+                const SizedBox(height: 16),
+
+                // Count slider
+                _buildCountSlider(loc),
+
+                const SizedBox(height: 16),
+
+                // Options section
+                _buildOptionsSection(loc),
 
                 const SizedBox(height: 16),
 
@@ -428,120 +351,58 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
             ),
           ),
         ),
-        const SizedBox(height: 16),
 
-        // Results card
-        if (_generatedTimes.isNotEmpty)
+        const SizedBox(height: 24),
+
+        // Results
+        if (_generatedTimes.isNotEmpty) ...[
+          Text(
+            loc.randomResult,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        loc.randomResult,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      IconButton(
-                        icon: Icon(_copied ? Icons.check : Icons.copy),
-                        onPressed: _copyToClipboard,
-                        tooltip: loc.copyToClipboard,
-                      ),
-                    ],
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _generatedTimes.map((time) {
+                      return Chip(
+                        label: Text(_formatTimeOfDay(time)),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        labelStyle: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 16),
-                  AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: _animationController.value,
-                        child: child,
-                      );
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _generatedTimes.map((time) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text(
-                            _formatTimeOfDay(time),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                  OutlinedButton.icon(
+                    onPressed: _copyToClipboard,
+                    icon: Icon(_copied ? Icons.check : Icons.copy),
+                    label: Text(_copied ? loc.copied : loc.copyToClipboard),
                   ),
                 ],
               ),
             ),
           ),
+        ],
       ],
     );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-
-    // Build main content and history widgets
-    final mainContent = _buildMainContent(loc);
-    final historyWidget = _buildHistoryWidget(loc);
-
-    // Responsive layout: side-by-side for large screens, vertical for small screens
-    Widget content;
-    if (MediaQuery.of(context).size.width >= 1200 &&
-        _historyEnabled &&
-        _history.isNotEmpty) {
-      // Large screen: side-by-side layout
-      content = Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Main content takes 60% of width
-            Expanded(
-              flex: 3,
-              child: SingleChildScrollView(
-                child: mainContent,
-              ),
-            ),
-            const SizedBox(width: 16),
-            // History takes 40% of width
-            Expanded(
-              flex: 2,
-              child: SingleChildScrollView(
-                child: historyWidget,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen: vertical layout
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            mainContent,
-            historyWidget,
-          ],
-        ),
-      );
-    }
-
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.timeGenerator),
-        ),
-        body: content,
-      );
-    }
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.timeGenerator,
+    );
   }
 }

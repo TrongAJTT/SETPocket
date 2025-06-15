@@ -2009,6 +2009,18 @@ abstract class AppLocalizations {
   /// **'Flipping...'**
   String get flipping;
 
+  /// No description provided for @skipAnimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip Animation'**
+  String get skipAnimation;
+
+  /// No description provided for @skipAnimationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable animation for faster results'**
+  String get skipAnimationDesc;
+
   /// No description provided for @cacheTypeTextTemplates.
   ///
   /// In en, this message translates to:
@@ -2074,6 +2086,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No history yet'**
   String get noHistoryYet;
+
+  /// No description provided for @noHistoryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate some random results to see them here'**
+  String get noHistoryMessage;
 
   /// No description provided for @clearHistory.
   ///

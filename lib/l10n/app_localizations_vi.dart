@@ -1054,6 +1054,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flipping => 'Đang lật...';
 
   @override
+  String get skipAnimation => 'Bỏ qua hoạt ảnh';
+
+  @override
+  String get skipAnimationDesc => 'Tắt hoạt ảnh để có kết quả nhanh hơn';
+
+  @override
   String get cacheTypeTextTemplates => 'Mẫu văn bản';
 
   @override
@@ -1085,6 +1091,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get noHistoryYet => 'Chưa có lịch sử';
+
+  @override
+  String get noHistoryMessage => 'Tạo một số kết quả ngẫu nhiên để xem chúng ở đây';
 
   @override
   String get clearHistory => 'Xóa lịch sử';

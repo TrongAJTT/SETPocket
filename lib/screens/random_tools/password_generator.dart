@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class PasswordGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -89,107 +90,15 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory(
-                                'password');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory(
-                              'password');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    return RandomGeneratorHistoryWidget(
+      historyType: 'password',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('password');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
     );
   }
 
@@ -304,60 +213,64 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 1200;
 
-    final generatorCard = Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final generatorContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Settings card
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  loc.numCharacters,
-                  style: Theme.of(context).textTheme.titleMedium,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      loc.numCharacters,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      '$_passwordLength',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
                 ),
-                Text(
-                  '$_passwordLength',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                Slider(
+                  value: _passwordLength.toDouble(),
+                  min: 4,
+                  max: 32,
+                  divisions: 28,
+                  label: _passwordLength.toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      _passwordLength = value.round();
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildCheckboxOptions(context, loc),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _generatePassword,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(loc.generate),
+                  ),
                 ),
               ],
             ),
-            Slider(
-              value: _passwordLength.toDouble(),
-              min: 4,
-              max: 32,
-              divisions: 28,
-              label: _passwordLength.toString(),
-              onChanged: (double value) {
-                setState(() {
-                  _passwordLength = value.round();
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildCheckboxOptions(context, loc),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _generatePassword,
-                icon: const Icon(Icons.refresh),
-                label: Text(loc.generate),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
 
-    final resultCard = _generatedPassword.isNotEmpty
-        ? Column(
+        // Result card
+        if (_generatedPassword.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -391,72 +304,18 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
                 ),
               ),
             ],
-          )
-        : const SizedBox.shrink();
+          ),
+        ],
+      ],
+    );
 
-    final historyWidget = _buildHistoryWidget(loc);
-
-    Widget content;
-    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
-      // Large screen layout: generator and result on left, history on right
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  generatorCard,
-                  if (_generatedPassword.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    resultCard,
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: 1,
-              child: historyWidget,
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen layout: vertical stack
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            generatorCard,
-            if (_generatedPassword.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              resultCard,
-            ],
-            if (_historyEnabled && _history.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              historyWidget,
-            ],
-          ],
-        ),
-      );
-    }
-
-    // Return either the content directly (if embedded) or wrapped in a Scaffold
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.passwordGenerator),
-          elevation: 0,
-        ),
-        body: content,
-      );
-    }
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.passwordGenerator,
+    );
   }
 }

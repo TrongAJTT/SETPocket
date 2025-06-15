@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class ColorGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -15,7 +16,7 @@ class ColorGeneratorScreen extends StatefulWidget {
 
 class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
     with SingleTickerProviderStateMixin {
-  Color _generatedColor = Colors.blue;
+  Color _currentColor = Colors.blue;
   bool _withAlpha = false;
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -56,7 +57,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
     _controller.forward();
 
     setState(() {
-      _generatedColor = RandomGenerator.generateColor(withAlpha: _withAlpha);
+      _currentColor = RandomGenerator.generateColor(withAlpha: _withAlpha);
     });
 
     // Save to history if enabled
@@ -77,114 +78,46 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory(
-                                'color');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory('color');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
+    return RandomGeneratorHistoryWidget(
+      historyType: 'color',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('color');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
+      customItemBuilder: (item, context) {
+        final color = _parseColorFromHex(item.value);
+        return ListTile(
+          dense: true,
+          leading: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: color,
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  final color = _parseColorFromHex(item.value);
-                  return ListTile(
-                    dense: true,
-                    leading: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: color,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
+          ),
+          title: Text(
+            item.value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
-          ],
-        ),
-      ),
+          ),
+          subtitle: Text(
+            'Generated at: ${item.timestamp.toString().substring(0, 19)}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.copy, size: 18),
+            onPressed: () => _copyHistoryItem(item.value),
+            tooltip: 'Copy to Clipboard',
+          ),
+        );
+      },
     );
   }
 
@@ -204,17 +137,17 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
 
   String _getHexColor() {
     if (_withAlpha) {
-      return '#${_generatedColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
+      return '#${_currentColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
     } else {
-      return '#${_generatedColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
+      return '#${_currentColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
     }
   }
 
   String _getRgbColor() {
     if (_withAlpha) {
-      return 'rgba(${(_generatedColor.r).toStringAsFixed(2)}, ${(_generatedColor.g).toStringAsFixed(2)}, ${(_generatedColor.b).toStringAsFixed(2)}, ${(_generatedColor.a / 255).toStringAsFixed(2)})';
+      return 'rgba(${(_currentColor.r).toStringAsFixed(2)}, ${(_currentColor.g).toStringAsFixed(2)}, ${(_currentColor.b).toStringAsFixed(2)}, ${(_currentColor.a / 255).toStringAsFixed(2)})';
     } else {
-      return 'rgb(${(_generatedColor.r).toStringAsFixed(2)}, ${(_generatedColor.g).toStringAsFixed(2)}, ${(_generatedColor.b).toStringAsFixed(2)})';
+      return 'rgb(${(_currentColor.r).toStringAsFixed(2)}, ${(_currentColor.g).toStringAsFixed(2)}, ${(_currentColor.b).toStringAsFixed(2)})';
     }
   }
 
@@ -229,40 +162,50 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 1200;
 
     final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Color display - Fixed height instead of flex
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.4,
+        // Color preview - Full height for immersive color view
+        AspectRatio(
+          aspectRatio: 16 / 9,
           child: AnimatedBuilder(
             animation: _animation,
             builder: (context, child) {
               return Container(
-                color: _generatedColor,
+                decoration: BoxDecoration(
+                  color: _currentColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _currentColor.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      spreadRadius: 4,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
                 child: Center(
-                  child: Transform.scale(
-                    scale: 0.7 + (_animation.value * 0.3),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _isColorDark(_currentColor)
+                          ? Colors.white.withValues(alpha: 0.9)
+                          : Colors.black.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Text(
                       _getHexColor(),
                       style: TextStyle(
-                        fontSize: 32,
+                        color: _isColorDark(_currentColor)
+                            ? Colors.black
+                            : Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: _isColorDark(_generatedColor)
-                            ? Colors.white
-                            : Colors.black,
-                        shadows: [
-                          Shadow(
-                            color: _isColorDark(_generatedColor)
-                                ? Colors.black38
-                                : Colors.white38,
-                            blurRadius: 2,
-                            offset: const Offset(1, 1),
-                          ),
-                        ],
                       ),
                     ),
                   ),
@@ -272,144 +215,94 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
           ),
         ),
 
-        // Controls - Scrollable to prevent overflow
-        Expanded(
-          child: SingleChildScrollView(
+        const SizedBox(height: 24),
+
+        // Format selection
+        Card(
+          child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Row(
               children: [
-                // Format selection
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: Text(loc.hex6),
-                            value: false,
-                            groupValue: _withAlpha,
-                            onChanged: (value) {
-                              setState(() {
-                                _withAlpha = value ?? false;
-                                _generateColor();
-                              });
-                            },
-                            dense: true,
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: Text(loc.hex8),
-                            value: true,
-                            groupValue: _withAlpha,
-                            onChanged: (value) {
-                              setState(() {
-                                _withAlpha = value ?? true;
-                                _generateColor();
-                              });
-                            },
-                            dense: true,
-                          ),
-                        ),
-                      ],
-                    ),
+                Expanded(
+                  child: RadioListTile<bool>(
+                    title: Text(loc.hex6),
+                    value: false,
+                    groupValue: _withAlpha,
+                    onChanged: (value) {
+                      setState(() {
+                        _withAlpha = value ?? false;
+                        _generateColor();
+                      });
+                    },
+                    dense: true,
                   ),
                 ),
-
-                const SizedBox(height: 16),
-
-                // Color info
-                Text(
-                  loc.generatedColor,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildColorInfoCard(
-                        'HEX',
-                        _getHexColor(),
-                        onTap: () => _copyToClipboard(_getHexColor()),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildColorInfoCard(
-                        'RGB',
-                        _getRgbColor(),
-                        onTap: () => _copyToClipboard(_getRgbColor()),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Generate button
-                FilledButton.icon(
-                  onPressed: _generateColor,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(loc.generate),
+                Expanded(
+                  child: RadioListTile<bool>(
+                    title: Text(loc.hex8),
+                    value: true,
+                    groupValue: _withAlpha,
+                    onChanged: (value) {
+                      setState(() {
+                        _withAlpha = value ?? true;
+                        _generateColor();
+                      });
+                    },
+                    dense: true,
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ],
-    );
 
-    final historyWidget = _buildHistoryWidget(loc);
+        const SizedBox(height: 16),
 
-    Widget content;
-    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
-      // Large screen layout: generator on left, history on right
-      content = Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: generatorContent,
-          ),
-          Expanded(
-            flex: 1,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: historyWidget,
+        // Color info
+        Text(
+          loc.generatedColor,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: _buildColorInfoCard(
+                'HEX',
+                _getHexColor(),
+                onTap: () => _copyToClipboard(_getHexColor()),
+              ),
             ),
-          ),
-        ],
-      );
-    } else {
-      // Small screen layout: vertical stack
-      content = Column(
-        children: [
-          Expanded(child: generatorContent),
-          if (_historyEnabled && _history.isNotEmpty) ...[
-            Container(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: historyWidget,
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildColorInfoCard(
+                'RGB',
+                _getRgbColor(),
+                onTap: () => _copyToClipboard(_getRgbColor()),
               ),
             ),
           ],
-        ],
-      );
-    }
-
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.colorGenerator),
         ),
-        body: content,
-      );
-    }
+
+        const SizedBox(height: 16),
+
+        // Generate button
+        FilledButton.icon(
+          onPressed: _generateColor,
+          icon: const Icon(Icons.refresh),
+          label: Text(loc.generate),
+        ),
+      ],
+    );
+
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.colorGenerator,
+    );
   }
 
   Widget _buildColorInfoCard(String title, String value,

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 import 'dart:math' as math;
 
 class DiceRollGeneratorScreen extends StatefulWidget {
@@ -103,105 +104,40 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory(
-                                'dice_roll');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory(
-                              'dice_roll');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
+    return RandomGeneratorHistoryWidget(
+      historyType: 'dice',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('dice');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
+      customItemBuilder: (item, context) {
+        return ListTile(
+          dense: true,
+          leading: Icon(
+            Icons.casino,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          title: Text(
+            item.value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+          subtitle: Text(
+            'Generated at: ${item.timestamp.toString().substring(0, 19)}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.copy, size: 18),
+            onPressed: () => _copyHistoryItem(item.value),
+            tooltip: 'Copy to Clipboard',
+          ),
+        );
+      },
     );
   }
 
@@ -212,8 +148,6 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 1200;
 
     final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -296,8 +230,8 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
             ),
           ),
         ),
-        const SizedBox(height: 24),
         if (_results.isNotEmpty) ...[
+          const SizedBox(height: 24),
           AnimatedBuilder(
             animation: _rollAnimation,
             builder: (context, child) {
@@ -308,7 +242,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
             },
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
                     // Result heading
@@ -358,56 +292,14 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
       ],
     );
 
-    final historyWidget = _buildHistoryWidget(loc);
-
-    Widget content;
-    if (isLargeScreen && (_historyEnabled && _history.isNotEmpty)) {
-      // Large screen layout: generator on left, history on right
-      content = Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: SingleChildScrollView(
-                child: generatorContent,
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: 1,
-              child: historyWidget,
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen layout: vertical stack
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            generatorContent,
-            if (_historyEnabled && _history.isNotEmpty) ...[
-              const SizedBox(height: 32),
-              historyWidget,
-            ],
-          ],
-        ),
-      );
-    }
-
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.rollDice),
-        ),
-        body: content,
-      );
-    }
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.rollDice,
+    );
   }
 
   Widget _buildDie(int value) {

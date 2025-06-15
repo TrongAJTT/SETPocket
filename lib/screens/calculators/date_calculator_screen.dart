@@ -362,8 +362,9 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen>
     String result = '';
     if (years > 0) result += '$years year${years > 1 ? 's' : ''} ';
     if (months > 0) result += '$months month${months > 1 ? 's' : ''} ';
-    if (finalDays > 0 || result.isEmpty)
+    if (finalDays > 0 || result.isEmpty) {
       result += '$finalDays day${finalDays != 1 ? 's' : ''}';
+    }
 
     _dateDifference = result.trim();
     _dateDifference = '$_dateDifference\n($days total days)';

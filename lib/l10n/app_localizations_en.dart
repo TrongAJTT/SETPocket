@@ -1054,6 +1054,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flipping => 'Flipping...';
 
   @override
+  String get skipAnimation => 'Skip Animation';
+
+  @override
+  String get skipAnimationDesc => 'Disable animation for faster results';
+
+  @override
   String get cacheTypeTextTemplates => 'Text Templates';
 
   @override
@@ -1085,6 +1091,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noHistoryYet => 'No history yet';
+
+  @override
+  String get noHistoryMessage => 'Generate some random results to see them here';
 
   @override
   String get clearHistory => 'Clear History';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 import 'dart:math';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {
@@ -130,7 +131,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     // Add jokers if enabled
     if (_includeJokers) {
       cards.add(PlayingCard(suit: '🃏', rank: 'Joker'));
-      cards.add(PlayingCard(suit: '🃏', rank: 'Joker'));
+      cards.add(PlayingCard(suit: '��', rank: 'Joker'));
     }
 
     return cards;
@@ -204,33 +205,24 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
                     },
                   ),
                 ),
+                const SizedBox(width: 16),
                 Container(
-                  width: 60,
-                  margin: const EdgeInsets.only(left: 16),
-                  child: TextFormField(
-                    controller:
-                        TextEditingController(text: _cardCount.toString()),
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.all(8),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _cardCount.toString(),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
-                    onChanged: (value) {
-                      final newCount = int.tryParse(value);
-                      if (newCount != null &&
-                          newCount >= 1 &&
-                          newCount <= (_includeJokers ? 54 : 52)) {
-                        setState(() {
-                          _cardCount = newCount;
-                          _cardCountSlider = newCount.toDouble();
-                        });
-                      }
-                    },
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(2),
-                    ],
                   ),
                 ),
               ],
@@ -242,11 +234,9 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
               onChanged: (value) {
                 setState(() {
                   _includeJokers = value;
-                  // Update slider max and reset count if necessary
-                  final maxCards = value ? 54 : 52;
-                  if (_cardCount > maxCards) {
-                    _cardCount = maxCards;
-                    _cardCountSlider = maxCards.toDouble();
+                  if (!value && _cardCount > 52) {
+                    _cardCount = 52;
+                    _cardCountSlider = 52.0;
                   }
                 });
               },
@@ -348,17 +338,17 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
 
   Widget _buildCardWidget(PlayingCard card) {
     return Container(
-      width: 60,
-      height: 84,
+      width: 80,
+      height: 112,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.black, width: 2),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(2, 2),
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 6,
+            offset: const Offset(2, 3),
           ),
         ],
       ),
@@ -368,7 +358,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
           Text(
             card.rank,
             style: TextStyle(
-              fontSize: card.rank == '10' ? 10 : 12,
+              fontSize: card.rank == '10' ? 14 : 16,
               fontWeight: FontWeight.bold,
               color: _getSuitColor(card.suit),
             ),
@@ -376,14 +366,14 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
           Text(
             card.suit,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 20,
               color: _getSuitColor(card.suit),
             ),
           ),
           Text(
             card.rank,
             style: TextStyle(
-              fontSize: card.rank == '10' ? 10 : 12,
+              fontSize: card.rank == '10' ? 14 : 16,
               fontWeight: FontWeight.bold,
               color: _getSuitColor(card.suit),
             ),
@@ -393,109 +383,16 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     );
   }
 
-  Widget _buildHistoryWidget() {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory(
-                                'playing_cards');
-                            _loadHistory();
-                          },
-                          icon: const Icon(Icons.clear_all),
-                          label:
-                              Text(AppLocalizations.of(context)!.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          AppLocalizations.of(context)!.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory(
-                              'playing_cards');
-                          _loadHistory();
-                        },
-                        icon: const Icon(Icons.clear_all),
-                        label: Text(AppLocalizations.of(context)!.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 8),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      title: Text(
-                        item.value,
-                        style: const TextStyle(fontFamily: 'monospace'),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        '${AppLocalizations.of(context)!.generatedAt}: ${item.timestamp.toString().split('.')[0]}',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () => _copyHistoryItem(item.value),
-                        tooltip: AppLocalizations.of(context)!.copyToClipboard,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+  Widget _buildHistoryWidget(AppLocalizations loc) {
+    return RandomGeneratorHistoryWidget(
+      historyType: 'playing_cards',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('playing_cards');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
     );
   }
 
@@ -503,8 +400,8 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    // Build main content and history widgets
-    final mainContent = Column(
+    final generatorContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildSliderControls(),
         const SizedBox(height: 16),
@@ -521,61 +418,14 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
       ],
     );
 
-    final historyWidget = _buildHistoryWidget();
-
-    // Responsive layout: side-by-side for large screens, vertical for small screens
-    Widget content;
-    if (MediaQuery.of(context).size.width >= 1200 &&
-        _historyEnabled &&
-        _history.isNotEmpty) {
-      // Large screen: side-by-side layout
-      content = Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Main content takes 60% of width
-            Expanded(
-              flex: 3,
-              child: SingleChildScrollView(
-                child: mainContent,
-              ),
-            ),
-            const SizedBox(width: 16),
-            // History takes 40% of width
-            Expanded(
-              flex: 2,
-              child: SingleChildScrollView(
-                child: historyWidget,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen: vertical layout
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            mainContent,
-            historyWidget,
-          ],
-        ),
-      );
-    }
-
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.playingCards),
-        ),
-        body: content,
-      );
-    }
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.playingCards,
+    );
   }
 }
 

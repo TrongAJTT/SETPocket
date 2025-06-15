@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/widgets/random_generator_layout.dart';
 
 class DateGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -259,105 +260,38 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   }
 
   Widget _buildHistoryWidget(AppLocalizations loc) {
-    if (!_historyEnabled || _history.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive header that wraps on small screens
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // If space is limited, use Column layout
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.generationHistory,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await GenerationHistoryService.clearHistory('date');
-                            await _loadHistory();
-                          },
-                          child: Text(loc.clearHistory),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Use Row layout when there's enough space
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          loc.generationHistory,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await GenerationHistoryService.clearHistory('date');
-                          await _loadHistory();
-                        },
-                        child: Text(loc.clearHistory),
-                      ),
-                    ],
-                  );
-                }
-              },
+    return RandomGeneratorHistoryWidget(
+      historyType: 'date',
+      history: _history,
+      title: loc.generationHistory,
+      onClearHistory: () async {
+        await GenerationHistoryService.clearHistory('date');
+        await _loadHistory();
+      },
+      onCopyItem: _copyHistoryItem,
+      customItemBuilder: (item, context) {
+        return ListTile(
+          dense: true,
+          title: Text(
+            item.value,
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 14,
             ),
-            const Divider(),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _history.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      item.value,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      onPressed: () => _copyHistoryItem(item.value),
-                      tooltip: loc.copyToClipboard,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            '${loc.generatedAt}: ${item.timestamp.toString().substring(0, 19)}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.copy, size: 18),
+            onPressed: () => _copyHistoryItem(item.value),
+            tooltip: loc.copyToClipboard,
+          ),
+        );
+      },
     );
   }
 
@@ -367,7 +301,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
     final dateFormat = DateFormat('yyyy-MM-dd');
 
     // Build main content widget
-    final mainContent = Column(
+    final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Configuration card
@@ -471,62 +405,13 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
       ],
     );
 
-    // Build history widget
-    final historyWidget = _buildHistoryWidget(loc);
-
-    // Responsive layout: side-by-side for large screens, vertical for small screens
-    Widget content;
-    if (MediaQuery.of(context).size.width >= 1200 &&
-        _historyEnabled &&
-        _history.isNotEmpty) {
-      // Large screen: side-by-side layout
-      content = Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Main content takes 60% of width
-            Expanded(
-              flex: 3,
-              child: SingleChildScrollView(
-                child: mainContent,
-              ),
-            ),
-            const SizedBox(width: 16),
-            // History takes 40% of width
-            Expanded(
-              flex: 2,
-              child: SingleChildScrollView(
-                child: historyWidget,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Small screen: vertical layout
-      content = SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            mainContent,
-            const SizedBox(height: 24),
-            historyWidget,
-          ],
-        ),
-      );
-    }
-
-    if (widget.isEmbedded) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(loc.dateGenerator),
-        ),
-        body: content,
-      );
-    }
+    return RandomGeneratorLayout(
+      generatorContent: generatorContent,
+      historyWidget: _buildHistoryWidget(loc),
+      historyEnabled: _historyEnabled,
+      hasHistory: _history.isNotEmpty,
+      isEmbedded: widget.isEmbedded,
+      title: loc.dateGenerator,
+    );
   }
 }

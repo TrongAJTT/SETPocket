@@ -337,6 +337,8 @@
     "paper": "Bao", 
     "scissors": "Kéo",    
     "randomResult": "Kết quả",
+    "skipAnimation": "Bỏ qua hoạt ảnh",
+    "skipAnimationDesc": "Tắt hoạt ảnh để có kết quả nhanh hơn",
     "cacheDetails": "Chi tiết bộ nhớ đệm",
     "viewCacheDetails": "Xem chi tiết",
     "cacheSize": "Kích thước bộ nhớ đệm",
@@ -357,6 +359,7 @@
     "generationHistory": "Lịch sử tạo",
     "generatedAt": "Tạo lúc",
     "noHistoryYet": "Chưa có lịch sử",
+    "noHistoryMessage": "Tạo một số kết quả ngẫu nhiên để xem chúng ở đây",
     "clearHistory": "Xóa lịch sử",
     "typeConfirmToProceed": "Nhập \"confirm\" để tiếp tục:",
     "toolsShortcuts": "Công cụ & Phím tắt",
@@ -1152,5 +1155,8 @@
     "dataConverterInfo": "Thông Tin Chuyển Đổi Dung Lượng Lưu Trữ",
     "customizeDataUnits": "Tùy Chỉnh Đơn Vị Dung Lượng Lưu Trữ",
     "selectDataUnits": "Chọn đơn vị dung lượng lưu trữ để hiển thị",
-    "dataUnits": "Đơn Vị Dung Lượng Lưu Trữ"
+    "dataUnits": "Đơn Vị Dung Lượng Lưu Trữ",
+    "randomResult": "Kết quả",
+    "skipAnimation": "Bỏ qua hoạt ảnh",
+    "skipAnimationDesc": "Tắt hoạt ảnh để có kết quả nhanh hơn"
 }

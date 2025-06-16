@@ -292,6 +292,13 @@ class _DesktopLayoutState extends State<DesktopLayout> {
   List<BreadcrumbData> breadcrumbs = []; // Track navigation hierarchy
   final GlobalKey<_ToolSelectionScreenState> _toolSelectionKey = GlobalKey();
 
+  // Callback to check if current tool has unsaved changes
+  Future<bool> Function()? _checkUnsavedChanges;
+
+  void _registerUnsavedChangesCallback(Future<bool> Function()? callback) {
+    _checkUnsavedChanges = callback;
+  }
+
   void _refreshToolSelection() {
     // Refresh the tool list first
     _toolSelectionKey.currentState?.refreshTools();
@@ -305,10 +312,58 @@ class _DesktopLayoutState extends State<DesktopLayout> {
     });
   }
 
-  void _navigateToParent() {
+  void _navigateToParent() async {
+    // Check for unsaved changes before navigating
+    if (_checkUnsavedChanges != null) {
+      final hasUnsavedChanges = await _checkUnsavedChanges!();
+      if (hasUnsavedChanges) {
+        if (!mounted) return; // Guard against unmounted widget
+
+        final l10n = AppLocalizations.of(context)!;
+        final result = await showDialog<String>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.unsavedChanges),
+            content: Text(l10n.unsavedChangesMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('stay'),
+                child: Text(l10n.stayHere),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('draft'),
+                child: Text(l10n.saveDraft),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('exit'),
+                child: Text(l10n.exitWithoutSaving),
+              ),
+            ],
+          ),
+        );
+
+        switch (result) {
+          case 'stay':
+            return; // Don't navigate
+          case 'exit':
+            break; // Continue with navigation
+          case 'draft':
+            // Let the current tool handle draft saving
+            // Then continue with navigation
+            break;
+          default:
+            return; // Don't navigate if dialog was dismissed
+        }
+      }
+    }
+
     if (breadcrumbs.isNotEmpty) {
       // Remove current breadcrumb
       breadcrumbs.removeLast();
+
+      // Clear the callback when navigating away
+      _checkUnsavedChanges = null;
 
       if (breadcrumbs.isNotEmpty) {
         // Navigate to parent breadcrumb
@@ -507,6 +562,8 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                         selectedToolType: selectedToolType,
                         parentToolType: parentToolType,
                         onToolVisibilityChanged: _refreshToolSelection,
+                        onRegisterUnsavedChangesCallback:
+                            _registerUnsavedChangesCallback,
                         onToolSelected: (Widget tool, String title,
                             {String? parentCategory, IconData? icon}) {
                           setState(() {
@@ -656,6 +713,7 @@ class ToolSelectionScreen extends StatefulWidget {
   final String? selectedToolType;
   final String? parentToolType;
   final VoidCallback? onToolVisibilityChanged;
+  final Function(Future<bool> Function()?)? onRegisterUnsavedChangesCallback;
 
   const ToolSelectionScreen({
     super.key,
@@ -664,6 +722,7 @@ class ToolSelectionScreen extends StatefulWidget {
     this.selectedToolType,
     this.parentToolType,
     this.onToolVisibilityChanged,
+    this.onRegisterUnsavedChangesCallback,
   });
 
   @override
@@ -705,6 +764,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               widget.onToolSelected?.call(tool, title,
                   parentCategory: parentCategory ?? 'TemplateListScreen',
                   icon: icon),
+          onRegisterUnsavedChangesCallback:
+              widget.onRegisterUnsavedChangesCallback,
         );
       case 'randomTools':
         return RandomToolsScreen(

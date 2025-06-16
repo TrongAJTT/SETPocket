@@ -3,7 +3,6 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template.dart';
 import 'package:setpocket/services/template_service.dart';
 import 'package:setpocket/services/draft_service.dart';
-import 'package:setpocket/screens/text_template_gen_list_screen.dart';
 import 'dart:async';
 
 class TemplateEditScreen extends StatefulWidget {
@@ -12,6 +11,7 @@ class TemplateEditScreen extends StatefulWidget {
   final bool isEmbedded;
   final Function(Widget, String, {String? parentCategory, IconData? icon})?
       onToolSelected;
+  final Function(Future<bool> Function()?)? onRegisterUnsavedChangesCallback;
 
   const TemplateEditScreen({
     super.key,
@@ -19,6 +19,7 @@ class TemplateEditScreen extends StatefulWidget {
     this.draft,
     this.isEmbedded = false,
     this.onToolSelected,
+    this.onRegisterUnsavedChangesCallback,
   });
 
   @override
@@ -39,12 +40,25 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   // Tab controller
   late TabController _tabController;
 
+  // Cache for expensive operations
+  List<DataLoop>? _cachedLoops;
+  bool? _cachedLoopsValid;
+  String _lastContentForCache = '';
+
   // Draft-related state
   String? _currentDraftId;
   Timer? _autoSaveTimer;
+  Timer? _debounceTimer; // Thêm debounce timer cho refresh elements
   bool _hasUnsavedChanges = false;
   String _initialTitle = '';
   String _initialContent = '';
+  bool _isUserExiting =
+      false; // Để kiểm soát việc auto-save khi user thoát thủ công
+
+  // Auto-save optimization
+  String _lastAutoSavedTitle = '';
+  String _lastAutoSavedContent = '';
+  DateTime? _lastAutoSaveTime;
 
   @override
   void initState() {
@@ -83,6 +97,11 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     _refreshElements();
     _setupAutoSave();
     _registerEmergencySave();
+
+    // Register unsaved changes callback for desktop navigation
+    if (widget.onRegisterUnsavedChangesCallback != null) {
+      widget.onRegisterUnsavedChangesCallback!(_checkUnsavedChanges);
+    }
   }
 
   void _setupAutoSave() {
@@ -90,13 +109,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     _titleController.addListener(_onContentChanged);
     _contentController.addListener(_onContentChanged);
 
+    // Enable auto-save timer on both mobile and desktop
     // Auto-save every 30 seconds
     _autoSaveTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      if (widget.isEmbedded) {
-        _autoSaveDraftWithNotification();
-      } else {
-        _autoSaveDraft();
-      }
+      _autoSaveDraft();
     });
   }
 
@@ -113,29 +129,50 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   Future<void> _autoSaveDraft() async {
     if (!_hasUnsavedChanges || _currentDraftId == null) return;
 
+    final currentTitle = _titleController.text;
+    final currentContent = _contentController.text;
+
+    // Skip auto-save if content hasn't changed since last auto-save
+    if (currentTitle == _lastAutoSavedTitle &&
+        currentContent == _lastAutoSavedContent) {
+      return;
+    }
+
+    // Skip auto-save if last save was less than 10 seconds ago (avoid spam)
+    final now = DateTime.now();
+    if (_lastAutoSaveTime != null &&
+        now.difference(_lastAutoSaveTime!).inSeconds < 10) {
+      return;
+    }
+
     try {
       await DraftService.autoSaveDraft(
         draftId: _currentDraftId!,
         type: widget.template != null ? DraftType.edit : DraftType.create,
         originalTemplateId: widget.template?.id,
-        title: _titleController.text,
-        content: _contentController.text,
+        title: currentTitle,
+        content: currentContent,
       );
 
-      // Debug: Show auto-save success
-      if (mounted) {
+      // Update auto-save tracking
+      _lastAutoSavedTitle = currentTitle;
+      _lastAutoSavedContent = currentContent;
+      _lastAutoSaveTime = now;
+
+      // Show auto-save success on mobile only (desktop saves silently)
+      if (mounted && !widget.isEmbedded) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.autoSaved),
             duration: const Duration(seconds: 1),
-            backgroundColor: Colors.green.withOpacity(0.8),
+            backgroundColor: Colors.green.withValues(alpha: 0.8),
           ),
         );
       }
     } catch (e) {
       // Auto-save failures should be silent in production
-      // But show error in debug mode
-      if (mounted) {
+      // But show error in debug mode on mobile only
+      if (mounted && !widget.isEmbedded) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Auto-save failed: ${e.toString()}'),
@@ -148,59 +185,26 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   }
 
   void _registerEmergencySave() {
-    // Register callback for emergency saves (window close, etc.)
+    // Register emergency save callback on both mobile and desktop
     DraftService.registerEmergencySaveCallback(_emergencySave);
   }
 
   void _emergencySave() {
-    if (_hasUnsavedChanges && _currentDraftId != null) {
+    // Auto-save on both mobile and desktop when app is closing
+    // But NOT when user is manually exiting with "don't save" choice
+    if (_hasUnsavedChanges && _currentDraftId != null && !_isUserExiting) {
       _autoSaveDraftSync();
     }
   }
 
   @override
   void deactivate() {
-    // Save draft when widget is deactivated (before dispose)
-    // This happens when user navigates away via sidebar in desktop mode
-    if (_hasUnsavedChanges && _currentDraftId != null) {
+    // Save draft on both mobile and desktop when widget is deactivated
+    // But NOT when user is manually exiting with "don't save" choice
+    if (_hasUnsavedChanges && _currentDraftId != null && !_isUserExiting) {
       _autoSaveDraftSync();
     }
     super.deactivate();
-  }
-
-  Future<void> _autoSaveDraftWithNotification() async {
-    if (!_hasUnsavedChanges || _currentDraftId == null) return;
-
-    try {
-      await DraftService.autoSaveDraft(
-        draftId: _currentDraftId!,
-        type: widget.template != null ? DraftType.edit : DraftType.create,
-        originalTemplateId: widget.template?.id,
-        title: _titleController.text,
-        content: _contentController.text,
-      );
-
-      // Show subtle notification for desktop auto-save
-      if (mounted && widget.isEmbedded) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text(AppLocalizations.of(context)!.draftSaved),
-              ],
-            ),
-            backgroundColor: Colors.green.shade600,
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
-          ),
-        );
-      }
-    } catch (e) {
-      // Auto-save failures should be silent in production
-    }
   }
 
   void _autoSaveDraftSync() {
@@ -229,9 +233,15 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _autoSaveTimer?.cancel();
+    _debounceTimer?.cancel(); // Cancel debounce timer
 
-    // Unregister emergency save callback
+    // Always unregister emergency save callback
     DraftService.unregisterEmergencySaveCallback(_emergencySave);
+
+    // Unregister unsaved changes callback
+    if (widget.onRegisterUnsavedChangesCallback != null) {
+      widget.onRegisterUnsavedChangesCallback!(null);
+    }
 
     _titleController.dispose();
     _contentController.dispose();
@@ -242,6 +252,14 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
 
   void _refreshElements() {
     final content = _contentController.text;
+
+    // Clear cache when content changes
+    if (content != _lastContentForCache) {
+      _cachedLoops = null;
+      _cachedLoopsValid = null;
+      _lastContentForCache = content;
+    }
+
     setState(() {
       _elements = TemplateManager.findElementsInContent(content);
       _duplicateIds = TemplateManager.findDuplicateIds(_elements);
@@ -249,8 +267,20 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     });
   }
 
+  void _debouncedRefreshElements() {
+    // Cancel previous timer if exists
+    _debounceTimer?.cancel();
+
+    // Set new timer with 300ms delay
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _refreshElements();
+      }
+    });
+  }
+
   bool get _isEmbeddedInDesktop {
-    return widget.isEmbedded || MediaQuery.of(context).size.width >= 1000;
+    return widget.isEmbedded;
   }
 
   @override
@@ -308,8 +338,16 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     }
 
     // Mobile view - normal Scaffold with AppBar
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          final shouldPop = await _onWillPop();
+          if (shouldPop && mounted && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      canPop: false,
       child: Scaffold(
         appBar: AppBar(
           title: Text(isEditing ? l10n.editTemplate : l10n.createTemplate),
@@ -523,7 +561,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 }
                 return null;
               },
-              onChanged: (_) => _refreshElements(),
+              onChanged: (_) => _debouncedRefreshElements(),
             ),
           ),
         ),
@@ -572,17 +610,21 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   }
 
   Widget _buildElementSummary() {
-    // Tìm các vòng lặp trong nội dung
-    final loops =
-        TemplateManager.findDataLoopsInContent(_contentController.text);
+    // Use cached loops or compute if cache is invalid
+    final content = _contentController.text;
+    if (_cachedLoops == null || content != _lastContentForCache) {
+      _cachedLoops = TemplateManager.findDataLoopsInContent(content);
+      _cachedLoopsValid = TemplateManager.validateLoops(content);
+      _lastContentForCache = content;
+    }
+
+    final loops = _cachedLoops!;
     final loopCount = loops.length;
+    final loopsValid = _cachedLoopsValid!;
 
     // Tìm các element ngoài vòng lặp
     final elementsNotInLoop = _elements.where((e) => e.loopId == null).toList();
     final elementsInLoopCount = _elements.length - elementsNotInLoop.length;
-
-    // Kiểm tra tính hợp lệ của các vòng lặp
-    final loopsValid = TemplateManager.validateLoops(_contentController.text);
 
     return Card(
       color: (_duplicateIds.isNotEmpty || !loopsValid)
@@ -1420,9 +1462,11 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
         if (!_isEmbeddedInDesktop) {
           // Mobile mode: Use normal navigation
           Navigator.pop(context, true); // Return true to indicate success
+        } else {
+          // Desktop embedded mode: Just show success message
+          // User can continue editing or use back button to return to list
+          // No automatic navigation after save
         }
-        // Desktop embedded mode: Just show success message
-        // User can navigate back using breadcrumb/back button
       }
     } catch (e) {
       setState(() {
@@ -1585,6 +1629,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   }
 
   Future<bool> _onWillPop() async {
+    // This method is only called on mobile (PopScope)
     if (!_hasUnsavedChanges) {
       return true;
     }
@@ -1614,13 +1659,94 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
 
     switch (result) {
       case 'draft':
-        await _saveDraft();
-        return true;
+        try {
+          await _saveDraft();
+          return true;
+        } catch (e) {
+          // If saving draft fails, show error and don't exit
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to save draft: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return false;
+        }
       case 'exit':
+        _isUserExiting = true; // Prevent auto-save
+        await _deleteDraft(); // Delete draft when user chooses to exit without saving
         return true;
       case 'stay':
       default:
         return false;
+    }
+  }
+
+  // Callback for desktop navigation - check if there are unsaved changes
+  Future<bool> _checkUnsavedChanges() async {
+    if (!_hasUnsavedChanges) {
+      return false; // No unsaved changes, allow navigation
+    }
+
+    // Show dialog for unsaved changes
+    final l10n = AppLocalizations.of(context)!;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.unsavedChanges),
+        content: Text(l10n.unsavedChangesMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('stay'),
+            child: Text(l10n.stayHere),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('draft'),
+            child: Text(l10n.saveDraft),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('exit'),
+            child: Text(l10n.exitWithoutSaving),
+          ),
+        ],
+      ),
+    );
+
+    switch (result) {
+      case 'draft':
+        try {
+          await _saveDraft();
+          return false; // Allow navigation after saving draft
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to save draft: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return true; // Prevent navigation if save failed
+        }
+      case 'exit':
+        _isUserExiting = true; // Prevent auto-save
+        await _deleteDraft(); // Delete draft when user chooses to exit without saving
+        return false; // Allow navigation after deleting draft
+      case 'stay':
+      default:
+        return true; // Prevent navigation, stay on current screen
+    }
+  }
+
+  Future<void> _deleteDraft() async {
+    if (_currentDraftId == null) return;
+
+    try {
+      await DraftService.deleteDraft(_currentDraftId!);
+    } catch (e) {
+      // Silent fail for draft deletion
     }
   }
 
@@ -1664,7 +1790,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    // Save draft on various app state changes
+    // Save draft on app state changes for both mobile and desktop
     switch (state) {
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:

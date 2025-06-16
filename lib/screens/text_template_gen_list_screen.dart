@@ -17,9 +17,14 @@ class TemplateListScreen extends StatefulWidget {
   final bool isEmbedded;
   final Function(Widget, String, {String? parentCategory, IconData? icon})?
       onToolSelected;
+  final Function(Future<bool> Function()?)? onRegisterUnsavedChangesCallback;
 
-  const TemplateListScreen(
-      {super.key, this.isEmbedded = false, this.onToolSelected});
+  const TemplateListScreen({
+    super.key,
+    this.isEmbedded = false,
+    this.onToolSelected,
+    this.onRegisterUnsavedChangesCallback,
+  });
 
   @override
   State<TemplateListScreen> createState() => _TemplateListScreenState();
@@ -333,10 +338,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         );
       },
     );
-  }
-
-  Future<void> _navigateToCreateTemplate() async {
-    _navigateToEditScreen(template: null, draft: null);
   }
 
   Future<void> _navigateToEditTemplate(Template template) async {
@@ -845,11 +846,13 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           draft: draft,
           isEmbedded: true,
           onToolSelected: widget.onToolSelected,
+          onRegisterUnsavedChangesCallback:
+              widget.onRegisterUnsavedChangesCallback,
         ),
         draft != null
             ? (draft.type == DraftType.create ? 'Continue Draft' : 'Edit Draft')
             : (template != null ? 'Edit Template' : 'Create Template'),
-        parentCategory: 'Text Templates',
+        parentCategory: 'TemplateListScreen',
         icon: Icons.edit,
       );
     } else {

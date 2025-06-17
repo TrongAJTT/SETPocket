@@ -1211,6 +1211,12 @@ abstract class AppLocalizations {
   /// **'Copied!'**
   String get copied;
 
+  /// No description provided for @restored.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored!'**
+  String get restored;
+
   /// No description provided for @numberGenerator.
   ///
   /// In en, this message translates to:
@@ -2146,6 +2152,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear History'**
   String get clearHistory;
+
+  /// No description provided for @calculationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation History'**
+  String get calculationHistory;
+
+  /// No description provided for @noCalculationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No calculation history yet'**
+  String get noCalculationHistory;
+
+  /// No description provided for @saveCalculationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Calculation History'**
+  String get saveCalculationHistory;
+
+  /// No description provided for @saveCalculationHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember and display history of calculations'**
+  String get saveCalculationHistoryDesc;
 
   /// No description provided for @typeConfirmToProceed.
   ///

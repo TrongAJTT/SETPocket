@@ -633,6 +633,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copied => 'Copied!';
 
   @override
+  String get restored => 'Restored!';
+
+  @override
   String get numberGenerator => 'Number Generator';
 
   @override
@@ -1121,6 +1124,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearHistory => 'Clear History';
+
+  @override
+  String get calculationHistory => 'Calculation History';
+
+  @override
+  String get noCalculationHistory => 'No calculation history yet';
+
+  @override
+  String get saveCalculationHistory => 'Save Calculation History';
+
+  @override
+  String get saveCalculationHistoryDesc => 'Remember and display history of calculations';
 
   @override
   String get typeConfirmToProceed => 'Type \"confirm\" to proceed:';

@@ -633,6 +633,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get copied => 'Đã sao chép!';
 
   @override
+  String get restored => 'Đã khôi phục!';
+
+  @override
   String get numberGenerator => 'Tạo số ngẫu nhiên';
 
   @override
@@ -1121,6 +1124,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get clearHistory => 'Xóa lịch sử';
+
+  @override
+  String get calculationHistory => 'Lịch sử tính toán';
+
+  @override
+  String get noCalculationHistory => 'Chưa có lịch sử tính toán';
+
+  @override
+  String get saveCalculationHistory => 'Ghi nhớ lịch sử tính toán';
+
+  @override
+  String get saveCalculationHistoryDesc => 'Ghi nhớ và hiển thị lịch sử các phép tính';
 
   @override
   String get typeConfirmToProceed => 'Nhập \"confirm\" để tiếp tục:';

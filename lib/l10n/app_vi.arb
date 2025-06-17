@@ -184,6 +184,7 @@
     "generatedPassword": "Mật khẩu đã tạo",
     "copyToClipboard": "Sao chép",
     "copied": "Đã sao chép!",
+    "restored": "Đã khôi phục!",
     
     "numberGenerator": "Tạo số ngẫu nhiên",
     "integers": "Số nguyên",
@@ -366,6 +367,10 @@
     "noHistoryYet": "Chưa có lịch sử",
     "noHistoryMessage": "Tạo một số kết quả ngẫu nhiên để xem chúng ở đây",
     "clearHistory": "Xóa lịch sử",
+    "calculationHistory": "Lịch sử tính toán",
+    "noCalculationHistory": "Chưa có lịch sử tính toán",
+    "saveCalculationHistory": "Ghi nhớ lịch sử tính toán",
+    "saveCalculationHistoryDesc": "Ghi nhớ và hiển thị lịch sử các phép tính",
     "typeConfirmToProceed": "Nhập \"confirm\" để tiếp tục:",
     "toolsShortcuts": "Công cụ & Phím tắt",
     "displayArrangeTools": "Hiển thị và sắp xếp công cụ",

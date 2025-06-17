@@ -5,7 +5,6 @@ import 'hive_service.dart';
 
 class DraftService {
   static const String _draftsKey = 'drafts';
-  static const Duration _draftExpiryDuration = Duration(days: 7);
 
   static Future<List<TemplateDraft>> getDrafts() async {
     try {
@@ -158,7 +157,7 @@ class DraftService {
   }
 
   // Global callback for emergency saves (e.g., window close)
-  static List<Function()> _emergencySaveCallbacks = [];
+  static final List<Function()> _emergencySaveCallbacks = [];
 
   static void registerEmergencySaveCallback(Function() callback) {
     _emergencySaveCallbacks.add(callback);

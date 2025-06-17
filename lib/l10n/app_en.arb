@@ -195,6 +195,7 @@
     "generatedPassword": "Generated Password",
     "copyToClipboard": "Copy to Clipboard",
     "copied": "Copied!",
+    "restored": "Restored!",
     
     "numberGenerator": "Number Generator",
     "integers": "Integers",
@@ -364,6 +365,10 @@
     "noHistoryYet": "No history yet",
     "noHistoryMessage": "Generate some random results to see them here",
     "clearHistory": "Clear History",
+    "calculationHistory": "Calculation History",
+    "noCalculationHistory": "No calculation history yet",
+    "saveCalculationHistory": "Save Calculation History",
+    "saveCalculationHistoryDesc": "Remember and display history of calculations",
     "typeConfirmToProceed": "Type \"confirm\" to proceed:",
     "toolsShortcuts": "Tools & Shortcuts",
     "displayArrangeTools": "Display and arrange tools",

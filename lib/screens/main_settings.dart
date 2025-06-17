@@ -8,6 +8,7 @@ import 'package:setpocket/widgets/quick_actions_dialog.dart';
 import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/services/calculator_history_service.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/converter_services/currency_cache_service.dart';
 import 'package:setpocket/services/converter_services/currency_state_service.dart';
@@ -42,6 +43,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _clearing = false;
   bool _loading = true;
   bool _historyEnabled = false;
+  bool _calculatorHistoryEnabled = false;
   bool _featureStateSavingEnabled = true;
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
   int _fetchTimeoutSeconds = 10;
@@ -72,6 +74,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final themeIndex = prefs.getInt('themeMode');
     final lang = prefs.getString('language');
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
+    final calculatorHistoryEnabled =
+        await CalculatorHistoryService.isHistoryEnabled();
     final featureStateSavingEnabled =
         await SettingsService.getFeatureStateSaving();
     final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
@@ -84,6 +88,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           : settingsController.themeMode;
       _language = lang ?? settingsController.locale.languageCode;
       _historyEnabled = historyEnabled;
+      _calculatorHistoryEnabled = calculatorHistoryEnabled;
       _featureStateSavingEnabled = featureStateSavingEnabled;
       _currencyFetchMode = currencyFetchMode;
       _fetchTimeoutSeconds = fetchTimeout;
@@ -210,6 +215,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     await GenerationHistoryService.setHistoryEnabled(enabled);
   }
 
+  void _onCalculatorHistoryEnabledChanged(bool enabled) async {
+    setState(() => _calculatorHistoryEnabled = enabled);
+    await CalculatorHistoryService.setHistoryEnabled(enabled);
+  }
+
   void _onFeatureStateSavingChanged(bool enabled) async {
     setState(() => _featureStateSavingEnabled = enabled);
     await SettingsService.updateFeatureStateSaving(enabled);
@@ -327,6 +337,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                           _buildToolsShortcutsSection(loc),
                           const SizedBox(height: 24),
                           _buildRandomToolsSection(loc),
+                          const SizedBox(height: 24),
+                          _buildCalculatorToolsSection(loc),
                         ],
                       ),
                     ),
@@ -367,6 +379,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         _buildToolsShortcutsSection(loc),
         const SizedBox(height: 24),
         _buildRandomToolsSection(loc),
+        const SizedBox(height: 24),
+        _buildCalculatorToolsSection(loc),
         const SizedBox(height: 24),
         _buildConverterToolsSection(loc),
         const SizedBox(height: 24),
@@ -604,6 +618,17 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     );
   }
 
+  Widget _buildCalculatorToolsSection(AppLocalizations loc) {
+    return _buildSection(
+      title: loc.calculatorTools,
+      icon: Icons.calculate_outlined,
+      iconColor: Colors.teal.shade600,
+      children: [
+        _buildCalculatorHistorySettings(loc),
+      ],
+    );
+  }
+
   Widget _buildDataSection(AppLocalizations loc) {
     return _buildSection(
       title: loc.dataAndStorage,
@@ -781,6 +806,37 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         Switch(
           value: _historyEnabled,
           onChanged: _onHistoryEnabledChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalculatorHistorySettings(AppLocalizations loc) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                loc.saveCalculationHistory,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                loc.saveCalculationHistoryDesc,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        Switch(
+          value: _calculatorHistoryEnabled,
+          onChanged: _onCalculatorHistoryEnabledChanged,
         ),
       ],
     );

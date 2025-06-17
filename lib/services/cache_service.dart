@@ -2,6 +2,7 @@ import 'package:setpocket/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
+import 'calculator_history_service.dart';
 import 'hive_service.dart';
 import 'converter_services/currency_state_service.dart';
 import 'converter_services/currency_preset_service.dart';
@@ -142,6 +143,33 @@ class CacheService {
       keys: (_cacheKeys['random_generators'] ?? []) +
           RandomStateService.getAllStateKeys(),
     );
+
+    // Calculator Tools Cache
+    try {
+      final calculatorHistoryEnabled =
+          await CalculatorHistoryService.isHistoryEnabled();
+      final calculatorHistoryCount =
+          await CalculatorHistoryService.getTotalHistoryCount();
+      final calculatorHistorySize =
+          await CalculatorHistoryService.getHistoryDataSize();
+
+      cacheInfoMap['calculator_tools'] = CacheInfo(
+        name: 'Calculator Tools',
+        description: 'Calculation history and calculator settings',
+        itemCount: calculatorHistoryCount + (calculatorHistoryEnabled ? 1 : 0),
+        sizeBytes: calculatorHistorySize + (calculatorHistoryEnabled ? 4 : 0),
+        keys: ['calculator_history_enabled'],
+      );
+    } catch (e) {
+      logError('CacheService: Error getting calculator tools cache info: $e');
+      cacheInfoMap['calculator_tools'] = CacheInfo(
+        name: 'Calculator Tools',
+        description: 'Calculation history and calculator settings',
+        itemCount: 0,
+        sizeBytes: 0,
+        keys: ['calculator_history_enabled'],
+      );
+    }
 
     // Converter Tools Cache (includes currency and length states)
     try {
@@ -474,6 +502,11 @@ class CacheService {
       await GenerationHistoryService.clearAllHistory();
       // Also clear the history enabled setting
       await prefs.remove('generation_history_enabled');
+    } else if (cacheType == 'calculator_tools') {
+      // Clear all calculator history through the service
+      await CalculatorHistoryService.clearAllHistory();
+      // Also clear the history enabled setting
+      await prefs.remove('calculator_history_enabled');
     } else if (cacheType == 'text_templates') {
       // Clear templates cache from Hive
       await HiveService.clearBox(HiveService.templatesBoxName);
@@ -527,6 +560,7 @@ class CacheService {
 
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
+    await CalculatorHistoryService.clearAllHistory();
 
     // Close all converter boxes first to avoid type conflicts
     try {

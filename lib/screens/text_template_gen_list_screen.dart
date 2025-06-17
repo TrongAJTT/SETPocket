@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template.dart';
 import 'package:setpocket/services/template_service.dart';
-import 'package:setpocket/services/draft_service.dart';
 import 'package:setpocket/widgets/import_status_dialog.dart';
 import 'package:setpocket/widgets/batch_export_dialog.dart';
 import 'package:setpocket/widgets/batch_delete_dialog.dart';

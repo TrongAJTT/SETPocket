@@ -125,28 +125,28 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
-        padding: EdgeInsets.all(isDesktop ? 12 : 8),
+        padding: EdgeInsets.all(isDesktop ? 12 : 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             // Card header
             _buildCardHeader(context, l10n, isDesktop, card),
-            SizedBox(height: isDesktop ? 16 : 12),
+            SizedBox(height: isDesktop ? 16 : 8),
 
             // Base unit input and dropdown
             _buildBaseUnitSection(context, l10n, card, cardControllers),
-            SizedBox(height: isDesktop ? 12 : 8),
+            SizedBox(height: isDesktop ? 12 : 6),
 
             // "Converted to" label
             Text(
               '${l10n.convertedTo}:',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: isDesktop ? 15 : 14,
+                fontSize: isDesktop ? 15 : 13,
               ),
             ),
-            SizedBox(height: isDesktop ? 12 : 8),
+            SizedBox(height: isDesktop ? 12 : 6),
 
             // Other units
             _buildOtherUnits(context, constraints, isDesktop, card),
@@ -589,7 +589,7 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
     return Column(
       children: otherUnits.map((unitId) {
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 2),
+          margin: const EdgeInsets.symmetric(vertical: 1),
           child: _buildUnitDisplayTile(context, unitId, card),
         );
       }).toList(),

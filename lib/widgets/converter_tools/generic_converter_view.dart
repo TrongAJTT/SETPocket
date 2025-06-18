@@ -8,7 +8,7 @@ import 'converter_card_widget.dart';
 import 'converter_table_widget.dart';
 import 'converter_status_widget.dart';
 
-class GenericConverterView extends StatelessWidget {
+class GenericConverterView extends StatefulWidget {
   final ConverterController controller;
   final bool isEmbedded;
   final String? title;
@@ -29,13 +29,36 @@ class GenericConverterView extends StatelessWidget {
   });
 
   @override
+  State<GenericConverterView> createState() => _GenericConverterViewState();
+}
+
+class _GenericConverterViewState extends State<GenericConverterView> {
+  late PageController _pageController;
+  int _currentPageIndex = 0;
+  int _previousCardCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _previousCardCount = widget.controller.state.cards.length;
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isEmbedded) {
-      return _buildConverterContent(context, controller);
+    if (widget.isEmbedded) {
+      return _buildConverterContent(context, widget.controller);
     }
 
     final l10n = AppLocalizations.of(context)!;
-    final displayTitle = title ?? controller.converterService.displayName;
+    final displayTitle =
+        widget.title ?? widget.controller.converterService.displayName;
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
@@ -45,28 +68,31 @@ class GenericConverterView extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
-          if (onShowInfo != null)
+          if (widget.onShowInfo != null)
             IconButton(
               icon: const Icon(Icons.info_outline),
-              onPressed: onShowInfo,
+              onPressed: widget.onShowInfo,
               tooltip: '$displayTitle Info',
             ),
 
-          // Mobile: Show more actions menu
+          // Mobile: Show customize units button and context menu for other actions
           if (isMobile) ...[
+            IconButton(
+              icon: const Icon(Icons.tune),
+              onPressed: () =>
+                  _showGlobalUnitsCustomization(context, widget.controller),
+              tooltip: l10n.customizeUnits,
+            ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               tooltip: l10n.moreActions,
               onSelected: (value) {
                 switch (value) {
                   case 'focus_mode':
-                    _toggleFocusMode(context, controller);
+                    _toggleFocusMode(context, widget.controller);
                     break;
                   case 'reset_layout':
-                    _showResetLayoutConfirmation(context, controller);
-                    break;
-                  case 'customize_units':
-                    _showGlobalUnitsCustomization(context, controller);
+                    _showResetLayoutConfirmation(context, widget.controller);
                     break;
                 }
               },
@@ -76,13 +102,13 @@ class GenericConverterView extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        controller.isFocusMode
+                        widget.controller.isFocusMode
                             ? Icons.center_focus_weak
                             : Icons.center_focus_strong,
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        controller.isFocusMode
+                        widget.controller.isFocusMode
                             ? l10n.disableFocusMode
                             : l10n.enableFocusMode,
                       ),
@@ -99,16 +125,6 @@ class GenericConverterView extends StatelessWidget {
                     ],
                   ),
                 ),
-                PopupMenuItem<String>(
-                  value: 'customize_units',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.tune),
-                      const SizedBox(width: 12),
-                      Text(l10n.customizeUnits),
-                    ],
-                  ),
-                ),
               ],
             ),
           ]
@@ -116,31 +132,31 @@ class GenericConverterView extends StatelessWidget {
           else ...[
             IconButton(
               icon: Icon(
-                controller.isFocusMode
+                widget.controller.isFocusMode
                     ? Icons.center_focus_weak
                     : Icons.center_focus_strong,
               ),
-              onPressed: () => _toggleFocusMode(context, controller),
-              tooltip: controller.isFocusMode
+              onPressed: () => _toggleFocusMode(context, widget.controller),
+              tooltip: widget.controller.isFocusMode
                   ? l10n.disableFocusMode
                   : l10n.enableFocusMode,
             ),
             IconButton(
               icon: const Icon(Icons.restart_alt),
               onPressed: () =>
-                  _showResetLayoutConfirmation(context, controller),
+                  _showResetLayoutConfirmation(context, widget.controller),
               tooltip: l10n.resetLayout,
             ),
             IconButton(
               icon: const Icon(Icons.tune),
               onPressed: () =>
-                  _showGlobalUnitsCustomization(context, controller),
+                  _showGlobalUnitsCustomization(context, widget.controller),
               tooltip: l10n.customizeUnits,
             ),
           ],
         ],
       ),
-      body: _buildConverterContent(context, controller),
+      body: _buildConverterContent(context, widget.controller),
     );
   }
 
@@ -154,8 +170,8 @@ class GenericConverterView extends StatelessWidget {
           if (controller.requiresRealTimeData && !controller.isFocusMode) ...[
             ConverterStatusWidget(
               controller: controller,
-              onRefresh: onRefresh ?? controller.refreshData,
-              onShowStatus: onShowStatus,
+              onRefresh: widget.onRefresh ?? controller.refreshData,
+              onShowStatus: widget.onShowStatus,
             ),
             const SizedBox(height: 16),
           ],
@@ -224,7 +240,7 @@ class GenericConverterView extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 // Add focus button for embedded mode
-                if (isEmbedded) ...[
+                if (widget.isEmbedded) ...[
                   IconButton(
                     icon: Icon(
                       controller.isFocusMode
@@ -268,16 +284,8 @@ class GenericConverterView extends StatelessWidget {
               }
 
               if (crossAxisCount == 1) {
-                // Single column layout for mobile
-                return ReorderableListView.builder(
-                  itemCount: controller.state.cards.length,
-                  onReorder: controller.reorderCards,
-                  itemBuilder: (context, index) => ConverterCardWidget(
-                    key: ValueKey('card_$index'),
-                    cardIndex: index,
-                    controller: controller,
-                  ),
-                );
+                // Horizontal PageView layout for mobile
+                return _buildMobilePageView(context, controller);
               } else {
                 // Multi-column layout for larger screens with proper drag support
                 return SingleChildScrollView(
@@ -291,6 +299,110 @@ class GenericConverterView extends StatelessWidget {
             },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildMobilePageView(
+      BuildContext context, ConverterController controller) {
+    final cardCount = controller.state.cards.length;
+
+    // Kiểm tra nếu có card mới được thêm
+    if (cardCount > _previousCardCount && cardCount > 0) {
+      // Card mới được thêm, chuyển đến card cuối cùng (card mới)
+      _currentPageIndex = cardCount - 1;
+      _previousCardCount = cardCount;
+
+      // Animate đến card mới sau một delay nhỏ để đảm bảo PageView đã được build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_pageController.hasClients && mounted) {
+          _pageController.animateToPage(
+            cardCount - 1,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    } else if (cardCount < _previousCardCount) {
+      // Card bị xóa, cập nhật số lượng
+      _previousCardCount = cardCount;
+      // Đảm bảo currentPageIndex không vượt quá số card hiện có
+      if (_currentPageIndex >= cardCount && cardCount > 0) {
+        _currentPageIndex = cardCount - 1;
+      }
+    }
+
+    return Column(
+      children: [
+        // PageView với các cards
+        Expanded(
+          child: cardCount > 0
+              ? PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPageIndex = index;
+                    });
+                  },
+                  itemCount: cardCount,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height * 0.5,
+                          ),
+                          child: ConverterCardWidget(
+                            key: ValueKey('card_$index'),
+                            cardIndex: index,
+                            controller: controller,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : const Center(
+                  child: Text('No cards available'),
+                ),
+        ),
+
+        // Dấu chấm indicator với khả năng tap để chuyển card
+        if (cardCount > 1) ...[
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              cardCount,
+              (index) => GestureDetector(
+                onTap: () {
+                  // Animate to selected page when tapped
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentPageIndex == index ? 12 : 8,
+                  height: _currentPageIndex == index ? 12 : 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentPageIndex == index
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .outline
+                            .withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
       ],
     );
   }
@@ -334,7 +446,7 @@ class GenericConverterView extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 // Add focus button for embedded mode
-                if (isEmbedded) ...[
+                if (widget.isEmbedded) ...[
                   IconButton(
                     icon: Icon(
                       controller.isFocusMode
@@ -400,7 +512,7 @@ class GenericConverterView extends StatelessWidget {
 
     final exitInstruction = FocusModeService.getExitInstruction(
       context,
-      isEmbedded: isEmbedded,
+      isEmbedded: widget.isEmbedded,
     );
 
     FocusModeService.showFocusModeNotification(

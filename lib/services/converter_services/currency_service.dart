@@ -191,6 +191,11 @@ class CurrencyService {
   static Map<String, double> _currentRates = _staticRates;
   static final Map<String, CurrencyStatus> _currencyStatus = {};
 
+  // Add conversion cache for performance optimization
+  static final Map<String, double> _conversionCache = {};
+  static int _cacheHits = 0;
+  static int _cacheMisses = 0;
+
   // Get available currencies - extensive list
   static List<Currency> getSupportedCurrencies() {
     return [
@@ -299,9 +304,18 @@ class CurrencyService {
     ];
   }
 
-  // Convert currency - now uses cache service
+  // Convert currency - now uses cache service with optimization
   static double convert(double amount, String fromCurrency, String toCurrency) {
     if (fromCurrency == toCurrency) return amount;
+
+    // Performance optimization: Use conversion cache for exchange rates
+    final cacheKey = '${fromCurrency}_$toCurrency';
+    if (_conversionCache.containsKey(cacheKey)) {
+      _cacheHits++;
+      return amount * _conversionCache[cacheKey]!;
+    }
+
+    _cacheMisses++;
 
     // Try to get rates from cache, fallback to current rates if cache not available
     Map<String, double>? cachedRates;
@@ -317,9 +331,18 @@ class CurrencyService {
         cachedRates[fromCurrency] ?? _staticRates[fromCurrency] ?? 1.0;
     final toRate = cachedRates[toCurrency] ?? _staticRates[toCurrency] ?? 1.0;
 
-    // Convert to USD first, then to target currency
-    final usdAmount = amount / fromRate;
-    return usdAmount * toRate;
+    // Calculate exchange rate directly
+    final exchangeRate = toRate / fromRate;
+
+    // Cache the exchange rate for future use
+    _conversionCache[cacheKey] = exchangeRate;
+
+    // Limit cache size to prevent memory issues
+    if (_conversionCache.length > 1000) {
+      _conversionCache.clear();
+    }
+
+    return amount * exchangeRate;
   }
 
   // Get exchange rate between two currencies
@@ -622,6 +645,10 @@ class CurrencyService {
     _currentRates = Map<String, double>.from(newRates);
     _lastUpdated = DateTime.now();
     _isUsingLiveRates = true;
+
+    // Clear conversion cache when rates update to ensure accuracy
+    _conversionCache.clear();
+
     logInfo(
         'CurrencyService: Current rates updated with ${newRates.length} currencies');
   }
@@ -633,12 +660,34 @@ class CurrencyService {
     _isUsingLiveRates = false;
     _currencyStatus.clear();
     _currencyFetchTimes.clear();
+
+    // Clear conversion cache on reset
+    _conversionCache.clear();
+
     logInfo('CurrencyService: Reset to static rates');
   }
 
   // Check if API is available
   static bool get isLiveDataAvailable =>
       true; // Set to true now that we have real API integration
+
+  // Performance monitoring methods
+  static Map<String, dynamic> getCacheStats() {
+    final total = _cacheHits + _cacheMisses;
+    final hitRate = total > 0 ? (_cacheHits / total * 100) : 0.0;
+    return {
+      'cacheHits': _cacheHits,
+      'cacheMisses': _cacheMisses,
+      'hitRate': hitRate.toStringAsFixed(1),
+      'cacheSize': _conversionCache.length,
+    };
+  }
+
+  // Clear performance stats
+  static void clearCacheStats() {
+    _cacheHits = 0;
+    _cacheMisses = 0;
+  }
 
   // Get currency status
   static CurrencyStatus getCurrencyStatus(String currencyCode) {

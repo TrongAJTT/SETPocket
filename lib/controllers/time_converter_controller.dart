@@ -97,20 +97,19 @@ class TimeConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Optimized helper method to get formatted value using service cache
   String getFormattedValue(double value, String unitId) {
     try {
       if (unitId.isEmpty) {
         return value.toStringAsFixed(6);
       }
 
-      final unit = converterService.getUnit(unitId);
-      if (unit != null) {
-        return unit.formatValue(value);
-      }
-      return value.toStringAsFixed(6); // Higher precision for time units
+      // Use optimized service method with caching
+      final service = converterService as TimeConverterService;
+      return service.getFormattedValue(value, unitId);
     } catch (e) {
-      logError('Error formatting value for unit $unitId: $e');
+      logError(
+          'TimeConverterController: Error formatting value for unit $unitId: $e');
       return value.toStringAsFixed(6);
     }
   }
@@ -129,5 +128,63 @@ class TimeConverterController extends ConverterController {
         'millennia'
       ],
     };
+  }
+
+  /// Get conversion factor between two units
+  double getConversionFactor(String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(1.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError('TimeConverterController: Error getting conversion factor: $e');
+      return 1.0;
+    }
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return TimeConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return TimeConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    TimeConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    TimeConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return TimeConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final conversionHitRate = metrics['conversionHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Time Converter Performance: '
+        'Conversion Cache Hit Rate: $conversionHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('TimeConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('TimeConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'TimeConverterController: Error logging performance metrics: $e');
+    }
   }
 }

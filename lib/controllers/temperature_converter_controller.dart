@@ -10,7 +10,10 @@ class TemperatureConverterController extends ConverterController {
       : super(
           converterService: TemperatureConverterService(),
           stateService: TemperatureStateAdapter(),
-        );
+        ) {
+    logInfo(
+        'TemperatureConverterController: Initialized with TemperatureConverterService and TemperatureStateAdapter');
+  }
 
   // Generic Preset functionality using new GenericPresetService
   Future<List<GenericPresetModel>> getPresets() async {
@@ -77,12 +80,99 @@ class TemperatureConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Helper method to get formatted value with optimization
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    try {
+      final temperatureService =
+          converterService as TemperatureConverterService;
+      return temperatureService.getFormattedValue(value, unitId);
+    } catch (e) {
+      logError(
+          'TemperatureConverterController: Error getting formatted value: $e');
+      final unit = converterService.getUnit(unitId);
+      if (unit != null) {
+        return unit.formatValue(value);
+      }
+      return value.toStringAsFixed(2);
     }
-    return value.toStringAsFixed(2);
+  }
+
+  /// Get temperature-specific unit categories for customization
+  Map<String, List<String>> getTemperatureUnitCategories() {
+    return {
+      'common': ['celsius', 'fahrenheit'],
+      'scientific': ['kelvin'],
+      'historical': ['rankine', 'reaumur', 'delisle'],
+    };
+  }
+
+  /// Get conversion factor between two units (using 0°C as base)
+  double getConversionFactor(String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(0.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError(
+          'TemperatureConverterController: Error getting conversion factor: $e');
+      return 0.0; // Note: Temperature conversions don't have simple multiplication factors
+    }
+  }
+
+  /// Convert temperature with proper validation
+  double convertTemperature(double value, String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(value, fromUnitId, toUnitId);
+    } catch (e) {
+      logError(
+          'TemperatureConverterController: Error converting temperature: $e');
+      return value;
+    }
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return TemperatureConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return TemperatureConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    TemperatureConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    TemperatureConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return TemperatureConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final conversionHitRate = metrics['conversionHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Temperature Converter Performance: '
+        'Conversion Cache Hit Rate: $conversionHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('TemperatureConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('TemperatureConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'TemperatureConverterController: Error logging performance metrics: $e');
+    }
   }
 }

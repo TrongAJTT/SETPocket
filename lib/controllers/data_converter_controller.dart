@@ -10,7 +10,10 @@ class DataConverterController extends ConverterController {
       : super(
           converterService: DataConverterService(),
           stateService: DataStateAdapter(),
-        );
+        ) {
+    logInfo(
+        'DataConverterController: Initialized with DataConverterService and DataStateAdapter');
+  }
 
   // Generic Preset functionality using new GenericPresetService
   Future<List<GenericPresetModel>> getPresets() async {
@@ -77,12 +80,91 @@ class DataConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Helper method to get formatted value with optimization
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    try {
+      final dataService = converterService as DataConverterService;
+      return dataService.getFormattedValue(value, unitId);
+    } catch (e) {
+      logError('DataConverterController: Error getting formatted value: $e');
+      final unit = converterService.getUnit(unitId);
+      if (unit != null) {
+        return unit.formatValue(value);
+      }
+      return value.toStringAsFixed(2);
     }
-    return value.toStringAsFixed(2);
+  }
+
+  /// Get data storage-specific unit categories for customization
+  Map<String, List<String>> getDataStorageUnitCategories() {
+    return {
+      'bytes': [
+        'byte',
+        'kilobyte',
+        'megabyte',
+        'gigabyte',
+        'terabyte',
+        'petabyte'
+      ],
+      'bits': ['bit', 'kilobit', 'megabit', 'gigabit'],
+    };
+  }
+
+  /// Get conversion factor between two units
+  double getConversionFactor(String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(1.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError('DataConverterController: Error getting conversion factor: $e');
+      return 1.0;
+    }
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return DataConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return DataConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    DataConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    DataConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return DataConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final conversionHitRate = metrics['conversionHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Data Storage Converter Performance: '
+        'Conversion Cache Hit Rate: $conversionHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('DataConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('DataConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'DataConverterController: Error logging performance metrics: $e');
+    }
   }
 }

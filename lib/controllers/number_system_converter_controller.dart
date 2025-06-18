@@ -80,12 +80,109 @@ class NumberSystemConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Helper method to get formatted value using optimized service method
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    final service = converterService as NumberSystemConverterService;
+    return service.getFormattedValue(value, unitId);
+  }
+
+  /// Get number system specific unit categories for customization
+  Map<String, List<String>> getNumberSystemUnitCategories() {
+    return {
+      'basic': ['binary', 'octal', 'decimal', 'hexadecimal'],
+      'extended': ['base32', 'base64'],
+      'specialized': ['base128', 'base256'],
+    };
+  }
+
+  /// Get conversion factor between two units (always 1 for number systems as they represent same value)
+  double getConversionFactor(String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(1.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError(
+          'NumberSystemConverterController: Error getting conversion factor: $e');
+      return 1.0;
     }
-    return value.toStringAsFixed(0); // For integers
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return NumberSystemConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return NumberSystemConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    NumberSystemConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    NumberSystemConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return NumberSystemConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final unitsHitRate = metrics['unitsHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Number System Converter Performance: '
+        'Units Cache Hit Rate: $unitsHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('NumberSystemConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('NumberSystemConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'NumberSystemConverterController: Error logging performance metrics: $e');
+    }
+  }
+
+  /// Parse value from input string for specific number system base
+  double parseValueForBase(String input, String unitId) {
+    try {
+      final service = converterService as NumberSystemConverterService;
+      final unit = service.getUnit(unitId) as NumberSystemUnit?;
+      if (unit == null) return 0.0;
+
+      return unit.parseValue(input);
+    } catch (e) {
+      logError(
+          'NumberSystemConverterController: Error parsing value "$input" for base $unitId: $e');
+      return 0.0;
+    }
+  }
+
+  /// Validate input for specific number system base
+  bool validateInputForBase(String input, String unitId) {
+    if (input.isEmpty) return true; // Empty input is valid
+
+    try {
+      final service = converterService as NumberSystemConverterService;
+      final unit = service.getUnit(unitId) as NumberSystemUnit?;
+      if (unit == null) return false;
+
+      // Try to parse the input
+      unit.parseValue(input);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

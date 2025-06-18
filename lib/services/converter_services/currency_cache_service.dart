@@ -12,6 +12,7 @@ class CurrencyCacheService {
 
   static Box<CurrencyCacheModel>? _cacheBox;
   static bool _isFetching = false;
+  static int _saveCount = 0; // Counter for optimizing flush operations
 
   // Initialize the cache service
   static Future<void> initialize() async {
@@ -197,9 +198,17 @@ class CurrencyCacheService {
       logInfo('CurrencyCacheService: Saving to cache with key: $_cacheKey');
       await _cacheBox!.put(_cacheKey, cacheModel);
 
-      // Force flush to disk
-      await _cacheBox!.flush();
-      logInfo('CurrencyCacheService: Cache saved and flushed to disk');
+      // Optimize: Only flush to disk every 5 saves to reduce I/O
+      // Force flush to disk less frequently for better performance
+      if (_saveCount % 5 == 0) {
+        await _cacheBox!.flush();
+        logInfo(
+            'CurrencyCacheService: Cache saved and flushed to disk (every 5 saves)');
+      } else {
+        logInfo(
+            'CurrencyCacheService: Cache saved (flush deferred for performance)');
+      }
+      _saveCount++;
     } catch (e) {
       logError('CurrencyCacheService: Error saving to cache: $e');
       rethrow;

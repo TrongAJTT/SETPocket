@@ -1,5 +1,6 @@
 import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'converter_service_base.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class NumberSystemUnit extends ConverterUnit {
   final String _id;
@@ -213,6 +214,19 @@ class NumberSystemConverterService extends ConverterServiceBase {
   factory NumberSystemConverterService() => _instance;
   NumberSystemConverterService._internal();
 
+  // Performance optimization: Static caches for singleton pattern
+  static final Map<String, NumberSystemUnit> _unitsCache =
+      <String, NumberSystemUnit>{};
+  static final Map<String, String> _formattingCache = <String, String>{};
+  static bool _cacheInitialized = false;
+
+  // Performance monitoring
+  static int _cacheHits = 0;
+  static int _cacheMisses = 0;
+  static int _formattingCacheHits = 0;
+  static int _formattingCacheMisses = 0;
+  static int _conversionCount = 0;
+
   @override
   String get converterType => 'number_system';
 
@@ -222,74 +236,41 @@ class NumberSystemConverterService extends ConverterServiceBase {
   @override
   bool get requiresRealTimeData => false;
 
-  // Define all number system units
-  static final _binaryUnit = NumberSystemUnit(
-    id: 'binary',
-    name: 'Binary',
-    symbol: 'bin',
-    base: 2,
-  );
+  // Initialize cache with all number system units for O(1) lookup
+  static void _initializeCache() {
+    if (_cacheInitialized) return;
 
-  static final _octalUnit = NumberSystemUnit(
-    id: 'octal',
-    name: 'Octal',
-    symbol: 'oct',
-    base: 8,
-  );
+    _unitsCache.clear();
 
-  static final _decimalUnit = NumberSystemUnit(
-    id: 'decimal',
-    name: 'Decimal',
-    symbol: 'dec',
-    base: 10,
-  );
+    // Define all number system units
+    final units = [
+      NumberSystemUnit(id: 'binary', name: 'Binary', symbol: 'bin', base: 2),
+      NumberSystemUnit(id: 'octal', name: 'Octal', symbol: 'oct', base: 8),
+      NumberSystemUnit(id: 'decimal', name: 'Decimal', symbol: 'dec', base: 10),
+      NumberSystemUnit(
+          id: 'hexadecimal', name: 'Hexadecimal', symbol: 'hex', base: 16),
+      NumberSystemUnit(id: 'base32', name: 'Base 32', symbol: 'b32', base: 32),
+      NumberSystemUnit(id: 'base64', name: 'Base 64', symbol: 'b64', base: 64),
+      NumberSystemUnit(
+          id: 'base128', name: 'Base 128', symbol: 'b128', base: 128),
+      NumberSystemUnit(
+          id: 'base256', name: 'Base 256', symbol: 'b256', base: 256),
+    ];
 
-  static final _hexadecimalUnit = NumberSystemUnit(
-    id: 'hexadecimal',
-    name: 'Hexadecimal',
-    symbol: 'hex',
-    base: 16,
-  );
+    for (final unit in units) {
+      _unitsCache[unit.id] = unit;
+    }
 
-  static final _base32Unit = NumberSystemUnit(
-    id: 'base32',
-    name: 'Base 32',
-    symbol: 'b32',
-    base: 32,
-  );
-
-  static final _base64Unit = NumberSystemUnit(
-    id: 'base64',
-    name: 'Base 64',
-    symbol: 'b64',
-    base: 64,
-  );
-
-  static final _base128Unit = NumberSystemUnit(
-    id: 'base128',
-    name: 'Base 128',
-    symbol: 'b128',
-    base: 128,
-  );
-
-  static final _base256Unit = NumberSystemUnit(
-    id: 'base256',
-    name: 'Base 256',
-    symbol: 'b256',
-    base: 256,
-  );
+    _cacheInitialized = true;
+    logInfo(
+        'NumberSystemConverterService: Initialized cache with ${_unitsCache.length} number system units');
+  }
 
   @override
-  List<ConverterUnit> get units => [
-        _binaryUnit,
-        _octalUnit,
-        _decimalUnit,
-        _hexadecimalUnit,
-        _base32Unit,
-        _base64Unit,
-        _base128Unit,
-        _base256Unit,
-      ];
+  List<ConverterUnit> get units {
+    _initializeCache(); // Ensure cache is initialized
+    return _unitsCache.values.toList();
+  }
 
   @override
   Set<String> get defaultVisibleUnits => {
@@ -300,54 +281,84 @@ class NumberSystemConverterService extends ConverterServiceBase {
       };
 
   @override
-  ConverterUnit? getUnit(String id) {
-    try {
-      return units.firstWhere((unit) => unit.id == id);
-    } catch (e) {
-      return null;
+  ConverterUnit? getUnit(String id) => _getUnitById(id);
+
+  NumberSystemUnit? _getUnitById(String unitId) {
+    _initializeCache(); // Ensure cache is initialized
+
+    if (_unitsCache.containsKey(unitId)) {
+      _cacheHits++;
+      return _unitsCache[unitId];
     }
+
+    _cacheMisses++;
+    return null;
   }
-
-  // @override
-  // Map<String, double> convertToAll(
-  //     String fromUnitId, double value, Set<String> visibleUnits) {
-  //   final fromUnit = getUnit(fromUnitId) as NumberSystemUnit?;
-  //   if (fromUnit == null) return {};
-
-  //   final results = <String, double>{};
-
-  //   // First convert to decimal (base 10) if not already
-  //   double decimalValue;
-  //   if (fromUnit.base == 10) {
-  //     decimalValue = value;
-  //   } else {
-  //     // Convert from the input base to decimal
-  //     decimalValue = value; // Already converted by parseValue
-  //   }
-
-  //   // Convert decimal to all visible units
-  //   for (String unitId in visibleUnits) {
-  //     final toUnit = getUnit(unitId) as NumberSystemUnit?;
-  //     if (toUnit != null) {
-  //       results[unitId] = decimalValue;
-  //     }
-  //   }
-
-  //   return results;
-  // }
-
-  // @override
-  // double parseValue(String input, String unitId) {
-  //   final unit = getUnit(unitId) as NumberSystemUnit?;
-  //   if (unit == null) return 0.0;
-
-  //   return unit.parseValue(input);
-  // }
 
   @override
   double convert(double value, String fromUnitId, String toUnitId) {
-    // For number systems, all conversions go through decimal
-    return value; // Value is already in decimal after parseValue
+    try {
+      if (fromUnitId == toUnitId) return value;
+
+      _conversionCount++;
+      _initializeCache(); // Ensure cache is initialized
+
+      final fromUnit = _unitsCache[fromUnitId];
+      final toUnit = _unitsCache[toUnitId];
+
+      if (fromUnit == null || toUnit == null) {
+        logError(
+            'NumberSystemConverterService: Unknown unit in conversion: $fromUnitId -> $toUnitId');
+        return value;
+      }
+
+      // For number systems, we need to work with integers and convert via decimal
+      final intValue = value.round();
+
+      // Value is already decimal from parseValue(), so just return it
+      // The UI handles formatting through formatValue()
+      final result = value;
+
+      logInfo(
+          'NumberSystemConverterService: Converted $intValue ${fromUnit.symbol} = $result ${toUnit.symbol}');
+      return result;
+    } catch (e) {
+      logError(
+          'NumberSystemConverterService: Error converting $fromUnitId to $toUnitId: $e');
+      return value;
+    }
+  }
+
+  // Optimized formatting with cache
+  String getFormattedValue(double value, String unitId) {
+    // Round to integer for cache key consistency (number systems work with integers)
+    final intValue = value.round();
+    final cacheKey = '${intValue}_$unitId';
+
+    if (_formattingCache.containsKey(cacheKey)) {
+      _formattingCacheHits++;
+      return _formattingCache[cacheKey]!;
+    }
+
+    _formattingCacheMisses++;
+    final unit = getUnit(unitId);
+    final formatted = unit?.formatValue(value) ?? value.toStringAsFixed(0);
+
+    // Cache the result
+    _formattingCache[cacheKey] = formatted;
+
+    // Limit formatting cache size
+    if (_formattingCache.length > 1000) {
+      _formattingCache.clear();
+    }
+
+    return formatted;
+  }
+
+  @override
+  ConversionStatus getUnitStatus(String unitId) {
+    // Number system conversions are always successful as they're mathematical
+    return ConversionStatus.success;
   }
 
   @override
@@ -361,4 +372,90 @@ class NumberSystemConverterService extends ConverterServiceBase {
 
   @override
   bool get isUsingLiveData => false;
+
+  // Performance monitoring methods
+  static Map<String, dynamic> getCacheStats() {
+    final total = _cacheHits + _cacheMisses;
+    final hitRate = total > 0 ? (_cacheHits / total * 100) : 0.0;
+
+    final formattingTotal = _formattingCacheHits + _formattingCacheMisses;
+    final formattingHitRate = formattingTotal > 0
+        ? (_formattingCacheHits / formattingTotal * 100)
+        : 0.0;
+
+    return {
+      'unitsCacheHits': _cacheHits,
+      'unitsCacheMisses': _cacheMisses,
+      'unitsHitRate': hitRate.toStringAsFixed(1),
+      'formattingCacheHits': _formattingCacheHits,
+      'formattingCacheMisses': _formattingCacheMisses,
+      'formattingHitRate': formattingHitRate.toStringAsFixed(1),
+      'formattingCacheSize': _formattingCache.length,
+      'unitsCacheSize': _unitsCache.length,
+      'totalConversions': _conversionCount,
+    };
+  }
+
+  // Get performance metrics
+  static Map<String, dynamic> getPerformanceMetrics() {
+    final cacheStats = getCacheStats();
+    final memoryStats = getMemoryStats();
+
+    return {
+      ...cacheStats,
+      ...memoryStats,
+      'totalCacheOperations': _cacheHits + _cacheMisses,
+      'totalFormattingOperations':
+          _formattingCacheHits + _formattingCacheMisses,
+    };
+  }
+
+  // Clear performance stats
+  static void clearCacheStats() {
+    _cacheHits = 0;
+    _cacheMisses = 0;
+    _formattingCacheHits = 0;
+    _formattingCacheMisses = 0;
+    _conversionCount = 0;
+  }
+
+  // Clear all caches (for memory management)
+  static void clearCaches() {
+    _formattingCache.clear();
+    _unitsCache.clear();
+    _cacheInitialized = false;
+    clearCacheStats();
+    logInfo('NumberSystemConverterService: All caches cleared');
+  }
+
+  // Get memory usage estimation
+  static Map<String, dynamic> getMemoryStats() {
+    final formattingMemory =
+        _formattingCache.length * 50; // Estimated bytes per entry
+    final unitsMemory =
+        _unitsCache.length * 200; // Estimated bytes per unit object
+    final totalMemory = formattingMemory + unitsMemory;
+
+    return {
+      'formattingCacheMemoryBytes': formattingMemory,
+      'unitsCacheMemoryBytes': unitsMemory,
+      'totalMemoryBytes': totalMemory,
+      'totalMemoryKB': (totalMemory / 1024).toStringAsFixed(2),
+    };
+  }
+
+  // Get performance summary for logging
+  static String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final unitsHitRate = metrics['unitsHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Number System Converter Performance: '
+        'Units Cache Hit Rate: $unitsHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB, '
+        'Total Conversions: $_conversionCount, '
+        'Units Cached: ${_unitsCache.length}';
+  }
 }

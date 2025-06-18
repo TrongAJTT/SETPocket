@@ -90,6 +90,9 @@ class AreaConverterController extends ConverterController {
       final adapter = AreaStateAdapter();
       await adapter.clearState('area');
 
+      // Clear performance caches from service
+      AreaConverterService.clearCaches();
+
       logInfo('AreaConverterController: All cache data cleared successfully');
     } catch (e) {
       logError('AreaConverterController: Error force clearing cache: $e');
@@ -97,13 +100,15 @@ class AreaConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Helper method to get formatted value using optimized service method
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    try {
+      final service = converterService as AreaConverterService;
+      return service.getFormattedValue(value, unitId);
+    } catch (e) {
+      logError('AreaConverterController: Error formatting value: $e');
+      return value.toStringAsFixed(6); // Higher precision for area units
     }
-    return value.toStringAsFixed(6); // Higher precision for area units
   }
 
   /// Get area-specific unit categories for customization
@@ -153,8 +158,12 @@ class AreaConverterController extends ConverterController {
 
   /// Get conversion factor between two units
   double getConversionFactor(String fromUnitId, String toUnitId) {
-    final service = converterService as AreaConverterService;
-    return service.getConversionFactor(fromUnitId, toUnitId);
+    try {
+      return converterService.convert(1.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError('AreaConverterController: Error getting conversion factor: $e');
+      return 1.0;
+    }
   }
 
   /// Get units categorized for customization dialog
@@ -168,5 +177,53 @@ class AreaConverterController extends ConverterController {
     }
 
     return result;
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return AreaConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return AreaConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    AreaConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    AreaConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return AreaConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final conversionHitRate = metrics['conversionHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Area Converter Performance: '
+        'Conversion Cache Hit Rate: $conversionHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('AreaConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('AreaConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'AreaConverterController: Error logging performance metrics: $e');
+    }
   }
 }

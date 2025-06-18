@@ -49,6 +49,23 @@ class LengthConverterService extends ConverterServiceBase {
   factory LengthConverterService() => _instance;
   LengthConverterService._internal();
 
+  // Performance optimization: Cache for units lookup
+  static final Map<String, LengthUnit> _unitsCache = {};
+  static final Map<String, double> _conversionCache = {};
+  static int _cacheHits = 0;
+  static int _cacheMisses = 0;
+  static bool _cacheInitialized = false;
+
+  // Initialize units cache on first access
+  void _initializeCache() {
+    if (_cacheInitialized) return;
+
+    for (final unit in units) {
+      _unitsCache[unit.id] = unit as LengthUnit;
+    }
+    _cacheInitialized = true;
+  }
+
   @override
   String get converterType => 'length';
 
@@ -93,27 +110,41 @@ class LengthConverterService extends ConverterServiceBase {
   double convert(double value, String fromUnitId, String toUnitId) {
     if (fromUnitId == toUnitId) return value;
 
-    final fromUnit = _getUnitById(fromUnitId);
-    final toUnit = _getUnitById(toUnitId);
+    // Performance optimization: Use conversion cache for conversion factors
+    final cacheKey = '${fromUnitId}_$toUnitId';
+    if (_conversionCache.containsKey(cacheKey)) {
+      _cacheHits++;
+      return value * _conversionCache[cacheKey]!;
+    }
+
+    _cacheMisses++;
+    _initializeCache(); // Ensure cache is initialized
+
+    final fromUnit = _unitsCache[fromUnitId];
+    final toUnit = _unitsCache[toUnitId];
 
     if (fromUnit == null || toUnit == null) {
       throw Exception('Unit not found: $fromUnitId or $toUnitId');
     }
 
-    // Convert to base unit (meter) first, then to target unit
-    final baseValue = value * fromUnit.factor;
-    return baseValue / toUnit.factor;
+    // Calculate conversion factor and cache it
+    final conversionFactor = fromUnit.factor / toUnit.factor;
+    _conversionCache[cacheKey] = conversionFactor;
+
+    // Limit cache size to prevent memory issues
+    if (_conversionCache.length > 500) {
+      _conversionCache.clear();
+    }
+
+    return value * conversionFactor;
   }
 
   @override
   ConverterUnit? getUnit(String unitId) => _getUnitById(unitId);
 
   LengthUnit? _getUnitById(String unitId) {
-    try {
-      return units.firstWhere((unit) => unit.id == unitId) as LengthUnit;
-    } catch (e) {
-      return null;
-    }
+    _initializeCache(); // Ensure cache is initialized
+    return _unitsCache[unitId];
   }
 
   @override
@@ -135,4 +166,31 @@ class LengthConverterService extends ConverterServiceBase {
 
   @override
   bool get isUsingLiveData => false;
+
+  // Performance monitoring methods
+  static Map<String, dynamic> getCacheStats() {
+    final total = _cacheHits + _cacheMisses;
+    final hitRate = total > 0 ? (_cacheHits / total * 100) : 0.0;
+    return {
+      'cacheHits': _cacheHits,
+      'cacheMisses': _cacheMisses,
+      'hitRate': hitRate.toStringAsFixed(1),
+      'conversionCacheSize': _conversionCache.length,
+      'unitsCacheSize': _unitsCache.length,
+    };
+  }
+
+  // Clear performance stats
+  static void clearCacheStats() {
+    _cacheHits = 0;
+    _cacheMisses = 0;
+  }
+
+  // Clear all caches (for memory management)
+  static void clearCaches() {
+    _conversionCache.clear();
+    _unitsCache.clear();
+    _cacheInitialized = false;
+    clearCacheStats();
+  }
 }

@@ -26,6 +26,8 @@ class ConverterCardWidget extends StatefulWidget {
 
 class _ConverterCardWidgetState extends State<ConverterCardWidget> {
   Timer? _debounceTimer;
+  String?
+      _lastInputValue; // Cache last input to avoid unnecessary recalculations
 
   @override
   void dispose() {
@@ -34,8 +36,13 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
   }
 
   void _debouncedOnChanged(int cardIndex, String unitId, String value) {
+    // Optimize: Skip if value hasn't actually changed
+    if (_lastInputValue == value) return;
+    _lastInputValue = value;
+
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+    // Reduce debounce time for better responsiveness
+    _debounceTimer = Timer(const Duration(milliseconds: 200), () {
       widget.controller.onValueChanged(cardIndex, unitId, value);
     });
   }

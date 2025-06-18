@@ -51,71 +51,71 @@ class ConverterToolsScreen extends StatelessWidget {
         IconData icon;
         Color iconColor;
         switch (index) {
-          case 0:
+          case 0: // Currency Converter - Most popular (as requested)
             screen = const CurrencyConverterScreen();
             title = loc.currencyConverter;
             icon = Icons.attach_money;
             iconColor = Colors.green;
             break;
-          case 1:
+          case 1: // Length Converter - Very popular for everyday use
             screen = const LengthConverterNewScreen();
             title = loc.lengthConverter;
             icon = Icons.straighten;
             iconColor = Colors.blue;
             break;
-          case 2:
-            screen = const MassConverterNewScreen();
-            title = loc.massConverter;
-            icon = Icons.balance;
-            iconColor = Colors.orange;
-            break;
-          case 3:
-            screen = const WeightConverterScreen();
-            title = loc.weightConverter;
-            icon = Icons.fitness_center;
-            iconColor = Colors.deepPurple;
-            break;
-          case 4:
-            screen = const AreaConverterScreen();
-            title = loc.areaConverter;
-            icon = Icons.crop_free;
-            iconColor = Colors.purple;
-            break;
-          case 5:
-            screen = const TimeConverterScreen();
-            title = loc.timeConverter;
-            icon = Icons.schedule;
-            iconColor = Colors.red;
-            break;
-          case 6:
-            screen = const VolumeConverterScreen();
-            title = loc.volumeConverter;
-            icon = Icons.local_drink;
-            iconColor = Colors.cyan;
-            break;
-          case 7:
-            screen = const NumberSystemConverterScreen();
-            title = loc.numberSystemConverter;
-            icon = Icons.code;
-            iconColor = Colors.indigo;
-            break;
-          case 8:
-            screen = const SpeedConverterScreen();
-            title = loc.speedConverter;
-            icon = Icons.speed;
-            iconColor = Colors.teal;
-            break;
-          case 9:
+          case 2: // Temperature Converter - Widely used (weather, cooking)
             screen = const TemperatureConverterScreen();
             title = loc.temperatureConverter;
             icon = Icons.thermostat;
             iconColor = Colors.amber;
             break;
-          case 10:
+          case 3: // Mass Converter - Common for weight measurements
+            screen = const MassConverterNewScreen();
+            title = loc.massConverter;
+            icon = Icons.balance;
+            iconColor = Colors.orange;
+            break;
+          case 4: // Time Converter - Popular for time zones
+            screen = const TimeConverterScreen();
+            title = loc.timeConverter;
+            icon = Icons.schedule;
+            iconColor = Colors.red;
+            break;
+          case 5: // Data Converter - Growing popularity with digital needs
             screen = const DataConverterScreen();
             title = loc.dataConverter;
             icon = Icons.storage;
             iconColor = Colors.deepOrange;
+            break;
+          case 6: // Volume Converter - Cooking and fluid measurements
+            screen = const VolumeConverterScreen();
+            title = loc.volumeConverter;
+            icon = Icons.local_drink;
+            iconColor = Colors.cyan;
+            break;
+          case 7: // Speed Converter - Transportation, sports
+            screen = const SpeedConverterScreen();
+            title = loc.speedConverter;
+            icon = Icons.speed;
+            iconColor = Colors.teal;
+            break;
+          case 8: // Area Converter - Real estate, land measurements
+            screen = const AreaConverterScreen();
+            title = loc.areaConverter;
+            icon = Icons.crop_free;
+            iconColor = Colors.purple;
+            break;
+          case 9: // Weight Converter - Force measurements (less common)
+            screen = const WeightConverterScreen();
+            title = loc.weightConverter;
+            icon = Icons.fitness_center;
+            iconColor = Colors.deepPurple;
+            break;
+          case 10: // Number System Converter - Specialized technical use
+            screen = const NumberSystemConverterScreen();
+            title = loc.numberSystemConverter;
+            icon = Icons.code;
+            iconColor = Colors.indigo;
             break;
           default:
             screen = const SizedBox();
@@ -212,23 +212,23 @@ class ConverterToolsScreen extends StatelessWidget {
       case 1:
         return loc.lengthConverterDesc;
       case 2:
-        return loc.massConverterDesc;
+        return loc.temperatureConverterDesc;
       case 3:
-        return loc.weightConverterDesc;
+        return loc.massConverterDesc;
       case 4:
-        return loc.areaConverterDesc;
-      case 5:
         return loc.timeConverterDesc;
+      case 5:
+        return loc.dataConverterDesc;
       case 6:
         return loc.volumeConverterDesc;
       case 7:
-        return loc.numberSystemConverterDesc;
-      case 8:
         return loc.speedConverterDesc;
+      case 8:
+        return loc.areaConverterDesc;
       case 9:
-        return loc.temperatureConverterDesc;
+        return loc.weightConverterDesc;
       case 10:
-        return loc.dataConverterDesc;
+        return loc.numberSystemConverterDesc;
       default:
         return "";
     }

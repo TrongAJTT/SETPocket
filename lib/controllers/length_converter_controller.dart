@@ -77,12 +77,33 @@ class LengthConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Cache for formatted values to avoid repeated formatting
+  static final Map<String, String> _formattedValueCache = {};
+
+  // Helper method to get formatted value with caching
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    // Create cache key with reduced precision to increase cache hits
+    final roundedValue = (value * 1000).round() / 1000; // 3 decimal precision
+    final cacheKey = '${roundedValue}_$unitId';
+
+    if (_formattedValueCache.containsKey(cacheKey)) {
+      return _formattedValueCache[cacheKey]!;
     }
-    return value.toStringAsFixed(2);
+
+    final unit = converterService.getUnit(unitId);
+    final formatted = unit?.formatValue(value) ?? value.toStringAsFixed(2);
+
+    // Cache the result (limit cache size)
+    if (_formattedValueCache.length > 1000) {
+      _formattedValueCache.clear();
+    }
+    _formattedValueCache[cacheKey] = formatted;
+
+    return formatted;
+  }
+
+  // Clear formatting cache when needed
+  static void clearFormattingCache() {
+    _formattedValueCache.clear();
   }
 }

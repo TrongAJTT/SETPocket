@@ -90,6 +90,9 @@ class WeightConverterController extends ConverterController {
       final adapter = WeightStateAdapter();
       await adapter.clearState('weight');
 
+      // Clear performance caches from service
+      WeightConverterService.clearCaches();
+
       logInfo('WeightConverterController: All cache data cleared successfully');
     } catch (e) {
       logError('WeightConverterController: Error force clearing cache: $e');
@@ -97,13 +100,16 @@ class WeightConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Helper method to get formatted value using optimized service method
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    try {
+      final service = converterService as WeightConverterService;
+      return service.getFormattedValue(value, unitId);
+    } catch (e) {
+      logError('WeightConverterController: Error formatting value: $e');
+      return value
+          .toStringAsFixed(6); // Higher precision for weight/force units
     }
-    return value.toStringAsFixed(6); // Higher precision for weight/force units
   }
 
   /// Get weight-specific unit categories for customization
@@ -137,5 +143,64 @@ class WeightConverterController extends ConverterController {
   /// Get advanced units for professionals
   List<String> getAdvancedUnits() {
     return ['dyne', 'kilopond', 'ton_force', 'gram_force', 'troy_pound'];
+  }
+
+  /// Get conversion factor between two units
+  double getConversionFactor(String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(1.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError(
+          'WeightConverterController: Error getting conversion factor: $e');
+      return 1.0;
+    }
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return WeightConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return WeightConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    WeightConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    WeightConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return WeightConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final conversionHitRate = metrics['conversionHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Weight Converter Performance: '
+        'Conversion Cache Hit Rate: $conversionHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('WeightConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('WeightConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'WeightConverterController: Error logging performance metrics: $e');
+    }
   }
 }

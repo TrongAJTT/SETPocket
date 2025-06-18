@@ -110,20 +110,147 @@ class CurrencyConverterController extends ConverterController {
     }
   }
 
-  // Helper method to get formatted value
+  // Helper method to get formatted value using optimized service method
   String getFormattedValue(double value, String unitId) {
-    final unit = converterService.getUnit(unitId);
-    if (unit != null) {
-      return unit.formatValue(value);
+    final service = converterService as CurrencyConverterService;
+    return service.getFormattedValue(value, unitId);
+  }
+
+  /// Get currency specific unit categories for customization
+  Map<String, List<String>> getCurrencyUnitCategories() {
+    return {
+      'major': ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF'],
+      'asian': [
+        'VND',
+        'CNY',
+        'HKD',
+        'TWD',
+        'SGD',
+        'MYR',
+        'THB',
+        'IDR',
+        'PHP',
+        'INR',
+        'KRW'
+      ],
+      'european': [
+        'EUR',
+        'GBP',
+        'CHF',
+        'SEK',
+        'NOK',
+        'DKK',
+        'PLN',
+        'CZK',
+        'HUF',
+        'RON'
+      ],
+      'americas': ['USD', 'CAD', 'BRL', 'MXN', 'ARS', 'CLP', 'COP', 'PEN'],
+      'middle_east_africa': [
+        'AED',
+        'SAR',
+        'QAR',
+        'KWD',
+        'BHD',
+        'OMR',
+        'JOD',
+        'ZAR',
+        'EGP',
+        'NGN'
+      ],
+    };
+  }
+
+  /// Get conversion factor between two currencies
+  double getConversionFactor(String fromUnitId, String toUnitId) {
+    try {
+      return converterService.convert(1.0, fromUnitId, toUnitId);
+    } catch (e) {
+      logError(
+          'CurrencyConverterController: Error getting conversion factor: $e');
+      return 1.0;
     }
-    return value.toStringAsFixed(2);
+  }
+
+  // Performance monitoring methods
+  Map<String, dynamic> getCacheStats() {
+    return CurrencyConverterService.getCacheStats();
+  }
+
+  Map<String, dynamic> getPerformanceMetrics() {
+    return CurrencyConverterService.getPerformanceMetrics();
+  }
+
+  void clearCacheStats() {
+    CurrencyConverterService.clearCacheStats();
+  }
+
+  void clearPerformanceCaches() {
+    CurrencyConverterService.clearCaches();
+  }
+
+  Map<String, dynamic> getMemoryStats() {
+    return CurrencyConverterService.getMemoryStats();
+  }
+
+  /// Get performance summary for logging/debugging
+  String getPerformanceSummary() {
+    final metrics = getPerformanceMetrics();
+    final unitsHitRate = metrics['unitsHitRate'] ?? '0.0';
+    final formattingHitRate = metrics['formattingHitRate'] ?? '0.0';
+    final memoryKB = metrics['totalMemoryKB'] ?? '0.0';
+
+    return 'Currency Converter Performance: '
+        'Units Cache Hit Rate: $unitsHitRate%, '
+        'Formatting Cache Hit Rate: $formattingHitRate%, '
+        'Memory Usage: ${memoryKB}KB';
+  }
+
+  /// Log performance metrics for monitoring
+  void logPerformanceMetrics() {
+    try {
+      final summary = getPerformanceSummary();
+      logInfo('CurrencyConverterController: $summary');
+
+      final metrics = getPerformanceMetrics();
+      logInfo('CurrencyConverterController: Detailed metrics: $metrics');
+    } catch (e) {
+      logError(
+          'CurrencyConverterController: Error logging performance metrics: $e');
+    }
+  }
+
+  /// Check if currency data is live or static
+  @override
+  bool get isUsingLiveData {
+    final service = converterService as CurrencyConverterService;
+    return service.isUsingLiveData;
+  }
+
+  /// Get last update time for currency data
+  @override
+  DateTime? get lastUpdated {
+    final service = converterService as CurrencyConverterService;
+    return service.lastUpdated;
+  }
+
+  /// Force refresh currency data
+  Future<void> forceRefreshData() async {
+    try {
+      logInfo('CurrencyConverterController: Force refreshing currency data');
+      await refreshData();
+      logInfo('CurrencyConverterController: Force refresh completed');
+    } catch (e) {
+      logError('CurrencyConverterController: Error in force refresh: $e');
+      rethrow;
+    }
   }
 
   // Override refresh to use currency-specific refresh
   @override
   Future<void> refreshData() async {
     try {
-      logInfo('Refreshing currency data');
+      logInfo('CurrencyConverterController: Refreshing currency data');
 
       final currencyService = converterService as CurrencyConverterService;
       await currencyService.refreshData();
@@ -131,9 +258,11 @@ class CurrencyConverterController extends ConverterController {
       // Trigger UI update
       notifyListeners();
 
-      logInfo('Currency data refreshed successfully');
+      logInfo(
+          'CurrencyConverterController: Currency data refreshed successfully');
     } catch (e) {
-      logError('Error refreshing currency data: $e');
+      logError(
+          'CurrencyConverterController: Error refreshing currency data: $e');
       rethrow;
     }
   }

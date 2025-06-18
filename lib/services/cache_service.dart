@@ -74,6 +74,8 @@ class CacheService {
     String? appSettingsDesc,
     String? randomGeneratorsName,
     String? randomGeneratorsDesc,
+    String? calculatorToolsName,
+    String? calculatorToolsDesc,
     String? converterToolsName,
     String? converterToolsDesc,
   }) async {
@@ -159,8 +161,8 @@ class CacheService {
           await GraphingCalculatorService.getCacheInfo();
 
       cacheInfoMap['calculator_tools'] = CacheInfo(
-        name: 'Calculator Tools',
-        description:
+        name: calculatorToolsName ?? 'Calculator Tools',
+        description: calculatorToolsDesc ??
             'Calculation history, graphing calculator data, and settings',
         itemCount: calculatorHistoryCount +
             (calculatorHistoryEnabled ? 1 : 0) +
@@ -176,8 +178,8 @@ class CacheService {
     } catch (e) {
       logError('CacheService: Error getting calculator tools cache info: $e');
       cacheInfoMap['calculator_tools'] = CacheInfo(
-        name: 'Calculator Tools',
-        description:
+        name: calculatorToolsName ?? 'Calculator Tools',
+        description: calculatorToolsDesc ??
             'Calculation history, graphing calculator data, and settings',
         itemCount: 0,
         sizeBytes: 0,
@@ -636,11 +638,21 @@ class CacheService {
         .fold<int>(0, (sum, info) => sum + info.sizeBytes);
   }
 
+  static Future<int> getTotalLogSize() async {
+    try {
+      return await AppLogger.instance.getTotalLogSize();
+    } catch (e) {
+      return 0;
+    }
+  }
+
   static String formatCacheSize(int bytes) {
     if (bytes < 1024) {
       return '$bytes B';
-    } else {
+    } else if (bytes < 1024 * 1024) {
       return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
   }
 

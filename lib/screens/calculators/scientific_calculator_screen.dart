@@ -841,6 +841,7 @@ class _ScientificCalculatorScreenState
       hasHistory: _history.isNotEmpty,
       isEmbedded: widget.isEmbedded,
       title: l10n.scientificCalculator,
+      onShowInfo: _showScientificCalculatorInfo,
     );
   }
 
@@ -1025,5 +1026,486 @@ class _ScientificCalculatorScreenState
 
   bool _isConstant(String text) {
     return ['π', 'e'].contains(text);
+  }
+
+  void _showScientificCalculatorInfo() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          width: isDesktop ? 600 : screenWidth * 0.9,
+          height: isDesktop ? 700 : MediaQuery.of(context).size.height * 0.8,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.onPrimary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.calculate,
+                        color: theme.colorScheme.onPrimary,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.scientificCalculatorDetailedInfo,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.scientificCalculatorOverview,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary
+                                  .withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Key Features
+                      _buildInfoSection(
+                        theme,
+                        l10n.scientificKeyFeatures,
+                        Icons.star_outline,
+                        Colors.orange,
+                        [
+                          _buildFeatureItem(theme, l10n.realTimeCalculation,
+                              l10n.realTimeCalculationDesc, Icons.speed),
+                          _buildFeatureItem(theme, l10n.comprehensiveFunctions,
+                              l10n.comprehensiveFunctionsDesc, Icons.functions),
+                          _buildFeatureItem(theme, l10n.dualAngleModes,
+                              l10n.dualAngleModesDesc, Icons.rotate_left),
+                          _buildFeatureItem(theme, l10n.secondaryFunctions,
+                              l10n.secondaryFunctionsDesc, Icons.alt_route),
+                          _buildFeatureItem(theme, l10n.calculationHistory,
+                              l10n.calculationHistoryDesc, Icons.history),
+                          _buildFeatureItem(theme, l10n.memoryOperations,
+                              l10n.memoryOperationsDesc, Icons.memory),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // How to Use
+                      _buildInfoSection(
+                        theme,
+                        l10n.scientificHowToUse,
+                        Icons.help_outline,
+                        Colors.blue,
+                        [
+                          _buildStepItem(theme, l10n.step1Scientific,
+                              l10n.step1ScientificDesc),
+                          _buildStepItem(theme, l10n.step2Scientific,
+                              l10n.step2ScientificDesc),
+                          _buildStepItem(theme, l10n.step3Scientific,
+                              l10n.step3ScientificDesc),
+                          _buildStepItem(theme, l10n.step4Scientific,
+                              l10n.step4ScientificDesc),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Tips
+                      _buildInfoSection(
+                        theme,
+                        l10n.scientificTips,
+                        Icons.lightbulb_outline,
+                        Colors.green,
+                        [
+                          _buildTipItem(theme, l10n.tip1Scientific),
+                          _buildTipItem(theme, l10n.tip2Scientific),
+                          _buildTipItem(theme, l10n.tip3Scientific),
+                          _buildTipItem(theme, l10n.tip4Scientific),
+                          _buildTipItem(theme, l10n.tip5Scientific),
+                          _buildTipItem(theme, l10n.tip6Scientific),
+                          _buildTipItem(theme, l10n.tip7Scientific),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Function Categories
+                      _buildInfoSection(
+                        theme,
+                        l10n.scientificFunctionCategories,
+                        Icons.category,
+                        Colors.purple,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.basicArithmetic,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.basicArithmeticDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.trigonometricFunctionsScientific,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.trigonometricFunctionsScientificDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.logarithmicFunctionsScientific,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.logarithmicFunctionsScientificDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.algebraicFunctions,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.algebraicFunctionsDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Mode Controls
+                      _buildInfoSection(
+                        theme,
+                        l10n.scientificModeControls,
+                        Icons.settings,
+                        Colors.indigo,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.angleMode,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.angleModeDesc,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.functionToggle,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.functionToggleDesc,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.memoryFunctions,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.memoryFunctionsDesc,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.historyAccess,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.historyAccessDesc,
+                                    style: theme.textTheme.bodySmall),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Practical Applications
+                      _buildInfoSection(
+                        theme,
+                        l10n.scientificPracticalApplications,
+                        Icons.build,
+                        Colors.teal,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              l10n.scientificPracticalApplicationsDesc,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.check),
+                      label: Text(l10n.close),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(ThemeData theme, String title, IconData icon,
+      Color color, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: Column(children: children),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(
+      ThemeData theme, String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepItem(ThemeData theme, String step, String description) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                step.split(
+                    ' ')[1], // Extract step number (e.g., "1" from "Step 1")
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  step,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTipItem(ThemeData theme, String tip) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      child: Text(
+        tip,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
   }
 }

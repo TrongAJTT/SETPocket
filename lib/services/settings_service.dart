@@ -119,6 +119,15 @@ class SettingsService {
     final currentSettings = await getSettings();
     final updatedSettings = currentSettings.copyWith(logRetentionDays: days);
     await saveSettings(updatedSettings);
+
+    // Trigger immediate cleanup when retention period is reduced
+    try {
+      await AppLogger.instance.cleanupOldLogs();
+      logInfo(
+          'SettingsService: Triggered immediate log cleanup after retention change to $days days');
+    } catch (e) {
+      logError('SettingsService: Failed to trigger immediate log cleanup: $e');
+    }
   } // Get log retention days with migration support
 
   static Future<int> getLogRetentionDays() async {

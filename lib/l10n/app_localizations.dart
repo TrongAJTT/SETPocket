@@ -62,7 +62,8 @@ import 'app_localizations_vi.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,7 +84,8 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -2921,6 +2924,642 @@ abstract class AppLocalizations {
   /// **'Plot and visualize mathematical functions'**
   String get graphingCalculatorDesc;
 
+  /// No description provided for @graphingCalculatorDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Graphing Calculator Information'**
+  String get graphingCalculatorDetailedInfo;
+
+  /// No description provided for @graphingCalculatorOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced mathematical function plotting and visualization tool'**
+  String get graphingCalculatorOverview;
+
+  /// No description provided for @graphingKeyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get graphingKeyFeatures;
+
+  /// No description provided for @realTimePlotting.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Plotting'**
+  String get realTimePlotting;
+
+  /// No description provided for @realTimePlottingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Instantly visualize functions as you type with smooth curve rendering'**
+  String get realTimePlottingDesc;
+
+  /// No description provided for @multipleFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Functions'**
+  String get multipleFunction;
+
+  /// No description provided for @multipleFunctionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Plot and compare multiple functions simultaneously with color coding'**
+  String get multipleFunctionDesc;
+
+  /// No description provided for @interactiveControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactive Controls'**
+  String get interactiveControls;
+
+  /// No description provided for @interactiveControlsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom, pan, and navigate the graph with intuitive touch and mouse controls'**
+  String get interactiveControlsDesc;
+
+  /// No description provided for @aspectRatioControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspect Ratio Control'**
+  String get aspectRatioControl;
+
+  /// No description provided for @aspectRatioControlDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize X:Y axis scaling for optimal function visualization'**
+  String get aspectRatioControlDesc;
+
+  /// No description provided for @functionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Function History'**
+  String get functionHistory;
+
+  /// No description provided for @functionHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and load function groups with automatic state preservation'**
+  String get functionHistoryDesc;
+
+  /// No description provided for @mathExpressionSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Math Support'**
+  String get mathExpressionSupport;
+
+  /// No description provided for @mathExpressionSupportDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports trigonometric, logarithmic, and polynomial functions'**
+  String get mathExpressionSupportDesc;
+
+  /// No description provided for @graphingHowToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get graphingHowToUse;
+
+  /// No description provided for @step1Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Enter Function'**
+  String get step1Graph;
+
+  /// No description provided for @step1GraphDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a mathematical function in the input field (e.g., x^2, sin(x), log(x))'**
+  String get step1GraphDesc;
+
+  /// No description provided for @step2Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Plot Function'**
+  String get step2Graph;
+
+  /// No description provided for @step2GraphDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Press Enter or tap the add button to plot the function on the graph'**
+  String get step2GraphDesc;
+
+  /// No description provided for @step3Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Navigate Graph'**
+  String get step3Graph;
+
+  /// No description provided for @step3GraphDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use zoom controls, pan gestures, or adjust aspect ratio for better viewing'**
+  String get step3GraphDesc;
+
+  /// No description provided for @step4Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Add More Functions'**
+  String get step4Graph;
+
+  /// No description provided for @step4GraphDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add multiple functions to compare and analyze their behaviors'**
+  String get step4GraphDesc;
+
+  /// No description provided for @graphingTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro Tips'**
+  String get graphingTips;
+
+  /// No description provided for @tip1Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Use parentheses for complex expressions: sin(x^2) instead of sin x^2'**
+  String get tip1Graph;
+
+  /// No description provided for @tip2Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Common functions: sin(x), cos(x), tan(x), log(x), sqrt(x), abs(x)'**
+  String get tip2Graph;
+
+  /// No description provided for @tip3Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Use π and e constants: sin(π*x), e^x'**
+  String get tip3Graph;
+
+  /// No description provided for @tip4Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Pan by dragging the graph area with mouse or touch'**
+  String get tip4Graph;
+
+  /// No description provided for @tip5Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Save function groups to history for quick access later'**
+  String get tip5Graph;
+
+  /// No description provided for @tip6Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle function visibility using the eye icon without removing them'**
+  String get tip6Graph;
+
+  /// No description provided for @tip7Graph.
+  ///
+  /// In en, this message translates to:
+  /// **'Use aspect ratio controls for specialized viewing (1:1 for circles, 5:1 for oscillations)'**
+  String get tip7Graph;
+
+  /// No description provided for @supportedFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported Functions'**
+  String get supportedFunctions;
+
+  /// No description provided for @basicOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Operations'**
+  String get basicOperations;
+
+  /// No description provided for @basicOperationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Addition (+), Subtraction (-), Multiplication (*), Division (/), Power (^)'**
+  String get basicOperationsDesc;
+
+  /// No description provided for @trigonometricFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Trigonometric Functions'**
+  String get trigonometricFunctions;
+
+  /// No description provided for @trigonometricFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'sin(x), cos(x), tan(x) and their inverse functions'**
+  String get trigonometricFunctionsDesc;
+
+  /// No description provided for @logarithmicFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Logarithmic Functions'**
+  String get logarithmicFunctions;
+
+  /// No description provided for @logarithmicFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural logarithm log(x), exponential e^x'**
+  String get logarithmicFunctionsDesc;
+
+  /// No description provided for @otherFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Functions'**
+  String get otherFunctions;
+
+  /// No description provided for @otherFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Square root sqrt(x), absolute value abs(x), polynomial functions'**
+  String get otherFunctionsDesc;
+
+  /// No description provided for @navigationControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation Controls'**
+  String get navigationControls;
+
+  /// No description provided for @zoomControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom Controls'**
+  String get zoomControls;
+
+  /// No description provided for @zoomControlsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use + and - buttons or pinch gestures to zoom in and out'**
+  String get zoomControlsDesc;
+
+  /// No description provided for @panControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Pan Controls'**
+  String get panControls;
+
+  /// No description provided for @panControlsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the graph to move around and explore different areas'**
+  String get panControlsDesc;
+
+  /// No description provided for @resetControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Controls'**
+  String get resetControls;
+
+  /// No description provided for @resetControlsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to center or reset the entire plot to default state'**
+  String get resetControlsDesc;
+
+  /// No description provided for @aspectRatioDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspect Ratio'**
+  String get aspectRatioDialog;
+
+  /// No description provided for @aspectRatioDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust X:Y axis scaling from 0.1:1 to 10:1 for optimal viewing'**
+  String get aspectRatioDialogDesc;
+
+  /// No description provided for @graphingPracticalApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Applications'**
+  String get graphingPracticalApplications;
+
+  /// No description provided for @graphingPracticalApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Useful for students learning algebra and calculus, visualizing function behavior, and exploring mathematical concepts through interactive graphs.'**
+  String get graphingPracticalApplicationsDesc;
+
+  /// No description provided for @scientificCalculatorDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific Calculator Information'**
+  String get scientificCalculatorDetailedInfo;
+
+  /// No description provided for @scientificCalculatorOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced scientific calculator with comprehensive mathematical functions'**
+  String get scientificCalculatorOverview;
+
+  /// No description provided for @scientificKeyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get scientificKeyFeatures;
+
+  /// No description provided for @realTimeCalculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Calculation'**
+  String get realTimeCalculation;
+
+  /// No description provided for @realTimeCalculationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See instant preview results as you type expressions'**
+  String get realTimeCalculationDesc;
+
+  /// No description provided for @comprehensiveFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive Functions'**
+  String get comprehensiveFunctions;
+
+  /// No description provided for @comprehensiveFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete set of trigonometric, logarithmic, and algebraic functions'**
+  String get comprehensiveFunctionsDesc;
+
+  /// No description provided for @dualAngleModes.
+  ///
+  /// In en, this message translates to:
+  /// **'Dual Angle Modes'**
+  String get dualAngleModes;
+
+  /// No description provided for @dualAngleModesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between radians and degrees for trigonometric calculations'**
+  String get dualAngleModesDesc;
+
+  /// No description provided for @secondaryFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary Functions'**
+  String get secondaryFunctions;
+
+  /// No description provided for @secondaryFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Access extended functions with the 2nd button toggle'**
+  String get secondaryFunctionsDesc;
+
+  /// No description provided for @calculationHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic saving and browsing of previous calculations'**
+  String get calculationHistoryDesc;
+
+  /// No description provided for @memoryOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Operations'**
+  String get memoryOperations;
+
+  /// No description provided for @memoryOperationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Store and recall values with memory management functions'**
+  String get memoryOperationsDesc;
+
+  /// No description provided for @scientificHowToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get scientificHowToUse;
+
+  /// No description provided for @step1Scientific.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Enter Expression'**
+  String get step1Scientific;
+
+  /// No description provided for @step1ScientificDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Type numbers and use function buttons to build mathematical expressions'**
+  String get step1ScientificDesc;
+
+  /// No description provided for @step2Scientific.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Use Functions'**
+  String get step2Scientific;
+
+  /// No description provided for @step2ScientificDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Access trigonometric, logarithmic, and algebraic functions from the keypad'**
+  String get step2ScientificDesc;
+
+  /// No description provided for @step3Scientific.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Toggle Modes'**
+  String get step3Scientific;
+
+  /// No description provided for @step3ScientificDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between radians/degrees and primary/secondary functions as needed'**
+  String get step3ScientificDesc;
+
+  /// Step 4 for using scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Use History - View and reuse previous calculations'**
+  String get step4Scientific;
+
+  /// No description provided for @step4ScientificDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Press = to calculate or see real-time preview while typing'**
+  String get step4ScientificDesc;
+
+  /// No description provided for @scientificTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro Tips'**
+  String get scientificTips;
+
+  /// Tip 1 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Use parentheses to ensure correct order of operations: (2+3)×4 = 20'**
+  String get tip1Scientific;
+
+  /// Tip 2 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to DEG mode for degree calculations, RAD for radians'**
+  String get tip2Scientific;
+
+  /// Tip 3 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Use the 2nd button to access inverse functions: sin⁻¹, cos⁻¹, log⁻¹'**
+  String get tip3Scientific;
+
+  /// Tip 4 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Use memory functions (MS, MR, M+, M-) to store intermediate results'**
+  String get tip4Scientific;
+
+  /// Tip 5 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap numbers to select and copy results'**
+  String get tip5Scientific;
+
+  /// Tip 6 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Use EXP for scientific notation: 1.23E+5 = 123,000'**
+  String get tip6Scientific;
+
+  /// Tip 7 for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Clear individual entries with C, or clear all with AC'**
+  String get tip7Scientific;
+
+  /// Basic arithmetic operations section
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Arithmetic'**
+  String get basicArithmetic;
+
+  /// Trigonometric functions section for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Trigonometric Functions'**
+  String get trigonometricFunctionsScientific;
+
+  /// Logarithmic functions section for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Logarithmic Functions'**
+  String get logarithmicFunctionsScientific;
+
+  /// Algebraic functions section
+  ///
+  /// In en, this message translates to:
+  /// **'Algebraic Functions'**
+  String get algebraicFunctions;
+
+  /// No description provided for @scientificFunctionCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Function Categories'**
+  String get scientificFunctionCategories;
+
+  /// No description provided for @basicArithmeticDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Addition (+), Subtraction (-), Multiplication (*), Division (/)'**
+  String get basicArithmeticDesc;
+
+  /// No description provided for @trigonometricFunctionsScientificDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'sin, cos, tan and their inverse functions (asin, acos, atan)'**
+  String get trigonometricFunctionsScientificDesc;
+
+  /// No description provided for @logarithmicFunctionsScientificDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural log (ln), common log (log), exponential (exp, eˣ, 10ˣ)'**
+  String get logarithmicFunctionsScientificDesc;
+
+  /// No description provided for @algebraicFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Powers (x², x³, xʸ), roots (√, ∛), factorial (n!), absolute value (|x|)'**
+  String get algebraicFunctionsDesc;
+
+  /// Angle mode control
+  ///
+  /// In en, this message translates to:
+  /// **'Angle Mode'**
+  String get angleMode;
+
+  /// Function toggle control
+  ///
+  /// In en, this message translates to:
+  /// **'Function Toggle'**
+  String get functionToggle;
+
+  /// Memory functions control
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Functions'**
+  String get memoryFunctions;
+
+  /// History access control
+  ///
+  /// In en, this message translates to:
+  /// **'History Access'**
+  String get historyAccess;
+
+  /// Practical applications section for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Applications'**
+  String get scientificCalculatorPracticalApplications;
+
+  /// Practical applications description for scientific calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Helpful for students in mathematics and science courses, basic engineering calculations, and everyday problem-solving involving complex mathematical operations.'**
+  String get scientificCalculatorPracticalApplicationsDesc;
+
+  /// Cache info with log size
+  ///
+  /// In en, this message translates to:
+  /// **'Cache: {cacheSize} (+{logSize} log)'**
+  String cacheWithLogSize(String cacheSize, String logSize);
+
+  /// No description provided for @scientificModeControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode Controls'**
+  String get scientificModeControls;
+
+  /// No description provided for @angleModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle between Radians and Degrees for trigonometric calculations'**
+  String get angleModeDesc;
+
+  /// No description provided for @functionToggleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Press 2nd to switch between primary and secondary function sets'**
+  String get functionToggleDesc;
+
+  /// No description provided for @memoryFunctionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Store, recall, and manage values in calculator memory'**
+  String get memoryFunctionsDesc;
+
+  /// No description provided for @historyAccessDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse previous calculations and reuse expressions'**
+  String get historyAccessDesc;
+
+  /// No description provided for @scientificPracticalApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Applications'**
+  String get scientificPracticalApplications;
+
+  /// No description provided for @scientificPracticalApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Helpful for students in mathematics and science courses, performing calculations that require trigonometric, logarithmic, and algebraic functions.'**
+  String get scientificPracticalApplicationsDesc;
+
   /// No description provided for @metric.
   ///
   /// In en, this message translates to:
@@ -3316,6 +3955,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Large file detected. Using optimized loading...'**
   String get largeFileDetected;
+
+  /// No description provided for @cacheTypeCalculatorTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator Tools'**
+  String get cacheTypeCalculatorTools;
+
+  /// No description provided for @cacheTypeCalculatorToolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation history, graphing calculator data, and settings'**
+  String get cacheTypeCalculatorToolsDesc;
 
   /// No description provided for @cacheTypeConverterTools.
   ///
@@ -4052,7 +4703,7 @@ abstract class AppLocalizations {
   /// No description provided for @statePersistence.
   ///
   /// In en, this message translates to:
-  /// **'State Persistence'**
+  /// **'State Persistence:'**
   String get statePersistence;
 
   /// No description provided for @statePersistenceDesc.
@@ -4322,7 +4973,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsWeightDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for mechanical engineering, structural analysis, material testing, physics experiments, and any application requiring precise force measurements.'**
+  /// **'Useful for engineering calculations, physics experiments, and applications requiring force measurements.'**
   String get practicalApplicationsWeightDesc;
 
   /// No description provided for @practicalApplications.
@@ -4334,7 +4985,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Perfect for engineering, science, construction, and everyday measurements with professional accuracy.'**
+  /// **'Helpful for everyday measurements and unit conversions in various contexts.'**
   String get practicalApplicationsDesc;
 
   /// No description provided for @massConverterDetailedInfo.
@@ -4448,7 +5099,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsMassDesc.
   ///
   /// In en, this message translates to:
-  /// **'Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.'**
+  /// **'Useful for cooking measurements, basic scientific calculations, and everyday mass conversions.'**
   String get practicalApplicationsMassDesc;
 
   /// Title for area converter info dialog
@@ -4586,7 +5237,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsAreaDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements.'**
+  /// **'Helpful for home improvement projects, gardening, and basic area calculations.'**
   String get practicalApplicationsAreaDesc;
 
   /// No description provided for @timeConverterDetailedInfo.
@@ -4700,7 +5351,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsTimeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for project management, scientific calculations, programming, scheduling, performance analysis, and any application requiring precise time measurements and conversions.'**
+  /// **'Useful for scheduling, time zone conversions, and everyday time calculations.'**
   String get practicalApplicationsTimeDesc;
 
   /// No description provided for @volumeConverterDetailedInfo.
@@ -4832,7 +5483,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsVolumeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Perfect for cooking, chemistry, fluid mechanics, construction, brewing, and any application requiring precise volume measurements.'**
+  /// **'Helpful for cooking, baking, and basic volume measurements.'**
   String get practicalApplicationsVolumeDesc;
 
   /// No description provided for @volumeConverterInfo.
@@ -5072,7 +5723,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsNumberSystemDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for computer programming, digital electronics, cryptography, data encoding, memory addressing, and any application requiring number base conversions.'**
+  /// **'Useful for basic programming, learning number systems, and simple base conversions.'**
   String get practicalApplicationsNumberSystemDesc;
 
   /// No description provided for @numberSystemConverterInfo.
@@ -5270,7 +5921,7 @@ abstract class AppLocalizations {
   /// No description provided for @practicalApplicationsSpeedDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for automotive engineering, aviation, maritime navigation, physics calculations, sports analysis, and any application requiring precise speed measurements.'**
+  /// **'Helpful for travel planning, sports activities, and basic speed conversions.'**
   String get practicalApplicationsSpeedDesc;
 
   /// No description provided for @speedConverterInfo.
@@ -5438,7 +6089,7 @@ abstract class AppLocalizations {
   /// No description provided for @temperaturePracticalApplicationsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for cooking, weather monitoring, scientific research, engineering, HVAC systems, and any application requiring precise temperature measurements and conversions.'**
+  /// **'Useful for cooking, weather understanding, and basic temperature conversions.'**
   String get temperaturePracticalApplicationsDesc;
 
   /// No description provided for @temperatureConverterInfo.
@@ -5606,7 +6257,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataPracticalApplicationsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Essential for IT professionals, software developers, network administrators, file management, storage planning, bandwidth calculations, and understanding device specifications.'**
+  /// **'Helpful for understanding file sizes, storage needs, and basic data unit conversions.'**
   String get dataPracticalApplicationsDesc;
 
   /// No description provided for @dataConverterInfo.
@@ -5981,18 +6632,6 @@ abstract class AppLocalizations {
   /// **'Common Functions'**
   String get commonFunctions;
 
-  /// No description provided for @trigonometricFunctions.
-  ///
-  /// In en, this message translates to:
-  /// **'Trigonometric Functions'**
-  String get trigonometricFunctions;
-
-  /// No description provided for @logarithmicFunctions.
-  ///
-  /// In en, this message translates to:
-  /// **'Logarithmic Functions'**
-  String get logarithmicFunctions;
-
   /// No description provided for @polynomialFunctions.
   ///
   /// In en, this message translates to:
@@ -6016,12 +6655,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please check your function syntax and try again'**
   String get functionSyntaxErrorDesc;
-
-  /// No description provided for @basicOperations.
-  ///
-  /// In en, this message translates to:
-  /// **'Basic Operations'**
-  String get basicOperations;
 
   /// No description provided for @advancedFunctions.
   ///
@@ -6082,6 +6715,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remember choice'**
   String get rememberChoice;
+
+  /// No description provided for @info.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get info;
 
   /// No description provided for @yes.
   ///
@@ -6172,9 +6811,184 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lightness'**
   String get lightness;
+
+  /// No description provided for @debugCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug Cache'**
+  String get debugCache;
+
+  /// No description provided for @deletingOldLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting old logs...'**
+  String get deletingOldLogs;
+
+  /// Message showing how many old log files were deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} old log files'**
+  String deletedOldLogFiles(int count);
+
+  /// No description provided for @noOldLogFilesToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'No old log files to delete'**
+  String get noOldLogFilesToDelete;
+
+  /// Error message when deleting logs fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting logs: {error}'**
+  String errorDeletingLogs(String error);
+
+  /// No description provided for @mobileCacheDebug.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Cache Debug'**
+  String get mobileCacheDebug;
+
+  /// No description provided for @runningCacheDiagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'Running cache diagnostics...'**
+  String get runningCacheDiagnostics;
+
+  /// No description provided for @cacheDiagnosticsResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Diagnostics Results'**
+  String get cacheDiagnosticsResults;
+
+  /// No description provided for @cacheStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Status:'**
+  String get cacheStatus;
+
+  /// No description provided for @reliability.
+  ///
+  /// In en, this message translates to:
+  /// **'Reliability'**
+  String get reliability;
+
+  /// No description provided for @reliable.
+  ///
+  /// In en, this message translates to:
+  /// **'Reliable'**
+  String get reliable;
+
+  /// No description provided for @unreliable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unreliable'**
+  String get unreliable;
+
+  /// No description provided for @hasCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Has Cache'**
+  String get hasCache;
+
+  /// No description provided for @currencyState.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency State'**
+  String get currencyState;
+
+  /// No description provided for @lengthState.
+  ///
+  /// In en, this message translates to:
+  /// **'Length State'**
+  String get lengthState;
+
+  /// No description provided for @timeState.
+  ///
+  /// In en, this message translates to:
+  /// **'Time State'**
+  String get timeState;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @defaultState.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultState;
+
+  /// Generic error message with details
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {details}'**
+  String errorWithDetails(String details);
+
+  /// No description provided for @stateLoadingIssuesDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ State Loading Issues Detected'**
+  String get stateLoadingIssuesDetected;
+
+  /// No description provided for @stateLoadingIssuesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This usually happens after app updates that change data structure.'**
+  String get stateLoadingIssuesDesc;
+
+  /// No description provided for @clearAllStateData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All State Data'**
+  String get clearAllStateData;
+
+  /// No description provided for @clearingStateData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing all converter state data...'**
+  String get clearingStateData;
+
+  /// No description provided for @clearingAllConverterStateData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing all converter state data...'**
+  String get clearingAllConverterStateData;
+
+  /// No description provided for @allStateDataCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'All state data has been cleared. The app will restart to complete the process.'**
+  String get allStateDataCleared;
+
+  /// Error message when diagnostics fail
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to run diagnostics: {error}'**
+  String failedToRunDiagnostics(String error);
+
+  /// Error message when clearing state data fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clear state data: {error}'**
+  String failedToClearStateData(String error);
+
+  /// No description provided for @stateDataClearedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All state data has been cleared. The app will restart to complete the process.'**
+  String get stateDataClearedSuccess;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -6183,25 +6997,25 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'vi'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'vi'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'vi': return AppLocalizationsVi();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'vi':
+      return AppLocalizationsVi();
   }
 
   throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
-  );
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

@@ -10,6 +10,7 @@ class CalculatorLayout extends StatefulWidget {
   final bool hasHistory;
   final bool isEmbedded;
   final String title;
+  final VoidCallback? onShowInfo;
 
   const CalculatorLayout({
     super.key,
@@ -19,6 +20,7 @@ class CalculatorLayout extends StatefulWidget {
     required this.hasHistory,
     required this.isEmbedded,
     required this.title,
+    this.onShowInfo,
   });
 
   @override
@@ -161,10 +163,27 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
         appBar: AppBar(
           title: Text(widget.title),
           elevation: 0,
+          actions: _buildAppBarActions(context),
         ),
         body: content,
       );
     }
+  }
+
+  List<Widget> _buildAppBarActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (widget.onShowInfo != null) {
+      return [
+        IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: widget.onShowInfo,
+          tooltip: l10n.info,
+        ),
+      ];
+    }
+
+    return [];
   }
 }
 

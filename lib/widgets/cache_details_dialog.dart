@@ -44,6 +44,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         appSettingsDesc: loc.cacheTypeAppSettingsDesc,
         randomGeneratorsName: loc.cacheTypeRandomGenerators,
         randomGeneratorsDesc: loc.cacheTypeRandomGeneratorsDesc,
+        calculatorToolsName: loc.cacheTypeCalculatorTools,
+        calculatorToolsDesc: loc.cacheTypeCalculatorToolsDesc,
         converterToolsName: loc.cacheTypeConverterTools,
         converterToolsDesc: loc.cacheTypeConverterToolsDesc,
       );

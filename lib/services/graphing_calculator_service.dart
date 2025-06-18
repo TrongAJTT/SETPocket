@@ -135,7 +135,7 @@ class GraphingCalculatorService {
 
       if (f1.expression != f2.expression ||
           f1.isVisible != f2.isVisible ||
-          f1.color.value != f2.color.value) {
+          f1.color.toARGB32() != f2.color.toARGB32()) {
         return false;
       }
     }

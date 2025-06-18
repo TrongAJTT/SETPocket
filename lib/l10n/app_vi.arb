@@ -560,6 +560,125 @@
     "scientificCalculatorDesc": "Máy tính nâng cao với các hàm lượng giác, logarit",
     "graphingCalculator": "Máy tính Vẽ đồ thị",
     "graphingCalculatorDesc": "Vẽ và hiển thị các hàm toán học",
+    "graphingCalculatorDetailedInfo": "Thông tin Máy tính Vẽ đồ thị",
+    "graphingCalculatorOverview": "Công cụ vẽ và trực quan hóa hàm toán học chuyên nghiệp",
+    
+    "graphingKeyFeatures": "Tính năng chính",
+    "realTimePlotting": "Vẽ đồ thị thời gian thực",
+    "realTimePlottingDesc": "Hiển thị hàm số ngay lập tức khi bạn nhập với đường cong mượt mà",
+    "multipleFunction": "Nhiều hàm số",
+    "multipleFunctionDesc": "Vẽ và so sánh nhiều hàm số cùng lúc với mã màu khác nhau",
+    "interactiveControls": "Điều khiển tương tác",
+    "interactiveControlsDesc": "Zoom, di chuyển và điều hướng đồ thị bằng thao tác chạm và chuột trực quan",
+    "aspectRatioControl": "Điều khiển tỷ lệ khung hình",
+    "aspectRatioControlDesc": "Tùy chỉnh tỷ lệ trục X:Y để hiển thị hàm số tối ưu",
+    "functionHistory": "Lịch sử hàm số", 
+    "functionHistoryDesc": "Lưu và tải nhóm hàm số với tự động lưu trạng thái",
+    "mathExpressionSupport": "Hỗ trợ toán học nâng cao",
+    "mathExpressionSupportDesc": "Hỗ trợ hàm lượng giác, logarit và đa thức",
+    
+    "graphingHowToUse": "Cách sử dụng",
+    "step1Graph": "Bước 1: Nhập hàm số",
+    "step1GraphDesc": "Gõ hàm toán học vào ô nhập (ví dụ: x^2, sin(x), log(x))",
+    "step2Graph": "Bước 2: Vẽ hàm số", 
+    "step2GraphDesc": "Nhấn Enter hoặc nút thêm để vẽ hàm số lên đồ thị",
+    "step3Graph": "Bước 3: Điều hướng đồ thị",
+    "step3GraphDesc": "Dùng các nút zoom, thao tác kéo hoặc điều chỉnh tỷ lệ để xem tốt hơn",
+    "step4Graph": "Bước 4: Thêm nhiều hàm số",
+    "step4GraphDesc": "Thêm nhiều hàm số để so sánh và phân tích hành vi của chúng",
+    
+    "graphingTips": "Mẹo chuyên nghiệp",
+    "tip1Graph": "Dùng dấu ngoặc cho biểu thức phức tạp: sin(x^2) thay vì sin x^2",
+    "tip2Graph": "Hàm thông dụng: sin(x), cos(x), tan(x), log(x), sqrt(x), abs(x)",
+    "tip3Graph": "Dùng hằng số π và e: sin(π*x), e^x",
+    "tip4Graph": "Di chuyển bằng cách kéo vùng đồ thị bằng chuột hoặc chạm",
+    "tip5Graph": "Lưu nhóm hàm số vào lịch sử để truy cập nhanh sau này",
+    "tip6Graph": "Bật/tắt hiển thị hàm số bằng biểu tượng mắt mà không cần xóa",
+    "tip7Graph": "Dùng điều khiển tỷ lệ cho xem chuyên biệt (1:1 cho hình tròn, 5:1 cho dao động)",
+    
+    "supportedFunctions": "Hàm số được hỗ trợ",
+    "basicOperations": "Phép toán cơ bản",
+    "basicOperationsDesc": "Cộng (+), Trừ (-), Nhân (*), Chia (/), Lũy thừa (^)",
+    "trigonometricFunctions": "Hàm lượng giác",
+    "trigonometricFunctionsDesc": "sin(x), cos(x), tan(x) và các hàm nghịch đảo",
+    "logarithmicFunctions": "Hàm logarit", 
+    "logarithmicFunctionsDesc": "Logarit tự nhiên log(x), hàm mũ e^x",
+    "otherFunctions": "Hàm khác",
+    "otherFunctionsDesc": "Căn bậc hai sqrt(x), giá trị tuyệt đối abs(x), hàm đa thức",
+    
+    "navigationControls": "Điều khiển điều hướng",
+    "zoomControls": "Điều khiển zoom",
+    "zoomControlsDesc": "Dùng nút + và - hoặc thao tác véo để phong to và thu nhỏ",
+    "panControls": "Điều khiển di chuyển", 
+    "panControlsDesc": "Kéo đồ thị để di chuyển và khám phá các vùng khác nhau",
+    "resetControls": "Điều khiển đặt lại",
+    "resetControlsDesc": "Quay về giữa hoặc đặt lại toàn bộ đồ thị về trạng thái mặc định",
+    "aspectRatioDialog": "Tỷ lệ khung hình",
+    "aspectRatioDialogDesc": "Điều chỉnh tỷ lệ trục X:Y từ 0.1:1 đến 10:1 để xem tối ưu",
+    
+    "graphingPracticalApplications": "Ứng dụng thực tế",
+    "graphingPracticalApplicationsDesc": "Hữu ích cho học sinh học đại số và giải tích, trực quan hóa hành vi hàm số và khám phá các khái niệm toán học qua đồ thị tương tác.",
+    
+    "scientificCalculatorDetailedInfo": "Thông tin Máy tính Khoa học",
+    "scientificCalculatorOverview": "Máy tính khoa học nâng cao với các hàm toán học toàn diện",
+    
+    "scientificKeyFeatures": "Tính năng chính",
+    "realTimeCalculation": "Tính toán thời gian thực",
+    "realTimeCalculationDesc": "Xem kết quả xem trước ngay lập tức khi bạn nhập biểu thức",
+    "comprehensiveFunctions": "Hàm số toàn diện",
+    "comprehensiveFunctionsDesc": "Bộ đầy đủ các hàm lượng giác, logarit và đại số",
+    "dualAngleModes": "Chế độ góc kép",
+    "dualAngleModesDesc": "Chuyển đổi giữa radian và độ cho tính toán lượng giác",
+    "secondaryFunctions": "Hàm phụ",
+    "secondaryFunctionsDesc": "Truy cập các hàm mở rộng với nút chuyển đổi 2nd",
+    "calculationHistory": "Lịch sử tính toán",
+    "calculationHistoryDesc": "Tự động lưu và duyệt các phép tính trước đó",
+    "memoryOperations": "Thao tác bộ nhớ",
+    "memoryOperationsDesc": "Lưu trữ và gọi lại giá trị với các hàm quản lý bộ nhớ",
+    
+    "scientificHowToUse": "Cách sử dụng",
+    "step1Scientific": "Bước 1: Nhập biểu thức",
+    "step1ScientificDesc": "Gõ số và sử dụng các nút hàm để xây dựng biểu thức toán học",
+    "step2Scientific": "Bước 2: Sử dụng hàm",
+    "step2ScientificDesc": "Truy cập các hàm lượng giác, logarit và đại số từ bàn phím",
+    "step3Scientific": "Bước 3: Chuyển đổi chế độ",
+    "step3ScientificDesc": "Chuyển đổi giữa radian/độ và hàm chính/phụ khi cần",
+    "step4Scientific": "Bước 4: Xem kết quả",
+    "step4ScientificDesc": "Nhấn = để tính toán hoặc xem xem trước thời gian thực khi nhập",
+    
+    "scientificTips": "Mẹo chuyên nghiệp",
+    "tip1Scientific": "Dùng dấu ngoặc để kiểm soát thứ tự tính toán: sin(π/2) thay vì sin π/2",
+    "tip2Scientific": "Nhấn 2nd để truy cập hàm phụ như asin, acos, atan",
+    "tip3Scientific": "Chuyển chế độ Rad/Deg cho hàm lượng giác (mặc định là radian)",
+    "tip4Scientific": "Dùng hàm bộ nhớ để lưu kết quả trung gian",
+    "tip5Scientific": "Xem lịch sử tính toán để xem lại và tái sử dụng biểu thức trước đó",
+    "tip6Scientific": "Xem trước thời gian thực hiển thị kết quả trước khi nhấn bằng",
+    "tip7Scientific": "Dùng hằng số π và e cho tính toán toán học chính xác",
+    
+    "scientificFunctionCategories": "Danh mục hàm",
+    "basicArithmetic": "Số học cơ bản",
+    "basicArithmeticDesc": "Cộng (+), Trừ (-), Nhân (*), Chia (/)",
+    "trigonometricFunctionsScientific": "Hàm lượng giác",
+    "trigonometricFunctionsScientificDesc": "sin, cos, tan và các hàm nghịch đảo (asin, acos, atan)",
+    "logarithmicFunctionsScientific": "Hàm logarit",
+    "logarithmicFunctionsScientificDesc": "Logarit tự nhiên (ln), logarit thường (log), mũ (exp, eˣ, 10ˣ)",
+    "algebraicFunctions": "Hàm đại số",
+    "algebraicFunctionsDesc": "Lũy thừa (x², x³, xʸ), căn (√, ∛), giai thừa (n!), giá trị tuyệt đối (|x|)",
+    
+    "scientificModeControls": "Điều khiển chế độ",
+    "angleMode": "Chế độ góc",
+    "angleModeDesc": "Chuyển đổi giữa Radian và Độ cho tính toán lượng giác",
+    "functionToggle": "Chuyển đổi hàm",
+    "functionToggleDesc": "Nhấn 2nd để chuyển đổi giữa bộ hàm chính và phụ",
+    "memoryFunctions": "Hàm bộ nhớ",
+    "memoryFunctionsDesc": "Lưu trữ, gọi lại và quản lý giá trị trong bộ nhớ máy tính",
+    "historyAccess": "Truy cập lịch sử",
+    "historyAccessDesc": "Duyệt các phép tính trước đó và tái sử dụng biểu thức",
+    
+    "scientificPracticalApplications": "Ứng dụng thực tế",
+    "scientificPracticalApplicationsDesc": "Hữu ích cho học sinh trong các môn toán và khoa học, thực hiện phép tính cần các hàm lượng giác, logarit và đại số.",
+    "scientificCalculatorPracticalApplications": "Ứng dụng thực tế",
+    "scientificCalculatorPracticalApplicationsDesc": "Hữu ích cho học sinh trong các khóa học toán và khoa học, tính toán kỹ thuật cơ bản và giải quyết vấn đề hàng ngày liên quan đến các phép toán phức tạp.",
     
     "currencyFetchMode": "Tải tỷ giá Tiền tệ",
     "currencyFetchModeDesc": "Chọn cách cập nhật tỷ giá hối đoái",
@@ -698,7 +817,9 @@
   "loadingLogContent": "Đang tải nội dung log...",
   "largeFileDetected": "Phát hiện file lớn. Đang sử dụng tải tối ưu...",
 
-  "cacheTypeConverterTools": "Công cụ chuyển đổi",
+      "cacheTypeCalculatorTools": "Công cụ Tính toán",
+    "cacheTypeCalculatorToolsDesc": "Lịch sử tính toán, dữ liệu máy tính đồ thị và cài đặt",
+    "cacheTypeConverterTools": "Công cụ chuyển đổi",
     "cacheTypeConverterToolsDesc": "Trạng thái tiền tệ/chiều dài, cài đặt sẵn và bộ nhớ đệm tỷ giá",
 
     "cardName": "Tên Thẻ",
@@ -893,7 +1014,7 @@
     "lengthUnitRange": "Phạm Vi Đơn Vị Hỗ Trợ",
     "lengthUnitRangeDesc": "Từ phép đo dưới nguyên tử (angstrom) đến thiên văn (năm ánh sáng) với độ chính xác được duy trì xuyên suốt.",
     "practicalApplications": "Ứng Dụng Thực Tế",
-    "practicalApplicationsDesc": "Hoàn hảo cho kỹ thuật, khoa học, xây dựng và các phép đo hàng ngày với độ chính xác chuyên nghiệp.",
+    "practicalApplicationsDesc": "Hữu ích cho các phép đo hàng ngày và chuyển đổi đơn vị trong nhiều tình huống.",
     
     "massConverterDetailedInfo": "Bộ Chuyển Đổi Khối Lượng - Thông Tin Chi Tiết",
     "massConverterOverview": "Bộ chuyển đổi khối lượng chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng khoa học, y tế và thương mại.",
@@ -913,7 +1034,7 @@
     "tip6Mass": "• Sử dụng cấu hình để lưu các tổ hợp đơn vị yêu thích",
     "massUnitSystems": "Hệ Thống Đơn Vị Hỗ Trợ",
     "massUnitSystemsDesc": "Hệ mét (ng đến tấn), hệ Anh (hạt đến tấn), troy (kim loại quý), dược sĩ (dược phẩm), và đơn vị đặc biệt (carat, slug, đơn vị khối lượng nguyên tử).",
-    "practicalApplicationsMassDesc": "Hoàn hảo cho hóa học, dược phẩm, giao dịch kim loại quý, vận chuyển, nấu ăn và nghiên cứu khoa học với độ chính xác chuyên nghiệp.",
+    "practicalApplicationsMassDesc": "Hữu ích cho việc nấu ăn, tính toán khoa học cơ bản và chuyển đổi khối lượng hàng ngày.",
     
     "weightConverterDetailedInfo": "Bộ Chuyển Đổi Trọng Lượng - Thông Tin Chi Tiết",
     "weightConverterOverview": "Bộ chuyển đổi trọng lượng/lực chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng kỹ thuật, vật lý và khoa học.",
@@ -940,7 +1061,7 @@
     "uncommonUnitsWeightDesc": "Tấn-lực (tf) - cho các phép đo lực rất lớn trong công nghiệp nặng.",
     "specialUnits": "Đơn Vị Đặc Biệt",
     "specialUnitsWeightDesc": "Gram-lực (gf), Troy pound-lực - cho các phép đo chính xác và kim loại quý.",
-    "practicalApplicationsWeightDesc": "Thiết yếu cho kỹ thuật cơ khí, phân tích kết cấu, thử nghiệm vật liệu, thí nghiệm vật lý và bất kỳ ứng dụng nào yêu cầu đo lực chính xác.",
+    "practicalApplicationsWeightDesc": "Hữu ích cho các tính toán kỹ thuật, thí nghiệm vật lý và ứng dụng cần đo lực.",
     
     "areaConverter": "Chuyển đổi Diện tích",
     "@areaConverter": {
@@ -978,7 +1099,7 @@
     "commonUnitsAreaDesc": "Mét vuông (m²), Kilômét vuông (km²), Centimet vuông (cm²) - các đơn vị hệ mét được sử dụng thường xuyên nhất.",
     "lessCommonUnitsAreaDesc": "Héc-ta (ha), Acre (ac), Foot vuông (ft²), Inch vuông (in²) - ứng dụng chuyên biệt trong nông nghiệp và xây dựng.",
     "uncommonUnitsAreaDesc": "Yard vuông (yd²), Mile vuông (mi²), Rood - cho các phép đo khu vực hoặc lịch sử cụ thể.",
-    "practicalApplicationsAreaDesc": "Thiết yếu cho bất động sản, nông nghiệp, xây dựng, quy hoạch đô thị, khảo sát đất đai và bất kỳ ứng dụng nào yêu cầu đo diện tích chính xác.",
+    "practicalApplicationsAreaDesc": "Hữu ích cho các dự án cải tạo nhà cửa, làm vườn và tính toán diện tích cơ bản.",
     "timeConverterDetailedInfo": "Chuyển đổi Thời gian - Thông tin Chi tiết",
     "timeConverterOverview": "Chuyển đổi đơn vị thời gian toàn diện với tính toán chính xác và hỗ trợ nhiều đơn vị.",
     "step1Time": "Bước 1: Chọn Đơn vị Thời gian",
@@ -997,7 +1118,7 @@
     "tip6Time": "• Chế độ tập trung giúp tập trung vào các phép tính thời gian phức tạp",
     "timeUnitSystems": "Hệ Thống Đơn vị Thời gian",
     "timeUnitSystemsDesc": "Hỗ trợ đơn vị thời gian tiêu chuẩn (s, min, h, d, wk, mo, yr), đơn vị chính xác (ms, μs, ns), và đơn vị mở rộng (thập kỷ, thế kỷ, thiên niên kỷ) để đo thời gian toàn diện trên mọi quy mô.",
-    "practicalApplicationsTimeDesc": "Thiết yếu cho quản lý dự án, tính toán khoa học, lập trình, lập lịch, phân tích hiệu suất và bất kỳ ứng dụng nào yêu cầu đo lường và chuyển đổi thời gian chính xác.",
+    "practicalApplicationsTimeDesc": "Hữu ích cho việc lập lịch, chuyển đổi múi giờ và tính toán thời gian hàng ngày.",
     
     "volumeConverterDetailedInfo": "Bộ Chuyển Đổi Thể Tích - Thông Tin Chi Tiết",
     "volumeConverterOverview": "Bộ chuyển đổi thể tích chính xác này hỗ trợ nhiều hệ thống đơn vị với tính toán độ chính xác cao cho ứng dụng nấu ăn, hóa học, kỹ thuật và khoa học.",
@@ -1020,7 +1141,7 @@
     "lessCommonUnitsVolumeDesc": "Gallon (Mỹ/Anh), Foot khối (ft³), Quart, Pint - đơn vị hệ Anh và Mỹ.",
     "uncommonUnitsVolumeDesc": "Héc-tô-lít (hL), Thùng (bbl), Cup, Ounce chất lỏng - ứng dụng chuyên biệt.",
     "specialUnitsVolumeDesc": "Centimet khối (cm³), Inch khối (in³), Yard khối (yd³) - đơn vị kỹ thuật và xây dựng.",
-    "practicalApplicationsVolumeDesc": "Hoàn hảo cho nấu ăn, hóa học, cơ học chất lỏng, xây dựng, pha chế và bất kỳ ứng dụng nào yêu cầu đo thể tích chính xác.",
+    "practicalApplicationsVolumeDesc": "Hữu ích cho việc nấu ăn, làm bánh và đo thể tích cơ bản.",
     "volumeConverterInfo": "Thông tin Chuyển đổi Thể tích",
     "customizeVolumeUnits": "Tùy chỉnh đơn vị thể tích",
     "selectVolumeUnits": "Chọn đơn vị thể tích để hiển thị",
@@ -1062,7 +1183,7 @@
     "commonBasesDesc": "Nhị phân (Cơ số 2), Thập phân (Cơ số 10), Thập lục phân (Cơ số 16) - được sử dụng thường xuyên nhất trong máy tính và toán học.",
     "lessCommonBasesDesc": "Bát phân (Cơ số 8), Cơ số 32, Cơ số 64 - ứng dụng chuyên biệt trong lập trình và mã hóa dữ liệu.",
     "uncommonBasesDesc": "Cơ số 128, Cơ số 256 - cho biểu diễn dữ liệu nâng cao và thuật toán chuyên biệt.",
-    "practicalApplicationsNumberSystemDesc": "Thiết yếu cho lập trình máy tính, điện tử số, mật mã học, mã hóa dữ liệu, địa chỉ bộ nhớ và bất kỳ ứng dụng nào yêu cầu chuyển đổi hệ cơ số.",
+    "practicalApplicationsNumberSystemDesc": "Hữu ích cho lập trình cơ bản, học hệ số và chuyển đổi cơ số đơn giản.",
     "numberSystemConverterInfo": "Thông tin Chuyển đổi Hệ Số",
     "customizeNumberSystemBases": "Tùy chỉnh Hệ Cơ Số",
     "selectNumberSystemBases": "Chọn hệ cơ số để hiển thị",
@@ -1099,7 +1220,7 @@
     "tip6Speed": "• Mach biểu thị tốc độ âm thanh, quan trọng trong hàng không siêu âm",
     "speedUnitRange": "Phạm Vi Đơn Vị Hỗ Trợ",
     "speedUnitRangeDesc": "Từ tốc độ vi mô (mm/s) đến siêu âm (Mach) với độ chính xác được duy trì cho mọi ứng dụng.",
-    "practicalApplicationsSpeedDesc": "Hoàn hảo cho ô tô, hàng không, hàng hải, thể thao, khoa học và bất kỳ ứng dụng nào yêu cầu đo tốc độ chính xác.",
+    "practicalApplicationsSpeedDesc": "Hữu ích cho việc lập kế hoạch du lịch, hoạt động thể thao và chuyển đổi tốc độ cơ bản.",
     "feetPerSecond": "Feet/giây",
     "mach": "Mach",
     "speedUnitCategories": "Danh Mục Đơn Vị Tốc Độ",
@@ -1132,7 +1253,7 @@
     "temperatureLessCommonUnitsDesc": "Kelvin (K) - thang đo nhiệt độ tuyệt đối được sử dụng trong ứng dụng khoa học và kỹ thuật.",
     "temperatureRareUnits": "Thang Đo Chuyên Biệt",
     "temperatureRareUnitsDesc": "Rankine (°R), Réaumur (°Ré), Delisle (°De) - thang đo nhiệt độ lịch sử và chuyên biệt cho các ứng dụng cụ thể.",
-    "temperaturePracticalApplicationsDesc": "Thiết yếu cho nấu ăn, giám sát thời tiết, nghiên cứu khoa học, kỹ thuật, hệ thống HVAC và bất kỳ ứng dụng nào yêu cầu đo lường và chuyển đổi nhiệt độ chính xác.",
+    "temperaturePracticalApplicationsDesc": "Hữu ích cho việc nấu ăn, hiểu thời tiết và chuyển đổi nhiệt độ cơ bản.",
     "temperatureConverterInfo": "Thông Tin Chuyển Đổi Nhiệt Độ",
     "customizeTemperatureUnits": "Tùy Chỉnh Thang Đo Nhiệt Độ",
     "selectTemperatureUnits": "Chọn thang đo nhiệt độ để hiển thị",
@@ -1161,7 +1282,7 @@
     "dataLessCommonUnitsDesc": "Terabyte (TB), Petabyte (PB), và đơn vị Byte (B) cơ bản cho ứng dụng lưu trữ chuyên biệt và đo lường dữ liệu rất lớn hoặc rất nhỏ.",
     "dataRareUnits": "Đơn Vị Mạng",
     "dataRareUnitsDesc": "Bit, Kilobit (Kbit), Megabit (Mbit), Gigabit (Gbit) chủ yếu được sử dụng cho tốc độ mạng và tốc độ truyền dữ liệu.",
-    "dataPracticalApplicationsDesc": "Thiết yếu cho chuyên gia IT, nhà phát triển phần mềm, quản trị viên mạng, quản lý file, lập kế hoạch lưu trữ, tính toán băng thông và hiểu thông số kỹ thuật thiết bị.",
+    "dataPracticalApplicationsDesc": "Hữu ích cho việc hiểu kích thước file, nhu cầu lưu trữ và chuyển đổi đơn vị dữ liệu cơ bản.",
     "dataConverterInfo": "Thông Tin Chuyển Đổi Dung Lượng Lưu Trữ",
     "customizeDataUnits": "Tùy Chỉnh Đơn Vị Dung Lượng Lưu Trữ",
     "selectDataUnits": "Chọn đơn vị dung lượng lưu trữ để hiển thị",
@@ -1252,6 +1373,7 @@
     "saveCurrentGroupQuestion": "Bạn có muốn lưu nhóm hàm hiện tại vào lịch sử không?",
     "dontAskAgain": "Không hỏi lại",
     "rememberChoice": "Ghi nhớ lựa chọn",
+    "info": "Thông tin",
     "yes": "Có",
     "no": "Không",
     "functionGroup": "Nhóm hàm",
@@ -1268,5 +1390,96 @@
     "select": "Chọn",
     "hue": "Sắc độ",
     "saturation": "Độ bão hòa",
-    "lightness": "Độ sáng"
+    "lightness": "Độ sáng",
+    "cacheWithLogSize": "Bộ nhớ đệm: {cacheSize} (+{logSize} nhật ký)",
+    "@cacheWithLogSize": {
+        "description": "Thông tin bộ nhớ đệm với kích thước log",
+        "placeholders": {
+            "cacheSize": {
+                "type": "String",
+                "example": "180.5KB"
+            },
+            "logSize": {
+                "type": "String",
+                "example": "3.05MB"
+            }
+        }
+    },
+    "debugCache": "Debug Cache",
+    "deletingOldLogs": "Đang xóa log cũ...",
+    "deletedOldLogFiles": "Đã xóa {count} file log cũ",
+    "@deletedOldLogFiles": {
+        "description": "Thông báo số file log cũ đã được xóa",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "3"
+            }
+        }
+    },
+    "noOldLogFilesToDelete": "Không có file log cũ nào để xóa",
+    "errorDeletingLogs": "Lỗi khi xóa log: {error}",
+    "@errorDeletingLogs": {
+        "description": "Thông báo lỗi khi xóa log thất bại",
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Không có quyền truy cập"
+            }
+        }
+    },
+    "mobileCacheDebug": "Mobile Cache Debug",
+    "runningCacheDiagnostics": "Đang chạy kiểm tra cache...",
+    "cacheDiagnosticsResults": "Kết quả Kiểm tra Cache",
+    "cacheStatus": "Trạng thái Cache:",
+    "reliability": "Độ tin cậy",
+    "reliable": "Tin cậy",
+    "unreliable": "Không tin cậy",
+    "hasCache": "Có Cache",
+    "statePersistence": "Duy trì Trạng thái:",
+    "currencyState": "Trạng thái Tiền tệ",
+    "lengthState": "Trạng thái Độ dài",
+    "timeState": "Trạng thái Thời gian",
+    "saved": "Đã lưu",
+    "defaultState": "Mặc định",
+    "errorWithDetails": "Lỗi: {details}",
+    "@errorWithDetails": {
+        "description": "Thông báo lỗi chung với chi tiết",
+        "placeholders": {
+            "details": {
+                "type": "String",
+                "example": "Kết nối thất bại"
+            }
+        }
+    },
+    "stateLoadingIssuesDetected": "⚠️ Phát hiện vấn đề tải trạng thái",
+    "stateLoadingIssuesDesc": "Điều này thường xảy ra sau khi cập nhật ứng dụng thay đổi cấu trúc dữ liệu.",
+    "clearAllStateData": "Xóa tất cả dữ liệu trạng thái",
+    "clearingStateData": "Đang xóa dữ liệu trạng thái",
+    "clearingAllConverterStateData": "Đang xóa tất cả dữ liệu trạng thái converter...",
+    "success": "Thành công",
+    "allStateDataCleared": "Tất cả dữ liệu trạng thái đã được xóa. Ứng dụng sẽ khởi động lại để hoàn tất quá trình.",
+    "failedToRunDiagnostics": "Thất bại khi chạy kiểm tra: {error}",
+    "@failedToRunDiagnostics": {
+        "description": "Thông báo lỗi khi kiểm tra thất bại",
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Lỗi mạng"
+            }
+        }
+    },
+    "failedToClearStateData": "Thất bại khi xóa dữ liệu trạng thái: {error}",
+    "@failedToClearStateData": {
+        "description": "Thông báo lỗi khi xóa dữ liệu trạng thái thất bại",
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Không có quyền truy cập"
+            }
+        }
+    },
+    "clearingStateData": "Đang xóa tất cả dữ liệu trạng thái converter...",
+    "stateDataClearedSuccess": "Tất cả dữ liệu trạng thái đã được xóa. Ứng dụng sẽ khởi động lại để hoàn tất quá trình.",
+    "ok": "OK"
 }

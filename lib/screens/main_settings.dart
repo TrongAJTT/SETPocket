@@ -116,10 +116,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     }
 
     try {
-      final totalSize = await CacheService.getTotalCacheSize();
+      final totalCacheSize = await CacheService.getTotalCacheSize();
+      final totalLogSize = await CacheService.getTotalLogSize();
+
       if (mounted) {
         setState(() {
-          _cacheInfo = CacheService.formatCacheSize(totalSize);
+          final cacheFormated = CacheService.formatCacheSize(totalCacheSize);
+          final logFormated = CacheService.formatCacheSize(totalLogSize);
+          _cacheInfo = l10n.cacheWithLogSize(cacheFormated, logFormated);
         });
       }
     } catch (e) {
@@ -1243,11 +1247,15 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: 8),
-        Text(
-          '${loc.cache}: $_cacheInfo',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+        Expanded(
+          child: Text(
+            _cacheInfo,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -1305,7 +1313,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     if (kDebugMode) {
       debugButton = OutlinedButton.icon(
         icon: const Icon(Icons.bug_report_outlined),
-        label: const Text('Debug Cache'),
+        label: Text(loc.debugCache),
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: EdgeInsets.symmetric(
@@ -1580,7 +1588,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                   const SizedBox(height: 16),
                   _buildLogRetentionSettings(loc),
                   const SizedBox(height: 16),
-                  _buildLogViewer(loc),
+                  _buildLogManagementButtons(loc),
                 ],
               ),
             ),
@@ -1705,15 +1713,35 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     ]);
   }
 
-  Widget _buildLogViewer(AppLocalizations loc) {
-    return OutlinedButton.icon(
-      icon: const Icon(Icons.visibility_outlined),
-      label: Text(loc.viewLogs),
-      style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
-      onPressed: _showLogViewer,
+  Widget _buildLogManagementButtons(AppLocalizations loc) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.visibility_outlined),
+            label: Text(loc.viewLogs),
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            onPressed: _showLogViewer,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.delete_sweep_outlined),
+            label: Text(loc.clearLogs),
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            onPressed: _forceCleanupLogs,
+          ),
+        ),
+      ],
     );
   }
 
@@ -1771,19 +1799,77 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     await SettingsService.updateLogRetentionDays(days);
   }
 
+  Future<void> _forceCleanupLogs() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Expanded(child: Text(l10n.deletingOldLogs)),
+            ],
+          ),
+        ),
+      );
+
+      // Force cleanup
+      final deletedCount = await AppLogger.instance.forceCleanupNow();
+
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
+
+      // Pre-compute message
+      final message = deletedCount > 0
+          ? l10n.deletedOldLogFiles(deletedCount)
+          : l10n.noOldLogFilesToDelete;
+
+      // Show result
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
+
+      // Show error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorDeletingLogs(e.toString())),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
   // Debug function for mobile cache issues
   Future<void> _debugMobileCache() async {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        title: Text('Mobile Cache Debug'),
+      builder: (context) => AlertDialog(
+        title: Text(l10n.mobileCacheDebug),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Running cache diagnostics...'),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
+            Text(l10n.runningCacheDiagnostics),
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(),
           ],
         ),
       ),
@@ -1795,6 +1881,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       final settings = await SettingsService.getSettings();
       final hasCache = await CurrencyCacheService.hasCachedData();
 
+      // Pre-compute localized strings
+      final savedText = '✓ ${l10n.saved}';
+      final defaultText = l10n.defaultState;
+
       // Test state loading with error handling
       String currencyStateResult = '✗ Error';
       String lengthStateResult = '✗ Error';
@@ -1802,29 +1892,29 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
       try {
         await CurrencyStateService.loadState();
-        currencyStateResult = '✓ Saved';
+        currencyStateResult = savedText;
       } catch (e) {
         logError('Currency state load error: $e');
         currencyStateResult =
-            '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
+            '✗ $defaultText (Error: ${e.toString().substring(0, 30)}...)';
       }
 
       try {
         await LengthStateService.loadState();
-        lengthStateResult = '✓ Saved';
+        lengthStateResult = savedText;
       } catch (e) {
         logError('Length state load error: $e');
         lengthStateResult =
-            '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
+            '✗ $defaultText (Error: ${e.toString().substring(0, 30)}...)';
       }
 
       try {
         await TimeStateService.loadState();
-        timeStateResult = '✓ Saved';
+        timeStateResult = savedText;
       } catch (e) {
         logError('Time state load error: $e');
         timeStateResult =
-            '✗ Default (Error: ${e.toString().substring(0, 30)}...)';
+            '✗ $defaultText (Error: ${e.toString().substring(0, 30)}...)';
       }
 
       // Close loading dialog
@@ -1832,73 +1922,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
       // Show results
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Cache Diagnostics Results'),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Cache Status:',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(
-                      '• Reliability: ${isReliable ? "✓ Reliable" : "✗ Unreliable"}'),
-                  Text('• Has Cache: ${hasCache ? "✓ Yes" : "✗ No"}'),
-                  const SizedBox(height: 12),
-                  const Text('Settings:',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(
-                      '• Feature State Saving: ${settings.featureStateSavingEnabled ? "✓ Enabled" : "✗ Disabled"}'),
-                  const SizedBox(height: 12),
-                  const Text('State Persistence:',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('• Currency State: $currencyStateResult'),
-                  Text('• Length State: $lengthStateResult'),
-                  Text('• Time State: $timeStateResult'),
-                  if (currencyStateResult.contains('Error') ||
-                      lengthStateResult.contains('Error') ||
-                      timeStateResult.contains('Error')) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade100,
-                        border: Border.all(color: Colors.orange),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('⚠️ State Loading Issues Detected',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          const Text(
-                              'This usually happens after app updates that change data structure.'),
-                          const SizedBox(height: 8),
-                          ElevatedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              await _clearAllStateData();
-                            },
-                            child: const Text('Clear All State Data'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-        );
+        _showDiagnosticsResults(l10n, isReliable, hasCache, settings,
+            currencyStateResult, lengthStateResult, timeStateResult);
       }
     } catch (e) {
       // Close loading dialog
@@ -1908,12 +1933,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed to run diagnostics: $e'),
+            title: Text(l10n.errorLabel),
+            content: Text(l10n.failedToRunDiagnostics(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.close),
               ),
             ],
           ),
@@ -1922,18 +1947,98 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     }
   }
 
+  void _showDiagnosticsResults(
+    AppLocalizations l10n,
+    bool isReliable,
+    bool hasCache,
+    dynamic settings,
+    String currencyStateResult,
+    String lengthStateResult,
+    String timeStateResult,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.cacheDiagnosticsResults),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.cacheStatus,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                  '• ${l10n.reliability}: ${isReliable ? "✓ ${l10n.reliable}" : "✗ ${l10n.unreliable}"}'),
+              Text(
+                  '• ${l10n.hasCache}: ${hasCache ? "✓ ${l10n.yes}" : "✗ ${l10n.no}"}'),
+              const SizedBox(height: 12),
+              Text(l10n.settings,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                  '• Feature State Saving: ${settings.featureStateSavingEnabled ? "✓ Enabled" : "✗ Disabled"}'),
+              const SizedBox(height: 12),
+              Text(l10n.statePersistence,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text('• ${l10n.currencyState}: $currencyStateResult'),
+              Text('• ${l10n.lengthState}: $lengthStateResult'),
+              Text('• ${l10n.timeState}: $timeStateResult'),
+              if (currencyStateResult.contains('Error') ||
+                  lengthStateResult.contains('Error') ||
+                  timeStateResult.contains('Error')) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    border: Border.all(color: Colors.orange),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.stateLoadingIssuesDetected,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text(l10n.stateLoadingIssuesDesc),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          await _clearAllStateData();
+                        },
+                        child: Text(l10n.clearAllStateData),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.close),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _clearAllStateData() async {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        title: Text('Clearing State Data'),
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearAllStateData),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Clearing all converter state data...'),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
+            Text(l10n.clearingStateData),
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(),
           ],
         ),
       ),
@@ -1952,9 +2057,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Success'),
-            content: const Text(
-                'All state data has been cleared. The app will restart to complete the process.'),
+            title: Text(l10n.success),
+            content: Text(l10n.stateDataClearedSuccess),
             actions: [
               TextButton(
                 onPressed: () {
@@ -1963,7 +2067,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil('/', (route) => false);
                 },
-                child: const Text('OK'),
+                child: Text(l10n.ok),
               ),
             ],
           ),
@@ -1976,12 +2080,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed to clear state data: $e'),
+            title: Text(l10n.errorLabel),
+            content: Text(l10n.failedToClearStateData(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.close),
               ),
             ],
           ),

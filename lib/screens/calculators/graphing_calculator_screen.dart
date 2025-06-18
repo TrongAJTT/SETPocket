@@ -797,6 +797,486 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
     await _loadHistory();
   }
 
+  void _showGraphingCalculatorInfo() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          width: isDesktop ? 600 : screenWidth * 0.9,
+          height: isDesktop ? 700 : MediaQuery.of(context).size.height * 0.8,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.onPrimary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.auto_graph,
+                        color: theme.colorScheme.onPrimary,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.graphingCalculatorDetailedInfo,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.graphingCalculatorOverview,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary
+                                  .withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Key Features
+                      _buildInfoSection(
+                        theme,
+                        l10n.graphingKeyFeatures,
+                        Icons.star_outline,
+                        Colors.orange,
+                        [
+                          _buildFeatureItem(theme, l10n.realTimePlotting,
+                              l10n.realTimePlottingDesc, Icons.speed),
+                          _buildFeatureItem(theme, l10n.multipleFunction,
+                              l10n.multipleFunctionDesc, Icons.functions),
+                          _buildFeatureItem(theme, l10n.interactiveControls,
+                              l10n.interactiveControlsDesc, Icons.touch_app),
+                          _buildFeatureItem(theme, l10n.aspectRatioControl,
+                              l10n.aspectRatioControlDesc, Icons.aspect_ratio),
+                          _buildFeatureItem(theme, l10n.functionHistory,
+                              l10n.functionHistoryDesc, Icons.history),
+                          _buildFeatureItem(theme, l10n.mathExpressionSupport,
+                              l10n.mathExpressionSupportDesc, Icons.calculate),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // How to Use
+                      _buildInfoSection(
+                        theme,
+                        l10n.graphingHowToUse,
+                        Icons.help_outline,
+                        Colors.blue,
+                        [
+                          _buildStepItem(
+                              theme, l10n.step1Graph, l10n.step1GraphDesc),
+                          _buildStepItem(
+                              theme, l10n.step2Graph, l10n.step2GraphDesc),
+                          _buildStepItem(
+                              theme, l10n.step3Graph, l10n.step3GraphDesc),
+                          _buildStepItem(
+                              theme, l10n.step4Graph, l10n.step4GraphDesc),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Tips
+                      _buildInfoSection(
+                        theme,
+                        l10n.graphingTips,
+                        Icons.lightbulb_outline,
+                        Colors.green,
+                        [
+                          _buildTipItem(theme, l10n.tip1Graph),
+                          _buildTipItem(theme, l10n.tip2Graph),
+                          _buildTipItem(theme, l10n.tip3Graph),
+                          _buildTipItem(theme, l10n.tip4Graph),
+                          _buildTipItem(theme, l10n.tip5Graph),
+                          _buildTipItem(theme, l10n.tip6Graph),
+                          _buildTipItem(theme, l10n.tip7Graph),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Supported Functions
+                      _buildInfoSection(
+                        theme,
+                        l10n.supportedFunctions,
+                        Icons.category,
+                        Colors.purple,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.basicOperations,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.basicOperationsDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.trigonometricFunctions,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.trigonometricFunctionsDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.logarithmicFunctions,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.logarithmicFunctionsDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.otherFunctions,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.otherFunctionsDesc,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Navigation Controls
+                      _buildInfoSection(
+                        theme,
+                        l10n.navigationControls,
+                        Icons.navigation,
+                        Colors.indigo,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.zoomControls,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.zoomControlsDesc,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.panControls,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.panControlsDesc,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.resetControls,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.resetControlsDesc,
+                                    style: theme.textTheme.bodySmall),
+                                const SizedBox(height: 12),
+                                Text(
+                                  l10n.aspectRatioDialog,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(l10n.aspectRatioDialogDesc,
+                                    style: theme.textTheme.bodySmall),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Practical Applications
+                      _buildInfoSection(
+                        theme,
+                        l10n.graphingPracticalApplications,
+                        Icons.build,
+                        Colors.teal,
+                        [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              l10n.graphingPracticalApplicationsDesc,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.check),
+                      label: Text(l10n.close),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(ThemeData theme, String title, IconData icon,
+      Color color, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: Column(children: children),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(
+      ThemeData theme, String title, String description, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepItem(ThemeData theme, String step, String description) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                step.substring(5, 6), // Extract step number
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  step,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTipItem(ThemeData theme, String tip) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      child: Text(
+        tip,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -923,8 +1403,13 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
     final l10n = AppLocalizations.of(context)!;
 
     if (isMobile) {
-      // Mobile: Show only aspect ratio and context menu
+      // Mobile: Show info and aspect ratio buttons, plus context menu for other actions
       return [
+        IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: _showGraphingCalculatorInfo,
+          tooltip: l10n.info,
+        ),
         IconButton(
           icon: const Icon(Icons.aspect_ratio),
           onPressed: _showAspectRatioDialog,
@@ -965,6 +1450,11 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
     } else {
       // Desktop: Show all buttons
       return [
+        IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: _showGraphingCalculatorInfo,
+          tooltip: l10n.info,
+        ),
         IconButton(
           icon: const Icon(Icons.aspect_ratio),
           onPressed: _showAspectRatioDialog,

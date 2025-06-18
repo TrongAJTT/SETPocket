@@ -66,6 +66,9 @@ class AppLogger {
       // Setup daily cleanup
       _setupDailyCleanup();
 
+      // Trigger initial cleanup on startup to handle any missed cleanups
+      _performInitialCleanup();
+
       _isInitialized = true;
 
       if (kReleaseMode) {
@@ -275,6 +278,16 @@ class AppLogger {
   void _performCleanup() {
     cleanupOldLogs().catchError((e) {
       if (kDebugMode) print('[LOG_ERROR] Cleanup failed: $e');
+    });
+  }
+
+  /// Perform initial cleanup on startup (delayed to avoid blocking initialization)
+  void _performInitialCleanup() {
+    // Delay initial cleanup to not block app startup
+    Timer(const Duration(seconds: 5), () {
+      cleanupOldLogs().catchError((e) {
+        if (kDebugMode) print('[LOG_ERROR] Initial cleanup failed: $e');
+      });
     });
   }
 
@@ -499,6 +512,8 @@ class AppLogger {
           if (lastModified.isBefore(cutoffTime)) {
             await file.delete();
             deletedCount++;
+            info(
+                'Deleted old log file: ${file.path} (${lastModified.toString().split(' ')[0]})');
           }
         } catch (e) {
           warning('Failed to delete log file ${file.path}: $e');
@@ -506,10 +521,50 @@ class AppLogger {
       }
 
       if (deletedCount > 0) {
-        info('Cleanup completed: $deletedCount log files deleted');
+        info(
+            'Log cleanup completed: $deletedCount log files deleted (retention: ${retentionDays}d)');
+      } else {
+        info(
+            'Log cleanup completed: No old files to delete (retention: ${retentionDays}d)');
       }
     } catch (e) {
       error('Log cleanup failed: $e');
+    }
+  }
+
+  /// Force cleanup now - manual trigger for immediate cleanup
+  Future<int> forceCleanupNow() async {
+    try {
+      final retentionDays = await SettingsService.getLogRetentionDays();
+      if (retentionDays == -1) {
+        info('Force cleanup skipped: retention set to keep forever');
+        return 0; // Keep forever
+      }
+
+      final files = await getLogFiles();
+      final cutoffTime = DateTime.now().subtract(Duration(days: retentionDays));
+
+      int deletedCount = 0;
+      for (final file in files) {
+        try {
+          final lastModified = await file.lastModified();
+          if (lastModified.isBefore(cutoffTime)) {
+            await file.delete();
+            deletedCount++;
+            info(
+                'Force deleted old log file: ${file.path} (${lastModified.toString().split(' ')[0]})');
+          }
+        } catch (e) {
+          warning('Failed to force delete log file ${file.path}: $e');
+        }
+      }
+
+      info(
+          'Force cleanup completed: $deletedCount log files deleted (retention: ${retentionDays}d)');
+      return deletedCount;
+    } catch (e) {
+      error('Force log cleanup failed: $e');
+      return 0;
     }
   }
 

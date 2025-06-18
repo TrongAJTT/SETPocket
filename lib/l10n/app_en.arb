@@ -510,6 +510,195 @@
     "scientificCalculatorDesc": "Advanced calculator with trigonometric, logarithmic functions",
     "graphingCalculator": "Graphing Calculator",
     "graphingCalculatorDesc": "Plot and visualize mathematical functions",
+    "graphingCalculatorDetailedInfo": "Graphing Calculator Information",
+    "graphingCalculatorOverview": "Advanced mathematical function plotting and visualization tool",
+    
+    "graphingKeyFeatures": "Key Features",
+    "realTimePlotting": "Real-time Plotting",
+    "realTimePlottingDesc": "Instantly visualize functions as you type with smooth curve rendering",
+    "multipleFunction": "Multiple Functions",
+    "multipleFunctionDesc": "Plot and compare multiple functions simultaneously with color coding",
+    "interactiveControls": "Interactive Controls",
+    "interactiveControlsDesc": "Zoom, pan, and navigate the graph with intuitive touch and mouse controls",
+    "aspectRatioControl": "Aspect Ratio Control",
+    "aspectRatioControlDesc": "Customize X:Y axis scaling for optimal function visualization",
+    "functionHistory": "Function History", 
+    "functionHistoryDesc": "Save and load function groups with automatic state preservation",
+    "mathExpressionSupport": "Advanced Math Support",
+    "mathExpressionSupportDesc": "Supports trigonometric, logarithmic, and polynomial functions",
+    
+    "graphingHowToUse": "How to Use",
+    "step1Graph": "Step 1: Enter Function",
+    "step1GraphDesc": "Type a mathematical function in the input field (e.g., x^2, sin(x), log(x))",
+    "step2Graph": "Step 2: Plot Function", 
+    "step2GraphDesc": "Press Enter or tap the add button to plot the function on the graph",
+    "step3Graph": "Step 3: Navigate Graph",
+    "step3GraphDesc": "Use zoom controls, pan gestures, or adjust aspect ratio for better viewing",
+    "step4Graph": "Step 4: Add More Functions",
+    "step4GraphDesc": "Add multiple functions to compare and analyze their behaviors",
+    
+    "graphingTips": "Pro Tips",
+    "tip1Graph": "Use parentheses for complex expressions: sin(x^2) instead of sin x^2",
+    "tip2Graph": "Common functions: sin(x), cos(x), tan(x), log(x), sqrt(x), abs(x)",
+    "tip3Graph": "Use π and e constants: sin(π*x), e^x",
+    "tip4Graph": "Pan by dragging the graph area with mouse or touch",
+    "tip5Graph": "Save function groups to history for quick access later",
+    "tip6Graph": "Toggle function visibility using the eye icon without removing them",
+    "tip7Graph": "Use aspect ratio controls for specialized viewing (1:1 for circles, 5:1 for oscillations)",
+    
+    "supportedFunctions": "Supported Functions",
+    "basicOperations": "Basic Operations",
+    "basicOperationsDesc": "Addition (+), Subtraction (-), Multiplication (*), Division (/), Power (^)",
+    "trigonometricFunctions": "Trigonometric Functions",
+    "trigonometricFunctionsDesc": "sin(x), cos(x), tan(x) and their inverse functions",
+    "logarithmicFunctions": "Logarithmic Functions", 
+    "logarithmicFunctionsDesc": "Natural logarithm log(x), exponential e^x",
+    "otherFunctions": "Other Functions",
+    "otherFunctionsDesc": "Square root sqrt(x), absolute value abs(x), polynomial functions",
+    
+    "navigationControls": "Navigation Controls",
+    "zoomControls": "Zoom Controls",
+    "zoomControlsDesc": "Use + and - buttons or pinch gestures to zoom in and out",
+    "panControls": "Pan Controls", 
+    "panControlsDesc": "Drag the graph to move around and explore different areas",
+    "resetControls": "Reset Controls",
+    "resetControlsDesc": "Return to center or reset the entire plot to default state",
+    "aspectRatioDialog": "Aspect Ratio",
+    "aspectRatioDialogDesc": "Adjust X:Y axis scaling from 0.1:1 to 10:1 for optimal viewing",
+    
+    "graphingPracticalApplications": "Practical Applications",
+    "graphingPracticalApplicationsDesc": "Useful for students learning algebra and calculus, visualizing function behavior, and exploring mathematical concepts through interactive graphs.",
+    
+    "scientificCalculatorDetailedInfo": "Scientific Calculator Information",
+    "scientificCalculatorOverview": "Advanced scientific calculator with comprehensive mathematical functions",
+    
+    "scientificKeyFeatures": "Key Features",
+    "realTimeCalculation": "Real-time Calculation",
+    "realTimeCalculationDesc": "See instant preview results as you type expressions",
+    "comprehensiveFunctions": "Comprehensive Functions",
+    "comprehensiveFunctionsDesc": "Complete set of trigonometric, logarithmic, and algebraic functions",
+    "dualAngleModes": "Dual Angle Modes",
+    "dualAngleModesDesc": "Switch between radians and degrees for trigonometric calculations",
+    "secondaryFunctions": "Secondary Functions",
+    "secondaryFunctionsDesc": "Access extended functions with the 2nd button toggle",
+    "calculationHistory": "Calculation History",
+    "calculationHistoryDesc": "Automatic saving and browsing of previous calculations",
+    "memoryOperations": "Memory Operations",
+    "memoryOperationsDesc": "Store and recall values with memory management functions",
+    
+    "scientificHowToUse": "How to Use",
+    "step1Scientific": "Step 1: Enter Expression",
+    "step1ScientificDesc": "Type numbers and use function buttons to build mathematical expressions",
+    "step2Scientific": "Step 2: Use Functions",
+    "step2ScientificDesc": "Access trigonometric, logarithmic, and algebraic functions from the keypad",
+    "step3Scientific": "Step 3: Toggle Modes",
+    "step3ScientificDesc": "Switch between radians/degrees and primary/secondary functions as needed",
+    "step4Scientific": "Step 4: Use History - View and reuse previous calculations",
+    "@step4Scientific": {
+        "description": "Step 4 for using scientific calculator"
+    },
+    "step4ScientificDesc": "Press = to calculate or see real-time preview while typing",
+    
+    "scientificTips": "Pro Tips",
+    "tip1Scientific": "Use parentheses to ensure correct order of operations: (2+3)×4 = 20",
+    "@tip1Scientific": {
+        "description": "Tip 1 for scientific calculator"
+    },
+    "tip2Scientific": "Switch to DEG mode for degree calculations, RAD for radians",
+    "@tip2Scientific": {
+        "description": "Tip 2 for scientific calculator"
+    },
+    "tip3Scientific": "Use the 2nd button to access inverse functions: sin⁻¹, cos⁻¹, log⁻¹",
+    "@tip3Scientific": {
+        "description": "Tip 3 for scientific calculator"
+    },
+    "tip4Scientific": "Use memory functions (MS, MR, M+, M-) to store intermediate results",
+    "@tip4Scientific": {
+        "description": "Tip 4 for scientific calculator"
+    },
+    "tip5Scientific": "Double-tap numbers to select and copy results",
+    "@tip5Scientific": {
+        "description": "Tip 5 for scientific calculator"
+    },
+    "tip6Scientific": "Use EXP for scientific notation: 1.23E+5 = 123,000",
+    "@tip6Scientific": {
+        "description": "Tip 6 for scientific calculator"
+    },
+    "tip7Scientific": "Clear individual entries with C, or clear all with AC",
+    "@tip7Scientific": {
+        "description": "Tip 7 for scientific calculator"
+    },
+    "basicArithmetic": "Basic Arithmetic",
+    "@basicArithmetic": {
+        "description": "Basic arithmetic operations section"
+    },
+    "trigonometricFunctionsScientific": "Trigonometric Functions",
+    "@trigonometricFunctionsScientific": {
+        "description": "Trigonometric functions section for scientific calculator"
+    },
+    "logarithmicFunctionsScientific": "Logarithmic Functions",
+    "@logarithmicFunctionsScientific": {
+        "description": "Logarithmic functions section for scientific calculator"
+    },
+    "algebraicFunctions": "Algebraic Functions",
+    "@algebraicFunctions": {
+        "description": "Algebraic functions section"
+    },
+    "scientificFunctionCategories": "Function Categories",
+    "basicArithmeticDesc": "Addition (+), Subtraction (-), Multiplication (*), Division (/)",
+    "trigonometricFunctionsScientificDesc": "sin, cos, tan and their inverse functions (asin, acos, atan)",
+    "logarithmicFunctionsScientificDesc": "Natural log (ln), common log (log), exponential (exp, eˣ, 10ˣ)",
+    "algebraicFunctionsDesc": "Powers (x², x³, xʸ), roots (√, ∛), factorial (n!), absolute value (|x|)",
+    "angleMode": "Angle Mode (DEG/RAD)",
+    "@angleMode": {
+        "description": "Angle mode control"
+    },
+    "functionToggle": "Function Toggle (2nd)",
+    "@functionToggle": {
+        "description": "Function toggle control"
+    },
+    "memoryFunctions": "Memory Functions",
+    "@memoryFunctions": {
+        "description": "Memory functions control"
+    },
+    "historyAccess": "History Access",
+    "@historyAccess": {
+        "description": "History access control"
+    },
+    "scientificCalculatorPracticalApplications": "Practical Applications",
+    "@scientificCalculatorPracticalApplications": {
+        "description": "Practical applications section for scientific calculator"
+    },
+    "scientificCalculatorPracticalApplicationsDesc": "Helpful for students in mathematics and science courses, basic engineering calculations, and everyday problem-solving involving complex mathematical operations.",
+    "@scientificCalculatorPracticalApplicationsDesc": {
+        "description": "Practical applications description for scientific calculator"
+    },
+    "cacheWithLogSize": "Cache: {cacheSize} (+{logSize} log)",
+    "@cacheWithLogSize": {
+        "description": "Cache info with log size",
+        "placeholders": {
+            "cacheSize": {
+                "type": "String",
+                "example": "180.5KB"
+            },
+            "logSize": {
+                "type": "String",
+                "example": "3.05MB"
+            }
+        }
+    },
+    "scientificModeControls": "Mode Controls",
+    "angleMode": "Angle Mode",
+    "angleModeDesc": "Toggle between Radians and Degrees for trigonometric calculations",
+    "functionToggle": "Function Toggle",
+    "functionToggleDesc": "Press 2nd to switch between primary and secondary function sets",
+    "memoryFunctions": "Memory Functions",
+    "memoryFunctionsDesc": "Store, recall, and manage values in calculator memory",
+    "historyAccess": "History Access",
+    "historyAccessDesc": "Browse previous calculations and reuse expressions",
+    
+    "scientificPracticalApplications": "Practical Applications",
+    "scientificPracticalApplicationsDesc": "Helpful for students in mathematics and science courses, performing calculations that require trigonometric, logarithmic, and algebraic functions.",
     "metric": "Metric",
     "imperial": "Imperial", 
     "enterMeasurements": "Enter your measurements",
@@ -660,7 +849,9 @@
   "loadingLogContent": "Loading log content...",
   "largeFileDetected": "Large file detected. Using optimized loading...",
 
-  "cacheTypeConverterTools": "Converter Tools",
+      "cacheTypeCalculatorTools": "Calculator Tools",
+    "cacheTypeCalculatorToolsDesc": "Calculation history, graphing calculator data, and settings",
+    "cacheTypeConverterTools": "Converter Tools",
     "cacheTypeConverterToolsDesc": "Currency/length states, presets and exchange rates cache",
 
     "cardName": "Card Name",
@@ -927,9 +1118,9 @@
     "uncommonUnitsWeightDesc": "Ton-force (tf) - for very large force measurements in heavy industry.",
     "specialUnits": "Special Units",
     "specialUnitsWeightDesc": "Gram-force (gf), Troy pound-force - for precision measurements and precious metals.",
-    "practicalApplicationsWeightDesc": "Essential for mechanical engineering, structural analysis, material testing, physics experiments, and any application requiring precise force measurements.",
+    "practicalApplicationsWeightDesc": "Useful for engineering calculations, physics experiments, and applications requiring force measurements.",
     "practicalApplications": "Practical Applications",
-    "practicalApplicationsDesc": "Perfect for engineering, science, construction, and everyday measurements with professional accuracy.",
+    "practicalApplicationsDesc": "Helpful for everyday measurements and unit conversions in various contexts.",
     
     "massConverterDetailedInfo": "Mass Converter - Detailed Information",
     "massConverterOverview": "This precise mass converter supports multiple unit systems with high accuracy calculations for scientific, medical, and commercial applications.",
@@ -949,7 +1140,7 @@
     "tip6Mass": "• Use presets to save your favorite unit combinations",
     "massUnitSystems": "Supported Unit Systems",
     "massUnitSystemsDesc": "Metric (ng to tonnes), Imperial (grains to tons), Troy (precious metals), Apothecaries (pharmacy), and special units (carats, slugs, atomic mass units).",
-    "practicalApplicationsMassDesc": "Perfect for chemistry, pharmacy, precious metals trading, shipping, cooking, and scientific research with professional precision.",
+    "practicalApplicationsMassDesc": "Useful for cooking measurements, basic scientific calculations, and everyday mass conversions.",
     
     "areaConverter": "Area Converter",
     "@areaConverter": {
@@ -987,7 +1178,7 @@
     "commonUnitsAreaDesc": "Square meter (m²), Square kilometer (km²), Square centimeter (cm²) - most frequently used metric units.",
     "lessCommonUnitsAreaDesc": "Hectare (ha), Acre (ac), Square foot (ft²), Square inch (in²) - specialized applications in agriculture and construction.",
     "uncommonUnitsAreaDesc": "Square yard (yd²), Square mile (mi²), Rood - for specific regional or historical measurements.",
-    "practicalApplicationsAreaDesc": "Essential for real estate, agriculture, construction, urban planning, land surveying, and any application requiring precise area measurements.",
+    "practicalApplicationsAreaDesc": "Helpful for home improvement projects, gardening, and basic area calculations.",
     "timeConverter": "Time Converter",
     "timeConverterDetailedInfo": "Time Converter - Detailed Information",
     "timeConverterOverview": "Comprehensive time unit conversion with precision calculations and multiple unit support.",
@@ -1007,7 +1198,7 @@
     "tip6Time": "• Focus mode helps concentrate on complex time calculations",
     "timeUnitSystems": "Time Unit Systems",
     "timeUnitSystemsDesc": "Supports standard time units (s, min, h, d, wk, mo, yr), precision units (ms, μs, ns), and extended units (decades, centuries, millennia) for comprehensive time measurement across all scales.",
-    "practicalApplicationsTimeDesc": "Essential for project management, scientific calculations, programming, scheduling, performance analysis, and any application requiring precise time measurements and conversions.",
+    "practicalApplicationsTimeDesc": "Useful for scheduling, time zone conversions, and everyday time calculations.",
     
     "volumeConverterDetailedInfo": "Volume Converter - Detailed Information",
     "volumeConverterOverview": "This precision volume converter supports multiple unit systems with high accuracy calculations for cooking, chemistry, engineering, and scientific applications.",
@@ -1030,7 +1221,7 @@
     "lessCommonUnitsVolumeDesc": "Gallon (US/UK), Cubic foot (ft³), Quart, Pint - imperial and US customary units.",
     "uncommonUnitsVolumeDesc": "Hectoliter (hL), Barrel (bbl), Cup, Fluid ounce - specialized applications.",
     "specialUnitsVolumeDesc": "Cubic centimeter (cm³), Cubic inch (in³), Cubic yard (yd³) - engineering and construction units.",
-    "practicalApplicationsVolumeDesc": "Perfect for cooking, chemistry, fluid mechanics, construction, brewing, and any application requiring precise volume measurements.",
+    "practicalApplicationsVolumeDesc": "Helpful for cooking, baking, and basic volume measurements.",
     "volumeConverterInfo": "Volume Converter Information",
     "customizeVolumeUnits": "Customize Volume Units",
     "selectVolumeUnits": "Select volume units to display",
@@ -1072,7 +1263,7 @@
     "commonBasesDesc": "Binary (Base 2), Decimal (Base 10), Hexadecimal (Base 16) - most frequently used in computing and mathematics.",
     "lessCommonBasesDesc": "Octal (Base 8), Base 32, Base 64 - specialized applications in programming and data encoding.",
     "uncommonBasesDesc": "Base 128, Base 256 - for advanced data representation and specialized algorithms.",
-    "practicalApplicationsNumberSystemDesc": "Essential for computer programming, digital electronics, cryptography, data encoding, memory addressing, and any application requiring number base conversions.",
+    "practicalApplicationsNumberSystemDesc": "Useful for basic programming, learning number systems, and simple base conversions.",
     "numberSystemConverterInfo": "Number System Converter Information",
     "customizeNumberSystemBases": "Customize Number System Bases",
     "selectNumberSystemBases": "Select number bases to display",
@@ -1111,7 +1302,7 @@
     "commonUnitsSpeedDesc": "Kilometers per hour (km/h), Meters per second (m/s), Miles per hour (mph) - most frequently used for ground transportation.",
     "lessCommonUnitsSpeedDesc": "Knots (kn), Feet per second (ft/s) - specialized for maritime, aviation, and ballistics applications.",
     "uncommonUnitsSpeedDesc": "Mach (M) - for supersonic and hypersonic speeds in aerospace applications.",
-    "practicalApplicationsSpeedDesc": "Essential for automotive engineering, aviation, maritime navigation, physics calculations, sports analysis, and any application requiring precise speed measurements.",
+    "practicalApplicationsSpeedDesc": "Helpful for travel planning, sports activities, and basic speed conversions.",
     "speedConverterInfo": "Speed Converter Information",
     "customizeSpeedUnits": "Customize Speed Units",
     "selectSpeedUnits": "Select speed units to display",
@@ -1140,7 +1331,7 @@
     "temperatureLessCommonUnitsDesc": "Kelvin (K) - absolute temperature scale used in scientific and engineering applications.",
     "temperatureRareUnits": "Specialized Scales",
     "temperatureRareUnitsDesc": "Rankine (°R), Réaumur (°Ré), Delisle (°De) - historical and specialized temperature scales for specific applications.",
-    "temperaturePracticalApplicationsDesc": "Essential for cooking, weather monitoring, scientific research, engineering, HVAC systems, and any application requiring precise temperature measurements and conversions.",
+    "temperaturePracticalApplicationsDesc": "Useful for cooking, weather understanding, and basic temperature conversions.",
     "temperatureConverterInfo": "Temperature Converter Information",
     "customizeTemperatureUnits": "Customize Temperature Scales",
     "selectTemperatureUnits": "Select temperature scales to display",
@@ -1169,7 +1360,7 @@
     "dataLessCommonUnitsDesc": "Terabyte (TB), Petabyte (PB), and basic Byte (B) units for specialized storage applications and very large or very small data measurements.",
     "dataRareUnits": "Network Units",
     "dataRareUnitsDesc": "Bit, Kilobit (Kbit), Megabit (Mbit), Gigabit (Gbit) are primarily used for network speeds and data transmission rates.",
-    "dataPracticalApplicationsDesc": "Essential for IT professionals, software developers, network administrators, file management, storage planning, bandwidth calculations, and understanding device specifications.",
+    "dataPracticalApplicationsDesc": "Helpful for understanding file sizes, storage needs, and basic data unit conversions.",
     "dataConverterInfo": "Data Storage Converter Information",
     "customizeDataUnits": "Customize Data Storage Units",
     "selectDataUnits": "Select data storage units to display",
@@ -1289,6 +1480,7 @@
     "saveCurrentGroupQuestion": "Do you want to save the current function group to history?",
     "dontAskAgain": "Don't ask again",
     "rememberChoice": "Remember choice",
+    "info": "Info",
     "yes": "Yes",
     "no": "No",
     "functionGroup": "Function Group",
@@ -1319,5 +1511,96 @@
     "select": "Select",
     "hue": "Hue",
     "saturation": "Saturation",
-    "lightness": "Lightness"
+    "lightness": "Lightness",
+    "cacheWithLogSize": "Cache: {cacheSize} (+{logSize} log)",
+    "@cacheWithLogSize": {
+        "description": "Cache info with log size",
+        "placeholders": {
+            "cacheSize": {
+                "type": "String",
+                "example": "180.5KB"
+            },
+            "logSize": {
+                "type": "String",
+                "example": "3.05MB"
+            }
+        }
+    },
+    "debugCache": "Debug Cache",
+    "deletingOldLogs": "Deleting old logs...",
+    "deletedOldLogFiles": "Deleted {count} old log files",
+    "@deletedOldLogFiles": {
+        "description": "Message showing how many old log files were deleted",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "3"
+            }
+        }
+    },
+    "noOldLogFilesToDelete": "No old log files to delete",
+    "errorDeletingLogs": "Error deleting logs: {error}",
+    "@errorDeletingLogs": {
+        "description": "Error message when deleting logs fails",
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Permission denied"
+            }
+        }
+    },
+    "mobileCacheDebug": "Mobile Cache Debug",
+    "runningCacheDiagnostics": "Running cache diagnostics...",
+    "cacheDiagnosticsResults": "Cache Diagnostics Results",
+    "cacheStatus": "Cache Status:",
+    "reliability": "Reliability",
+    "reliable": "Reliable",
+    "unreliable": "Unreliable",
+    "hasCache": "Has Cache",
+    "statePersistence": "State Persistence:",
+    "currencyState": "Currency State",
+    "lengthState": "Length State",
+    "timeState": "Time State",
+    "saved": "Saved",
+    "defaultState": "Default",
+    "errorWithDetails": "Error: {details}",
+    "@errorWithDetails": {
+        "description": "Generic error message with details",
+        "placeholders": {
+            "details": {
+                "type": "String",
+                "example": "Connection failed"
+            }
+        }
+    },
+    "stateLoadingIssuesDetected": "⚠️ State Loading Issues Detected",
+    "stateLoadingIssuesDesc": "This usually happens after app updates that change data structure.",
+    "clearAllStateData": "Clear All State Data",
+    "clearingStateData": "Clearing State Data",
+    "clearingAllConverterStateData": "Clearing all converter state data...",
+    "success": "Success",
+    "allStateDataCleared": "All state data has been cleared. The app will restart to complete the process.",
+    "failedToRunDiagnostics": "Failed to run diagnostics: {error}",
+    "@failedToRunDiagnostics": {
+        "description": "Error message when diagnostics fail",
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Network error"
+            }
+        }
+    },
+    "failedToClearStateData": "Failed to clear state data: {error}",
+    "@failedToClearStateData": {
+        "description": "Error message when clearing state data fails",
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Permission denied"
+            }
+        }
+    },
+    "clearingStateData": "Clearing all converter state data...",
+    "stateDataClearedSuccess": "All state data has been cleared. The app will restart to complete the process.",
+    "ok": "OK"
 }

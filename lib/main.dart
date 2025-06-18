@@ -13,6 +13,7 @@ import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
 import 'package:setpocket/services/draft_service.dart';
+import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/text_template_gen_list_screen.dart';
@@ -76,6 +77,9 @@ void main() async {
 
   // Initialize AppLogger service (depends on settings)
   await AppLogger.instance.initialize();
+
+  // Initialize GraphingCalculatorService
+  await GraphingCalculatorService.initialize();
 
   // Initialize settings controller and load saved settings
   await settingsController.loadSettings();

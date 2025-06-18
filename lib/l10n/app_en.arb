@@ -32,7 +32,7 @@
     "logRetentionDesc": "Set how long to keep application logs before automatic deletion",
     "logRetentionDescDetail": "Choose log retention period (5-30 days in 5-day intervals, or forever)",
     "logRetentionAutoDelete": "Auto-delete after a period of time",
-    "logManagement": "Log Management",
+    "logManagement": "App logs management and storage settings",
     "logManagementDesc": "Manage application logs and retention settings",
     "logStatus": "Log Status",
     "logsDesc": "Application log files and debug information",
@@ -1203,5 +1203,121 @@
     "manageDrafts": "Manage Drafts",
     "draftsExpireAfter": "Drafts expire after 7 days",
     "expiredDraft": "Expired",
-    "draftCount": "{count} drafts"
+    "draftCount": "{count} drafts",
+    "graphingFunction": "f(x) = ",
+    "enterFunction": "Enter function (e.g., x^2, sin(x), etc.)",
+    "plot": "Plot",
+    "aspectRatio": "Aspect Ratio",
+    "aspectRatioXY": "Aspect Ratio (X:Y)",
+    "currentRatio": "Current ratio: {ratio}:1",
+    "@currentRatio": {
+        "placeholders": {
+            "ratio": {
+                "type": "String"
+            }
+        }
+    },
+    "resetPlot": "Reset Plot",
+    "resetZoom": "Reset Zoom",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "returnToCenter": "Return to Center",
+    "panning": "Panning",
+    "equalXYRatio": "Equal X:Y ratio",
+    "yAxisWiderThanX": "Y-axis will be {ratio}× wider than X-axis",
+    "@yAxisWiderThanX": {
+        "placeholders": {
+            "ratio": {
+                "type": "String"
+            }
+        }
+    },
+    "xAxisWiderThanY": "X-axis will be {ratio}× wider than Y-axis",
+    "@xAxisWiderThanY": {
+        "placeholders": {
+            "ratio": {
+                "type": "String"
+            }
+        }
+    },
+    "invalidFunction": "Invalid function: {error}",
+    "@invalidFunction": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "enterFunctionToPlot": "Enter a function to plot",
+    "functionLabel": "Function {number}",
+    "@functionLabel": {
+        "placeholders": {
+            "number": {
+                "type": "int"
+            }
+        }
+    },
+    "apply": "Apply",
+    "reset": "Reset",
+    "graphPanel": "Graph",
+    "functionsPanel": "Functions",
+    "historyPanel": "History",
+    "activeFunctions": "Active Functions",
+    "noActiveFunctions": "No active functions",
+    "addFunction": "Add Function",
+    "removeFunction": "Remove Function",
+    "toggleFunction": "Toggle Function",
+    "functionVisible": "Function visible",
+    "functionHidden": "Function hidden",
+    "functionInputHelp": "Function Input Help",
+    "functionInputHelpDesc": "Get help with mathematical function syntax",
+    "commonFunctions": "Common Functions",
+    "trigonometricFunctions": "Trigonometric Functions",
+    "logarithmicFunctions": "Logarithmic Functions",
+    "polynomialFunctions": "Polynomial Functions",
+    "insertFunction": "Insert",
+    "functionSyntaxError": "Invalid function syntax",
+    "functionSyntaxErrorDesc": "Please check your function syntax and try again",
+    "basicOperations": "Basic Operations",
+    "advancedFunctions": "Advanced Functions",
+    "askBeforeLoadingHistory": "Ask before loading history",
+    "askBeforeLoadingHistoryDesc": "Show confirmation dialog when loading function groups from history",
+    "rememberCalculationHistory": "Remember calculation history",
+    "rememberCalculationHistoryDesc": "Save function groups to history for later use",
+    "saveCurrentToHistory": "Save current group to history",
+    "loadHistoryGroup": "Load History Group",
+    "saveCurrentGroupQuestion": "Do you want to save the current function group to history?",
+    "dontAskAgain": "Don't ask again",
+    "rememberChoice": "Remember choice",
+    "yes": "Yes",
+    "no": "No",
+    "functionGroup": "Function Group",
+    "savedOn": "Saved on {date}",
+    "@savedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "functionsCount": "{count} functions",
+    "@functionsCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "editFunctionColor": "Edit function color",
+    "selectColor": "Select Color",
+    "moreActions": "More actions",
+    "noHistoryAvailable": "No history available",
+    "removeFromHistory": "Remove from history",
+    "selectedColor": "Selected Color",
+    "predefinedColors": "Predefined Colors",
+    "customColor": "Custom Color",
+    "select": "Select",
+    "hue": "Hue",
+    "saturation": "Saturation",
+    "lightness": "Lightness"
 }

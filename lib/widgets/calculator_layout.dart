@@ -44,7 +44,6 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final isLargeScreen = screenWidth > 1200;
 
     Widget content;

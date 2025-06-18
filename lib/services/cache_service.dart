@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
 import 'calculator_history_service.dart';
+import 'graphing_calculator_service.dart';
 import 'hive_service.dart';
 import 'converter_services/currency_state_service.dart';
 import 'converter_services/currency_preset_service.dart';
@@ -153,21 +154,37 @@ class CacheService {
       final calculatorHistorySize =
           await CalculatorHistoryService.getHistoryDataSize();
 
+      // Include graphing calculator cache
+      final graphingCalculatorCache =
+          await GraphingCalculatorService.getCacheInfo();
+
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: 'Calculator Tools',
-        description: 'Calculation history and calculator settings',
-        itemCount: calculatorHistoryCount + (calculatorHistoryEnabled ? 1 : 0),
-        sizeBytes: calculatorHistorySize + (calculatorHistoryEnabled ? 4 : 0),
-        keys: ['calculator_history_enabled'],
+        description:
+            'Calculation history, graphing calculator data, and settings',
+        itemCount: calculatorHistoryCount +
+            (calculatorHistoryEnabled ? 1 : 0) +
+            (graphingCalculatorCache['items'] as int),
+        sizeBytes: calculatorHistorySize +
+            (calculatorHistoryEnabled ? 4 : 0) +
+            (graphingCalculatorCache['size'] as int),
+        keys: [
+          'calculator_history_enabled',
+          'graphing_calculator_ask_before_loading'
+        ],
       );
     } catch (e) {
       logError('CacheService: Error getting calculator tools cache info: $e');
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: 'Calculator Tools',
-        description: 'Calculation history and calculator settings',
+        description:
+            'Calculation history, graphing calculator data, and settings',
         itemCount: 0,
         sizeBytes: 0,
-        keys: ['calculator_history_enabled'],
+        keys: [
+          'calculator_history_enabled',
+          'graphing_calculator_ask_before_loading'
+        ],
       );
     }
 
@@ -505,8 +522,11 @@ class CacheService {
     } else if (cacheType == 'calculator_tools') {
       // Clear all calculator history through the service
       await CalculatorHistoryService.clearAllHistory();
-      // Also clear the history enabled setting
+      // Clear graphing calculator data
+      await GraphingCalculatorService.clearAllCache();
+      // Also clear the history enabled settings
       await prefs.remove('calculator_history_enabled');
+      await prefs.remove('graphing_calculator_ask_before_loading');
     } else if (cacheType == 'text_templates') {
       // Clear templates cache from Hive
       await HiveService.clearBox(HiveService.templatesBoxName);

@@ -254,7 +254,7 @@ abstract class AppLocalizations {
   /// No description provided for @logManagement.
   ///
   /// In en, this message translates to:
-  /// **'Log Management'**
+  /// **'App logs management and storage settings'**
   String get logManagement;
 
   /// No description provided for @logManagementDesc.
@@ -3980,7 +3980,7 @@ abstract class AppLocalizations {
   /// No description provided for @moreActions.
   ///
   /// In en, this message translates to:
-  /// **'More Actions'**
+  /// **'More actions'**
   String get moreActions;
 
   /// No description provided for @moreOptions.
@@ -5788,6 +5788,390 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} drafts'**
   String draftCount(Object count);
+
+  /// No description provided for @graphingFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'f(x) = '**
+  String get graphingFunction;
+
+  /// No description provided for @enterFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter function (e.g., x^2, sin(x), etc.)'**
+  String get enterFunction;
+
+  /// No description provided for @plot.
+  ///
+  /// In en, this message translates to:
+  /// **'Plot'**
+  String get plot;
+
+  /// No description provided for @aspectRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspect Ratio'**
+  String get aspectRatio;
+
+  /// No description provided for @aspectRatioXY.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspect Ratio (X:Y)'**
+  String get aspectRatioXY;
+
+  /// No description provided for @currentRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Current ratio: {ratio}:1'**
+  String currentRatio(String ratio);
+
+  /// No description provided for @resetPlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Plot'**
+  String get resetPlot;
+
+  /// No description provided for @resetZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Zoom'**
+  String get resetZoom;
+
+  /// No description provided for @zoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom In'**
+  String get zoomIn;
+
+  /// No description provided for @zoomOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom Out'**
+  String get zoomOut;
+
+  /// No description provided for @returnToCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to Center'**
+  String get returnToCenter;
+
+  /// No description provided for @panning.
+  ///
+  /// In en, this message translates to:
+  /// **'Panning'**
+  String get panning;
+
+  /// No description provided for @equalXYRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Equal X:Y ratio'**
+  String get equalXYRatio;
+
+  /// No description provided for @yAxisWiderThanX.
+  ///
+  /// In en, this message translates to:
+  /// **'Y-axis will be {ratio}× wider than X-axis'**
+  String yAxisWiderThanX(String ratio);
+
+  /// No description provided for @xAxisWiderThanY.
+  ///
+  /// In en, this message translates to:
+  /// **'X-axis will be {ratio}× wider than Y-axis'**
+  String xAxisWiderThanY(String ratio);
+
+  /// No description provided for @invalidFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid function: {error}'**
+  String invalidFunction(String error);
+
+  /// No description provided for @enterFunctionToPlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a function to plot'**
+  String get enterFunctionToPlot;
+
+  /// No description provided for @functionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Function {number}'**
+  String functionLabel(int number);
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @graphPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Graph'**
+  String get graphPanel;
+
+  /// No description provided for @functionsPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Functions'**
+  String get functionsPanel;
+
+  /// No description provided for @historyPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyPanel;
+
+  /// No description provided for @activeFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Functions'**
+  String get activeFunctions;
+
+  /// No description provided for @noActiveFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'No active functions'**
+  String get noActiveFunctions;
+
+  /// No description provided for @addFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Function'**
+  String get addFunction;
+
+  /// No description provided for @removeFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Function'**
+  String get removeFunction;
+
+  /// No description provided for @toggleFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle Function'**
+  String get toggleFunction;
+
+  /// No description provided for @functionVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'Function visible'**
+  String get functionVisible;
+
+  /// No description provided for @functionHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Function hidden'**
+  String get functionHidden;
+
+  /// No description provided for @functionInputHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Function Input Help'**
+  String get functionInputHelp;
+
+  /// No description provided for @functionInputHelpDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get help with mathematical function syntax'**
+  String get functionInputHelpDesc;
+
+  /// No description provided for @commonFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Functions'**
+  String get commonFunctions;
+
+  /// No description provided for @trigonometricFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Trigonometric Functions'**
+  String get trigonometricFunctions;
+
+  /// No description provided for @logarithmicFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Logarithmic Functions'**
+  String get logarithmicFunctions;
+
+  /// No description provided for @polynomialFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Polynomial Functions'**
+  String get polynomialFunctions;
+
+  /// No description provided for @insertFunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert'**
+  String get insertFunction;
+
+  /// No description provided for @functionSyntaxError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid function syntax'**
+  String get functionSyntaxError;
+
+  /// No description provided for @functionSyntaxErrorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your function syntax and try again'**
+  String get functionSyntaxErrorDesc;
+
+  /// No description provided for @basicOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Operations'**
+  String get basicOperations;
+
+  /// No description provided for @advancedFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Functions'**
+  String get advancedFunctions;
+
+  /// No description provided for @askBeforeLoadingHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask before loading history'**
+  String get askBeforeLoadingHistory;
+
+  /// No description provided for @askBeforeLoadingHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Show confirmation dialog when loading function groups from history'**
+  String get askBeforeLoadingHistoryDesc;
+
+  /// No description provided for @rememberCalculationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember calculation history'**
+  String get rememberCalculationHistory;
+
+  /// No description provided for @rememberCalculationHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save function groups to history for later use'**
+  String get rememberCalculationHistoryDesc;
+
+  /// No description provided for @saveCurrentToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save current group to history'**
+  String get saveCurrentToHistory;
+
+  /// No description provided for @loadHistoryGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Load History Group'**
+  String get loadHistoryGroup;
+
+  /// No description provided for @saveCurrentGroupQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to save the current function group to history?'**
+  String get saveCurrentGroupQuestion;
+
+  /// No description provided for @dontAskAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t ask again'**
+  String get dontAskAgain;
+
+  /// No description provided for @rememberChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember choice'**
+  String get rememberChoice;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @functionGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Function Group'**
+  String get functionGroup;
+
+  /// No description provided for @savedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on {date}'**
+  String savedOn(String date);
+
+  /// No description provided for @functionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} functions'**
+  String functionsCount(int count);
+
+  /// No description provided for @editFunctionColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit function color'**
+  String get editFunctionColor;
+
+  /// No description provided for @selectColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Color'**
+  String get selectColor;
+
+  /// No description provided for @noHistoryAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No history available'**
+  String get noHistoryAvailable;
+
+  /// No description provided for @removeFromHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from history'**
+  String get removeFromHistory;
+
+  /// No description provided for @selectedColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Color'**
+  String get selectedColor;
+
+  /// No description provided for @predefinedColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Predefined Colors'**
+  String get predefinedColors;
+
+  /// No description provided for @customColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Color'**
+  String get customColor;
+
+  /// No description provided for @hue.
+  ///
+  /// In en, this message translates to:
+  /// **'Hue'**
+  String get hue;
+
+  /// No description provided for @saturation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get saturation;
+
+  /// No description provided for @lightness.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightness'**
+  String get lightness;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

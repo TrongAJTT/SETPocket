@@ -89,7 +89,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logRetentionAutoDelete => 'Auto-delete after a period of time';
 
   @override
-  String get logManagement => 'Log Management';
+  String get logManagement => 'App logs management and storage settings';
 
   @override
   String get logManagementDesc => 'Manage application logs and retention settings';
@@ -2084,7 +2084,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusModeHelpDeactivationMobile => '• Mobile: Use zoom out gesture or tap focus icon again';
 
   @override
-  String get moreActions => 'More Actions';
+  String get moreActions => 'More actions';
 
   @override
   String get moreOptions => 'More Options';
@@ -2994,4 +2994,210 @@ class AppLocalizationsEn extends AppLocalizations {
   String draftCount(Object count) {
     return '$count drafts';
   }
+
+  @override
+  String get graphingFunction => 'f(x) = ';
+
+  @override
+  String get enterFunction => 'Enter function (e.g., x^2, sin(x), etc.)';
+
+  @override
+  String get plot => 'Plot';
+
+  @override
+  String get aspectRatio => 'Aspect Ratio';
+
+  @override
+  String get aspectRatioXY => 'Aspect Ratio (X:Y)';
+
+  @override
+  String currentRatio(String ratio) {
+    return 'Current ratio: $ratio:1';
+  }
+
+  @override
+  String get resetPlot => 'Reset Plot';
+
+  @override
+  String get resetZoom => 'Reset Zoom';
+
+  @override
+  String get zoomIn => 'Zoom In';
+
+  @override
+  String get zoomOut => 'Zoom Out';
+
+  @override
+  String get returnToCenter => 'Return to Center';
+
+  @override
+  String get panning => 'Panning';
+
+  @override
+  String get equalXYRatio => 'Equal X:Y ratio';
+
+  @override
+  String yAxisWiderThanX(String ratio) {
+    return 'Y-axis will be $ratio× wider than X-axis';
+  }
+
+  @override
+  String xAxisWiderThanY(String ratio) {
+    return 'X-axis will be $ratio× wider than Y-axis';
+  }
+
+  @override
+  String invalidFunction(String error) {
+    return 'Invalid function: $error';
+  }
+
+  @override
+  String get enterFunctionToPlot => 'Enter a function to plot';
+
+  @override
+  String functionLabel(int number) {
+    return 'Function $number';
+  }
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get graphPanel => 'Graph';
+
+  @override
+  String get functionsPanel => 'Functions';
+
+  @override
+  String get historyPanel => 'History';
+
+  @override
+  String get activeFunctions => 'Active Functions';
+
+  @override
+  String get noActiveFunctions => 'No active functions';
+
+  @override
+  String get addFunction => 'Add Function';
+
+  @override
+  String get removeFunction => 'Remove Function';
+
+  @override
+  String get toggleFunction => 'Toggle Function';
+
+  @override
+  String get functionVisible => 'Function visible';
+
+  @override
+  String get functionHidden => 'Function hidden';
+
+  @override
+  String get functionInputHelp => 'Function Input Help';
+
+  @override
+  String get functionInputHelpDesc => 'Get help with mathematical function syntax';
+
+  @override
+  String get commonFunctions => 'Common Functions';
+
+  @override
+  String get trigonometricFunctions => 'Trigonometric Functions';
+
+  @override
+  String get logarithmicFunctions => 'Logarithmic Functions';
+
+  @override
+  String get polynomialFunctions => 'Polynomial Functions';
+
+  @override
+  String get insertFunction => 'Insert';
+
+  @override
+  String get functionSyntaxError => 'Invalid function syntax';
+
+  @override
+  String get functionSyntaxErrorDesc => 'Please check your function syntax and try again';
+
+  @override
+  String get basicOperations => 'Basic Operations';
+
+  @override
+  String get advancedFunctions => 'Advanced Functions';
+
+  @override
+  String get askBeforeLoadingHistory => 'Ask before loading history';
+
+  @override
+  String get askBeforeLoadingHistoryDesc => 'Show confirmation dialog when loading function groups from history';
+
+  @override
+  String get rememberCalculationHistory => 'Remember calculation history';
+
+  @override
+  String get rememberCalculationHistoryDesc => 'Save function groups to history for later use';
+
+  @override
+  String get saveCurrentToHistory => 'Save current group to history';
+
+  @override
+  String get loadHistoryGroup => 'Load History Group';
+
+  @override
+  String get saveCurrentGroupQuestion => 'Do you want to save the current function group to history?';
+
+  @override
+  String get dontAskAgain => 'Don\'t ask again';
+
+  @override
+  String get rememberChoice => 'Remember choice';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get functionGroup => 'Function Group';
+
+  @override
+  String savedOn(String date) {
+    return 'Saved on $date';
+  }
+
+  @override
+  String functionsCount(int count) {
+    return '$count functions';
+  }
+
+  @override
+  String get editFunctionColor => 'Edit function color';
+
+  @override
+  String get selectColor => 'Select Color';
+
+  @override
+  String get noHistoryAvailable => 'No history available';
+
+  @override
+  String get removeFromHistory => 'Remove from history';
+
+  @override
+  String get selectedColor => 'Selected Color';
+
+  @override
+  String get predefinedColors => 'Predefined Colors';
+
+  @override
+  String get customColor => 'Custom Color';
+
+  @override
+  String get hue => 'Hue';
+
+  @override
+  String get saturation => 'Saturation';
+
+  @override
+  String get lightness => 'Lightness';
 }

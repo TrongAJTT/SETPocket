@@ -2994,4 +2994,210 @@ class AppLocalizationsVi extends AppLocalizations {
   String draftCount(Object count) {
     return '$count bản nháp';
   }
+
+  @override
+  String get graphingFunction => 'f(x) = ';
+
+  @override
+  String get enterFunction => 'Nhập hàm số (ví dụ: x^2, sin(x), v.v.)';
+
+  @override
+  String get plot => 'Vẽ';
+
+  @override
+  String get aspectRatio => 'Tỉ lệ khung hình';
+
+  @override
+  String get aspectRatioXY => 'Tỉ lệ khung hình (X:Y)';
+
+  @override
+  String currentRatio(String ratio) {
+    return 'Tỉ lệ hiện tại: $ratio:1';
+  }
+
+  @override
+  String get resetPlot => 'Đặt lại đồ thị';
+
+  @override
+  String get resetZoom => 'Đặt lại phóng to';
+
+  @override
+  String get zoomIn => 'Phóng to';
+
+  @override
+  String get zoomOut => 'Thu nhỏ';
+
+  @override
+  String get returnToCenter => 'Về giữa';
+
+  @override
+  String get panning => 'Di chuyển';
+
+  @override
+  String get equalXYRatio => 'Tỉ lệ X:Y bằng nhau';
+
+  @override
+  String yAxisWiderThanX(String ratio) {
+    return 'Trục Y sẽ rộng hơn trục X $ratio lần';
+  }
+
+  @override
+  String xAxisWiderThanY(String ratio) {
+    return 'Trục X sẽ rộng hơn trục Y $ratio lần';
+  }
+
+  @override
+  String invalidFunction(String error) {
+    return 'Hàm không hợp lệ: $error';
+  }
+
+  @override
+  String get enterFunctionToPlot => 'Nhập hàm số để vẽ đồ thị';
+
+  @override
+  String functionLabel(int number) {
+    return 'Hàm $number';
+  }
+
+  @override
+  String get reset => 'Đặt lại';
+
+  @override
+  String get graphPanel => 'Đồ thị';
+
+  @override
+  String get functionsPanel => 'Hàm số';
+
+  @override
+  String get historyPanel => 'Lịch sử';
+
+  @override
+  String get activeFunctions => 'Hàm đang hoạt động';
+
+  @override
+  String get noActiveFunctions => 'Không có hàm nào đang hoạt động';
+
+  @override
+  String get addFunction => 'Thêm hàm';
+
+  @override
+  String get removeFunction => 'Xóa hàm';
+
+  @override
+  String get toggleFunction => 'Bật/tắt hàm';
+
+  @override
+  String get functionVisible => 'Hàm đang hiển thị';
+
+  @override
+  String get functionHidden => 'Hàm đã ẩn';
+
+  @override
+  String get functionInputHelp => 'Trợ giúp nhập hàm';
+
+  @override
+  String get functionInputHelpDesc => 'Nhận trợ giúp về cú pháp hàm toán học';
+
+  @override
+  String get commonFunctions => 'Hàm thông dụng';
+
+  @override
+  String get trigonometricFunctions => 'Hàm lượng giác';
+
+  @override
+  String get logarithmicFunctions => 'Hàm logarit';
+
+  @override
+  String get polynomialFunctions => 'Hàm đa thức';
+
+  @override
+  String get insertFunction => 'Chèn';
+
+  @override
+  String get functionSyntaxError => 'Cú pháp hàm không hợp lệ';
+
+  @override
+  String get functionSyntaxErrorDesc => 'Vui lòng kiểm tra cú pháp hàm và thử lại';
+
+  @override
+  String get basicOperations => 'Phép toán cơ bản';
+
+  @override
+  String get advancedFunctions => 'Hàm nâng cao';
+
+  @override
+  String get askBeforeLoadingHistory => 'Hỏi trước khi tải lịch sử';
+
+  @override
+  String get askBeforeLoadingHistoryDesc => 'Hiển thị dialog xác nhận khi tải nhóm hàm từ lịch sử';
+
+  @override
+  String get rememberCalculationHistory => 'Ghi nhớ lịch sử tính toán';
+
+  @override
+  String get rememberCalculationHistoryDesc => 'Lưu nhóm hàm số vào lịch sử để sử dụng sau';
+
+  @override
+  String get saveCurrentToHistory => 'Lưu nhóm hiện tại vào lịch sử';
+
+  @override
+  String get loadHistoryGroup => 'Tải nhóm lịch sử';
+
+  @override
+  String get saveCurrentGroupQuestion => 'Bạn có muốn lưu nhóm hàm hiện tại vào lịch sử không?';
+
+  @override
+  String get dontAskAgain => 'Không hỏi lại';
+
+  @override
+  String get rememberChoice => 'Ghi nhớ lựa chọn';
+
+  @override
+  String get yes => 'Có';
+
+  @override
+  String get no => 'Không';
+
+  @override
+  String get functionGroup => 'Nhóm hàm';
+
+  @override
+  String savedOn(String date) {
+    return 'Đã lưu vào $date';
+  }
+
+  @override
+  String functionsCount(int count) {
+    return '$count hàm';
+  }
+
+  @override
+  String get editFunctionColor => 'Chỉnh sửa màu hàm';
+
+  @override
+  String get selectColor => 'Chọn màu';
+
+  @override
+  String get noHistoryAvailable => 'Không có lịch sử';
+
+  @override
+  String get removeFromHistory => 'Xóa khỏi lịch sử';
+
+  @override
+  String get selectedColor => 'Màu đã chọn';
+
+  @override
+  String get predefinedColors => 'Màu có sẵn';
+
+  @override
+  String get customColor => 'Màu tùy chỉnh';
+
+  @override
+  String get hue => 'Sắc độ';
+
+  @override
+  String get saturation => 'Độ bão hòa';
+
+  @override
+  String get lightness => 'Độ sáng';
 }

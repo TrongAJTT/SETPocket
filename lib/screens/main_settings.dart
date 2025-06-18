@@ -8,12 +8,12 @@ import 'package:setpocket/widgets/quick_actions_dialog.dart';
 import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/generation_history_service.dart';
-import 'package:setpocket/services/calculator_history_service.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/converter_services/currency_cache_service.dart';
 import 'package:setpocket/services/converter_services/currency_state_service.dart';
 import 'package:setpocket/services/converter_services/length_state_service.dart';
 import 'package:setpocket/services/converter_services/time_state_service.dart';
+import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/screens/log_viewer_screen.dart';
 
 import 'package:setpocket/models/converter_models/currency_cache_model.dart';
@@ -43,8 +43,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _clearing = false;
   bool _loading = true;
   bool _historyEnabled = false;
-  bool _calculatorHistoryEnabled = false;
+  bool _rememberCalculationHistory = true;
   bool _featureStateSavingEnabled = true;
+  bool _askBeforeLoadingHistory = true;
+
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
   int _fetchTimeoutSeconds = 10;
   int _fetchRetryTimes = 1;
@@ -74,26 +76,31 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final themeIndex = prefs.getInt('themeMode');
     final lang = prefs.getString('language');
     final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
-    final calculatorHistoryEnabled =
-        await CalculatorHistoryService.isHistoryEnabled();
     final featureStateSavingEnabled =
         await SettingsService.getFeatureStateSaving();
     final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
     final fetchTimeout = await SettingsService.getFetchTimeout();
     final fetchRetryTimes = await SettingsService.getFetchRetryTimes();
     final logRetentionDays = await SettingsService.getLogRetentionDays();
+    final askBeforeLoadingHistory =
+        await GraphingCalculatorService.getAskBeforeLoading();
+    final rememberCalculationHistory =
+        await GraphingCalculatorService.getRememberHistory();
+
     setState(() {
       _themeMode = themeIndex != null
           ? ThemeMode.values[themeIndex]
           : settingsController.themeMode;
       _language = lang ?? settingsController.locale.languageCode;
       _historyEnabled = historyEnabled;
-      _calculatorHistoryEnabled = calculatorHistoryEnabled;
+      _rememberCalculationHistory = rememberCalculationHistory;
       _featureStateSavingEnabled = featureStateSavingEnabled;
       _currencyFetchMode = currencyFetchMode;
       _fetchTimeoutSeconds = fetchTimeout;
       _fetchRetryTimes = fetchRetryTimes;
       _logRetentionDays = logRetentionDays;
+      _askBeforeLoadingHistory = askBeforeLoadingHistory;
+
       _loading = false;
     });
   }
@@ -154,7 +161,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
     try {
       await CacheService.clearAllCache();
+
+      // Reset "Hỏi trước khi tải lịch sử" khi clear Calculator Tools cache
+      await GraphingCalculatorService.setAskBeforeLoading(true);
+      await GraphingCalculatorService.setSaveDialogPreference(null);
+
       await _loadCacheInfo(); // Refresh cache info
+      await _loadSettings(); // Refresh settings để cập nhật UI
+
       setState(() {
         _clearing = false;
       });
@@ -215,11 +229,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     await GenerationHistoryService.setHistoryEnabled(enabled);
   }
 
-  void _onCalculatorHistoryEnabledChanged(bool enabled) async {
-    setState(() => _calculatorHistoryEnabled = enabled);
-    await CalculatorHistoryService.setHistoryEnabled(enabled);
-  }
-
   void _onFeatureStateSavingChanged(bool enabled) async {
     setState(() => _featureStateSavingEnabled = enabled);
     await SettingsService.updateFeatureStateSaving(enabled);
@@ -238,6 +247,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   void _onFetchRetryTimesChanged(int retryTimes) async {
     setState(() => _fetchRetryTimes = retryTimes);
     await SettingsService.updateFetchRetryTimes(retryTimes);
+  }
+
+  void _onRememberCalculationHistoryChanged(bool enabled) async {
+    setState(() {
+      _rememberCalculationHistory = enabled;
+    });
+
+    await GraphingCalculatorService.setRememberHistory(enabled);
   }
 
   void _showToolVisibilityDialog() async {
@@ -323,39 +340,36 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           if (!widget.isEmbedded) _buildHeader(loc),
           Expanded(
             child: SingleChildScrollView(
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left Column
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildUserInterfaceSection(loc),
-                          const SizedBox(height: 24),
-                          _buildToolsShortcutsSection(loc),
-                          const SizedBox(height: 24),
-                          _buildRandomToolsSection(loc),
-                          const SizedBox(height: 24),
-                          _buildCalculatorToolsSection(loc),
-                        ],
-                      ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left Column
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildUserInterfaceSection(loc),
+                        const SizedBox(height: 24),
+                        _buildToolsShortcutsSection(loc),
+                        const SizedBox(height: 24),
+                        _buildRandomToolsSection(loc),
+                        const SizedBox(height: 24),
+                        _buildCalculatorToolsSection(loc),
+                      ],
                     ),
-                    const SizedBox(width: 32),
-                    // Right Column
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildConverterToolsSection(loc),
-                          const SizedBox(height: 24),
-                          _buildDataSection(loc),
-                        ],
-                      ),
+                  ),
+                  const SizedBox(width: 32),
+                  // Right Column
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildConverterToolsSection(loc),
+                        const SizedBox(height: 24),
+                        _buildDataSection(loc),
+                        const SizedBox(height: 32), // Extra padding at bottom
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -624,7 +638,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       icon: Icons.calculate_outlined,
       iconColor: Colors.teal.shade600,
       children: [
-        _buildCalculatorHistorySettings(loc),
+        _buildRememberCalculationHistorySettings(loc),
+        const SizedBox(height: 24),
+        _buildAskBeforeLoadingHistorySettings(loc),
       ],
     );
   }
@@ -811,7 +827,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     );
   }
 
-  Widget _buildCalculatorHistorySettings(AppLocalizations loc) {
+  Widget _buildRememberCalculationHistorySettings(AppLocalizations loc) {
     return Row(
       children: [
         Expanded(
@@ -819,14 +835,14 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                loc.saveCalculationHistory,
+                loc.rememberCalculationHistory,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
               ),
               const SizedBox(height: 4),
               Text(
-                loc.saveCalculationHistoryDesc,
+                loc.rememberCalculationHistoryDesc,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -835,10 +851,40 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
           ),
         ),
         Switch(
-          value: _calculatorHistoryEnabled,
-          onChanged: _onCalculatorHistoryEnabledChanged,
+          value: _rememberCalculationHistory,
+          onChanged: _onRememberCalculationHistoryChanged,
         ),
       ],
+    );
+  }
+
+  Widget _buildAskBeforeLoadingHistorySettings(AppLocalizations loc) {
+    // Chỉ làm mờ khi "Ghi nhớ lịch sử tính toán" bị tắt hoặc khi đã được bật
+    final isDisabled = !_rememberCalculationHistory || _askBeforeLoadingHistory;
+
+    return Padding(
+      padding: EdgeInsets.zero,
+      child: SwitchListTile(
+        title: Text(loc.askBeforeLoadingHistory),
+        subtitle: Text(loc.askBeforeLoadingHistoryDesc),
+        value: _askBeforeLoadingHistory,
+        onChanged: isDisabled
+            ? null
+            : (bool value) async {
+                // Chỉ cho phép bật từ tắt khi "Ghi nhớ lịch sử tính toán" được bật
+                if (!_askBeforeLoadingHistory &&
+                    value &&
+                    _rememberCalculationHistory) {
+                  setState(() {
+                    _askBeforeLoadingHistory = value;
+                  });
+                  await GraphingCalculatorService.setAskBeforeLoading(value);
+
+                  // Reset dialog preference khi bật lại
+                  await GraphingCalculatorService.setSaveDialogPreference(null);
+                }
+              },
+      ),
     );
   }
 

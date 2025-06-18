@@ -1,6 +1,7 @@
 import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'converter_service_base.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:flutter/services.dart';
 
 class NumberSystemUnit extends ConverterUnit {
   final String _id;
@@ -457,5 +458,62 @@ class NumberSystemConverterService extends ConverterServiceBase {
         'Memory Usage: ${memoryKB}KB, '
         'Total Conversions: $_conversionCount, '
         'Units Cached: ${_unitsCache.length}';
+  }
+
+  /// Get allowed characters for a specific base
+  static String getAllowedCharactersForBase(int base) {
+    if (base <= 10) {
+      return '0123456789'.substring(0, base);
+    } else if (base <= 36) {
+      return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.substring(0, base);
+    } else if (base == 64) {
+      return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/';
+    } else {
+      // For bases > 36, use A-Z then a-z pattern
+      var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      if (base > 36) {
+        chars += 'abcdefghijklmnopqrstuvwxyz';
+      }
+      return chars.substring(0, base.clamp(0, chars.length));
+    }
+  }
+
+  /// Create input formatter for specific base
+  static TextInputFormatter createInputFormatterForBase(int base) {
+    final allowedChars = getAllowedCharactersForBase(base);
+    final pattern = '[${RegExp.escape(allowedChars)}]';
+
+    if (base > 10) {
+      // For bases that use letters, also convert to uppercase
+      return TextInputFormatter.withFunction((oldValue, newValue) {
+        final upperCaseText = newValue.text.toUpperCase();
+        final regex = RegExp(pattern, caseSensitive: false);
+
+        // Check if all characters are allowed
+        for (int i = 0; i < upperCaseText.length; i++) {
+          if (!regex.hasMatch(upperCaseText[i])) {
+            return oldValue; // Reject the change
+          }
+        }
+
+        return TextEditingValue(
+          text: upperCaseText,
+          selection: TextSelection.collapsed(offset: upperCaseText.length),
+        );
+      });
+    } else {
+      // For numeric-only bases, use simple filtering
+      return FilteringTextInputFormatter.allow(
+          RegExp(pattern, caseSensitive: false));
+    }
+  }
+
+  /// Get input formatter for a specific unit ID
+  static TextInputFormatter? getInputFormatterForUnit(String unitId) {
+    _initializeCache();
+    final unit = _unitsCache[unitId];
+    if (unit == null) return null;
+
+    return createInputFormatterForBase(unit.base);
   }
 }

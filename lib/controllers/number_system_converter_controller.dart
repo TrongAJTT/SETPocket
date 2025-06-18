@@ -4,8 +4,11 @@ import 'package:setpocket/services/converter_services/number_system_state_adapte
 import 'package:setpocket/services/converter_services/generic_preset_service.dart';
 import 'package:setpocket/models/converter_models/generic_preset_model.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:flutter/services.dart';
 
 class NumberSystemConverterController extends ConverterController {
+  bool _isInternalUpdate = false;
+
   NumberSystemConverterController()
       : super(
           converterService: NumberSystemConverterService(),
@@ -184,5 +187,45 @@ class NumberSystemConverterController extends ConverterController {
     } catch (e) {
       return false;
     }
+  }
+
+  /// Get input formatter for specific number system base
+  TextInputFormatter? getInputFormatterForUnit(String unitId) {
+    return NumberSystemConverterService.getInputFormatterForUnit(unitId);
+  }
+
+  /// Get allowed characters for a specific unit
+  String? getAllowedCharactersForUnit(String unitId) {
+    final service = converterService as NumberSystemConverterService;
+    final unit = service.getUnit(unitId) as NumberSystemUnit?;
+    if (unit == null) return null;
+
+    return NumberSystemConverterService.getAllowedCharactersForBase(unit.base);
+  }
+
+  /// Check if a unit uses letters (base > 10)
+  bool unitUsesLetters(String unitId) {
+    final service = converterService as NumberSystemConverterService;
+    final unit = service.getUnit(unitId) as NumberSystemUnit?;
+    if (unit == null) return false;
+
+    return unit.base > 10;
+  }
+
+  /// Override onValueChanged to use proper number system parsing
+  @override
+  void onValueChanged(int cardIndex, String unitId, String valueText) {
+    if (cardIndex >= state.cards.length || _isInternalUpdate) return;
+
+    // Use number system specific parsing instead of double.tryParse
+    final value = parseValueForBase(valueText, unitId);
+
+    logInfo('NumberSystemConverter: Parsed "$valueText" ($unitId) = $value');
+
+    // Convert the parsed value to string and call parent method
+    // to avoid code duplication
+    _isInternalUpdate = true;
+    super.onValueChanged(cardIndex, unitId, value.toString());
+    _isInternalUpdate = false;
   }
 }

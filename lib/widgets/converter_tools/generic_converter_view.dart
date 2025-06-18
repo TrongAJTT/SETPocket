@@ -62,6 +62,7 @@ class _GenericConverterViewState extends State<GenericConverterView> {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           displayTitle,

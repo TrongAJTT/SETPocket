@@ -284,30 +284,65 @@ class ConverterTableWidget extends StatelessWidget {
     return DataCell(
       SizedBox(
         width: 100,
-        child: TextField(
-          controller: cardControllers[unitId],
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-          ],
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color:
-                    Theme.of(context).colorScheme.outline.withValues(alpha: .5),
-              ),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            isDense: true,
-          ),
-          onChanged: (value) =>
-              controller.onValueChanged(cardIndex, unitId, value),
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 14),
-        ),
+        child:
+            _buildTableTextField(context, cardIndex, unitId, cardControllers),
       ),
+    );
+  }
+
+  Widget _buildTableTextField(
+    BuildContext context,
+    int cardIndex,
+    String unitId,
+    Map<String, TextEditingController> cardControllers,
+  ) {
+    final isNumberSystem =
+        controller.converterService.converterType == 'number_system';
+
+    // Get input formatters based on converter type
+    List<TextInputFormatter> inputFormatters;
+    TextInputType keyboardType;
+
+    if (isNumberSystem) {
+      // For number system converter, use special formatter based on selected base
+      try {
+        final formatter =
+            (controller as dynamic).getInputFormatterForUnit(unitId);
+        inputFormatters = formatter != null ? [formatter] : [];
+
+        // Use text input type for bases that use letters
+        final usesLetters = (controller as dynamic).unitUsesLetters(unitId);
+        keyboardType = usesLetters
+            ? TextInputType.text
+            : const TextInputType.numberWithOptions(decimal: false);
+      } catch (e) {
+        // Fallback to default number input if error
+        inputFormatters = [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))];
+        keyboardType = const TextInputType.numberWithOptions(decimal: false);
+      }
+    } else {
+      // Default behavior for other converters
+      inputFormatters = [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))];
+      keyboardType = const TextInputType.numberWithOptions(decimal: true);
+    }
+
+    return TextField(
+      controller: cardControllers[unitId],
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: .5),
+          ),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        isDense: true,
+      ),
+      onChanged: (value) => controller.onValueChanged(cardIndex, unitId, value),
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: 14),
     );
   }
 

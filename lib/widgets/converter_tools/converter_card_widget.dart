@@ -467,18 +467,61 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
   ) {
     // Use different labels based on converter type
     final isCurrency = controller.converterService.converterType == 'currency';
+    final isNumberSystem =
+        controller.converterService.converterType == 'number_system';
     final labelText = isCurrency ? l10n.amount : l10n.quantity;
+
+    // Get input formatters based on converter type
+    List<TextInputFormatter> inputFormatters;
+    TextInputType keyboardType;
+    String? helperText;
+
+    if (isNumberSystem) {
+      // For number system converter, use special formatter based on selected base
+      try {
+        final formatter =
+            (controller as dynamic).getInputFormatterForUnit(card.baseUnitId);
+        inputFormatters = formatter != null ? [formatter] : [];
+
+        // Use text input type for bases that use letters
+        final usesLetters =
+            (controller as dynamic).unitUsesLetters(card.baseUnitId);
+        keyboardType = usesLetters
+            ? TextInputType.text
+            : const TextInputType.numberWithOptions(decimal: false);
+
+        // Add helper text for bases that use letters
+        if (usesLetters) {
+          final allowedChars = (controller as dynamic)
+              .getAllowedCharactersForUnit(card.baseUnitId);
+          if (allowedChars != null && allowedChars.length > 10) {
+            helperText =
+                'Allowed: ${allowedChars.substring(0, 10)}${allowedChars.length > 10 ? '...' : ''}';
+          } else if (allowedChars != null) {
+            helperText = 'Allowed: $allowedChars';
+          }
+        }
+      } catch (e) {
+        // Fallback to default number input if error
+        inputFormatters = [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))];
+        keyboardType = const TextInputType.numberWithOptions(decimal: false);
+      }
+    } else {
+      // Default behavior for other converters
+      inputFormatters = [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))];
+      keyboardType = const TextInputType.numberWithOptions(decimal: true);
+    }
 
     return TextField(
       controller: cardControllers[card.baseUnitId],
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-      ],
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: labelText,
         border: const OutlineInputBorder(),
         isDense: true,
+        helperText: helperText,
+        helperMaxLines: 2,
       ),
       style: const TextStyle(fontSize: 14),
       onChanged: (value) =>
@@ -626,77 +669,163 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
         ? (isDarkMode ? Colors.red.shade400 : Colors.red.shade300)
         : null;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: BoxDecoration(
-        color: errorBackgroundColor,
-        borderRadius: BorderRadius.circular(6),
-        border: hasError
-            ? Border.all(
-                color: errorBorderColor!,
-                width: 1,
-              )
-            : null,
-      ),
-      child: Row(
-        children: [
-          // Unit symbol with status indicator
-          SizedBox(
-            width: 40,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Text(
-                  unit.symbol,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: hasError
-                        ? (isDarkMode
-                            ? Colors.red.shade300
-                            : Colors.red.shade700)
-                        : null,
-                  ),
-                ),
-                if (hasError)
-                  Positioned(
-                    top: -2,
-                    right: 0,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: status == ConversionStatus.timeout
-                            ? Colors.orange.shade600
-                            : Colors.red.shade600,
-                        shape: BoxShape.circle,
-                      ),
+    final fullValue = unit.formatValue(value);
+    // final l10n = AppLocalizations.of(context)!;
+
+    return GestureDetector(
+      onTap: () => _copyValueToClipboard(context, fullValue, unit.name),
+      onLongPress: () => _showFullValueDialog(context, fullValue, unit.name),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color: errorBackgroundColor,
+          borderRadius: BorderRadius.circular(6),
+          border: hasError
+              ? Border.all(
+                  color: errorBorderColor!,
+                  width: 1,
+                )
+              : null,
+        ),
+        child: Row(
+          children: [
+            // Unit symbol with status indicator
+            SizedBox(
+              width: 40,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    unit.symbol,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: hasError
+                          ? (isDarkMode
+                              ? Colors.red.shade300
+                              : Colors.red.shade700)
+                          : null,
                     ),
                   ),
+                  if (hasError)
+                    Positioned(
+                      top: -2,
+                      right: 0,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: status == ConversionStatus.timeout
+                              ? Colors.orange.shade600
+                              : Colors.red.shade600,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Unit name
+            Expanded(
+              child: Text(
+                unit.name,
+                style: const TextStyle(fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Value with truncation for long values
+            Expanded(
+              flex: 2,
+              child: Text(
+                _truncateValue(fullValue, 20), // Max 20 characters
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.end,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+
+            // Copy indicator
+            if (fullValue.length > 20) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.content_copy,
+                size: 12,
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.7),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _truncateValue(String value, int maxLength) {
+    if (value.length <= maxLength) return value;
+    return '${value.substring(0, maxLength - 3)}...';
+  }
+
+  void _copyValueToClipboard(
+      BuildContext context, String value, String unitName) {
+    Clipboard.setData(ClipboardData(text: value));
+
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${l10n.copied} $unitName: $value'),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showFullValueDialog(
+      BuildContext context, String value, String unitName) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(unitName),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SelectableText(
+              value,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    _copyValueToClipboard(context, value, unitName);
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.content_copy),
+                  label: Text(l10n.copy),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.close),
+                ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-
-          // Unit name
-          Expanded(
-            child: Text(
-              unit.name,
-              style: const TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 8),
-
-          // Value
-          Text(
-            unit.formatValue(value),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

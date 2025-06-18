@@ -4,6 +4,7 @@ import 'template_service.dart';
 import 'generation_history_service.dart';
 import 'calculator_history_service.dart';
 import 'graphing_calculator_service.dart';
+import 'bmi_service.dart';
 import 'hive_service.dart';
 import 'converter_services/currency_state_service.dart';
 import 'converter_services/currency_preset_service.dart';
@@ -160,19 +161,42 @@ class CacheService {
       final graphingCalculatorCache =
           await GraphingCalculatorService.getCacheInfo();
 
+      // Include BMI calculator cache
+      int bmiSize = 0;
+      int bmiCount = 0;
+      try {
+        final hasBmiData = await BmiService.hasData();
+        if (hasBmiData) {
+          bmiSize = await BmiService.getDataSize();
+          final bmiHistory = await BmiService.getHistory();
+          final bmiPreferences = await BmiService.getPreferences();
+
+          // Count items
+          bmiCount += bmiHistory.length;
+          if (bmiPreferences.isNotEmpty) {
+            bmiCount += 1; // Preferences as one item
+          }
+        }
+      } catch (e) {
+        logError('CacheService: Error checking BMI cache: $e');
+      }
+
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: calculatorToolsName ?? 'Calculator Tools',
         description: calculatorToolsDesc ??
-            'Calculation history, graphing calculator data, and settings',
+            'Calculation history, graphing calculator data, BMI data, and settings',
         itemCount: calculatorHistoryCount +
             (calculatorHistoryEnabled ? 1 : 0) +
-            (graphingCalculatorCache['items'] as int),
+            (graphingCalculatorCache['items'] as int) +
+            bmiCount,
         sizeBytes: calculatorHistorySize +
             (calculatorHistoryEnabled ? 4 : 0) +
-            (graphingCalculatorCache['size'] as int),
+            (graphingCalculatorCache['size'] as int) +
+            bmiSize,
         keys: [
           'calculator_history_enabled',
-          'graphing_calculator_ask_before_loading'
+          'graphing_calculator_ask_before_loading',
+          'bmi_data', // BMI cache key
         ],
       );
     } catch (e) {
@@ -180,12 +204,13 @@ class CacheService {
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: calculatorToolsName ?? 'Calculator Tools',
         description: calculatorToolsDesc ??
-            'Calculation history, graphing calculator data, and settings',
+            'Calculation history, graphing calculator data, BMI data, and settings',
         itemCount: 0,
         sizeBytes: 0,
         keys: [
           'calculator_history_enabled',
-          'graphing_calculator_ask_before_loading'
+          'graphing_calculator_ask_before_loading',
+          'bmi_data',
         ],
       );
     }
@@ -526,6 +551,13 @@ class CacheService {
       await CalculatorHistoryService.clearAllHistory();
       // Clear graphing calculator data
       await GraphingCalculatorService.clearAllCache();
+      // Clear BMI calculator data
+      try {
+        await BmiService.clearHistory();
+        await BmiService.clearPreferences();
+      } catch (e) {
+        logError('CacheService: Error clearing BMI cache: $e');
+      }
       // Also clear the history enabled settings
       await prefs.remove('calculator_history_enabled');
       await prefs.remove('graphing_calculator_ask_before_loading');
@@ -583,6 +615,14 @@ class CacheService {
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
     await CalculatorHistoryService.clearAllHistory();
+
+    // Clear BMI calculator data
+    try {
+      await BmiService.clearHistory();
+      await BmiService.clearPreferences();
+    } catch (e) {
+      logError('CacheService: Error clearing BMI cache in clearAllCache: $e');
+    }
 
     // Close all converter boxes first to avoid type conflicts
     try {
@@ -685,6 +725,7 @@ class CacheService {
       'generic_speed_presets',
       'generic_temperature_presets',
       'currency_cache',
+      'bmi_data', // BMI calculator data box
     ];
 
     for (final boxName in boxNames) {

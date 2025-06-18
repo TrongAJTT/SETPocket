@@ -140,6 +140,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get save => 'Lưu';
 
   @override
+  String get saved => 'Đã lưu';
+
+  @override
+  String get saveToHistory => 'Lưu vào lịch sử';
+
+  @override
   String get edit => 'Chỉnh sửa';
 
   @override
@@ -1117,10 +1123,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get generatedAt => 'Tạo lúc';
 
   @override
-  String get noHistoryYet => 'Chưa có lịch sử';
+  String get noHistoryYet => 'Chưa có phép tính nào';
 
   @override
-  String get noHistoryMessage => 'Tạo một số kết quả ngẫu nhiên để xem chúng ở đây';
+  String get noHistoryMessage => 'Lịch sử tính toán BMI của bạn sẽ xuất hiện ở đây';
 
   @override
   String get clearHistory => 'Xóa lịch sử';
@@ -1868,7 +1874,224 @@ class AppLocalizationsVi extends AppLocalizations {
   String get overweight => 'Thừa cân';
 
   @override
+  String get overweightI => 'Thừa cân I';
+
+  @override
+  String get overweightII => 'Thừa cân II';
+
+  @override
   String get obese => 'Béo phì';
+
+  @override
+  String get obeseI => 'Béo phì I';
+
+  @override
+  String get obeseII => 'Béo phì II';
+
+  @override
+  String get obeseIII => 'Béo phì III';
+
+  @override
+  String get bmiPercentileOverweight => 'Từ phân vị thứ 85 đến 95';
+
+  @override
+  String get bmiPercentileOverweightI => 'Phân vị 85-95';
+
+  @override
+  String get bmiPercentileObese => 'Trên phân vị thứ 95';
+
+  @override
+  String get bmiPercentileObeseI => '≥ Phân vị 95';
+
+  @override
+  String bmiNormalInterpretation(String bmi) {
+    return 'BMI của bạn nằm trong phạm vi cân nặng bình thường. Điều này cho thấy cân nặng khỏe mạnh cho chiều cao của bạn.';
+  }
+
+  @override
+  String bmiOverweightInterpretation(String bmi) {
+    return 'Chỉ số BMI cho thấy bạn bị thừa cân. Hãy cân nhắc thay đổi lối sống để đạt được cân nặng khỏe mạnh hơn.';
+  }
+
+  @override
+  String bmiObeseInterpretation(String bmi) {
+    return 'Chỉ số BMI cho thấy bạn bị béo phì. Điều quan trọng là tham khảo ý kiến chuyên gia y tế để được hướng dẫn phù hợp.';
+  }
+
+  @override
+  String get bmiUnderweightRec1 => 'Tăng lượng calo nạp vào với thực phẩm bổ dưỡng, nhiều calo';
+
+  @override
+  String get bmiUnderweightRec2 => 'Bao gồm chất béo lành mạnh, protein và carbohydrate phức hợp trong chế độ ăn';
+
+  @override
+  String get bmiUnderweightRec3 => 'Tham khảo ý kiến nhà cung cấp chăm sóc sức khỏe để loại trừ các vấn đề sức khỏe tiềm ẩn';
+
+  @override
+  String get bmiNormalRec1 => 'Duy trì chế độ ăn cân bằng với nhiều loại chất dinh dưỡng';
+
+  @override
+  String get bmiNormalRec2 => 'Tiếp tục hoạt động thể chất thường xuyên và thói quen tập thể dục';
+
+  @override
+  String get bmiNormalRec3 => 'Theo dõi cân nặng thường xuyên để duy trì trong phạm vi khỏe mạnh';
+
+  @override
+  String get bmiOverweightRec1 => 'Tạo ra sự thiếu hụt calo vừa phải thông qua chế độ ăn và tập thể dục';
+
+  @override
+  String get bmiOverweightRec2 => 'Tập trung vào kiểm soát khẩu phần và chọn thực phẩm giàu chất dinh dưỡng';
+
+  @override
+  String get bmiOverweightRec3 => 'Tăng hoạt động thể chất với cả cardio và tập luyện sức mạnh';
+
+  @override
+  String get bmiObeseRec1 => 'Làm việc với các chuyên gia chăm sóc sức khỏe để phát triển kế hoạch giảm cân an toàn';
+
+  @override
+  String get bmiObeseRec2 => 'Cân nhắc thay đổi lối sống toàn diện bao gồm chế độ ăn và tập thể dục';
+
+  @override
+  String get bmiObeseRec3 => 'Có thể cần thiết theo dõi y tế thường xuyên để có sức khỏe tối ưu';
+
+  @override
+  String get bmiUnderweightDesc => 'Có thể chỉ ra suy dinh dưỡng, rối loạn ăn uống, hoặc các vấn đề sức khỏe tiềm ẩn';
+
+  @override
+  String get bmiNormalDesc => 'Có liên quan đến nguy cơ thấp nhất về các vấn đề sức khỏe liên quan đến cân nặng';
+
+  @override
+  String get bmiOverweightDesc => 'Tăng nguy cơ bệnh tim mạch, tiểu đường và các vấn đề sức khỏe khác';
+
+  @override
+  String get bmiObeseDesc => 'Tăng đáng kể nguy cơ các biến chứng sức khỏe nghiêm trọng';
+
+  @override
+  String get bmiKeyFeatures => 'Tính năng chính';
+
+  @override
+  String get comprehensiveBmiCalc => 'Tính toán BMI toàn diện';
+
+  @override
+  String get comprehensiveBmiCalcDesc => 'Tính BMI sử dụng chiều cao, cân nặng, tuổi và giới tính để có kết quả chính xác';
+
+  @override
+  String get multipleUnitSystems => 'Nhiều hệ thống đơn vị';
+
+  @override
+  String get multipleUnitSystemsDesc => 'Hỗ trợ cả hệ mét (cm/kg) và hệ Anh (ft-in/lbs)';
+
+  @override
+  String get healthInsights => 'Thông tin sức khỏe';
+
+  @override
+  String get healthInsightsDesc => 'Nhận khuyến nghị cá nhân hóa dựa trên danh mục BMI của bạn';
+
+  @override
+  String get ageGenderConsideration => 'Cân nhắc tuổi & giới tính';
+
+  @override
+  String get ageGenderConsiderationDesc => 'Diễn giải BMI được điều chỉnh cho các yếu tố tuổi và giới tính';
+
+  @override
+  String get bmiHowToUse => 'Cách sử dụng';
+
+  @override
+  String get step1Bmi => 'Bước 1: Chọn hệ thống đơn vị';
+
+  @override
+  String get step1BmiDesc => 'Chọn giữa hệ mét (cm/kg) hoặc hệ Anh (ft-in/lbs)';
+
+  @override
+  String get step2Bmi => 'Bước 2: Nhập thông tin của bạn';
+
+  @override
+  String get step2BmiDesc => 'Nhập chiều cao, cân nặng, tuổi và giới tính để tính toán chính xác';
+
+  @override
+  String get step3Bmi => 'Bước 3: Xem kết quả';
+
+  @override
+  String get step3BmiDesc => 'Xem giá trị BMI, danh mục và khuyến nghị sức khỏe cá nhân hóa';
+
+  @override
+  String get step4Bmi => 'Bước 4: Theo dõi tiến trình';
+
+  @override
+  String get step4BmiDesc => 'Lưu phép tính vào lịch sử và theo dõi thay đổi theo thời gian';
+
+  @override
+  String get bmiTips => 'Mẹo sức khỏe';
+
+  @override
+  String get tip1Bmi => 'BMI là công cụ sàng lọc - hãy tham khảo ý kiến nhà cung cấp chăm sóc sức khỏe để đánh giá sức khỏe toàn diện';
+
+  @override
+  String get tip2Bmi => 'Theo dõi thường xuyên giúp theo dõi tiến trình hướng tới mục tiêu sức khỏe';
+
+  @override
+  String get tip3Bmi => 'BMI có thể không phản ánh chính xác thành phần cơ thể đối với vận động viên hoặc người cao tuổi';
+
+  @override
+  String get tip4Bmi => 'Tập trung vào thay đổi lối sống lành mạnh hơn là chỉ tập trung vào con số';
+
+  @override
+  String get tip5Bmi => 'Kết hợp BMI với các chỉ số sức khỏe khác để hiểu rõ hơn';
+
+  @override
+  String get bmiLimitations => 'Hiểu về giới hạn của BMI';
+
+  @override
+  String get bmiLimitationsDesc => 'BMI là công cụ sàng lọc hữu ích nhưng có giới hạn. Nó không phân biệt giữa khối lượng cơ và chất béo, và có thể không chính xác đối với vận động viên, người cao tuổi hoặc một số nhóm dân tộc nhất định. Luôn tham khảo ý kiến chuyên gia chăm sóc sức khỏe để đánh giá sức khỏe toàn diện.';
+
+  @override
+  String get bmiPracticalApplications => 'Ứng dụng thực tế';
+
+  @override
+  String get bmiPracticalApplicationsDesc => 'Hữu ích cho sàng lọc sức khỏe, lập kế hoạch quản lý cân nặng, đặt mục tiêu thể dục và theo dõi tiến trình sức khỏe theo thời gian.';
+
+  @override
+  String get clearBmiHistory => 'Xóa lịch sử BMI';
+
+  @override
+  String get confirmClearHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử BMI không?';
+
+  @override
+  String get historyCleared => 'Đã xóa lịch sử BMI';
+
+  @override
+  String calculatedOn(String date) {
+    return 'Được tính vào $date';
+  }
+
+  @override
+  String bmiResult(String bmi) {
+    return 'BMI: $bmi';
+  }
+
+  @override
+  String get personalInfo => 'Thông tin cá nhân';
+
+  @override
+  String get measurements => 'Số đo';
+
+  @override
+  String get bmiResults => 'Kết quả BMI';
+
+  @override
+  String get recommendations => 'Khuyến nghị';
+
+  @override
+  String get autoSaveToHistory => 'Tự động lưu vào lịch sử';
+
+  @override
+  String get autoSaveToHistoryDesc => 'Tự động lưu các phép tính vào lịch sử';
+
+  @override
+  String get rememberLastValues => 'Nhớ giá trị cuối cùng';
+
+  @override
+  String get rememberLastValuesDesc => 'Nhớ các giá trị bạn đã nhập lần cuối';
 
   @override
   String get currencyFetchMode => 'Tải tỷ giá Tiền tệ';
@@ -2055,7 +2278,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cacheTypeCalculatorTools => 'Công cụ Tính toán';
 
   @override
-  String get cacheTypeCalculatorToolsDesc => 'Lịch sử tính toán, dữ liệu máy tính đồ thị và cài đặt';
+  String get cacheTypeCalculatorToolsDesc => 'Lịch sử tính toán, dữ liệu máy tính đồ thị, dữ liệu BMI và cài đặt';
 
   @override
   String get cacheTypeConverterTools => 'Công cụ chuyển đổi';
@@ -3574,9 +3797,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get timeState => 'Trạng thái Thời gian';
 
   @override
-  String get saved => 'Đã lưu';
-
-  @override
   String get defaultState => 'Mặc định';
 
   @override
@@ -3617,4 +3837,105 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get bmiUnderweightInterpretation => 'Chỉ số BMI của bạn cho thấy bạn bị thiếu cân. Điều này có thể gợi ý bạn cần tăng cân để có sức khỏe tối ưu.';
+
+  @override
+  String get bmiElderlyNote => 'Đối với người trên 65 tuổi, phạm vi BMI hơi cao hơn (22-27) có thể được chấp nhận và có tác dụng bảo vệ.';
+
+  @override
+  String get bmiYouthNote => 'Đối với người dưới 20 tuổi, BMI nên được đánh giá bằng biểu đồ phần trăm theo tuổi và giới tính.';
+
+  @override
+  String get bmiLimitationReminder => 'Lưu ý: BMI chỉ là công cụ sàng lọc và không tính đến khối lượng cơ, mật độ xương hay thành phần cơ thể.';
+
+  @override
+  String get bmiElderlyRec => 'Là người lớn tuổi, hãy tập trung duy trì khối lượng cơ thông qua tập luyện sức bền và đủ protein.';
+
+  @override
+  String get bmiYouthRec => 'Đối với thanh niên, hãy tập trung xây dựng thói quen ăn uống lành mạnh và hoạt động thể chất thường xuyên.';
+
+  @override
+  String get bmiFemaleRec => 'Phụ nữ trong độ tuổi sinh sản nên đảm bảo dinh dưỡng đầy đủ, đặc biệt là sắt và canxi.';
+
+  @override
+  String get bmiConsultationRec => 'Cân nhắc tham khảo ý kiến chuyên gia y tế để được đánh giá sức khỏe và hướng dẫn cá nhân hóa.';
+
+  @override
+  String get bmiFormula => 'BMI = Cân nặng (kg) / [Chiều cao (m)]²';
+
+  @override
+  String get bmiLimitation1 => 'Không phản ánh thành phần cơ thể (tỷ lệ cơ bắp/mỡ)';
+
+  @override
+  String get bmiLimitation2 => 'Có thể không chính xác cho vận động viên, người già, hoặc một số nhóm dân tộc';
+
+  @override
+  String get bmiLimitation3 => 'Không đánh giá các yếu tố sức khỏe khác như huyết áp, cholesterol, đường huyết';
+
+  @override
+  String get bmiLimitation4 => 'Không phù hợp cho phụ nữ mang thai, trẻ em dưới 18 tuổi, hoặc người có bệnh lý nhất định';
+
+  @override
+  String get bmiConsult1 => 'Khám sức khỏe toàn diện và làm các xét nghiệm cần thiết';
+
+  @override
+  String get bmiConsult2 => 'Tham khảo ý kiến chuyên gia y tế và được hướng dẫn';
+
+  @override
+  String get bmiConsult3 => 'Nhận tư vấn và hướng dẫn chăm sóc phù hợp từ bác sĩ chuyên khoa';
+
+  @override
+  String get bmiPediatricTitle => 'Phân loại BMI cho Trẻ em và Thanh thiếu niên (Dưới 18 tuổi)';
+
+  @override
+  String get bmiAdultTitle => 'Phân loại BMI cho Người lớn (Từ 18 tuổi trở lên)';
+
+  @override
+  String get bmiPercentileNote => 'Dựa trên biểu đồ tăng trưởng CDC với phần trăm phân vị theo tuổi và giới tính';
+
+  @override
+  String get bmiPercentileUnderweight => 'Dưới phân vị thứ 5';
+
+  @override
+  String get bmiPercentileNormal => 'Từ phân vị thứ 5 đến 85';
+
+  @override
+  String bmiPediatricInterpretation(Object category, Object percentile) {
+    return 'Phân vị BMI của bạn là $percentile cho tuổi và giới tính của bạn. Điều này cho thấy $category.';
+  }
+
+  @override
+  String get bmiPediatricNote => 'Đối với trẻ em và thanh thiếu niên, BMI được so sánh với những người cùng tuổi và giới tính bằng biểu đồ phân vị.';
+
+  @override
+  String get bmiGrowthPattern => 'Tham khảo ý kiến bác sĩ nhi khoa để đánh giá mô hình tăng trưởng và sức khỏe tổng thể.';
+
+  @override
+  String get age => 'Tuổi';
+
+  @override
+  String get ageYears => 'Tuổi';
+
+  @override
+  String get gender => 'Giới tính';
+
+  @override
+  String get male => 'Nam';
+
+  @override
+  String get female => 'Nữ';
+
+  @override
+  String get bmiCalculatorTab => 'Máy tính';
+
+  @override
+  String get bmiHistoryTab => 'Lịch sử';
+
+  @override
+  String get bmiDetailedInfo => 'Thông tin máy tính BMI';
+
+  @override
+  String get bmiOverview => 'Máy tính chỉ số khối cơ thể toàn diện với thông tin và khuyến nghị sức khỏe';
 }

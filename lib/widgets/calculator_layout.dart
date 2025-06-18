@@ -5,6 +5,7 @@ import 'package:setpocket/services/calculator_history_service.dart';
 /// Generic layout widget for all calculator tools to ensure consistency
 class CalculatorLayout extends StatefulWidget {
   final Widget calculatorContent;
+  final Widget? mobileContent; // Different content for mobile if needed
   final Widget? historyWidget;
   final bool historyEnabled;
   final bool hasHistory;
@@ -15,6 +16,7 @@ class CalculatorLayout extends StatefulWidget {
   const CalculatorLayout({
     super.key,
     required this.calculatorContent,
+    this.mobileContent, // Optional mobile-specific content
     this.historyWidget,
     required this.historyEnabled,
     required this.hasHistory,
@@ -52,29 +54,94 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
 
     if (isLargeScreen) {
       if (widget.historyEnabled && widget.historyWidget != null) {
-        // Desktop with history: 3:2 ratio with constrained height
+        // Desktop with history: 3:2 ratio with bordered containers and titles
         content = LayoutBuilder(
           builder: (context, constraints) {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Calculator content: 60% width (3/5)
+                // Calculator content: 60% width (3/5) with border and title
                 Expanded(
                   flex: 3,
                   child: Container(
                     height: constraints.maxHeight,
-                    padding: const EdgeInsets.all(16),
-                    child: widget.calculatorContent,
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Calculator title header
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Theme.of(context)
+                                    .dividerColor
+                                    .withValues(alpha: 0.2),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calculate,
+                                size: 20,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                widget.title,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Calculator content
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: widget.calculatorContent,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 24),
-                // History widget: 40% width (2/5)
+
+                // History widget: 40% width (2/5) with border and title
                 Expanded(
                   flex: 2,
                   child: Container(
                     height: constraints.maxHeight,
-                    padding:
-                        const EdgeInsets.only(top: 16, right: 16, bottom: 16),
+                    margin: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.2),
+                      ),
+                    ),
                     child: widget.historyWidget!,
                   ),
                 ),
@@ -83,20 +150,77 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
           },
         );
       } else {
-        // Desktop without history: Calculator centered with constrained height
+        // Desktop without history: Calculator centered with border and title
         content = LayoutBuilder(
           builder: (context, constraints) {
             return Row(
               children: [
                 // Left spacer: 20%
                 const Expanded(flex: 1, child: SizedBox()),
-                // Calculator content: 60%
+                // Calculator content: 60% with border and title
                 Expanded(
                   flex: 3,
                   child: Container(
                     height: constraints.maxHeight,
-                    padding: const EdgeInsets.all(16),
-                    child: widget.calculatorContent,
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Calculator title header
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Theme.of(context)
+                                    .dividerColor
+                                    .withValues(alpha: 0.2),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calculate,
+                                size: 20,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                widget.title,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Calculator content
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: widget.calculatorContent,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // Right spacer: 20%
@@ -108,6 +232,8 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
       }
     } else {
       // Mobile: Tab layout or single view
+      final contentToUse = widget.mobileContent ?? widget.calculatorContent;
+
       if (widget.historyEnabled && widget.historyWidget != null) {
         final loc = AppLocalizations.of(context)!;
         content = Column(
@@ -134,7 +260,7 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
                   // Calculator tab - with proper constraints
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: widget.calculatorContent,
+                    child: contentToUse,
                   ),
                   // History tab
                   Padding(
@@ -150,7 +276,7 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
         // Mobile without history: Direct content with padding
         content = Padding(
           padding: const EdgeInsets.all(16),
-          child: widget.calculatorContent,
+          child: contentToUse,
         );
       }
     }

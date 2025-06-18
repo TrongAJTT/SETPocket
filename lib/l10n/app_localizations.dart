@@ -341,6 +341,18 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @saveToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to History'**
+  String get saveToHistory;
+
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:
@@ -2138,13 +2150,13 @@ abstract class AppLocalizations {
   /// No description provided for @noHistoryYet.
   ///
   /// In en, this message translates to:
-  /// **'No history yet'**
+  /// **'No calculations yet'**
   String get noHistoryYet;
 
   /// No description provided for @noHistoryMessage.
   ///
   /// In en, this message translates to:
-  /// **'Generate some random results to see them here'**
+  /// **'Your BMI calculation history will appear here'**
   String get noHistoryMessage;
 
   /// No description provided for @clearHistory.
@@ -3302,7 +3314,7 @@ abstract class AppLocalizations {
   /// No description provided for @calculationHistoryDesc.
   ///
   /// In en, this message translates to:
-  /// **'Automatic saving and browsing of previous calculations'**
+  /// **'Track your BMI calculations over time with detailed history'**
   String get calculationHistoryDesc;
 
   /// No description provided for @memoryOperations.
@@ -3629,11 +3641,425 @@ abstract class AppLocalizations {
   /// **'Overweight'**
   String get overweight;
 
+  /// No description provided for @overweightI.
+  ///
+  /// In en, this message translates to:
+  /// **'Overweight I'**
+  String get overweightI;
+
+  /// No description provided for @overweightII.
+  ///
+  /// In en, this message translates to:
+  /// **'Overweight II'**
+  String get overweightII;
+
   /// No description provided for @obese.
   ///
   /// In en, this message translates to:
   /// **'Obese'**
   String get obese;
+
+  /// No description provided for @obeseI.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese I'**
+  String get obeseI;
+
+  /// No description provided for @obeseII.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese II'**
+  String get obeseII;
+
+  /// No description provided for @obeseIII.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese III'**
+  String get obeseIII;
+
+  /// No description provided for @bmiPercentileOverweight.
+  ///
+  /// In en, this message translates to:
+  /// **'85th to 95th percentile'**
+  String get bmiPercentileOverweight;
+
+  /// No description provided for @bmiPercentileOverweightI.
+  ///
+  /// In en, this message translates to:
+  /// **'85th - 95th percentile'**
+  String get bmiPercentileOverweightI;
+
+  /// No description provided for @bmiPercentileObese.
+  ///
+  /// In en, this message translates to:
+  /// **'Above 95th percentile'**
+  String get bmiPercentileObese;
+
+  /// No description provided for @bmiPercentileObeseI.
+  ///
+  /// In en, this message translates to:
+  /// **'≥ 95th percentile'**
+  String get bmiPercentileObeseI;
+
+  /// No description provided for @bmiNormalInterpretation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI is within the normal weight range. This indicates a healthy weight for your height.'**
+  String bmiNormalInterpretation(String bmi);
+
+  /// No description provided for @bmiOverweightInterpretation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI indicates that you are overweight. Consider lifestyle changes to achieve a healthier weight.'**
+  String bmiOverweightInterpretation(String bmi);
+
+  /// No description provided for @bmiObeseInterpretation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI indicates obesity. It\'s important to consult with healthcare professionals for proper guidance.'**
+  String bmiObeseInterpretation(String bmi);
+
+  /// No description provided for @bmiUnderweightRec1.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase calorie intake with nutritious, high-calorie foods'**
+  String get bmiUnderweightRec1;
+
+  /// No description provided for @bmiUnderweightRec2.
+  ///
+  /// In en, this message translates to:
+  /// **'Include healthy fats, proteins, and complex carbohydrates in your diet'**
+  String get bmiUnderweightRec2;
+
+  /// No description provided for @bmiUnderweightRec3.
+  ///
+  /// In en, this message translates to:
+  /// **'Consult a healthcare provider to rule out underlying health issues'**
+  String get bmiUnderweightRec3;
+
+  /// No description provided for @bmiNormalRec1.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain a balanced diet with variety of nutrients'**
+  String get bmiNormalRec1;
+
+  /// No description provided for @bmiNormalRec2.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue regular physical activity and exercise routine'**
+  String get bmiNormalRec2;
+
+  /// No description provided for @bmiNormalRec3.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor your weight regularly to stay within healthy range'**
+  String get bmiNormalRec3;
+
+  /// No description provided for @bmiOverweightRec1.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a moderate calorie deficit through diet and exercise'**
+  String get bmiOverweightRec1;
+
+  /// No description provided for @bmiOverweightRec2.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on portion control and choose nutrient-dense foods'**
+  String get bmiOverweightRec2;
+
+  /// No description provided for @bmiOverweightRec3.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase physical activity with both cardio and strength training'**
+  String get bmiOverweightRec3;
+
+  /// No description provided for @bmiObeseRec1.
+  ///
+  /// In en, this message translates to:
+  /// **'Work with healthcare professionals to develop a safe weight loss plan'**
+  String get bmiObeseRec1;
+
+  /// No description provided for @bmiObeseRec2.
+  ///
+  /// In en, this message translates to:
+  /// **'Consider comprehensive lifestyle changes including diet and exercise'**
+  String get bmiObeseRec2;
+
+  /// No description provided for @bmiObeseRec3.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular medical monitoring may be necessary for optimal health'**
+  String get bmiObeseRec3;
+
+  /// No description provided for @bmiUnderweightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'May indicate malnutrition, eating disorders, or underlying health conditions'**
+  String get bmiUnderweightDesc;
+
+  /// No description provided for @bmiNormalDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Associated with lowest risk of weight-related health problems'**
+  String get bmiNormalDesc;
+
+  /// No description provided for @bmiOverweightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Increased risk of cardiovascular disease, diabetes, and other health issues'**
+  String get bmiOverweightDesc;
+
+  /// No description provided for @bmiObeseDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Significantly increased risk of serious health complications'**
+  String get bmiObeseDesc;
+
+  /// No description provided for @bmiKeyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get bmiKeyFeatures;
+
+  /// No description provided for @comprehensiveBmiCalc.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive BMI Calculation'**
+  String get comprehensiveBmiCalc;
+
+  /// No description provided for @comprehensiveBmiCalcDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate BMI using height, weight, age, and gender for accurate results'**
+  String get comprehensiveBmiCalcDesc;
+
+  /// No description provided for @multipleUnitSystems.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Unit Systems'**
+  String get multipleUnitSystems;
+
+  /// No description provided for @multipleUnitSystemsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements'**
+  String get multipleUnitSystemsDesc;
+
+  /// No description provided for @healthInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Insights'**
+  String get healthInsights;
+
+  /// No description provided for @healthInsightsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get personalized recommendations based on your BMI category'**
+  String get healthInsightsDesc;
+
+  /// No description provided for @ageGenderConsideration.
+  ///
+  /// In en, this message translates to:
+  /// **'Age & Gender Consideration'**
+  String get ageGenderConsideration;
+
+  /// No description provided for @ageGenderConsiderationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI interpretation adjusted for age and gender factors'**
+  String get ageGenderConsiderationDesc;
+
+  /// No description provided for @bmiHowToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get bmiHowToUse;
+
+  /// No description provided for @step1Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Select Unit System'**
+  String get step1Bmi;
+
+  /// No description provided for @step1BmiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements'**
+  String get step1BmiDesc;
+
+  /// No description provided for @step2Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Enter Your Information'**
+  String get step2Bmi;
+
+  /// No description provided for @step2BmiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Input your height, weight, age, and gender for accurate calculation'**
+  String get step2BmiDesc;
+
+  /// No description provided for @step3Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: View Results'**
+  String get step3Bmi;
+
+  /// No description provided for @step3BmiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See your BMI value, category, and personalized health recommendations'**
+  String get step3BmiDesc;
+
+  /// No description provided for @step4Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Track Progress'**
+  String get step4Bmi;
+
+  /// No description provided for @step4BmiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save calculations to history and monitor changes over time'**
+  String get step4BmiDesc;
+
+  /// No description provided for @bmiTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Tips'**
+  String get bmiTips;
+
+  /// No description provided for @tip1Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI is a screening tool - consult healthcare providers for complete health assessment'**
+  String get tip1Bmi;
+
+  /// No description provided for @tip2Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular monitoring helps track progress toward health goals'**
+  String get tip2Bmi;
+
+  /// No description provided for @tip3Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI may not accurately reflect body composition for athletes or elderly'**
+  String get tip3Bmi;
+
+  /// No description provided for @tip4Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on healthy lifestyle changes rather than just the number'**
+  String get tip4Bmi;
+
+  /// No description provided for @tip5Bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Combine BMI with other health indicators for better understanding'**
+  String get tip5Bmi;
+
+  /// No description provided for @bmiLimitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Understanding BMI Limitations'**
+  String get bmiLimitations;
+
+  /// No description provided for @bmiLimitationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI is a useful screening tool but has limitations. It doesn\'t distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.'**
+  String get bmiLimitationsDesc;
+
+  /// No description provided for @bmiPracticalApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Applications'**
+  String get bmiPracticalApplications;
+
+  /// No description provided for @bmiPracticalApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.'**
+  String get bmiPracticalApplicationsDesc;
+
+  /// No description provided for @clearBmiHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear BMI History'**
+  String get clearBmiHistory;
+
+  /// No description provided for @confirmClearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all BMI history?'**
+  String get confirmClearHistory;
+
+  /// No description provided for @historyCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI history cleared'**
+  String get historyCleared;
+
+  /// No description provided for @calculatedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated on {date}'**
+  String calculatedOn(String date);
+
+  /// No description provided for @bmiResult.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI: {bmi}'**
+  String bmiResult(String bmi);
+
+  /// No description provided for @personalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get personalInfo;
+
+  /// No description provided for @measurements.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurements'**
+  String get measurements;
+
+  /// No description provided for @bmiResults.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI Results'**
+  String get bmiResults;
+
+  /// No description provided for @recommendations.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get recommendations;
+
+  /// No description provided for @autoSaveToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-save to History'**
+  String get autoSaveToHistory;
+
+  /// No description provided for @autoSaveToHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically save calculations to history'**
+  String get autoSaveToHistoryDesc;
+
+  /// No description provided for @rememberLastValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Last Values'**
+  String get rememberLastValues;
+
+  /// No description provided for @rememberLastValuesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember your last entered values'**
+  String get rememberLastValuesDesc;
 
   /// No description provided for @currencyFetchMode.
   ///
@@ -3962,7 +4388,7 @@ abstract class AppLocalizations {
   /// No description provided for @cacheTypeCalculatorToolsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Calculation history, graphing calculator data, and settings'**
+  /// **'Calculation history, graphing calculator data, BMI data, and settings'**
   String get cacheTypeCalculatorToolsDesc;
 
   /// No description provided for @cacheTypeConverterTools.
@@ -6905,12 +7331,6 @@ abstract class AppLocalizations {
   /// **'Time State'**
   String get timeState;
 
-  /// No description provided for @saved.
-  ///
-  /// In en, this message translates to:
-  /// **'Saved'**
-  String get saved;
-
   /// No description provided for @defaultState.
   ///
   /// In en, this message translates to:
@@ -6982,6 +7402,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get ok;
+
+  /// No description provided for @bmiUnderweightInterpretation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI indicates that you are underweight. This may suggest you need to gain weight for optimal health.'**
+  String get bmiUnderweightInterpretation;
+
+  /// No description provided for @bmiElderlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'For adults over 65, slightly higher BMI ranges (22-27) may be acceptable and protective.'**
+  String get bmiElderlyNote;
+
+  /// No description provided for @bmiYouthNote.
+  ///
+  /// In en, this message translates to:
+  /// **'For individuals under 20, BMI should be evaluated using age and gender-specific percentile charts.'**
+  String get bmiYouthNote;
+
+  /// No description provided for @bmiLimitationReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember: BMI is a screening tool and doesn\'t account for muscle mass, bone density, or body composition.'**
+  String get bmiLimitationReminder;
+
+  /// No description provided for @bmiElderlyRec.
+  ///
+  /// In en, this message translates to:
+  /// **'As an older adult, focus on maintaining muscle mass through resistance training and adequate protein intake.'**
+  String get bmiElderlyRec;
+
+  /// No description provided for @bmiYouthRec.
+  ///
+  /// In en, this message translates to:
+  /// **'For young adults, focus on establishing healthy eating patterns and regular physical activity habits.'**
+  String get bmiYouthRec;
+
+  /// No description provided for @bmiFemaleRec.
+  ///
+  /// In en, this message translates to:
+  /// **'Women of reproductive age should ensure adequate nutrition, especially iron and calcium intake.'**
+  String get bmiFemaleRec;
+
+  /// No description provided for @bmiConsultationRec.
+  ///
+  /// In en, this message translates to:
+  /// **'Consider consulting with healthcare professionals for personalized health assessment and guidance.'**
+  String get bmiConsultationRec;
+
+  /// No description provided for @bmiFormula.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI = Weight (kg) / [Height (m)]²'**
+  String get bmiFormula;
+
+  /// No description provided for @bmiLimitation1.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not reflect body composition (muscle vs. fat ratio)'**
+  String get bmiLimitation1;
+
+  /// No description provided for @bmiLimitation2.
+  ///
+  /// In en, this message translates to:
+  /// **'May not be accurate for athletes, elderly, or certain ethnic groups'**
+  String get bmiLimitation2;
+
+  /// No description provided for @bmiLimitation3.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not assess other health factors like blood pressure, cholesterol, or blood sugar'**
+  String get bmiLimitation3;
+
+  /// No description provided for @bmiLimitation4.
+  ///
+  /// In en, this message translates to:
+  /// **'Not suitable for pregnant women, children under 18, or individuals with certain medical conditions'**
+  String get bmiLimitation4;
+
+  /// No description provided for @bmiConsult1.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive health checkups and necessary tests'**
+  String get bmiConsult1;
+
+  /// No description provided for @bmiConsult2.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional medical consultation and guidance'**
+  String get bmiConsult2;
+
+  /// No description provided for @bmiConsult3.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalized care recommendations from healthcare specialists'**
+  String get bmiConsult3;
+
+  /// No description provided for @bmiPediatricTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI Classification for Children and Adolescents (Under 18)'**
+  String get bmiPediatricTitle;
+
+  /// No description provided for @bmiAdultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI Classification for Adults (18 and Over)'**
+  String get bmiAdultTitle;
+
+  /// No description provided for @bmiPercentileNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on CDC growth charts with age and gender-specific percentiles'**
+  String get bmiPercentileNote;
+
+  /// No description provided for @bmiPercentileUnderweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Below 5th percentile'**
+  String get bmiPercentileUnderweight;
+
+  /// No description provided for @bmiPercentileNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'5th to 85th percentile'**
+  String get bmiPercentileNormal;
+
+  /// No description provided for @bmiPediatricInterpretation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI percentile is {percentile} for your age and gender. This indicates {category}.'**
+  String bmiPediatricInterpretation(Object category, Object percentile);
+
+  /// No description provided for @bmiPediatricNote.
+  ///
+  /// In en, this message translates to:
+  /// **'For children and adolescents, BMI is compared to others of the same age and gender using percentile charts.'**
+  String get bmiPediatricNote;
+
+  /// No description provided for @bmiGrowthPattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Consult with pediatrician to evaluate growth patterns and overall health.'**
+  String get bmiGrowthPattern;
+
+  /// No description provided for @age.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get age;
+
+  /// No description provided for @ageYears.
+  ///
+  /// In en, this message translates to:
+  /// **'Age (years)'**
+  String get ageYears;
+
+  /// No description provided for @gender.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get gender;
+
+  /// No description provided for @male.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get male;
+
+  /// No description provided for @female.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get female;
+
+  /// No description provided for @bmiCalculatorTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator'**
+  String get bmiCalculatorTab;
+
+  /// No description provided for @bmiHistoryTab.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get bmiHistoryTab;
+
+  /// No description provided for @bmiDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI Calculator Information'**
+  String get bmiDetailedInfo;
+
+  /// No description provided for @bmiOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive Body Mass Index calculator with health insights and recommendations'**
+  String get bmiOverview;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

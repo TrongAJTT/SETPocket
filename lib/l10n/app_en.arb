@@ -47,6 +47,8 @@
     "about": "About",
     "add": "Add",
     "save": "Save",
+    "saved": "Saved",
+    "saveToHistory": "Save to history",
     "edit": "Edit",
     "copy": "Copy",
     "cancel": "Cancel",
@@ -710,7 +712,126 @@
     "underweight": "Underweight",
     "normalWeight": "Normal Weight",
     "overweight": "Overweight",
+    "overweightI": "Overweight I",
+    "overweightII": "Overweight II", 
     "obese": "Obese",
+    "obeseI": "Obese I",
+    "obeseII": "Obese II",
+    "obeseIII": "Obese III",
+    
+    "bmiPercentileOverweight": "85th - 95th percentile",
+    "bmiPercentileOverweightI": "85th - 95th percentile",
+    "bmiPercentileObese": "≥ 95th percentile",
+    "bmiPercentileObeseI": "≥ 95th percentile",
+    
+    "bmiNormalInterpretation": "Your BMI is {bmi}, which is in the normal healthy weight range. Keep maintaining your current lifestyle!",
+    "@bmiNormalInterpretation": {
+        "placeholders": {
+            "bmi": {
+                "type": "String"
+            }
+        }
+    },
+    "bmiOverweightInterpretation": "Your BMI is {bmi}, which is considered overweight. Consider healthy lifestyle changes to reduce weight.",
+    "@bmiOverweightInterpretation": {
+        "placeholders": {
+            "bmi": {
+                "type": "String"
+            }
+        }
+    },
+    "bmiObeseInterpretation": "Your BMI is {bmi}, which is considered obese. It's recommended to consult healthcare professionals for guidance.",
+    "@bmiObeseInterpretation": {
+        "placeholders": {
+            "bmi": {
+                "type": "String"
+            }
+        }
+    },
+    
+    "bmiUnderweightRec1": "Increase calorie intake with nutritious, high-calorie foods",
+    "bmiUnderweightRec2": "Include healthy fats, proteins, and complex carbohydrates in your diet",
+    "bmiUnderweightRec3": "Consult a healthcare provider to rule out underlying health issues",
+    "bmiNormalRec1": "Maintain a balanced diet with variety of nutrients",
+    "bmiNormalRec2": "Continue regular physical activity and exercise routine",
+    "bmiNormalRec3": "Monitor your weight regularly to stay within healthy range",
+    "bmiOverweightRec1": "Create a moderate calorie deficit through diet and exercise",
+    "bmiOverweightRec2": "Focus on portion control and choose nutrient-dense foods",
+    "bmiOverweightRec3": "Increase physical activity with both cardio and strength training",
+    "bmiObeseRec1": "Work with healthcare professionals to develop a safe weight loss plan",
+    "bmiObeseRec2": "Consider comprehensive lifestyle changes including diet and exercise",
+    "bmiObeseRec3": "Regular medical monitoring may be necessary for optimal health",
+    
+    "bmiUnderweightDesc": "Below normal weight range, may indicate nutritional deficiency",
+    "bmiNormalDesc": "Optimal weight range associated with lowest health risks",
+    "bmiOverweightDesc": "Above normal weight range, increased risk of health issues",
+    "bmiObeseDesc": "Significantly above normal weight range, higher health risks",
+    
+    "bmiKeyFeatures": "Key Features",
+    "comprehensiveBmiCalc": "Comprehensive BMI Calculation",
+    "comprehensiveBmiCalcDesc": "Calculate BMI using height, weight, age, and gender for accurate results",
+    "multipleUnitSystems": "Multiple Unit Systems",
+    "multipleUnitSystemsDesc": "Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements",
+    "healthInsights": "Health Insights",
+    "healthInsightsDesc": "Get personalized recommendations based on your BMI category",
+    "calculationHistory": "Calculation History",
+    "calculationHistoryDesc": "Track your BMI calculations over time with detailed history",
+    "ageGenderConsideration": "Age & Gender Consideration",
+    "ageGenderConsiderationDesc": "BMI interpretation adjusted for age and gender factors",
+    
+    "bmiHowToUse": "How to Use",
+    "step1Bmi": "Step 1: Select Unit System",
+    "step1BmiDesc": "Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements",
+    "step2Bmi": "Step 2: Enter Your Information",
+    "step2BmiDesc": "Input your height, weight, age, and gender for accurate calculation",
+    "step3Bmi": "Step 3: View Results",
+    "step3BmiDesc": "See your BMI value, category, and personalized health recommendations",
+    "step4Bmi": "Step 4: Track Progress",
+    "step4BmiDesc": "Save calculations to history and monitor changes over time",
+    
+    "bmiTips": "Health Tips",
+    "tip1Bmi": "BMI is a screening tool - consult healthcare providers for complete health assessment",
+    "tip2Bmi": "Regular monitoring helps track progress toward health goals",
+    "tip3Bmi": "BMI may not accurately reflect body composition for athletes or elderly",
+    "tip4Bmi": "Focus on healthy lifestyle changes rather than just the number",
+    "tip5Bmi": "Combine BMI with other health indicators for better understanding",
+    
+    "bmiLimitations": "Understanding BMI Limitations",
+    "bmiLimitationsDesc": "BMI is a useful screening tool but has limitations. It doesn't distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.",
+    
+    "bmiPracticalApplications": "Practical Applications",
+    "bmiPracticalApplicationsDesc": "Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.",
+    
+    "noHistoryYet": "No calculations yet",
+    "noHistoryMessage": "Your BMI calculation history will appear here",
+    "clearBmiHistory": "Clear BMI History",
+    "confirmClearHistory": "Are you sure you want to clear all BMI history?",
+    "historyCleared": "BMI history cleared",
+    "calculatedOn": "Calculated on {date}",
+    "@calculatedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "bmiResult": "BMI: {bmi}",
+    "@bmiResult": {
+        "placeholders": {
+            "bmi": {
+                "type": "String"
+            }
+        }
+    },
+    "personalInfo": "Personal Information",
+    "measurements": "Measurements",
+    "bmiResults": "BMI Results",
+    "recommendations": "Recommendations",
+    "saveToHistory": "Save to History",
+    "autoSaveToHistory": "Auto-save to History",
+    "autoSaveToHistoryDesc": "Automatically save calculations to history",
+    "rememberLastValues": "Remember Last Values",
+    "rememberLastValuesDesc": "Remember your last entered values",
     
     "currencyFetchMode": "Currency Rate Fetching",
     "currencyFetchModeDesc": "Choose how currency exchange rates are updated",
@@ -850,7 +971,7 @@
   "largeFileDetected": "Large file detected. Using optimized loading...",
 
       "cacheTypeCalculatorTools": "Calculator Tools",
-    "cacheTypeCalculatorToolsDesc": "Calculation history, graphing calculator data, and settings",
+    "cacheTypeCalculatorToolsDesc": "Calculation history, graphing calculator data, BMI data, and settings",
     "cacheTypeConverterTools": "Converter Tools",
     "cacheTypeConverterToolsDesc": "Currency/length states, presets and exchange rates cache",
 
@@ -1602,5 +1723,56 @@
     },
     "clearingStateData": "Clearing all converter state data...",
     "stateDataClearedSuccess": "All state data has been cleared. The app will restart to complete the process.",
-    "ok": "OK"
+    "ok": "OK",
+    "bmiUnderweightInterpretation": "Your BMI indicates that you are underweight. This may suggest you need to gain weight for optimal health.",
+    "bmiNormalInterpretation": "Your BMI is within the normal weight range. This indicates a healthy weight for your height.",
+    "bmiOverweightInterpretation": "Your BMI indicates that you are overweight. Consider lifestyle changes to achieve a healthier weight.",
+    "bmiObeseInterpretation": "Your BMI indicates obesity. It's important to consult with healthcare professionals for proper guidance.",
+
+    "bmiElderlyNote": "For adults over 65, slightly higher BMI ranges (22-27) may be acceptable and protective.",
+    "bmiYouthNote": "For individuals under 20, BMI should be evaluated using age and gender-specific percentile charts.",
+    "bmiLimitationReminder": "Remember: BMI is a screening tool and doesn't account for muscle mass, bone density, or body composition.",
+
+    "bmiElderlyRec": "As an older adult, focus on maintaining muscle mass through resistance training and adequate protein intake.",
+    "bmiYouthRec": "For young adults, focus on establishing healthy eating patterns and regular physical activity habits.",
+    "bmiFemaleRec": "Women of reproductive age should ensure adequate nutrition, especially iron and calcium intake.",
+    "bmiConsultationRec": "Consider consulting with healthcare professionals for personalized health assessment and guidance.",
+
+    "bmiFormula": "BMI = Weight (kg) / [Height (m)]²",
+    "bmiLimitation1": "Does not reflect body composition (muscle vs. fat ratio)",
+    "bmiLimitation2": "May not be accurate for athletes, elderly, or certain ethnic groups",
+    "bmiLimitation3": "Does not assess other health factors like blood pressure, cholesterol, or blood sugar",
+    "bmiLimitation4": "Not suitable for pregnant women, children under 18, or individuals with certain medical conditions",
+
+    "bmiConsult1": "Comprehensive health checkups and necessary tests",
+    "bmiConsult2": "Professional medical consultation and guidance",
+    "bmiConsult3": "Personalized care recommendations from healthcare specialists",
+
+    "bmiUnderweightDesc": "May indicate malnutrition, eating disorders, or underlying health conditions",
+    "bmiNormalDesc": "Associated with lowest risk of weight-related health problems",
+    "bmiOverweightDesc": "Increased risk of cardiovascular disease, diabetes, and other health issues",
+    "bmiObeseDesc": "Significantly increased risk of serious health complications",
+
+    "bmiPediatricTitle": "BMI Classification for Children and Adolescents (Under 18)",
+    "bmiAdultTitle": "BMI Classification for Adults (18 and Over)",
+    "bmiPercentileNote": "Based on CDC growth charts with age and gender-specific percentiles",
+    "bmiPercentileUnderweight": "Below 5th percentile",
+    "bmiPercentileNormal": "5th to 85th percentile", 
+    "bmiPercentileOverweight": "85th to 95th percentile",
+    "bmiPercentileObese": "Above 95th percentile",
+
+    "bmiPediatricInterpretation": "Your BMI percentile is {percentile} for your age and gender. This indicates {category}.",
+    "bmiPediatricNote": "For children and adolescents, BMI is compared to others of the same age and gender using percentile charts.",
+    "bmiGrowthPattern": "Consult with pediatrician to evaluate growth patterns and overall health.",
+
+    "age": "Age",
+    "ageYears": "Age (years)",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "bmiCalculatorTab": "Calculator",
+    "bmiHistoryTab": "History",
+    "bmiDetailedInfo": "BMI Calculator Information",
+    "bmiOverview": "Comprehensive Body Mass Index calculator with health insights and recommendations"
 }

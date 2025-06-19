@@ -1,121 +1,422 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:math';
+
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/models/financial_models.dart';
+import 'package:setpocket/services/financial_calculator_service.dart';
+import 'package:setpocket/services/graphing_calculator_service.dart';
+import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 
 class FinancialCalculatorScreen extends StatefulWidget {
-  const FinancialCalculatorScreen({super.key});
+  final bool isEmbedded;
+
+  const FinancialCalculatorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<FinancialCalculatorScreen> createState() =>
       _FinancialCalculatorScreenState();
 }
 
-class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
+  // Form controllers for each tab
+  final Map<String, TextEditingController> _loanControllers = {
+    'amount': TextEditingController(),
+    'rate': TextEditingController(),
+    'term': TextEditingController(),
+  };
 
-  // Loan Calculator
-  final _loanAmountController = TextEditingController();
-  final _loanInterestController = TextEditingController();
-  final _loanTermController = TextEditingController();
-  double? _monthlyPayment;
-  double? _totalPayment;
-  double? _totalInterest;
+  final Map<String, TextEditingController> _investmentControllers = {
+    'initial': TextEditingController(),
+    'monthly': TextEditingController(),
+    'rate': TextEditingController(),
+    'term': TextEditingController(),
+  };
 
-  // Investment Calculator
-  final _initialInvestmentController = TextEditingController();
-  final _monthlyContributionController = TextEditingController();
-  final _investmentInterestController = TextEditingController();
-  final _investmentTermController = TextEditingController();
-  double? _futureValue;
-  double? _totalContributions;
-  double? _totalEarnings;
+  final Map<String, TextEditingController> _compoundControllers = {
+    'principal': TextEditingController(),
+    'rate': TextEditingController(),
+    'time': TextEditingController(),
+    'frequency': TextEditingController(),
+  };
 
-  // Compound Interest Calculator
-  final _principalController = TextEditingController();
-  final _compoundInterestController = TextEditingController();
-  final _compoundTermController = TextEditingController();
-  final _compoundFrequencyController = TextEditingController(text: '12');
-  double? _compoundAmount;
-  double? _compoundInterestEarned;
+  // Results
+  LoanCalculationResult? _loanResult;
+  InvestmentCalculationResult? _investmentResult;
+  CompoundInterestCalculationResult? _compoundResult;
+
+  // History and settings
+  List<FinancialCalculationHistory> _history = [];
+  bool _historyEnabled = false;
+
+  // Current main tab index for state management
+  int _currentMainTabIndex = 0;
+
+  // Flag to track if data was manually cleared
+  bool _wasDataCleared = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _loadSettings();
+    _loadState();
+  }
+
+  void _initializeDefaults() {
+    // Only set default frequency value if this is a fresh start (no state loaded)
+    // and data was not manually cleared
+    final allCompoundEmpty = _compoundControllers.values
+        .every((controller) => controller.text.isEmpty);
+
+    if (!_wasDataCleared &&
+        allCompoundEmpty &&
+        _compoundControllers['frequency']!.text.isEmpty) {
+      _compoundControllers['frequency']!.text = '12';
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadSettings();
+    _checkAndReloadState();
+  }
+
+  Future<void> _checkAndReloadState() async {
+    // Check if state exists in database but controller has old values
+    final state = await FinancialCalculatorService.getCurrentState();
+
+    // If no state exists but we have data in controllers, it means cache was cleared
+    // but widget wasn't reloaded - need to clear all data
+    if (state == null) {
+      final hasAnyData =
+          _loanControllers.values.any((c) => c.text.isNotEmpty) ||
+              _investmentControllers.values.any((c) => c.text.isNotEmpty) ||
+              _compoundControllers.values.any((c) => c.text.isNotEmpty) ||
+              _loanResult != null ||
+              _investmentResult != null ||
+              _compoundResult != null;
+
+      if (hasAnyData) {
+        // Clear all controllers to reflect the cleared cache state
+        setState(() {
+          for (final controller in _loanControllers.values) {
+            controller.clear();
+          }
+          for (final controller in _investmentControllers.values) {
+            controller.clear();
+          }
+          for (final controller in _compoundControllers.values) {
+            controller.clear();
+          }
+
+          // Clear results
+          _loanResult = null;
+          _investmentResult = null;
+          _compoundResult = null;
+
+          // Reset to default tab
+          _currentMainTabIndex = 0;
+
+          // Mark as cleared
+          _wasDataCleared = true;
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _loanAmountController.dispose();
-    _loanInterestController.dispose();
-    _loanTermController.dispose();
-    _initialInvestmentController.dispose();
-    _monthlyContributionController.dispose();
-    _investmentInterestController.dispose();
-    _investmentTermController.dispose();
-    _principalController.dispose();
-    _compoundInterestController.dispose();
-    _compoundTermController.dispose();
-    _compoundFrequencyController.dispose();
+    // Save state before disposing (while context is still valid)
+    // Use unawaited since dispose should not be async
+    if (mounted) {
+      _saveState().catchError((error) {
+        // Ignore save errors during dispose
+      });
+    }
+
+    _disposeControllers();
     super.dispose();
+  }
+
+  void _disposeControllers() {
+    for (final controller in _loanControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _investmentControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _compoundControllers.values) {
+      controller.dispose();
+    }
+  }
+
+  Future<void> _loadSettings() async {
+    final enabled = await GraphingCalculatorService.getRememberHistory();
+    final history = await FinancialCalculatorService.getHistory();
+    if (mounted) {
+      setState(() {
+        _historyEnabled = enabled;
+        _history = history;
+      });
+    }
+  }
+
+  Future<void> _loadState() async {
+    final state = await FinancialCalculatorService.getCurrentState();
+    if (state != null && mounted) {
+      setState(() {
+        // Restore main tab index
+        if (state.activeTabIndex < 3) {
+          _currentMainTabIndex = state.activeTabIndex;
+        }
+
+        // Load inputs
+        state.loanInputs.forEach((key, value) {
+          if (_loanControllers.containsKey(key)) {
+            _loanControllers[key]!.text = value;
+          }
+        });
+
+        state.investmentInputs.forEach((key, value) {
+          if (_investmentControllers.containsKey(key)) {
+            _investmentControllers[key]!.text = value;
+          }
+        });
+
+        state.compoundInputs.forEach((key, value) {
+          if (_compoundControllers.containsKey(key)) {
+            _compoundControllers[key]!.text = value;
+          }
+        });
+
+        // Load results
+        if (state.loanResults != null) {
+          _loanResult = LoanCalculationResult.fromMap(state.loanResults!);
+        }
+        if (state.investmentResults != null) {
+          _investmentResult =
+              InvestmentCalculationResult.fromMap(state.investmentResults!);
+        }
+        if (state.compoundResults != null) {
+          _compoundResult =
+              CompoundInterestCalculationResult.fromMap(state.compoundResults!);
+        }
+      });
+    }
+
+    // Initialize defaults after trying to load state
+    _initializeDefaults();
+  }
+
+  Future<void> _saveState() async {
+    try {
+      // Check if context is still valid before accessing MediaQuery
+      if (!mounted) return;
+
+      final state = FinancialCalculatorState(
+        activeTabIndex: _currentMainTabIndex,
+        loanInputs: _loanControllers
+            .map((key, controller) => MapEntry(key, controller.text)),
+        investmentInputs: _investmentControllers
+            .map((key, controller) => MapEntry(key, controller.text)),
+        compoundInputs: _compoundControllers
+            .map((key, controller) => MapEntry(key, controller.text)),
+        loanResults: _loanResult?.toMap(),
+        investmentResults: _investmentResult?.toMap(),
+        compoundResults: _compoundResult?.toMap(),
+        lastModified: DateTime.now(),
+      );
+
+      await FinancialCalculatorService.saveCurrentState(state);
+    } catch (e) {
+      // Ignore errors during dispose phase
+      // Context might not be available when widget is being disposed
+    }
+  }
+
+  Future<void> _saveLoanToHistory() async {
+    if (_loanResult == null) return;
+
+    final inputs = _loanControllers
+        .map((key, controller) => MapEntry(key, controller.text));
+
+    final item = FinancialCalculationHistory(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      type: FinancialCalculationType.loan,
+      inputs: inputs,
+      results: _loanResult!.toMap(),
+      timestamp: DateTime.now(),
+      displayTitle:
+          'Vay \$${inputs['amount']} - ${inputs['rate']}% - ${inputs['term']} năm',
+    );
+
+    await FinancialCalculatorService.saveToHistory(item);
+    await _loadSettings();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã lưu kết quả vay vào lịch sử'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveInvestmentToHistory() async {
+    if (_investmentResult == null) return;
+
+    final inputs = _investmentControllers
+        .map((key, controller) => MapEntry(key, controller.text));
+
+    final item = FinancialCalculationHistory(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      type: FinancialCalculationType.investment,
+      inputs: inputs,
+      results: _investmentResult!.toMap(),
+      timestamp: DateTime.now(),
+      displayTitle:
+          'Đầu tư \$${inputs['initial']} + \$${inputs['monthly']}/tháng - ${inputs['rate']}%',
+    );
+
+    await FinancialCalculatorService.saveToHistory(item);
+    await _loadSettings();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã lưu kết quả đầu tư vào lịch sử'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveCompoundToHistory() async {
+    if (_compoundResult == null) return;
+
+    final inputs = _compoundControllers
+        .map((key, controller) => MapEntry(key, controller.text));
+
+    final item = FinancialCalculationHistory(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      type: FinancialCalculationType.compoundInterest,
+      inputs: inputs,
+      results: _compoundResult!.toMap(),
+      timestamp: DateTime.now(),
+      displayTitle:
+          'Lãi kép \$${inputs['principal']} - ${inputs['rate']}% - ${inputs['time']} năm',
+    );
+
+    await FinancialCalculatorService.saveToHistory(item);
+    await _loadSettings();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã lưu kết quả lãi kép vào lịch sử'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Financial Calculator'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Loan', icon: Icon(Icons.home)),
-            Tab(text: 'Investment', icon: Icon(Icons.trending_up)),
-            Tab(text: 'Compound', icon: Icon(Icons.savings)),
-          ],
+    final l10n = AppLocalizations.of(context)!;
+
+    return TwoPanelsMainMultiTabLayout(
+      isEmbedded: widget.isEmbedded,
+      title: l10n.financialCalculator,
+      mainPanelTitle: l10n.financialCalculator,
+      mainPanelActions: [
+        IconButton(
+          onPressed: () => _showClearDataDialog(l10n),
+          icon: const Icon(Icons.clear_all),
+          tooltip: l10n.clearAll,
+          iconSize: 20,
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildLoanCalculator(),
-          _buildInvestmentCalculator(),
-          _buildCompoundInterestCalculator(),
-        ],
-      ),
+        IconButton(
+          onPressed: () => _showFinancialCalculatorInfo(context),
+          icon: const Icon(Icons.info_outline),
+          tooltip: l10n.info,
+          iconSize: 20,
+        ),
+      ],
+      initialMainTabIndex: _currentMainTabIndex,
+      onMainTabChanged: (index) {
+        _currentMainTabIndex = index;
+        _saveState();
+      },
+      mainTabs: [
+        TabData(
+          label: l10n.loanTab,
+          icon: Icons.home,
+          content: _buildLoanCalculator(l10n),
+        ),
+        TabData(
+          label: l10n.investmentTab,
+          icon: Icons.trending_up,
+          content: _buildInvestmentCalculator(l10n),
+        ),
+        TabData(
+          label: l10n.compoundTab,
+          icon: Icons.savings,
+          content: _buildCompoundInterestCalculator(l10n),
+        ),
+      ],
+      secondaryPanel: _historyEnabled ? _buildHistoryWidget() : null,
+      secondaryPanelTitle: 'Lịch sử tính toán',
+      secondaryPanelActions: _history.isNotEmpty
+          ? [
+              IconButton(
+                onPressed: () => _showClearHistoryDialog(l10n),
+                icon: const Icon(Icons.clear_all),
+                tooltip: l10n.clearAll,
+                iconSize: 20,
+              ),
+            ]
+          : null,
+      secondaryTab: _historyEnabled
+          ? TabData(
+              label: 'Lịch sử',
+              icon: Icons.history,
+              content: _buildHistoryWidget(),
+            )
+          : null,
+      secondaryEnabled: _historyEnabled,
     );
   }
 
-  Widget _buildLoanCalculator() {
+  Widget _buildLoanCalculator(AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Loan Calculator',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            l10n.loanCalculator,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           _buildInputField(
-            controller: _loanAmountController,
-            label: 'Loan Amount (\$)',
-            hint: 'Enter loan amount',
+            controller: _loanControllers['amount']!,
+            label: l10n.loanAmount,
+            hint: l10n.loanAmountHint,
             icon: Icons.attach_money,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _loanInterestController,
-            label: 'Annual Interest Rate (%)',
-            hint: 'Enter interest rate',
+            controller: _loanControllers['rate']!,
+            label: l10n.annualInterestRate,
+            hint: l10n.annualInterestRateHint,
             icon: Icons.percent,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _loanTermController,
-            label: 'Loan Term (years)',
-            hint: 'Enter loan term',
+            controller: _loanControllers['term']!,
+            label: l10n.loanTerm,
+            hint: l10n.loanTermHint,
             icon: Icons.calendar_today,
           ),
           const SizedBox(height: 24),
@@ -124,60 +425,64 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text('Calculate Loan', style: TextStyle(fontSize: 16)),
+            child:
+                Text(l10n.calculateLoan, style: const TextStyle(fontSize: 16)),
           ),
-          if (_monthlyPayment != null) ...[
+          if (_loanResult != null) ...[
             const SizedBox(height: 24),
-            _buildResultCard([
-              _buildResultRow('Monthly Payment',
-                  '\$${_monthlyPayment!.toStringAsFixed(2)}'),
-              _buildResultRow(
-                  'Total Payment', '\$${_totalPayment!.toStringAsFixed(2)}'),
-              _buildResultRow(
-                  'Total Interest', '\$${_totalInterest!.toStringAsFixed(2)}'),
-            ]),
+            _buildResultCard(
+                l10n,
+                [
+                  _buildResultRow(l10n, l10n.monthlyPayment,
+                      '\$${_loanResult!.monthlyPayment.toStringAsFixed(2)}'),
+                  _buildResultRow(l10n, l10n.totalPayment,
+                      '\$${_loanResult!.totalPayment.toStringAsFixed(2)}'),
+                  _buildResultRow(l10n, l10n.totalInterest,
+                      '\$${_loanResult!.totalInterest.toStringAsFixed(2)}'),
+                ],
+                onBookmark: _saveLoanToHistory),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildInvestmentCalculator() {
+  Widget _buildInvestmentCalculator(AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Investment Calculator',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            l10n.investmentCalculator,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           _buildInputField(
-            controller: _initialInvestmentController,
-            label: 'Initial Investment (\$)',
-            hint: 'Enter initial amount',
+            controller: _investmentControllers['initial']!,
+            label: l10n.initialInvestment,
+            hint: l10n.initialInvestmentHint,
             icon: Icons.savings,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _monthlyContributionController,
-            label: 'Monthly Contribution (\$)',
-            hint: 'Enter monthly contribution',
+            controller: _investmentControllers['monthly']!,
+            label: l10n.monthlyContribution,
+            hint: l10n.monthlyContributionHint,
             icon: Icons.calendar_month,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _investmentInterestController,
-            label: 'Annual Return (%)',
-            hint: 'Enter expected return',
+            controller: _investmentControllers['rate']!,
+            label: l10n.annualReturn,
+            hint: l10n.annualReturnHint,
             icon: Icons.trending_up,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _investmentTermController,
-            label: 'Investment Period (years)',
-            hint: 'Enter investment period',
+            controller: _investmentControllers['term']!,
+            label: l10n.investmentPeriod,
+            hint: l10n.investmentPeriodHint,
             icon: Icons.timeline,
           ),
           const SizedBox(height: 24),
@@ -186,61 +491,64 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text('Calculate Investment',
-                style: TextStyle(fontSize: 16)),
+            child: Text(l10n.calculateInvestment,
+                style: const TextStyle(fontSize: 16)),
           ),
-          if (_futureValue != null) ...[
+          if (_investmentResult != null) ...[
             const SizedBox(height: 24),
-            _buildResultCard([
-              _buildResultRow(
-                  'Future Value', '\$${_futureValue!.toStringAsFixed(2)}'),
-              _buildResultRow('Total Contributions',
-                  '\$${_totalContributions!.toStringAsFixed(2)}'),
-              _buildResultRow(
-                  'Total Earnings', '\$${_totalEarnings!.toStringAsFixed(2)}'),
-            ]),
+            _buildResultCard(
+                l10n,
+                [
+                  _buildResultRow(l10n, l10n.futureValue,
+                      '\$${_investmentResult!.futureValue.toStringAsFixed(2)}'),
+                  _buildResultRow(l10n, l10n.totalContributions,
+                      '\$${_investmentResult!.totalContributions.toStringAsFixed(2)}'),
+                  _buildResultRow(l10n, l10n.totalEarnings,
+                      '\$${_investmentResult!.totalEarnings.toStringAsFixed(2)}'),
+                ],
+                onBookmark: _saveInvestmentToHistory),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildCompoundInterestCalculator() {
+  Widget _buildCompoundInterestCalculator(AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Compound Interest Calculator',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            l10n.compoundInterestCalculator,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           _buildInputField(
-            controller: _principalController,
-            label: 'Principal Amount (\$)',
-            hint: 'Enter principal amount',
+            controller: _compoundControllers['principal']!,
+            label: l10n.principalAmount,
+            hint: l10n.principalAmountHint,
             icon: Icons.account_balance,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _compoundInterestController,
-            label: 'Annual Interest Rate (%)',
-            hint: 'Enter interest rate',
+            controller: _compoundControllers['rate']!,
+            label: l10n.annualInterestRate,
+            hint: l10n.annualInterestRateHint,
             icon: Icons.percent,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _compoundTermController,
-            label: 'Time Period (years)',
-            hint: 'Enter time period',
+            controller: _compoundControllers['time']!,
+            label: l10n.timePeriod,
+            hint: l10n.timePeriodHint,
             icon: Icons.schedule,
           ),
           const SizedBox(height: 16),
           _buildInputField(
-            controller: _compoundFrequencyController,
-            label: 'Compounding Frequency (per year)',
-            hint: 'Enter frequency (12 for monthly)',
+            controller: _compoundControllers['frequency']!,
+            label: l10n.compoundingFrequency,
+            hint: l10n.compoundingFrequencyHint,
             icon: Icons.repeat,
           ),
           const SizedBox(height: 24),
@@ -249,17 +557,20 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text('Calculate Compound Interest',
-                style: TextStyle(fontSize: 16)),
+            child: Text(l10n.calculateCompoundInterest,
+                style: const TextStyle(fontSize: 16)),
           ),
-          if (_compoundAmount != null) ...[
+          if (_compoundResult != null) ...[
             const SizedBox(height: 24),
-            _buildResultCard([
-              _buildResultRow(
-                  'Final Amount', '\$${_compoundAmount!.toStringAsFixed(2)}'),
-              _buildResultRow('Interest Earned',
-                  '\$${_compoundInterestEarned!.toStringAsFixed(2)}'),
-            ]),
+            _buildResultCard(
+                l10n,
+                [
+                  _buildResultRow(l10n, l10n.finalAmount,
+                      '\$${_compoundResult!.compoundAmount.toStringAsFixed(2)}'),
+                  _buildResultRow(l10n, l10n.interestEarned,
+                      '\$${_compoundResult!.compoundInterestEarned.toStringAsFixed(2)}'),
+                ],
+                onBookmark: _saveCompoundToHistory),
           ],
         ],
       ),
@@ -272,17 +583,39 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
     required String hint,
     required IconData icon,
   }) {
+    // Check if this is a percentage field
+    final isPercentageField = label.contains('(%)') || hint.contains('%');
+
     return TextField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
       ],
+      onChanged: (value) {
+        if (isPercentageField && value.isNotEmpty) {
+          final doubleValue = double.tryParse(value);
+          if (doubleValue != null && doubleValue > 100) {
+            controller.text = '100';
+            controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: controller.text.length),
+            );
+          }
+        }
+      },
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon),
         border: const OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[400]!
+                : Colors.grey[600]!,
+            width: 1.0,
+          ),
+        ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Theme.of(context).primaryColor),
         ),
@@ -290,7 +623,11 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
     );
   }
 
-  Widget _buildResultCard(List<Widget> children) {
+  Widget _buildResultCard(
+    AppLocalizations l10n,
+    List<Widget> children, {
+    VoidCallback? onBookmark,
+  }) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -298,9 +635,26 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Results',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.results,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                if (onBookmark != null)
+                  IconButton(
+                    onPressed: onBookmark,
+                    icon: const Icon(Icons.bookmark_add_outlined),
+                    tooltip: 'Lưu vào lịch sử',
+                    iconSize: 20,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
             ...children,
@@ -310,7 +664,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
     );
   }
 
-  Widget _buildResultRow(String label, String value) {
+  Widget _buildResultRow(AppLocalizations l10n, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -334,9 +688,9 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
   }
 
   void _calculateLoan() {
-    final amount = double.tryParse(_loanAmountController.text);
-    final rate = double.tryParse(_loanInterestController.text);
-    final term = double.tryParse(_loanTermController.text);
+    final amount = double.tryParse(_loanControllers['amount']!.text);
+    final rate = double.tryParse(_loanControllers['rate']!.text);
+    final term = double.tryParse(_loanControllers['term']!.text);
 
     if (amount == null ||
         rate == null ||
@@ -344,61 +698,50 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
         amount <= 0 ||
         rate < 0 ||
         term <= 0) {
-      _showErrorDialog('Please enter valid positive numbers for all fields.');
+      _showErrorDialog(AppLocalizations.of(context)!.pleaseEnterValidNumbers);
       return;
     }
 
-    final monthlyRate = rate / 100 / 12;
-    final numberOfPayments = term * 12;
-
-    if (rate == 0) {
-      _monthlyPayment = amount / numberOfPayments;
-    } else {
-      _monthlyPayment = amount *
-          (monthlyRate * pow(1 + monthlyRate, numberOfPayments)) /
-          (pow(1 + monthlyRate, numberOfPayments) - 1);
-    }
-
-    _totalPayment = _monthlyPayment! * numberOfPayments;
-    _totalInterest = _totalPayment! - amount;
-
-    setState(() {});
+    setState(() {
+      _loanResult = FinancialCalculatorService.calculateLoan(
+        amount: amount,
+        rate: rate,
+        term: term,
+      );
+    });
+    _saveState();
   }
 
   void _calculateInvestment() {
-    final initial = double.tryParse(_initialInvestmentController.text) ?? 0;
-    final monthly = double.tryParse(_monthlyContributionController.text) ?? 0;
-    final rate = double.tryParse(_investmentInterestController.text);
-    final term = double.tryParse(_investmentTermController.text);
+    final initial =
+        double.tryParse(_investmentControllers['initial']!.text) ?? 0;
+    final monthly =
+        double.tryParse(_investmentControllers['monthly']!.text) ?? 0;
+    final rate = double.tryParse(_investmentControllers['rate']!.text);
+    final term = double.tryParse(_investmentControllers['term']!.text);
 
     if (rate == null || term == null || rate < 0 || term <= 0) {
       _showErrorDialog(
-          'Please enter valid positive numbers for return rate and term.');
+          AppLocalizations.of(context)!.pleaseEnterValidReturnAndTerm);
       return;
     }
 
-    final monthlyRate = rate / 100 / 12;
-    final numberOfMonths = term * 12;
-
-    // Future value of initial investment
-    final futureValueInitial = initial * pow(1 + monthlyRate, numberOfMonths);
-
-    // Future value of monthly contributions (annuity)
-    final futureValueAnnuity =
-        monthly * ((pow(1 + monthlyRate, numberOfMonths) - 1) / monthlyRate);
-
-    _futureValue = futureValueInitial + futureValueAnnuity;
-    _totalContributions = initial + (monthly * numberOfMonths);
-    _totalEarnings = _futureValue! - _totalContributions!;
-
-    setState(() {});
+    setState(() {
+      _investmentResult = FinancialCalculatorService.calculateInvestment(
+        initial: initial,
+        monthly: monthly,
+        rate: rate,
+        term: term,
+      );
+    });
+    _saveState();
   }
 
   void _calculateCompoundInterest() {
-    final principal = double.tryParse(_principalController.text);
-    final rate = double.tryParse(_compoundInterestController.text);
-    final time = double.tryParse(_compoundTermController.text);
-    final frequency = double.tryParse(_compoundFrequencyController.text);
+    final principal = double.tryParse(_compoundControllers['principal']!.text);
+    final rate = double.tryParse(_compoundControllers['rate']!.text);
+    final time = double.tryParse(_compoundControllers['time']!.text);
+    final frequency = double.tryParse(_compoundControllers['frequency']!.text);
 
     if (principal == null ||
         rate == null ||
@@ -408,28 +751,326 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen>
         rate < 0 ||
         time <= 0 ||
         frequency <= 0) {
-      _showErrorDialog('Please enter valid positive numbers for all fields.');
+      _showErrorDialog(AppLocalizations.of(context)!.pleaseEnterValidNumbers);
       return;
     }
 
-    final rateDecimal = rate / 100;
-    _compoundAmount =
-        principal * pow(1 + rateDecimal / frequency, frequency * time);
-    _compoundInterestEarned = _compoundAmount! - principal;
+    setState(() {
+      _compoundResult = FinancialCalculatorService.calculateCompoundInterest(
+        principal: principal,
+        rate: rate,
+        time: time,
+        frequency: frequency,
+      );
+    });
+    _saveState();
+  }
 
-    setState(() {});
+  Widget _buildHistoryWidget() {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_history.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.history,
+              size: 48,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.noFinancialHistoryYet,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                l10n.startCalculatingHint,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: _history.length,
+      itemBuilder: (context, index) {
+        final item = _history[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Icon(
+                _getCalculationIcon(item.type),
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
+            title: Text(item.displayTitle),
+            subtitle: Text(
+              l10n.financialCalculationDate(
+                  item.timestamp.toString().split(' ')[0]),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            trailing: PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == 'delete') {
+                  await FinancialCalculatorService.removeFromHistory(item.id);
+                  await _loadSettings();
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.delete),
+                      const SizedBox(width: 8),
+                      Text(l10n.removeFromFinancialHistory),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            onTap: () {
+              // Load calculation into current state
+              _loadFromHistory(item);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showClearDataDialog(AppLocalizations l10n) async {
+    final tabNames = [l10n.loanTab, l10n.investmentTab, l10n.compoundTab];
+    final currentTabName = tabNames[_currentMainTabIndex];
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearAll),
+        content: Text('Xóa tất cả dữ liệu của tab $currentTabName?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      _clearCurrentTabData();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Đã xóa dữ liệu tab $currentTabName')),
+        );
+      }
+    }
+  }
+
+  void _clearCurrentTabData() {
+    setState(() {
+      _wasDataCleared = true; // Mark that data was manually cleared
+      switch (_currentMainTabIndex) {
+        case 0: // Loan tab
+          _loanControllers['amount']!.clear();
+          _loanControllers['rate']!.clear();
+          _loanControllers['term']!.clear();
+          _loanResult = null;
+          break;
+        case 1: // Investment tab
+          _investmentControllers['initial']!.clear();
+          _investmentControllers['monthly']!.clear();
+          _investmentControllers['rate']!.clear();
+          _investmentControllers['term']!.clear();
+          _investmentResult = null;
+          break;
+        case 2: // Compound Interest tab
+          _compoundControllers['principal']!.clear();
+          _compoundControllers['rate']!.clear();
+          _compoundControllers['time']!.clear();
+          _compoundControllers['frequency']!.clear();
+          _compoundResult = null;
+          break;
+      }
+    });
+    _saveState();
+  }
+
+  Future<void> _showClearHistoryDialog(AppLocalizations l10n) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearAll),
+        content: Text(l10n.confirmClearFinancialHistory),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      await FinancialCalculatorService.clearHistory();
+      await _loadSettings();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.financialHistoryCleared)),
+        );
+      }
+    }
+  }
+
+  IconData _getCalculationIcon(FinancialCalculationType type) {
+    switch (type) {
+      case FinancialCalculationType.loan:
+        return Icons.home;
+      case FinancialCalculationType.investment:
+        return Icons.trending_up;
+      case FinancialCalculationType.compoundInterest:
+        return Icons.savings;
+    }
+  }
+
+  void _loadFromHistory(FinancialCalculationHistory item) {
+    setState(() {
+      switch (item.type) {
+        case FinancialCalculationType.loan:
+          _currentMainTabIndex = 0;
+          item.inputs.forEach((key, value) {
+            if (_loanControllers.containsKey(key)) {
+              _loanControllers[key]!.text = value;
+            }
+          });
+          if (item.results != null) {
+            _loanResult = LoanCalculationResult.fromMap(item.results!);
+          }
+          break;
+        case FinancialCalculationType.investment:
+          _currentMainTabIndex = 1;
+          item.inputs.forEach((key, value) {
+            if (_investmentControllers.containsKey(key)) {
+              _investmentControllers[key]!.text = value;
+            }
+          });
+          if (item.results != null) {
+            _investmentResult =
+                InvestmentCalculationResult.fromMap(item.results!);
+          }
+          break;
+        case FinancialCalculationType.compoundInterest:
+          _currentMainTabIndex = 2;
+          item.inputs.forEach((key, value) {
+            if (_compoundControllers.containsKey(key)) {
+              _compoundControllers[key]!.text = value;
+            }
+          });
+          if (item.results != null) {
+            _compoundResult =
+                CompoundInterestCalculationResult.fromMap(item.results!);
+          }
+          break;
+      }
+    });
+  }
+
+  void _showFinancialCalculatorInfo(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.financialCalculatorDetailedInfo),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.financialCalculatorOverview,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.financialCalculationTypes,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text('• ${l10n.loanCalculator}'),
+              Text('• ${l10n.investmentCalculator}'),
+              Text('• ${l10n.compoundInterestCalculator}'),
+              const SizedBox(height: 16),
+              Text(
+                l10n.practicalFinancialApplications,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(l10n.financialApplicationsDesc),
+              const SizedBox(height: 16),
+              Text(
+                l10n.financialTips,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text('• ${l10n.financialTip1}'),
+              Text('• ${l10n.financialTip2}'),
+              Text('• ${l10n.financialTip3}'),
+              Text('• ${l10n.financialTip4}'),
+              Text('• ${l10n.financialTip5}'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.close),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Input Error'),
+        title: Text(AppLocalizations.of(context)!.inputError),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(AppLocalizations.of(context)!.ok),
           ),
         ],
       ),

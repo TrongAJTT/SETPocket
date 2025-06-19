@@ -1784,5 +1784,113 @@
     "bmiCalculatorTab": "Calculator",
     "bmiHistoryTab": "History",
     "bmiDetailedInfo": "BMI Calculator Information",
-    "bmiOverview": "Comprehensive Body Mass Index calculator with health insights and recommendations"
+    "bmiOverview": "Comprehensive Body Mass Index calculator with health insights and recommendations",
+
+    "financialCalculator": "Financial Calculator",
+    "financialCalculatorDesc": "Advanced financial calculations for loans, investments, and compound interest",
+    "financialCalculatorDetailedInfo": "Financial Calculator Information",
+    "financialCalculatorOverview": "Comprehensive financial calculator for loan payments, investment planning, and compound interest calculations",
+
+    "loanCalculator": "Loan Calculator",
+    "investmentCalculator": "Investment Calculator", 
+    "compoundInterestCalculator": "Compound Interest Calculator",
+
+    "loanAmount": "Loan Amount ($)",
+    "loanAmountHint": "Enter loan amount",
+    "annualInterestRate": "Annual Interest Rate (%)",
+    "annualInterestRateHint": "Enter interest rate",
+    "loanTerm": "Loan Term (years)",
+    "loanTermHint": "Enter loan term",
+    "calculateLoan": "Calculate Loan",
+
+    "initialInvestment": "Initial Investment ($)",
+    "initialInvestmentHint": "Enter initial amount",
+    "monthlyContribution": "Monthly Contribution ($)",
+    "monthlyContributionHint": "Enter monthly contribution",
+    "annualReturn": "Annual Return (%)",
+    "annualReturnHint": "Enter expected return",
+    "investmentPeriod": "Investment Period (years)",
+    "investmentPeriodHint": "Enter investment period",
+    "calculateInvestment": "Calculate Investment",
+
+    "principalAmount": "Principal Amount ($)",
+    "principalAmountHint": "Enter principal amount",
+    "timePeriod": "Time Period (years)",
+    "timePeriodHint": "Enter time period",
+    "compoundingFrequency": "Compounding Frequency (per year)",
+    "compoundingFrequencyHint": "Enter frequency (12 for monthly)",
+    "calculateCompoundInterest": "Calculate Compound Interest",
+
+    "monthlyPayment": "Monthly Payment",
+    "totalPayment": "Total Payment",
+    "totalInterest": "Total Interest",
+    "futureValue": "Future Value",
+    "totalContributions": "Total Contributions",
+    "totalEarnings": "Total Earnings",
+    "finalAmount": "Final Amount",
+    "interestEarned": "Interest Earned",
+
+    "results": "Results",
+    "financialHistory": "Financial History",
+    "historyTab": "History",
+    "loanTab": "Loan",
+    "investmentTab": "Investment", 
+    "compoundTab": "Compound",
+
+    "inputError": "Input Error",
+    "pleaseEnterValidNumbers": "Please enter valid positive numbers for all fields.",
+    "pleaseEnterValidReturnAndTerm": "Please enter valid positive numbers for return rate and term.",
+
+    "financialCalculationHistory": "Financial calculation history and saved calculations",
+    "financialHistoryCleared": "Financial history cleared",
+    "confirmClearFinancialHistory": "Are you sure you want to clear all financial calculation history?",
+
+    "loanCalculationSaved": "Loan calculation saved to history",
+    "investmentCalculationSaved": "Investment calculation saved to history", 
+    "compoundCalculationSaved": "Compound interest calculation saved to history",
+
+    "restoreCalculation": "Restore Calculation",
+    "copyResult": "Copy Result",
+    "copyInputs": "Copy Inputs",
+    "removeFromFinancialHistory": "Remove from history",
+
+    "financialCalculationDate": "Calculated on {date}",
+    "@financialCalculationDate": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+
+    "noFinancialHistoryYet": "No calculations yet",
+    "startCalculatingHint": "Start making financial calculations to see them here",
+
+    "financialResultsSummary": "{type}: {result}",
+    "@financialResultsSummary": {
+        "placeholders": {
+            "type": {
+                "type": "String"
+            },
+            "result": {
+                "type": "String"
+            }
+        }
+    },
+
+    "saveToFinancialHistory": "Save to history",
+    "financialCalculationTypes": "Financial Calculation Types",
+    "loanCalculationDesc": "Calculate monthly payments, total cost, and interest for loans",
+    "investmentCalculationDesc": "Plan future value of investments with regular contributions",
+    "compoundInterestDesc": "Calculate compound interest growth over time",
+
+    "practicalFinancialApplications": "Practical Applications",
+    "financialApplicationsDesc": "Mortgage planning, auto loans, retirement savings, education funding, business investments, and general financial planning.",
+
+    "financialTips": "Financial Tips",
+    "financialTip1": "Compare different loan terms to find the best option",
+    "financialTip2": "Start investing early to maximize compound interest",
+    "financialTip3": "Consider additional payments to reduce loan interest",
+    "financialTip4": "Regular contributions can significantly boost investment growth",
+    "financialTip5": "Higher compounding frequency increases returns"
 }

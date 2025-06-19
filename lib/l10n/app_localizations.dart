@@ -7660,6 +7660,444 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Comprehensive Body Mass Index calculator with health insights and recommendations'**
   String get bmiOverview;
+
+  /// No description provided for @financialCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Calculator'**
+  String get financialCalculator;
+
+  /// No description provided for @financialCalculatorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced financial calculations for loans, investments, and compound interest'**
+  String get financialCalculatorDesc;
+
+  /// No description provided for @financialCalculatorDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Calculator Information'**
+  String get financialCalculatorDetailedInfo;
+
+  /// No description provided for @financialCalculatorOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive financial calculator for loan payments, investment planning, and compound interest calculations'**
+  String get financialCalculatorOverview;
+
+  /// No description provided for @loanCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Loan Calculator'**
+  String get loanCalculator;
+
+  /// No description provided for @investmentCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Calculator'**
+  String get investmentCalculator;
+
+  /// No description provided for @compoundInterestCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Compound Interest Calculator'**
+  String get compoundInterestCalculator;
+
+  /// No description provided for @loanAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Loan Amount (\$)'**
+  String get loanAmount;
+
+  /// No description provided for @loanAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter loan amount'**
+  String get loanAmountHint;
+
+  /// No description provided for @annualInterestRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Interest Rate (%)'**
+  String get annualInterestRate;
+
+  /// No description provided for @annualInterestRateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter interest rate'**
+  String get annualInterestRateHint;
+
+  /// No description provided for @loanTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Loan Term (years)'**
+  String get loanTerm;
+
+  /// No description provided for @loanTermHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter loan term'**
+  String get loanTermHint;
+
+  /// No description provided for @calculateLoan.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Loan'**
+  String get calculateLoan;
+
+  /// No description provided for @initialInvestment.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Investment (\$)'**
+  String get initialInvestment;
+
+  /// No description provided for @initialInvestmentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter initial amount'**
+  String get initialInvestmentHint;
+
+  /// No description provided for @monthlyContribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Contribution (\$)'**
+  String get monthlyContribution;
+
+  /// No description provided for @monthlyContributionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter monthly contribution'**
+  String get monthlyContributionHint;
+
+  /// No description provided for @annualReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Return (%)'**
+  String get annualReturn;
+
+  /// No description provided for @annualReturnHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter expected return'**
+  String get annualReturnHint;
+
+  /// No description provided for @investmentPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Period (years)'**
+  String get investmentPeriod;
+
+  /// No description provided for @investmentPeriodHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter investment period'**
+  String get investmentPeriodHint;
+
+  /// No description provided for @calculateInvestment.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Investment'**
+  String get calculateInvestment;
+
+  /// No description provided for @principalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Principal Amount (\$)'**
+  String get principalAmount;
+
+  /// No description provided for @principalAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter principal amount'**
+  String get principalAmountHint;
+
+  /// No description provided for @timePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Period (years)'**
+  String get timePeriod;
+
+  /// No description provided for @timePeriodHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter time period'**
+  String get timePeriodHint;
+
+  /// No description provided for @compoundingFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Compounding Frequency (per year)'**
+  String get compoundingFrequency;
+
+  /// No description provided for @compoundingFrequencyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter frequency (12 for monthly)'**
+  String get compoundingFrequencyHint;
+
+  /// No description provided for @calculateCompoundInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Compound Interest'**
+  String get calculateCompoundInterest;
+
+  /// No description provided for @monthlyPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Payment'**
+  String get monthlyPayment;
+
+  /// No description provided for @totalPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Payment'**
+  String get totalPayment;
+
+  /// No description provided for @totalInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Interest'**
+  String get totalInterest;
+
+  /// No description provided for @futureValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Future Value'**
+  String get futureValue;
+
+  /// No description provided for @totalContributions.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Contributions'**
+  String get totalContributions;
+
+  /// No description provided for @totalEarnings.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Earnings'**
+  String get totalEarnings;
+
+  /// No description provided for @finalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Amount'**
+  String get finalAmount;
+
+  /// No description provided for @interestEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest Earned'**
+  String get interestEarned;
+
+  /// No description provided for @results.
+  ///
+  /// In en, this message translates to:
+  /// **'Results'**
+  String get results;
+
+  /// No description provided for @financialHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial History'**
+  String get financialHistory;
+
+  /// No description provided for @loanTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Loan'**
+  String get loanTab;
+
+  /// No description provided for @investmentTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment'**
+  String get investmentTab;
+
+  /// No description provided for @compoundTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Compound'**
+  String get compoundTab;
+
+  /// No description provided for @inputError.
+  ///
+  /// In en, this message translates to:
+  /// **'Input Error'**
+  String get inputError;
+
+  /// No description provided for @pleaseEnterValidNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter valid positive numbers for all fields.'**
+  String get pleaseEnterValidNumbers;
+
+  /// No description provided for @pleaseEnterValidReturnAndTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter valid positive numbers for return rate and term.'**
+  String get pleaseEnterValidReturnAndTerm;
+
+  /// No description provided for @financialCalculationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial calculation history and saved calculations'**
+  String get financialCalculationHistory;
+
+  /// No description provided for @financialHistoryCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial history cleared'**
+  String get financialHistoryCleared;
+
+  /// No description provided for @confirmClearFinancialHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all financial calculation history?'**
+  String get confirmClearFinancialHistory;
+
+  /// No description provided for @loanCalculationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Loan calculation saved to history'**
+  String get loanCalculationSaved;
+
+  /// No description provided for @investmentCalculationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment calculation saved to history'**
+  String get investmentCalculationSaved;
+
+  /// No description provided for @compoundCalculationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Compound interest calculation saved to history'**
+  String get compoundCalculationSaved;
+
+  /// No description provided for @restoreCalculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Calculation'**
+  String get restoreCalculation;
+
+  /// No description provided for @copyResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Result'**
+  String get copyResult;
+
+  /// No description provided for @copyInputs.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Inputs'**
+  String get copyInputs;
+
+  /// No description provided for @removeFromFinancialHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from history'**
+  String get removeFromFinancialHistory;
+
+  /// No description provided for @financialCalculationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated on {date}'**
+  String financialCalculationDate(String date);
+
+  /// No description provided for @noFinancialHistoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No calculations yet'**
+  String get noFinancialHistoryYet;
+
+  /// No description provided for @startCalculatingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start making financial calculations to see them here'**
+  String get startCalculatingHint;
+
+  /// No description provided for @financialResultsSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{type}: {result}'**
+  String financialResultsSummary(String type, String result);
+
+  /// No description provided for @saveToFinancialHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to history'**
+  String get saveToFinancialHistory;
+
+  /// No description provided for @financialCalculationTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Calculation Types'**
+  String get financialCalculationTypes;
+
+  /// No description provided for @loanCalculationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate monthly payments, total cost, and interest for loans'**
+  String get loanCalculationDesc;
+
+  /// No description provided for @investmentCalculationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan future value of investments with regular contributions'**
+  String get investmentCalculationDesc;
+
+  /// No description provided for @compoundInterestDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate compound interest growth over time'**
+  String get compoundInterestDesc;
+
+  /// No description provided for @practicalFinancialApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Applications'**
+  String get practicalFinancialApplications;
+
+  /// No description provided for @financialApplicationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mortgage planning, auto loans, retirement savings, education funding, business investments, and general financial planning.'**
+  String get financialApplicationsDesc;
+
+  /// No description provided for @financialTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Tips'**
+  String get financialTips;
+
+  /// No description provided for @financialTip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare different loan terms to find the best option'**
+  String get financialTip1;
+
+  /// No description provided for @financialTip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Start investing early to maximize compound interest'**
+  String get financialTip2;
+
+  /// No description provided for @financialTip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Consider additional payments to reduce loan interest'**
+  String get financialTip3;
+
+  /// No description provided for @financialTip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular contributions can significantly boost investment growth'**
+  String get financialTip4;
+
+  /// No description provided for @financialTip5.
+  ///
+  /// In en, this message translates to:
+  /// **'Higher compounding frequency increases returns'**
+  String get financialTip5;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

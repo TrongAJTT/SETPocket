@@ -78,7 +78,7 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
       _tabController.addListener(() {
         setState(() {});
       });
-      // Reset to first tab
+// Reset to first tab
     }
   }
 

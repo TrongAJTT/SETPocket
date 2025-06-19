@@ -3968,4 +3968,227 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bmiOverview => 'Máy tính chỉ số khối cơ thể toàn diện với thông tin và khuyến nghị sức khỏe';
+
+  @override
+  String get financialCalculator => 'Máy tính Tài chính';
+
+  @override
+  String get financialCalculatorDesc => 'Tính toán tài chính nâng cao cho vay, đầu tư và lãi kép';
+
+  @override
+  String get financialCalculatorDetailedInfo => 'Thông tin Máy tính Tài chính';
+
+  @override
+  String get financialCalculatorOverview => 'Máy tính tài chính toàn diện cho thanh toán vay, kế hoạch đầu tư và tính toán lãi kép';
+
+  @override
+  String get loanCalculator => 'Máy tính Vay';
+
+  @override
+  String get investmentCalculator => 'Máy tính Đầu tư';
+
+  @override
+  String get compoundInterestCalculator => 'Máy tính Lãi kép';
+
+  @override
+  String get loanAmount => 'Số tiền vay (\$)';
+
+  @override
+  String get loanAmountHint => 'Nhập số tiền vay';
+
+  @override
+  String get annualInterestRate => 'Lãi suất hàng năm (%)';
+
+  @override
+  String get annualInterestRateHint => 'Nhập lãi suất';
+
+  @override
+  String get loanTerm => 'Thời hạn vay (năm)';
+
+  @override
+  String get loanTermHint => 'Nhập thời hạn vay';
+
+  @override
+  String get calculateLoan => 'Tính toán Vay';
+
+  @override
+  String get initialInvestment => 'Đầu tư ban đầu (\$)';
+
+  @override
+  String get initialInvestmentHint => 'Nhập số tiền ban đầu';
+
+  @override
+  String get monthlyContribution => 'Đóng góp hàng tháng (\$)';
+
+  @override
+  String get monthlyContributionHint => 'Nhập đóng góp hàng tháng';
+
+  @override
+  String get annualReturn => 'Lợi nhuận hàng năm (%)';
+
+  @override
+  String get annualReturnHint => 'Nhập lợi nhuận dự kiến';
+
+  @override
+  String get investmentPeriod => 'Thời gian đầu tư (năm)';
+
+  @override
+  String get investmentPeriodHint => 'Nhập thời gian đầu tư';
+
+  @override
+  String get calculateInvestment => 'Tính toán Đầu tư';
+
+  @override
+  String get principalAmount => 'Số tiền gốc (\$)';
+
+  @override
+  String get principalAmountHint => 'Nhập số tiền gốc';
+
+  @override
+  String get timePeriod => 'Thời gian (năm)';
+
+  @override
+  String get timePeriodHint => 'Nhập thời gian';
+
+  @override
+  String get compoundingFrequency => 'Tần suất tính lãi (lần/năm)';
+
+  @override
+  String get compoundingFrequencyHint => 'Nhập tần suất (12 cho hàng tháng)';
+
+  @override
+  String get calculateCompoundInterest => 'Tính toán Lãi kép';
+
+  @override
+  String get monthlyPayment => 'Thanh toán hàng tháng';
+
+  @override
+  String get totalPayment => 'Tổng thanh toán';
+
+  @override
+  String get totalInterest => 'Tổng lãi';
+
+  @override
+  String get futureValue => 'Giá trị tương lai';
+
+  @override
+  String get totalContributions => 'Tổng đóng góp';
+
+  @override
+  String get totalEarnings => 'Tổng thu nhập';
+
+  @override
+  String get finalAmount => 'Số tiền cuối cùng';
+
+  @override
+  String get interestEarned => 'Lãi kiếm được';
+
+  @override
+  String get results => 'Kết quả';
+
+  @override
+  String get financialHistory => 'Lịch sử Tài chính';
+
+  @override
+  String get loanTab => 'Vay';
+
+  @override
+  String get investmentTab => 'Đầu tư';
+
+  @override
+  String get compoundTab => 'Lãi kép';
+
+  @override
+  String get inputError => 'Lỗi nhập liệu';
+
+  @override
+  String get pleaseEnterValidNumbers => 'Vui lòng nhập các số dương hợp lệ cho tất cả các trường.';
+
+  @override
+  String get pleaseEnterValidReturnAndTerm => 'Vui lòng nhập các số dương hợp lệ cho tỷ lệ lợi nhuận và thời hạn.';
+
+  @override
+  String get financialCalculationHistory => 'Lịch sử tính toán tài chính và các phép tính đã lưu';
+
+  @override
+  String get financialHistoryCleared => 'Đã xóa lịch sử tài chính';
+
+  @override
+  String get confirmClearFinancialHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử tính toán tài chính không?';
+
+  @override
+  String get loanCalculationSaved => 'Phép tính vay đã được lưu vào lịch sử';
+
+  @override
+  String get investmentCalculationSaved => 'Phép tính đầu tư đã được lưu vào lịch sử';
+
+  @override
+  String get compoundCalculationSaved => 'Phép tính lãi kép đã được lưu vào lịch sử';
+
+  @override
+  String get restoreCalculation => 'Khôi phục Tính toán';
+
+  @override
+  String get copyResult => 'Sao chép Kết quả';
+
+  @override
+  String get copyInputs => 'Sao chép Đầu vào';
+
+  @override
+  String get removeFromFinancialHistory => 'Xóa khỏi lịch sử';
+
+  @override
+  String financialCalculationDate(String date) {
+    return 'Tính toán vào $date';
+  }
+
+  @override
+  String get noFinancialHistoryYet => 'Chưa có phép tính nào';
+
+  @override
+  String get startCalculatingHint => 'Bắt đầu thực hiện tính toán tài chính để xem chúng tại đây';
+
+  @override
+  String financialResultsSummary(String type, String result) {
+    return '$type: $result';
+  }
+
+  @override
+  String get saveToFinancialHistory => 'Lưu vào lịch sử';
+
+  @override
+  String get financialCalculationTypes => 'Loại Tính toán Tài chính';
+
+  @override
+  String get loanCalculationDesc => 'Tính toán thanh toán hàng tháng, tổng chi phí và lãi cho các khoản vay';
+
+  @override
+  String get investmentCalculationDesc => 'Lập kế hoạch giá trị tương lai của đầu tư với đóng góp thường xuyên';
+
+  @override
+  String get compoundInterestDesc => 'Tính toán tăng trưởng lãi kép theo thời gian';
+
+  @override
+  String get practicalFinancialApplications => 'Ứng dụng Thực tế';
+
+  @override
+  String get financialApplicationsDesc => 'Kế hoạch thế chấp, vay mua xe, tiết kiệm hưu trí, quỹ giáo dục, đầu tư kinh doanh và lập kế hoạch tài chính tổng thể.';
+
+  @override
+  String get financialTips => 'Mẹo Tài chính';
+
+  @override
+  String get financialTip1 => 'So sánh các thời hạn vay khác nhau để tìm lựa chọn tốt nhất';
+
+  @override
+  String get financialTip2 => 'Bắt đầu đầu tư sớm để tối đa hóa lãi kép';
+
+  @override
+  String get financialTip3 => 'Cân nhắc thanh toán thêm để giảm lãi vay';
+
+  @override
+  String get financialTip4 => 'Đóng góp thường xuyên có thể tăng đáng kể tăng trưởng đầu tư';
+
+  @override
+  String get financialTip5 => 'Tần suất tính lãi cao hơn sẽ tăng lợi nhuận';
 }

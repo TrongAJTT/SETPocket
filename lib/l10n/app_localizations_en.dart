@@ -3968,4 +3968,227 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bmiOverview => 'Comprehensive Body Mass Index calculator with health insights and recommendations';
+
+  @override
+  String get financialCalculator => 'Financial Calculator';
+
+  @override
+  String get financialCalculatorDesc => 'Advanced financial calculations for loans, investments, and compound interest';
+
+  @override
+  String get financialCalculatorDetailedInfo => 'Financial Calculator Information';
+
+  @override
+  String get financialCalculatorOverview => 'Comprehensive financial calculator for loan payments, investment planning, and compound interest calculations';
+
+  @override
+  String get loanCalculator => 'Loan Calculator';
+
+  @override
+  String get investmentCalculator => 'Investment Calculator';
+
+  @override
+  String get compoundInterestCalculator => 'Compound Interest Calculator';
+
+  @override
+  String get loanAmount => 'Loan Amount (\$)';
+
+  @override
+  String get loanAmountHint => 'Enter loan amount';
+
+  @override
+  String get annualInterestRate => 'Annual Interest Rate (%)';
+
+  @override
+  String get annualInterestRateHint => 'Enter interest rate';
+
+  @override
+  String get loanTerm => 'Loan Term (years)';
+
+  @override
+  String get loanTermHint => 'Enter loan term';
+
+  @override
+  String get calculateLoan => 'Calculate Loan';
+
+  @override
+  String get initialInvestment => 'Initial Investment (\$)';
+
+  @override
+  String get initialInvestmentHint => 'Enter initial amount';
+
+  @override
+  String get monthlyContribution => 'Monthly Contribution (\$)';
+
+  @override
+  String get monthlyContributionHint => 'Enter monthly contribution';
+
+  @override
+  String get annualReturn => 'Annual Return (%)';
+
+  @override
+  String get annualReturnHint => 'Enter expected return';
+
+  @override
+  String get investmentPeriod => 'Investment Period (years)';
+
+  @override
+  String get investmentPeriodHint => 'Enter investment period';
+
+  @override
+  String get calculateInvestment => 'Calculate Investment';
+
+  @override
+  String get principalAmount => 'Principal Amount (\$)';
+
+  @override
+  String get principalAmountHint => 'Enter principal amount';
+
+  @override
+  String get timePeriod => 'Time Period (years)';
+
+  @override
+  String get timePeriodHint => 'Enter time period';
+
+  @override
+  String get compoundingFrequency => 'Compounding Frequency (per year)';
+
+  @override
+  String get compoundingFrequencyHint => 'Enter frequency (12 for monthly)';
+
+  @override
+  String get calculateCompoundInterest => 'Calculate Compound Interest';
+
+  @override
+  String get monthlyPayment => 'Monthly Payment';
+
+  @override
+  String get totalPayment => 'Total Payment';
+
+  @override
+  String get totalInterest => 'Total Interest';
+
+  @override
+  String get futureValue => 'Future Value';
+
+  @override
+  String get totalContributions => 'Total Contributions';
+
+  @override
+  String get totalEarnings => 'Total Earnings';
+
+  @override
+  String get finalAmount => 'Final Amount';
+
+  @override
+  String get interestEarned => 'Interest Earned';
+
+  @override
+  String get results => 'Results';
+
+  @override
+  String get financialHistory => 'Financial History';
+
+  @override
+  String get loanTab => 'Loan';
+
+  @override
+  String get investmentTab => 'Investment';
+
+  @override
+  String get compoundTab => 'Compound';
+
+  @override
+  String get inputError => 'Input Error';
+
+  @override
+  String get pleaseEnterValidNumbers => 'Please enter valid positive numbers for all fields.';
+
+  @override
+  String get pleaseEnterValidReturnAndTerm => 'Please enter valid positive numbers for return rate and term.';
+
+  @override
+  String get financialCalculationHistory => 'Financial calculation history and saved calculations';
+
+  @override
+  String get financialHistoryCleared => 'Financial history cleared';
+
+  @override
+  String get confirmClearFinancialHistory => 'Are you sure you want to clear all financial calculation history?';
+
+  @override
+  String get loanCalculationSaved => 'Loan calculation saved to history';
+
+  @override
+  String get investmentCalculationSaved => 'Investment calculation saved to history';
+
+  @override
+  String get compoundCalculationSaved => 'Compound interest calculation saved to history';
+
+  @override
+  String get restoreCalculation => 'Restore Calculation';
+
+  @override
+  String get copyResult => 'Copy Result';
+
+  @override
+  String get copyInputs => 'Copy Inputs';
+
+  @override
+  String get removeFromFinancialHistory => 'Remove from history';
+
+  @override
+  String financialCalculationDate(String date) {
+    return 'Calculated on $date';
+  }
+
+  @override
+  String get noFinancialHistoryYet => 'No calculations yet';
+
+  @override
+  String get startCalculatingHint => 'Start making financial calculations to see them here';
+
+  @override
+  String financialResultsSummary(String type, String result) {
+    return '$type: $result';
+  }
+
+  @override
+  String get saveToFinancialHistory => 'Save to history';
+
+  @override
+  String get financialCalculationTypes => 'Financial Calculation Types';
+
+  @override
+  String get loanCalculationDesc => 'Calculate monthly payments, total cost, and interest for loans';
+
+  @override
+  String get investmentCalculationDesc => 'Plan future value of investments with regular contributions';
+
+  @override
+  String get compoundInterestDesc => 'Calculate compound interest growth over time';
+
+  @override
+  String get practicalFinancialApplications => 'Practical Applications';
+
+  @override
+  String get financialApplicationsDesc => 'Mortgage planning, auto loans, retirement savings, education funding, business investments, and general financial planning.';
+
+  @override
+  String get financialTips => 'Financial Tips';
+
+  @override
+  String get financialTip1 => 'Compare different loan terms to find the best option';
+
+  @override
+  String get financialTip2 => 'Start investing early to maximize compound interest';
+
+  @override
+  String get financialTip3 => 'Consider additional payments to reduce loan interest';
+
+  @override
+  String get financialTip4 => 'Regular contributions can significantly boost investment growth';
+
+  @override
+  String get financialTip5 => 'Higher compounding frequency increases returns';
 }

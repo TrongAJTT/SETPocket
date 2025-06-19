@@ -21,6 +21,7 @@ import 'converter_services/temperature_state_service.dart';
 import 'converter_services/data_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'random_services/random_state_service.dart';
+import 'financial_calculator_service.dart';
 import 'package:hive/hive.dart';
 
 class CacheInfo {
@@ -181,22 +182,37 @@ class CacheService {
         logError('CacheService: Error checking BMI cache: $e');
       }
 
+      // Include financial calculator cache
+      int financialSize = 0;
+      int financialCount = 0;
+      try {
+        final financialCache = await FinancialCalculatorService.getCacheInfo();
+        financialSize = financialCache['size'] as int;
+        financialCount = financialCache['items'] as int;
+      } catch (e) {
+        logError('CacheService: Error checking financial calculator cache: $e');
+      }
+
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: calculatorToolsName ?? 'Calculator Tools',
         description: calculatorToolsDesc ??
-            'Calculation history, graphing calculator data, BMI data, and settings',
+            'Calculation history, graphing calculator data, BMI data, financial calculator data, and settings',
         itemCount: calculatorHistoryCount +
             (calculatorHistoryEnabled ? 1 : 0) +
             (graphingCalculatorCache['items'] as int) +
-            bmiCount,
+            bmiCount +
+            financialCount,
         sizeBytes: calculatorHistorySize +
             (calculatorHistoryEnabled ? 4 : 0) +
             (graphingCalculatorCache['size'] as int) +
-            bmiSize,
+            bmiSize +
+            financialSize,
         keys: [
           'calculator_history_enabled',
           'graphing_calculator_ask_before_loading',
           'bmi_data', // BMI cache key
+          'financial_calculator_history',
+          'financial_calculator_state',
         ],
       );
     } catch (e) {
@@ -558,6 +574,12 @@ class CacheService {
       } catch (e) {
         logError('CacheService: Error clearing BMI cache: $e');
       }
+      // Clear financial calculator data
+      try {
+        await FinancialCalculatorService.clearAllData();
+      } catch (e) {
+        logError('CacheService: Error clearing financial calculator cache: $e');
+      }
       // Also clear the history enabled settings
       await prefs.remove('calculator_history_enabled');
       await prefs.remove('graphing_calculator_ask_before_loading');
@@ -622,6 +644,14 @@ class CacheService {
       await BmiService.clearPreferences();
     } catch (e) {
       logError('CacheService: Error clearing BMI cache in clearAllCache: $e');
+    }
+
+    // Clear financial calculator data
+    try {
+      await FinancialCalculatorService.clearAllData();
+    } catch (e) {
+      logError(
+          'CacheService: Error clearing financial calculator cache in clearAllCache: $e');
     }
 
     // Close all converter boxes first to avoid type conflicts

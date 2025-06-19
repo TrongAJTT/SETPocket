@@ -41,42 +41,42 @@ class CalculatorToolsScreen extends StatelessWidget {
         'description': localizations.scientificCalculatorDesc,
         'icon': Icons.calculate,
         'color': Colors.teal,
-        'screen': const ScientificCalculatorScreen(),
+        'builder': () => ScientificCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
         'title': localizations.graphingCalculator,
         'description': localizations.graphingCalculatorDesc,
         'icon': Icons.show_chart,
         'color': Colors.indigo,
-        'screen': const GraphingCalculatorScreen(),
+        'builder': () => GraphingCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
         'title': localizations.bmiCalculator,
         'description': localizations.bmiCalculatorDesc,
         'icon': Icons.monitor_weight,
         'color': Colors.blue,
-        'screen': const BmiCalculatorScreen(),
+        'builder': () => BmiCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
-        'title': "Financial Calculator",
-        'description': "Calculate loans, investments, and compound interest",
+        'title': localizations.financialCalculator,
+        'description': localizations.financialCalculatorDesc,
         'icon': Icons.attach_money,
         'color': Colors.green,
-        'screen': const FinancialCalculatorScreen(),
+        'builder': () => FinancialCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
         'title': "Date Calculator",
         'description': "Calculate date differences and add/subtract dates",
         'icon': Icons.calendar_today,
         'color': Colors.orange,
-        'screen': const DateCalculatorScreen(),
+        'builder': () => const DateCalculatorScreen(),
       },
       {
         'title': "Discount Calculator",
         'description': "Calculate discounts, tips, and tax",
         'icon': Icons.local_offer,
         'color': Colors.purple,
-        'screen': const DiscountCalculatorScreen(),
+        'builder': () => const DiscountCalculatorScreen(),
       },
     ];
 
@@ -100,7 +100,8 @@ class CalculatorToolsScreen extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () {
-              final screen = calculator['screen'] as Widget;
+              final builder = calculator['builder'] as Widget Function();
+              final screen = builder();
               if (isEmbedded && onToolSelected != null) {
                 onToolSelected!(screen, title,
                     parentCategory: 'CalculatorToolsScreen', icon: icon);

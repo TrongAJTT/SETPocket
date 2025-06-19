@@ -1627,5 +1627,113 @@
     "bmiPediatricNote": "Đối với trẻ em và thanh thiếu niên, BMI được so sánh với những người cùng tuổi và giới tính bằng biểu đồ phân vị.",
     "bmiGrowthPattern": "Tham khảo ý kiến bác sĩ nhi khoa để đánh giá mô hình tăng trưởng và sức khỏe tổng thể.",
 
+    "financialCalculator": "Máy tính Tài chính",
+    "financialCalculatorDesc": "Tính toán tài chính nâng cao cho vay, đầu tư và lãi kép",
+    "financialCalculatorDetailedInfo": "Thông tin Máy tính Tài chính",
+    "financialCalculatorOverview": "Máy tính tài chính toàn diện cho thanh toán vay, kế hoạch đầu tư và tính toán lãi kép",
+
+    "loanCalculator": "Máy tính Vay",
+    "investmentCalculator": "Máy tính Đầu tư",
+    "compoundInterestCalculator": "Máy tính Lãi kép",
+
+    "loanAmount": "Số tiền vay ($)",
+    "loanAmountHint": "Nhập số tiền vay",
+    "annualInterestRate": "Lãi suất hàng năm (%)",
+    "annualInterestRateHint": "Nhập lãi suất",
+    "loanTerm": "Thời hạn vay (năm)",
+    "loanTermHint": "Nhập thời hạn vay",
+    "calculateLoan": "Tính toán Vay",
+
+    "initialInvestment": "Đầu tư ban đầu ($)",
+    "initialInvestmentHint": "Nhập số tiền ban đầu",
+    "monthlyContribution": "Đóng góp hàng tháng ($)",
+    "monthlyContributionHint": "Nhập đóng góp hàng tháng",
+    "annualReturn": "Lợi nhuận hàng năm (%)",
+    "annualReturnHint": "Nhập lợi nhuận dự kiến",
+    "investmentPeriod": "Thời gian đầu tư (năm)",
+    "investmentPeriodHint": "Nhập thời gian đầu tư",
+    "calculateInvestment": "Tính toán Đầu tư",
+
+    "principalAmount": "Số tiền gốc ($)",
+    "principalAmountHint": "Nhập số tiền gốc",
+    "timePeriod": "Thời gian (năm)",
+    "timePeriodHint": "Nhập thời gian",
+    "compoundingFrequency": "Tần suất tính lãi (lần/năm)",
+    "compoundingFrequencyHint": "Nhập tần suất (12 cho hàng tháng)",
+    "calculateCompoundInterest": "Tính toán Lãi kép",
+
+    "monthlyPayment": "Thanh toán hàng tháng",
+    "totalPayment": "Tổng thanh toán",
+    "totalInterest": "Tổng lãi",
+    "futureValue": "Giá trị tương lai",
+    "totalContributions": "Tổng đóng góp",
+    "totalEarnings": "Tổng thu nhập",
+    "finalAmount": "Số tiền cuối cùng",
+    "interestEarned": "Lãi kiếm được",
+
+    "results": "Kết quả",
+    "financialHistory": "Lịch sử Tài chính",
+    "historyTab": "Lịch sử",
+    "loanTab": "Vay",
+    "investmentTab": "Đầu tư",
+    "compoundTab": "Lãi kép",
+
+    "inputError": "Lỗi nhập liệu",
+    "pleaseEnterValidNumbers": "Vui lòng nhập các số dương hợp lệ cho tất cả các trường.",
+    "pleaseEnterValidReturnAndTerm": "Vui lòng nhập các số dương hợp lệ cho tỷ lệ lợi nhuận và thời hạn.",
+
+    "financialCalculationHistory": "Lịch sử tính toán tài chính và các phép tính đã lưu",
+    "financialHistoryCleared": "Đã xóa lịch sử tài chính",
+    "confirmClearFinancialHistory": "Bạn có chắc chắn muốn xóa tất cả lịch sử tính toán tài chính không?",
+
+    "loanCalculationSaved": "Phép tính vay đã được lưu vào lịch sử",
+    "investmentCalculationSaved": "Phép tính đầu tư đã được lưu vào lịch sử",
+    "compoundCalculationSaved": "Phép tính lãi kép đã được lưu vào lịch sử",
+
+    "restoreCalculation": "Khôi phục Tính toán",
+    "copyResult": "Sao chép Kết quả",
+    "copyInputs": "Sao chép Đầu vào",
+    "removeFromFinancialHistory": "Xóa khỏi lịch sử",
+
+    "financialCalculationDate": "Tính toán vào {date}",
+    "@financialCalculationDate": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+
+    "noFinancialHistoryYet": "Chưa có phép tính nào",
+    "startCalculatingHint": "Bắt đầu thực hiện tính toán tài chính để xem chúng tại đây",
+
+    "financialResultsSummary": "{type}: {result}",
+    "@financialResultsSummary": {
+        "placeholders": {
+            "type": {
+                "type": "String"
+            },
+            "result": {
+                "type": "String"
+            }
+        }
+    },
+
+    "saveToFinancialHistory": "Lưu vào lịch sử",
+    "financialCalculationTypes": "Loại Tính toán Tài chính",
+    "loanCalculationDesc": "Tính toán thanh toán hàng tháng, tổng chi phí và lãi cho các khoản vay",
+    "investmentCalculationDesc": "Lập kế hoạch giá trị tương lai của đầu tư với đóng góp thường xuyên",
+    "compoundInterestDesc": "Tính toán tăng trưởng lãi kép theo thời gian",
+
+    "practicalFinancialApplications": "Ứng dụng Thực tế",
+    "financialApplicationsDesc": "Kế hoạch thế chấp, vay mua xe, tiết kiệm hưu trí, quỹ giáo dục, đầu tư kinh doanh và lập kế hoạch tài chính tổng thể.",
+
+    "financialTips": "Mẹo Tài chính",
+    "financialTip1": "So sánh các thời hạn vay khác nhau để tìm lựa chọn tốt nhất",
+    "financialTip2": "Bắt đầu đầu tư sớm để tối đa hóa lãi kép",
+    "financialTip3": "Cân nhắc thanh toán thêm để giảm lãi vay",
+    "financialTip4": "Đóng góp thường xuyên có thể tăng đáng kể tăng trưởng đầu tư",
+    "financialTip5": "Tần suất tính lãi cao hơn sẽ tăng lợi nhuận",
+
     "bmiKeyFeatures": "Tính năng chính"
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_history_service.dart';
+import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/widgets/calculator_layout.dart';
 import 'dart:math' as math;
 
@@ -45,7 +46,7 @@ class _ScientificCalculatorScreenState
   }
 
   Future<void> _loadHistory() async {
-    final enabled = await CalculatorHistoryService.isHistoryEnabled();
+    final enabled = await GraphingCalculatorService.getRememberHistory();
     final history = await CalculatorHistoryService.getHistory('scientific');
     setState(() {
       _historyEnabled = enabled;
@@ -447,7 +448,8 @@ class _ScientificCalculatorScreenState
     return expression;
   }
 
-  void _restoreFromHistory(CalculatorHistoryItem item) {
+  void _restoreFromHistory(
+      CalculatorHistoryItem item, BuildContext historyContext) {
     setState(() {
       _expression = item.expression;
       _display = item.result;
@@ -456,6 +458,25 @@ class _ScientificCalculatorScreenState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context)!.restored)),
     );
+
+    // Switch to calculator tab on mobile
+    final tabSwitcher = CalculatorTabSwitcher.of(historyContext);
+    tabSwitcher?.onSwitchToCalculator?.call();
+  }
+
+  void _restoreExpression(String expression, BuildContext historyContext) {
+    setState(() {
+      _expression = expression;
+      _display = expression; // Show the expression in display
+      _justCalculated = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context)!.restored)),
+    );
+
+    // Switch to calculator tab on mobile
+    final tabSwitcher = CalculatorTabSwitcher.of(historyContext);
+    tabSwitcher?.onSwitchToCalculator?.call();
   }
 
   Widget _buildDisplayContent() {
@@ -688,101 +709,29 @@ class _ScientificCalculatorScreenState
     );
   }
 
-  Widget _buildHistoryWidget(AppLocalizations loc) {
-    return CalculatorHistoryWidget(
-      historyType: 'scientific',
+  Widget _buildHistoryWidget(AppLocalizations l10n) {
+    return _ScientificCalculatorHistoryWidget(
       history: _history,
-      title: loc.calculationHistory,
-      onClearHistory: () async {
-        await CalculatorHistoryService.clearHistory('scientific');
-        await _loadHistory();
+      onClearHistory: null, // Remove the clear callback - handled by layout
+      onRestoreFromHistory: (item, context) {
+        setState(() {
+          _display = item.result;
+          _expression = item.result;
+          _justCalculated = true;
+        });
+        // Switch to calculator tab on mobile if available
+        // This would need TabController access in a more complex implementation
       },
-      customItemBuilder: (item, context) {
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          elevation: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Expression
-                if (item.expression.isNotEmpty) ...[
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.input,
-                        size: 16,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          item.expression,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.restore, size: 16),
-                        onPressed: () => _restoreFromHistory(item),
-                        tooltip: 'Restore',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                ],
-
-                // Result
-                Row(
-                  children: [
-                    Icon(
-                      Icons.output,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        item.result,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Timestamp
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      item.timestamp.toString().substring(0, 19),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
+      onRestoreExpression: (expression, context) {
+        setState(() {
+          _expression = expression;
+          _display = expression;
+          _justCalculated = false;
+        });
+        // Switch to calculator tab on mobile if available
       },
+      showHeader:
+          false, // Don't show header for desktop - ThreePanelLayout provides it
     );
   }
 
@@ -834,14 +783,20 @@ class _ScientificCalculatorScreenState
       },
     );
 
-    return CalculatorLayout(
+    // Return the calculator layout directly - NewCalculatorLayout handles Scaffold internally
+    return NewCalculatorLayout(
       calculatorContent: calculatorContent,
       historyWidget: _historyEnabled ? _buildHistoryWidget(l10n) : null,
       historyEnabled: _historyEnabled,
-      hasHistory: _history.isNotEmpty,
+      hasHistory: _historyEnabled,
       isEmbedded: widget.isEmbedded,
       title: l10n.scientificCalculator,
       onShowInfo: _showScientificCalculatorInfo,
+      onClearHistory: () async {
+        await CalculatorHistoryService.clearHistory('scientific');
+        await _loadHistory();
+      },
+      hasHistoryData: _history.isNotEmpty,
     );
   }
 
@@ -1506,6 +1461,199 @@ class _ScientificCalculatorScreenState
           color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
+    );
+  }
+}
+
+class _ScientificCalculatorHistoryWidget extends StatefulWidget {
+  final List<CalculatorHistoryItem> history;
+  final VoidCallback? onClearHistory;
+  final Function(CalculatorHistoryItem, BuildContext) onRestoreFromHistory;
+  final Function(String, BuildContext) onRestoreExpression;
+  final bool showHeader;
+
+  const _ScientificCalculatorHistoryWidget({
+    required this.history,
+    this.onClearHistory,
+    required this.onRestoreFromHistory,
+    required this.onRestoreExpression,
+    this.showHeader = true,
+  });
+
+  @override
+  State<_ScientificCalculatorHistoryWidget> createState() =>
+      _ScientificCalculatorHistoryWidgetState();
+}
+
+class _ScientificCalculatorHistoryWidgetState
+    extends State<_ScientificCalculatorHistoryWidget> {
+  Widget _buildCompactHistoryItem(
+      AppLocalizations l10n, CalculatorHistoryItem item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (item.expression.isNotEmpty) ...[
+              Row(
+                children: [
+                  Icon(
+                    Icons.input,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      item.expression,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () =>
+                        widget.onRestoreExpression(item.expression, context),
+                    icon: const Icon(Icons.input, size: 18),
+                    tooltip: l10n.restoreExpression,
+                    constraints:
+                        const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+            ],
+            Row(
+              children: [
+                Icon(
+                  Icons.output,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    item.result,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => widget.onRestoreFromHistory(item, context),
+                  icon: const Icon(Icons.restore, size: 18),
+                  tooltip: l10n.restoreResult,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              item.timestamp.toString().substring(0, 19),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      children: [
+        // History header with consistent styling
+        if (widget.showHeader)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.history,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.calculationHistory,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const Spacer(),
+              ],
+            ),
+          ),
+
+        // History content
+        Expanded(
+          child: widget.history.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.history,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.noCalculationHistory,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          l10n.noHistoryMessage,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: widget.history.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.history[index];
+                    return _buildCompactHistoryItem(l10n, item);
+                  },
+                ),
+        ),
+      ],
     );
   }
 }

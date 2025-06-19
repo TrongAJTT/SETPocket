@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/graphing_function.dart';
 
@@ -20,6 +21,8 @@ class GraphPanel extends StatefulWidget {
   final VoidCallback onZoomOut;
   final VoidCallback onReturnToCenter;
   final bool isOffCenter;
+  final bool isJoystickEnabled;
+  final Function(double deltaX, double deltaY) onJoystickMove;
 
   const GraphPanel({
     super.key,
@@ -39,6 +42,8 @@ class GraphPanel extends StatefulWidget {
     required this.onZoomOut,
     required this.onReturnToCenter,
     required this.isOffCenter,
+    this.isJoystickEnabled = false,
+    required this.onJoystickMove,
   });
 
   @override
@@ -61,7 +66,7 @@ class _GraphPanelState extends State<GraphPanel> {
       ),
       child: Stack(
         children: [
-          // The main graph with pan gesture support
+          // The main graph with conditional pan gesture support
           widget.functionDataPoints.isEmpty && !widget.isCalculating
               ? Center(
                   child: Text(
@@ -69,118 +74,56 @@ class _GraphPanelState extends State<GraphPanel> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 )
-              : GestureDetector(
-                  onPanStart: (details) {
-                    widget.onPanStart(details);
-                    _panStartX = details.localPosition.dx;
-                    _panStartY = details.localPosition.dy;
-                  },
-                  onPanUpdate: (details) {
-                    double deltaX = details.localPosition.dx - _panStartX;
-                    double deltaY = details.localPosition.dy - _panStartY;
+              : widget.isJoystickEnabled
+                  ? // When joystick is enabled, disable pan gesture to avoid conflicts
+                  LineChart(
+                      LineChartData(
+                        minX: widget.minX,
+                        maxX: widget.maxX,
+                        minY: widget.minY,
+                        maxY: widget.maxY,
+                        lineTouchData: const LineTouchData(enabled: false),
+                        lineBarsData: _buildLineSegments(),
+                        gridData: _buildGridData(),
+                        titlesData: _buildTitlesData(),
+                        borderData: _buildBorderData(),
+                        extraLinesData: _buildExtraLinesData(),
+                      ),
+                    )
+                  : // When joystick is disabled, enable pan gesture
+                  GestureDetector(
+                      onPanStart: (details) {
+                        widget.onPanStart(details);
+                        _panStartX = details.localPosition.dx;
+                        _panStartY = details.localPosition.dy;
+                      },
+                      onPanUpdate: (details) {
+                        double deltaX = details.localPosition.dx - _panStartX;
+                        double deltaY = details.localPosition.dy - _panStartY;
 
-                    // Only pan if movement is significant enough
-                    if (deltaX.abs() > 1 || deltaY.abs() > 1) {
-                      widget.onPan(deltaX, deltaY);
-                      _panStartX = details.localPosition.dx;
-                      _panStartY = details.localPosition.dy;
-                    }
-                  },
-                  onPanEnd: widget.onPanEnd,
-                  child: LineChart(
-                    LineChartData(
-                      minX: widget.minX,
-                      maxX: widget.maxX,
-                      minY: widget.minY,
-                      maxY: widget.maxY,
-                      lineTouchData: const LineTouchData(enabled: false),
-                      lineBarsData: _buildLineSegments(),
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: true,
-                        drawHorizontalLine: true,
-                        horizontalInterval: (widget.maxY - widget.minY) / 10,
-                        verticalInterval: (widget.maxX - widget.minX) / 10,
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withValues(alpha: 0.3),
-                            strokeWidth: 1,
-                          );
-                        },
-                        getDrawingVerticalLine: (value) {
-                          return FlLine(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withValues(alpha: 0.3),
-                            strokeWidth: 1,
-                          );
-                        },
-                      ),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                            interval: (widget.maxY - widget.minY) / 5,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                value.toStringAsFixed(1),
-                                style: Theme.of(context).textTheme.labelSmall,
-                              );
-                            },
-                          ),
+                        // Only pan if movement is significant enough
+                        if (deltaX.abs() > 1 || deltaY.abs() > 1) {
+                          widget.onPan(deltaX, deltaY);
+                          _panStartX = details.localPosition.dx;
+                          _panStartY = details.localPosition.dy;
+                        }
+                      },
+                      onPanEnd: widget.onPanEnd,
+                      child: LineChart(
+                        LineChartData(
+                          minX: widget.minX,
+                          maxX: widget.maxX,
+                          minY: widget.minY,
+                          maxY: widget.maxY,
+                          lineTouchData: const LineTouchData(enabled: false),
+                          lineBarsData: _buildLineSegments(),
+                          gridData: _buildGridData(),
+                          titlesData: _buildTitlesData(),
+                          borderData: _buildBorderData(),
+                          extraLinesData: _buildExtraLinesData(),
                         ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 30,
-                            interval: (widget.maxX - widget.minX) / 5,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                value.toStringAsFixed(1),
-                                style: Theme.of(context).textTheme.labelSmall,
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                      ),
-                      borderData: FlBorderData(
-                        show: true,
-                        border: Border.all(
-                          color: Theme.of(context).dividerColor,
-                          width: 1,
-                        ),
-                      ),
-                      // Add axis lines
-                      extraLinesData: ExtraLinesData(
-                        horizontalLines: [
-                          HorizontalLine(
-                            y: 0,
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color ??
-                                    Colors.black,
-                            strokeWidth: 1,
-                          ),
-                        ],
-                        verticalLines: [
-                          VerticalLine(
-                            x: 0,
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color ??
-                                    Colors.black,
-                            strokeWidth: 1,
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                ),
 
           // Floating zoom controls in bottom right
           Positioned(
@@ -189,39 +132,74 @@ class _GraphPanelState extends State<GraphPanel> {
             child: _buildFloatingZoomControls(l10n),
           ),
 
-          // Pan indicator (only show when panning)
-          if (widget.isPanning)
+          // Joystick control (only show when enabled)
+          if (widget.isJoystickEnabled)
             Positioned(
-              top: 16,
+              bottom: 16,
               left: 16,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Theme.of(context)
                       .colorScheme
-                      .primary
-                      .withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.pan_tool,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.panning,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      .surface
+                      .withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
+                ),
+                child: Joystick(
+                  mode: JoystickMode.all,
+                  listener: (details) {
+                    // Add null safety check
+                    if (mounted && widget.onJoystickMove != null) {
+                      widget.onJoystickMove(details.x, details.y);
+                    }
+                  },
+                  base: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .outline
+                            .withValues(alpha: 0.5),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  stick: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -333,6 +311,90 @@ class _GraphPanelState extends State<GraphPanel> {
     }
 
     return segments;
+  }
+
+  FlGridData _buildGridData() {
+    return FlGridData(
+      show: true,
+      drawVerticalLine: true,
+      drawHorizontalLine: true,
+      horizontalInterval: (widget.maxY - widget.minY) / 10,
+      verticalInterval: (widget.maxX - widget.minX) / 10,
+      getDrawingHorizontalLine: (value) {
+        return FlLine(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+          strokeWidth: 1,
+        );
+      },
+      getDrawingVerticalLine: (value) {
+        return FlLine(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+          strokeWidth: 1,
+        );
+      },
+    );
+  }
+
+  FlTitlesData _buildTitlesData() {
+    return FlTitlesData(
+      leftTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          reservedSize: 40,
+          interval: (widget.maxY - widget.minY) / 5,
+          getTitlesWidget: (value, meta) {
+            return Text(
+              value.toStringAsFixed(1),
+              style: Theme.of(context).textTheme.labelSmall,
+            );
+          },
+        ),
+      ),
+      bottomTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          reservedSize: 30,
+          interval: (widget.maxX - widget.minX) / 5,
+          getTitlesWidget: (value, meta) {
+            return Text(
+              value.toStringAsFixed(1),
+              style: Theme.of(context).textTheme.labelSmall,
+            );
+          },
+        ),
+      ),
+      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    );
+  }
+
+  FlBorderData _buildBorderData() {
+    return FlBorderData(
+      show: true,
+      border: Border.all(
+        color: Theme.of(context).dividerColor,
+        width: 1,
+      ),
+    );
+  }
+
+  ExtraLinesData _buildExtraLinesData() {
+    return ExtraLinesData(
+      horizontalLines: [
+        HorizontalLine(
+          y: 0,
+          color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+          strokeWidth: 1,
+        ),
+      ],
+      verticalLines: [
+        VerticalLine(
+          x: 0,
+          color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+          strokeWidth: 1,
+        ),
+      ],
+    );
   }
 
   List<LineChartBarData> _buildLineSegments() {

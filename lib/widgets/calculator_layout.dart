@@ -1,6 +1,211 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_history_service.dart';
+import 'package:setpocket/services/graphing_calculator_service.dart';
+import 'package:setpocket/widgets/three_panel_layout.dart';
+
+/// New calculator layout using ThreePanelLayout for consistency
+class NewCalculatorLayout extends StatefulWidget {
+  final Widget calculatorContent;
+  final Widget? historyWidget;
+  final bool historyEnabled;
+  final bool hasHistory;
+  final bool isEmbedded;
+  final String title;
+  final VoidCallback? onShowInfo;
+  final List<Widget>? actions; // Additional actions for calculator panel
+  final VoidCallback? onClearHistory; // Generic clear history callback
+  final bool hasHistoryData; // Whether there is actually history data to clear
+  final String?
+      clearHistoryMessage; // Custom clear history confirmation message
+  final String? historyClearedMessage; // Custom history cleared success message
+
+  const NewCalculatorLayout({
+    super.key,
+    required this.calculatorContent,
+    this.historyWidget,
+    required this.historyEnabled,
+    required this.hasHistory,
+    required this.isEmbedded,
+    required this.title,
+    this.onShowInfo,
+    this.actions,
+    this.onClearHistory,
+    this.hasHistoryData = false,
+    this.clearHistoryMessage,
+    this.historyClearedMessage,
+  });
+
+  @override
+  State<NewCalculatorLayout> createState() => _NewCalculatorLayoutState();
+}
+
+class _NewCalculatorLayoutState extends State<NewCalculatorLayout> {
+  List<Widget> _buildCalculatorActions(BuildContext context) {
+    final actions = <Widget>[];
+
+    // Add info button if available
+    if (widget.onShowInfo != null) {
+      actions.add(
+        IconButton(
+          onPressed: widget.onShowInfo,
+          icon: const Icon(Icons.info_outline),
+          tooltip: AppLocalizations.of(context)!.info,
+        ),
+      );
+    }
+
+    // Add additional actions
+    if (widget.actions != null) {
+      actions.addAll(widget.actions!);
+    }
+
+    return actions;
+  }
+
+  List<Widget> _buildHistoryActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final actions = <Widget>[];
+
+    // Add clear history button if callback is provided and there is data to clear
+    if (widget.onClearHistory != null && widget.hasHistoryData) {
+      actions.add(
+        IconButton(
+          onPressed: () => _showClearHistoryDialog(context),
+          icon: const Icon(Icons.clear_all, size: 18),
+          tooltip: l10n.clearAll,
+        ),
+      );
+    }
+
+    return actions;
+  }
+
+  Future<void> _showClearHistoryDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    // Use custom message if provided, otherwise fall back to generic calculator message
+    final confirmMessage =
+        widget.clearHistoryMessage ?? l10n.confirmClearCalculatorHistory;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearAll),
+        content: Text(confirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      widget.onClearHistory?.call();
+
+      // Use custom success message if provided, otherwise fall back to generic calculator message
+      final successMessage =
+          widget.historyClearedMessage ?? l10n.calculatorHistoryCleared;
+
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text(successMessage)),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return ThreePanelLayout(
+      mainPanel: widget.calculatorContent,
+      topRightPanel: widget.historyWidget ?? Container(),
+      bottomRightPanel: null, // Single panel for most calculators
+      mainPanelTitle: widget.title,
+      topRightPanelTitle: widget.historyEnabled && widget.historyWidget != null
+          ? l10n.calculationHistory
+          : null,
+      title: widget.title,
+      isEmbedded: widget.isEmbedded, // Pass the embedded flag
+      hideBottomPanel: true, // Most calculators only need 2 panels
+      mainPanelActions: _buildCalculatorActions(context),
+      topRightPanelActions:
+          widget.historyEnabled && widget.historyWidget != null
+              ? _buildHistoryActions(context)
+              : null,
+    );
+  }
+}
+
+/// Generic calculator widget base class for common functionality
+abstract class CalculatorWidget extends StatefulWidget {
+  final bool isEmbedded;
+
+  const CalculatorWidget({super.key, this.isEmbedded = false});
+
+  // Abstract methods that subclasses must implement
+  String get title;
+  IconData get icon => Icons.calculate;
+  Widget buildCalculatorContent(BuildContext context);
+  Widget? buildHistoryWidget(BuildContext context) => null;
+  VoidCallback? getInfoCallback(BuildContext context) => null;
+  bool get hasHistory => false; // Default to false, override if has history
+
+  @override
+  CalculatorWidgetState createState();
+}
+
+/// Generic state class for calculator widgets
+abstract class CalculatorWidgetState<T extends CalculatorWidget>
+    extends State<T> {
+  bool _historyEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistorySettings();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadHistorySettings();
+  }
+
+  Future<void> _loadHistorySettings() async {
+    final enabled = await GraphingCalculatorService.getRememberHistory();
+    if (mounted) {
+      setState(() {
+        _historyEnabled = enabled;
+      });
+    }
+  }
+
+  // Override this to provide localized title
+  String getLocalizedTitle(BuildContext context) {
+    return widget.title;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorLayout(
+      calculatorContent: widget.buildCalculatorContent(context),
+      historyWidget: widget.buildHistoryWidget(context),
+      historyEnabled: _historyEnabled,
+      hasHistory: widget.hasHistory,
+      isEmbedded: widget.isEmbedded,
+      title: getLocalizedTitle(context),
+      onShowInfo: widget.getInfoCallback(context),
+    );
+  }
+}
 
 /// Generic layout widget for all calculator tools to ensure consistency
 class CalculatorLayout extends StatefulWidget {
@@ -45,6 +250,12 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
     super.dispose();
   }
 
+  void _switchToCalculatorTab() {
+    if (_tabController.index != 0) {
+      _tabController.animateTo(0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -81,6 +292,7 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
                         // Calculator title header
                         Container(
                           padding: const EdgeInsets.all(16),
+                          height: 65,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: const BorderRadius.only(
@@ -112,6 +324,18 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
+                              const Spacer(),
+                              if (widget.onShowInfo != null)
+                                IconButton(
+                                  onPressed: widget.onShowInfo,
+                                  icon: Icon(
+                                    Icons.info_outline,
+                                    size: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  tooltip: AppLocalizations.of(context)!.info,
+                                ),
                             ],
                           ),
                         ),
@@ -209,6 +433,18 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
+                              const Spacer(),
+                              if (widget.onShowInfo != null)
+                                IconButton(
+                                  onPressed: widget.onShowInfo,
+                                  icon: Icon(
+                                    Icons.info_outline,
+                                    size: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  tooltip: AppLocalizations.of(context)!.info,
+                                ),
                             ],
                           ),
                         ),
@@ -231,85 +467,235 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
         );
       }
     } else {
-      // Mobile: Tab layout or single view
-      final contentToUse = widget.mobileContent ?? widget.calculatorContent;
-
-      if (widget.historyEnabled && widget.historyWidget != null) {
-        final loc = AppLocalizations.of(context)!;
-        content = Column(
-          children: [
-            TabBar(
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              tabs: [
-                Tab(
-                  icon: const Icon(Icons.calculate),
-                  text: loc.calculatorTools,
-                ),
-                Tab(
-                  icon: const Icon(Icons.history),
-                  text: loc.calculationHistory,
-                ),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // Calculator tab - with proper constraints
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: contentToUse,
-                  ),
-                  // History tab
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: widget.historyWidget!,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      } else {
-        // Mobile without history: Direct content with padding
-        content = Padding(
-          padding: const EdgeInsets.all(16),
-          child: contentToUse,
-        );
-      }
+      // Mobile/Tablet: Use tab layout
+      content = widget.historyEnabled && widget.historyWidget != null
+          ? TabbedCalculatorLayout(
+              tabController: _tabController,
+              calculatorContent:
+                  widget.mobileContent ?? widget.calculatorContent,
+              historyWidget: widget.historyWidget!,
+              title: widget.title,
+              onShowInfo: widget.onShowInfo,
+              showTabBar: false,
+              onSwitchToCalculator: _switchToCalculatorTab,
+            )
+          : SingleCalculatorLayout(
+              calculatorContent:
+                  widget.mobileContent ?? widget.calculatorContent,
+              title: widget.title,
+              onShowInfo: widget.onShowInfo,
+            );
     }
 
-    // Return either the content directly (if embedded) or wrapped in a Scaffold
     if (widget.isEmbedded) {
       return content;
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          elevation: 0,
-          actions: _buildAppBarActions(context),
-        ),
-        body: content,
-      );
+      // Non-embedded: Add AppBar for mobile navigation
+      if (isLargeScreen) {
+        // Desktop: No AppBar needed
+        return Scaffold(
+          body: content,
+        );
+      } else {
+        // Mobile/Tablet: Add AppBar with back button
+        final tabbedContent =
+            widget.historyEnabled && widget.historyWidget != null
+                ? TabbedCalculatorLayout(
+                    tabController: _tabController,
+                    calculatorContent:
+                        widget.mobileContent ?? widget.calculatorContent,
+                    historyWidget: widget.historyWidget!,
+                    title: widget.title,
+                    onShowInfo: widget.onShowInfo,
+                    showTabBar: false, // Hide tab bar, will be in AppBar
+                    onSwitchToCalculator: _switchToCalculatorTab,
+                  )
+                : SingleCalculatorLayout(
+                    calculatorContent:
+                        widget.mobileContent ?? widget.calculatorContent,
+                    title: widget.title,
+                    onShowInfo: widget.onShowInfo,
+                    showHeader: false, // No header when AppBar is present
+                  );
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            elevation: 0,
+            actions: widget.onShowInfo != null
+                ? [
+                    IconButton(
+                      onPressed: widget.onShowInfo,
+                      icon: const Icon(Icons.info_outline),
+                      tooltip: AppLocalizations.of(context)!.info,
+                    ),
+                  ]
+                : null,
+            bottom: widget.historyEnabled && widget.historyWidget != null
+                ? TabBar(
+                    controller: _tabController,
+                    tabs: [
+                      Tab(
+                        icon: const Icon(Icons.calculate),
+                        text: AppLocalizations.of(context)!.calculatorTools,
+                      ),
+                      Tab(
+                        icon: const Icon(Icons.history),
+                        text: AppLocalizations.of(context)!.calculationHistory,
+                      ),
+                    ],
+                  )
+                : null,
+          ),
+          body: tabbedContent,
+        );
+      }
     }
   }
+}
 
-  List<Widget> _buildAppBarActions(BuildContext context) {
+/// Generic two-tab calculator layout for mobile/tablet
+class TabbedCalculatorLayout extends StatelessWidget {
+  final TabController tabController;
+  final Widget calculatorContent;
+  final Widget historyWidget;
+  final String title;
+  final VoidCallback? onShowInfo;
+  final bool showTabBar;
+  final VoidCallback? onSwitchToCalculator;
+
+  const TabbedCalculatorLayout({
+    super.key,
+    required this.tabController,
+    required this.calculatorContent,
+    required this.historyWidget,
+    required this.title,
+    this.onShowInfo,
+    this.showTabBar = true,
+    this.onSwitchToCalculator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    if (widget.onShowInfo != null) {
-      return [
-        IconButton(
-          icon: const Icon(Icons.info_outline),
-          onPressed: widget.onShowInfo,
-          tooltip: l10n.info,
+    return Column(
+      children: [
+        // Tab bar - only show if needed
+        if (showTabBar)
+          Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: TabBar(
+              controller: tabController,
+              tabs: [
+                Tab(
+                  icon: const Icon(Icons.calculate),
+                  text: l10n.calculatorTools,
+                ),
+                Tab(
+                  icon: const Icon(Icons.history),
+                  text: l10n.calculationHistory,
+                ),
+              ],
+            ),
+          ),
+        // Tab content
+        Expanded(
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              // Calculator tab
+              SingleCalculatorLayout(
+                calculatorContent: calculatorContent,
+                title: title,
+                onShowInfo: onShowInfo,
+                showHeader:
+                    showTabBar, // Show header only if no separate tab bar
+              ),
+              // History tab
+              _HistoryWidgetWrapper(
+                onSwitchToCalculator: onSwitchToCalculator,
+                child: historyWidget,
+              ),
+            ],
+          ),
         ),
-      ];
+      ],
+    );
+  }
+}
+
+/// Single calculator layout without tabs
+class SingleCalculatorLayout extends StatelessWidget {
+  final Widget calculatorContent;
+  final String title;
+  final VoidCallback? onShowInfo;
+  final bool showHeader;
+
+  const SingleCalculatorLayout({
+    super.key,
+    required this.calculatorContent,
+    required this.title,
+    this.onShowInfo,
+    this.showHeader = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!showHeader) {
+      return calculatorContent;
     }
 
-    return [];
+    return Column(
+      children: [
+        // Header
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.calculate,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const Spacer(),
+              if (onShowInfo != null)
+                IconButton(
+                  onPressed: onShowInfo,
+                  icon: Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  tooltip: AppLocalizations.of(context)!.info,
+                ),
+            ],
+          ),
+        ),
+        // Content
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: calculatorContent,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -527,5 +913,44 @@ class _CalculatorHistoryWidgetState extends State<CalculatorHistoryWidget> {
         ),
       ),
     );
+  }
+}
+
+/// Wrapper to inject callback into history widgets
+class _HistoryWidgetWrapper extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onSwitchToCalculator;
+
+  const _HistoryWidgetWrapper({
+    required this.child,
+    this.onSwitchToCalculator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CalculatorTabSwitcher(
+      onSwitchToCalculator: onSwitchToCalculator,
+      child: child,
+    );
+  }
+}
+
+/// InheritedWidget to provide tab switching callback
+class CalculatorTabSwitcher extends InheritedWidget {
+  final VoidCallback? onSwitchToCalculator;
+
+  const CalculatorTabSwitcher({
+    super.key,
+    required this.onSwitchToCalculator,
+    required super.child,
+  });
+
+  static CalculatorTabSwitcher? of(BuildContext context) {
+    return context.getInheritedWidgetOfExactType<CalculatorTabSwitcher>();
+  }
+
+  @override
+  bool updateShouldNotify(CalculatorTabSwitcher oldWidget) {
+    return onSwitchToCalculator != oldWidget.onSwitchToCalculator;
   }
 }

@@ -642,6 +642,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get restored => 'Đã khôi phục!';
 
   @override
+  String get restoreExpression => 'Khôi phục biểu thức';
+
+  @override
+  String get restoreResult => 'Khôi phục kết quả';
+
+  @override
   String get numberGenerator => 'Tạo số ngẫu nhiên';
 
   @override
@@ -2057,7 +2063,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get confirmClearHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử BMI không?';
 
   @override
+  String get confirmClearCalculatorHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử tính toán không?';
+
+  @override
   String get historyCleared => 'Đã xóa lịch sử BMI';
+
+  @override
+  String get calculatorHistoryCleared => 'Đã xóa lịch sử tính toán';
 
   @override
   String calculatedOn(String date) {
@@ -3581,6 +3593,24 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get panning => 'Di chuyển';
+
+  @override
+  String get joystickControl => 'Điều khiển Joystick';
+
+  @override
+  String get enableJoystick => 'Bật Joystick';
+
+  @override
+  String get disableJoystick => 'Tắt Joystick';
+
+  @override
+  String get joystickMode => 'Chế độ Joystick';
+
+  @override
+  String get joystickModeActive => 'Chế độ Joystick đang hoạt động';
+
+  @override
+  String get useJoystickToNavigateGraph => 'Sử dụng joystick để điều hướng đồ thị';
 
   @override
   String get equalXYRatio => 'Tỉ lệ X:Y bằng nhau';

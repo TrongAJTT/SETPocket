@@ -1229,6 +1229,18 @@ abstract class AppLocalizations {
   /// **'Restored!'**
   String get restored;
 
+  /// No description provided for @restoreExpression.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Expression'**
+  String get restoreExpression;
+
+  /// No description provided for @restoreResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Result'**
+  String get restoreResult;
+
   /// No description provided for @numberGenerator.
   ///
   /// In en, this message translates to:
@@ -3995,11 +4007,23 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to clear all BMI history?'**
   String get confirmClearHistory;
 
+  /// No description provided for @confirmClearCalculatorHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all calculation history?'**
+  String get confirmClearCalculatorHistory;
+
   /// No description provided for @historyCleared.
   ///
   /// In en, this message translates to:
   /// **'BMI history cleared'**
   String get historyCleared;
+
+  /// No description provided for @calculatorHistoryCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator history cleared'**
+  String get calculatorHistoryCleared;
 
   /// No description provided for @calculatedOn.
   ///
@@ -6934,6 +6958,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Panning'**
   String get panning;
+
+  /// No description provided for @joystickControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Joystick Control'**
+  String get joystickControl;
+
+  /// No description provided for @enableJoystick.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Joystick'**
+  String get enableJoystick;
+
+  /// No description provided for @disableJoystick.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Joystick'**
+  String get disableJoystick;
+
+  /// No description provided for @joystickMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Joystick Mode'**
+  String get joystickMode;
+
+  /// No description provided for @joystickModeActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Joystick Mode Active'**
+  String get joystickModeActive;
+
+  /// No description provided for @useJoystickToNavigateGraph.
+  ///
+  /// In en, this message translates to:
+  /// **'Use joystick to navigate the graph'**
+  String get useJoystickToNavigateGraph;
 
   /// No description provided for @equalXYRatio.
   ///

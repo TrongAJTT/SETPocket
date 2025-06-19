@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../models/bmi_models.dart';
-import '../l10n/app_localizations.dart';
+import 'package:setpocket/models/bmi_models.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import 'hive_service.dart';
 
 class BmiService {
@@ -296,10 +296,10 @@ class BmiService {
 
     // Add age-specific considerations
     if (age >= 65) {
-      return baseInterpretation + ' ' + l10n.bmiElderlyNote;
+      return '$baseInterpretation ${l10n.bmiElderlyNote}';
     }
     if (age < 25) {
-      return baseInterpretation + ' ' + l10n.bmiYouthNote;
+      return '$baseInterpretation ${l10n.bmiYouthNote}';
     }
 
     return baseInterpretation;
@@ -565,7 +565,7 @@ class BmiService {
       final totalInches = height;
       final feet = (totalInches / 12).floor();
       final inches = (totalInches % 12).round();
-      return "$feet'${inches}\"";
+      return "$feet'$inches\"";
     } else {
       return "${height.toStringAsFixed(0)} cm";
     }

@@ -28,6 +28,7 @@ dependencies:
   hive_flutter: ^1.1.0
   window_manager: ^0.5.0
   flutter_colorpicker: ^1.1.0
+  flutter_joystick: ^0.2.2
 
 dev_dependencies:
   flutter_test:

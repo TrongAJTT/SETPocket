@@ -44,6 +44,9 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
   double _lastPlottedMinX = 0;
   double _lastPlottedMaxX = 0;
 
+  // Joystick control
+  bool _isJoystickEnabled = false;
+
   // Animation and validation
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -578,6 +581,35 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
       _needsReplot = true;
     });
     _plotFunction();
+  }
+
+  void _toggleJoystick() {
+    setState(() {
+      _isJoystickEnabled = !_isJoystickEnabled;
+    });
+
+    // Show user feedback about gesture mode change
+    final l10n = AppLocalizations.of(context)!;
+    final message =
+        _isJoystickEnabled ? l10n.joystickModeActive : l10n.joystickMode;
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  void _onJoystickMove(double deltaX, double deltaY) {
+    // Use similar logic to pan but with joystick input
+    // deltaX and deltaY come from joystick (typically -1 to 1)
+    double sensitivity = 0.15;
+    // Invert direction for more intuitive control
+    _panGraph(-deltaX * 100 * sensitivity, -deltaY * 100 * sensitivity);
   }
 
   bool _isOffCenter() {
@@ -1315,89 +1347,53 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
             onZoomOut: _zoomOut,
             onReturnToCenter: _returnToCenter,
             isOffCenter: _isOffCenter(),
+            isJoystickEnabled: _isJoystickEnabled,
+            onJoystickMove: _onJoystickMove,
           ),
         ),
       ],
     );
 
-    if (widget.isEmbedded) {
-      return ThreePanelLayout(
-        mainPanel: graphContent,
-        topRightPanel: FunctionsPanel(
-          functionController: _functionController,
-          functions: _functions,
-          isCalculating: _isCalculating,
-          hasValidationError: _hasValidationError,
-          shakeAnimation: _shakeAnimation,
-          onAddFunction: _addFunction,
-          onRemoveFunction: _removeFunction,
-          onToggleVisibility: _toggleFunctionVisibility,
-          onUpdateColor: _updateFunctionColor,
-          onSaveToHistory: _rememberHistory ? _saveCurrentGroupToHistory : null,
-          showSaveButton: _rememberHistory,
-        ),
-        bottomRightPanel: _hideHistoryPanel
-            ? null
-            : HistoryPanel(
-                groupHistory: _groupHistory,
-                onLoadGroup: _loadGroupFromHistory,
-                onRemoveGroup: _removeGroupFromHistory,
-                onSaveCurrentGroup:
-                    _rememberHistory ? _saveCurrentGroupToHistory : null,
-                showSaveButton: _rememberHistory,
-              ),
-        mainPanelTitle: l10n.graphPanel,
-        topRightPanelTitle: l10n.functionsPanel,
-        bottomRightPanelTitle: _hideHistoryPanel ? null : l10n.historyPanel,
-        title: l10n.graphingCalculator,
-        hideBottomPanel: _hideHistoryPanel,
-      );
-    } else {
-      // Custom scaffold for standalone mode with app bar actions
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.graphingCalculator),
-          elevation: 0,
-          actions: _buildAppBarActions(context),
-        ),
-        body: ThreePanelLayout(
-          mainPanel: graphContent,
-          topRightPanel: FunctionsPanel(
-            functionController: _functionController,
-            functions: _functions,
-            isCalculating: _isCalculating,
-            hasValidationError: _hasValidationError,
-            shakeAnimation: _shakeAnimation,
-            onAddFunction: _addFunction,
-            onRemoveFunction: _removeFunction,
-            onToggleVisibility: _toggleFunctionVisibility,
-            onUpdateColor: _updateFunctionColor,
-            onSaveToHistory:
-                _rememberHistory ? _saveCurrentGroupToHistory : null,
-            showSaveButton: _rememberHistory,
-          ),
-          bottomRightPanel: _hideHistoryPanel
-              ? null
-              : HistoryPanel(
-                  groupHistory: _groupHistory,
-                  onLoadGroup: _loadGroupFromHistory,
-                  onRemoveGroup: _removeGroupFromHistory,
-                  onSaveCurrentGroup:
-                      _rememberHistory ? _saveCurrentGroupToHistory : null,
-                  showSaveButton: _rememberHistory,
-                ),
-          mainPanelTitle: l10n.graphPanel,
-          topRightPanelTitle: l10n.functionsPanel,
-          bottomRightPanelTitle: _hideHistoryPanel ? null : l10n.historyPanel,
-          isEmbedded: true, // Treat as embedded when inside custom scaffold
-          title: l10n.graphingCalculator,
-          hideBottomPanel: _hideHistoryPanel,
-        ),
-      );
-    }
+    // Build main panel actions (previously app bar actions)
+    final mainPanelActions = _buildMainPanelActions(context);
+
+    return ThreePanelLayout(
+      mainPanel: graphContent,
+      topRightPanel: FunctionsPanel(
+        functionController: _functionController,
+        functions: _functions,
+        isCalculating: _isCalculating,
+        hasValidationError: _hasValidationError,
+        shakeAnimation: _shakeAnimation,
+        onAddFunction: _addFunction,
+        onRemoveFunction: _removeFunction,
+        onToggleVisibility: _toggleFunctionVisibility,
+        onUpdateColor: _updateFunctionColor,
+        onSaveToHistory: null, // Remove save callback from panel
+        showSaveButton: false, // Disable save button in panel
+      ),
+      bottomRightPanel: _hideHistoryPanel
+          ? null
+          : HistoryPanel(
+              groupHistory: _groupHistory,
+              onLoadGroup: _loadGroupFromHistory,
+              onRemoveGroup: _removeGroupFromHistory,
+              onSaveCurrentGroup: null, // Remove save callback from panel
+              showSaveButton: false, // Disable save button in panel
+            ),
+      mainPanelTitle: l10n.graphPanel,
+      topRightPanelTitle: l10n.functionsPanel,
+      bottomRightPanelTitle: _hideHistoryPanel ? null : l10n.historyPanel,
+      title: l10n.graphingCalculator,
+      hideBottomPanel: _hideHistoryPanel,
+      mainPanelActions: mainPanelActions,
+      topRightPanelActions: _buildFunctionsPanelActions(context),
+      bottomRightPanelActions:
+          _hideHistoryPanel ? null : _buildHistoryActions(context),
+    );
   }
 
-  List<Widget> _buildAppBarActions(BuildContext context) {
+  List<Widget> _buildMainPanelActions(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
     final l10n = AppLocalizations.of(context)!;
@@ -1419,6 +1415,9 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
           icon: const Icon(Icons.more_vert),
           onSelected: (value) {
             switch (value) {
+              case 'toggle_joystick':
+                _toggleJoystick();
+                break;
               case 'reset_plot':
                 _resetPlot();
                 break;
@@ -1428,6 +1427,18 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
             }
           },
           itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'toggle_joystick',
+              child: ListTile(
+                leading: Icon(_isJoystickEnabled
+                    ? Icons.gamepad
+                    : Icons.gamepad_outlined),
+                title: Text(_isJoystickEnabled
+                    ? l10n.disableJoystick
+                    : l10n.enableJoystick),
+                dense: true,
+              ),
+            ),
             PopupMenuItem(
               value: 'reset_plot',
               child: ListTile(
@@ -1461,6 +1472,13 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
           tooltip: l10n.aspectRatio,
         ),
         IconButton(
+          icon:
+              Icon(_isJoystickEnabled ? Icons.gamepad : Icons.gamepad_outlined),
+          onPressed: _toggleJoystick,
+          tooltip:
+              _isJoystickEnabled ? l10n.disableJoystick : l10n.enableJoystick,
+        ),
+        IconButton(
           icon: const Icon(Icons.clear_all),
           onPressed: _resetPlot,
           tooltip: l10n.resetPlot,
@@ -1471,6 +1489,76 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
           tooltip: l10n.resetZoom,
         ),
       ];
+    }
+  }
+
+  List<Widget> _buildFunctionsPanelActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final actions = <Widget>[];
+
+    // Add save to history button if history is enabled and there are functions
+    if (_rememberHistory && _functions.isNotEmpty) {
+      actions.add(
+        IconButton(
+          onPressed: _saveCurrentGroupToHistory,
+          icon: const Icon(Icons.bookmark_add, size: 18),
+          tooltip: l10n.saveCurrentToHistory,
+          style: IconButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.tertiary,
+          ),
+        ),
+      );
+    }
+
+    return actions;
+  }
+
+  List<Widget> _buildHistoryActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final actions = <Widget>[];
+
+    // Add clear history button if there is data to clear
+    if (_groupHistory.isNotEmpty) {
+      actions.add(
+        IconButton(
+          onPressed: () => _showClearHistoryDialog(context),
+          icon: const Icon(Icons.clear_all, size: 18),
+          tooltip: l10n.clearAll,
+        ),
+      );
+    }
+
+    return actions;
+  }
+
+  Future<void> _showClearHistoryDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearAll),
+        content: Text(l10n.confirmClearCalculatorHistory),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      await GraphingCalculatorService.clearHistory();
+      await _loadHistory();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text(l10n.calculatorHistoryCleared)),
+      );
     }
   }
 

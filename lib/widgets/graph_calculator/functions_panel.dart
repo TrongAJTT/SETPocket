@@ -328,6 +328,9 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
                       .secondary
                       .withValues(alpha: 0.1),
                   foregroundColor: Theme.of(context).colorScheme.secondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
 
@@ -366,6 +369,9 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
                       .primary
                       .withValues(alpha: 0.1),
                   foregroundColor: Theme.of(context).colorScheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ],
@@ -569,23 +575,6 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
                         );
                       },
                     ),
-
-              // Floating save button for mobile
-              if (widget.showSaveButton &&
-                  MediaQuery.of(context).size.width <= 800 &&
-                  widget.functions.isNotEmpty &&
-                  widget.onSaveToHistory != null)
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: FloatingActionButton(
-                    onPressed: widget.onSaveToHistory,
-                    tooltip: l10n.saveCurrentToHistory,
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    foregroundColor: Theme.of(context).colorScheme.onTertiary,
-                    child: const Icon(Icons.save),
-                  ),
-                ),
             ],
           ),
         ),

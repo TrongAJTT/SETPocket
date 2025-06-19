@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'hive_service.dart';
+import 'graphing_calculator_service.dart';
 
 class CalculatorHistoryItem {
   final String expression;
@@ -92,7 +93,7 @@ class CalculatorHistoryService {
   /// Add a new item to calculator history
   static Future<void> addHistoryItem(
       String expression, String result, String type) async {
-    final enabled = await isHistoryEnabled();
+    final enabled = await GraphingCalculatorService.getRememberHistory();
     if (!enabled) return;
 
     try {
@@ -127,7 +128,7 @@ class CalculatorHistoryService {
 
   /// Get history for a specific calculator type
   static Future<List<CalculatorHistoryItem>> getHistory(String type) async {
-    final enabled = await isHistoryEnabled();
+    final enabled = await GraphingCalculatorService.getRememberHistory();
     if (!enabled) return [];
 
     try {

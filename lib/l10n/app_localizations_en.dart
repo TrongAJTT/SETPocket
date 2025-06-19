@@ -642,6 +642,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restored => 'Restored!';
 
   @override
+  String get restoreExpression => 'Restore Expression';
+
+  @override
+  String get restoreResult => 'Restore Result';
+
+  @override
   String get numberGenerator => 'Number Generator';
 
   @override
@@ -2057,7 +2063,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmClearHistory => 'Are you sure you want to clear all BMI history?';
 
   @override
+  String get confirmClearCalculatorHistory => 'Are you sure you want to clear all calculation history?';
+
+  @override
   String get historyCleared => 'BMI history cleared';
+
+  @override
+  String get calculatorHistoryCleared => 'Calculator history cleared';
 
   @override
   String calculatedOn(String date) {
@@ -3581,6 +3593,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get panning => 'Panning';
+
+  @override
+  String get joystickControl => 'Joystick Control';
+
+  @override
+  String get enableJoystick => 'Enable Joystick';
+
+  @override
+  String get disableJoystick => 'Disable Joystick';
+
+  @override
+  String get joystickMode => 'Joystick Mode';
+
+  @override
+  String get joystickModeActive => 'Joystick Mode Active';
+
+  @override
+  String get useJoystickToNavigateGraph => 'Use joystick to navigate the graph';
 
   @override
   String get equalXYRatio => 'Equal X:Y ratio';

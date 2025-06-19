@@ -198,6 +198,8 @@
     "copyToClipboard": "Copy to Clipboard",
     "copied": "Copied!",
     "restored": "Restored!",
+    "restoreExpression": "Restore Expression",
+    "restoreResult": "Restore Result",
     
     "numberGenerator": "Number Generator",
     "integers": "Integers",
@@ -806,7 +808,9 @@
     "noHistoryMessage": "Your BMI calculation history will appear here",
     "clearBmiHistory": "Clear BMI History",
     "confirmClearHistory": "Are you sure you want to clear all BMI history?",
+    "confirmClearCalculatorHistory": "Are you sure you want to clear all calculation history?",
     "historyCleared": "BMI history cleared",
+    "calculatorHistoryCleared": "Calculator history cleared",
     "calculatedOn": "Calculated on {date}",
     "@calculatedOn": {
         "placeholders": {
@@ -1535,6 +1539,12 @@
     "zoomOut": "Zoom Out",
     "returnToCenter": "Return to Center",
     "panning": "Panning",
+    "joystickControl": "Joystick Control",
+    "enableJoystick": "Enable Joystick",
+    "disableJoystick": "Disable Joystick",
+    "joystickMode": "Joystick Mode",
+    "joystickModeActive": "Joystick Mode Active",
+    "useJoystickToNavigateGraph": "Use joystick to navigate the graph",
     "equalXYRatio": "Equal X:Y ratio",
     "yAxisWiderThanX": "Y-axis will be {ratio}× wider than X-axis",
     "@yAxisWiderThanX": {

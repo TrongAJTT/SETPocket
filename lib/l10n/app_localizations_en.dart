@@ -161,6 +161,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchHint => 'Search...';
 
   @override
+  String get history => 'History';
+
+  @override
   String get total => 'Total';
 
   @override
@@ -642,6 +645,396 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restored => 'Restored!';
 
   @override
+  String get dateCalculator => 'Date Calculator';
+
+  @override
+  String get dateCalculatorDesc => 'A versatile tool for handling all your date-related calculations. Below is an overview of its features:';
+
+  @override
+  String get dateInfoTabDescription => 'Provides detailed information for any date, including day of the week, day of the year, week number, quarter, and leap year status.';
+
+  @override
+  String get dateDifferenceTabDescription => 'Calculates the duration between two dates, showing the result in a combination of years, months, and days, as well as in total units like months, weeks, days, etc.';
+
+  @override
+  String get addSubtractTabDescription => 'Adds or subtracts a specific number of years, months, and days from a given date to determine the resulting date.';
+
+  @override
+  String get ageCalculatorTabDescription => 'Calculates the age from a birth date and shows the total days lived, days until the next birthday, and the date of the next birthday.';
+
+  @override
+  String get dateCalculatorHistory => 'History';
+
+  @override
+  String get dateDifference => 'Difference';
+
+  @override
+  String get addSubtractDate => 'Add/Subtract';
+
+  @override
+  String get ageCalculator => 'Birthday';
+
+  @override
+  String get ageCalculatorDesc => 'Calculate age and track upcoming birthdays.';
+
+  @override
+  String get workingDays => 'Working Days';
+
+  @override
+  String get timezoneConverter => 'Timezone';
+
+  @override
+  String get recurringDates => 'Recurring';
+
+  @override
+  String get countdown => 'Countdown';
+
+  @override
+  String get dateInfo => 'Detail';
+
+  @override
+  String get dateInfoDesc => 'Get detailed information about any selected date';
+
+  @override
+  String get timeUnitConverter => 'Time Unit';
+
+  @override
+  String get nthWeekday => 'Nth Weekday';
+
+  @override
+  String get allCalculations => 'All Calculations';
+
+  @override
+  String get filterByType => 'Filter by type';
+
+  @override
+  String get clearCalculationHistory => 'Clear History';
+
+  @override
+  String get bookmarkResult => 'Bookmark Result';
+
+  @override
+  String get resultBookmarked => 'Result bookmarked to history';
+
+  @override
+  String get clearTabData => 'Clear Data';
+
+  @override
+  String get tabDataCleared => 'Data cleared for current tab';
+
+  @override
+  String get showCalculatorInfo => 'Show calculator information';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get baseDate => 'Base Date';
+
+  @override
+  String get birthDate => 'Birth Date';
+
+  @override
+  String get targetDate => 'Target Date';
+
+  @override
+  String get selectDateToView => 'Select a date to view detailed information';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get dateDistanceSection => 'Date Distance';
+
+  @override
+  String get unitConversionSection => 'Unit Conversion';
+
+  @override
+  String get totalMonths => 'Total Months';
+
+  @override
+  String get totalWeeks => 'Total Weeks';
+
+  @override
+  String get totalDays => 'Total Days';
+
+  @override
+  String get totalHours => 'Total Hours';
+
+  @override
+  String get totalMinutes => 'Total Minutes';
+
+  @override
+  String get resultDate => 'Result Date';
+
+  @override
+  String get dayOfWeek => 'Day of the week';
+
+  @override
+  String get years => 'Years';
+
+  @override
+  String get months => 'Months';
+
+  @override
+  String get days => 'Days';
+
+  @override
+  String get hours => 'Hours';
+
+  @override
+  String get minutes => 'Minutes';
+
+  @override
+  String get seconds => 'Seconds';
+
+  @override
+  String get weeks => 'Weeks';
+
+  @override
+  String get addSubtractValues => 'Add/Subtract Values';
+
+  @override
+  String get addSubtractResultsTitle => 'Result';
+
+  @override
+  String get ageCalculatorResultsTitle => 'Age Calculation Results';
+
+  @override
+  String get age => 'Your Current Age';
+
+  @override
+  String get daysLived => 'Total Days Lived';
+
+  @override
+  String get nextBirthday => 'Next Birthday On';
+
+  @override
+  String get daysUntilBirthday => 'Days Until Next Birthday';
+
+  @override
+  String get workingDaysCount => 'Working Days';
+
+  @override
+  String get excludeWeekends => 'Exclude Weekends';
+
+  @override
+  String get customHolidays => 'Custom Holidays';
+
+  @override
+  String get addHoliday => 'Add Holiday';
+
+  @override
+  String get removeHoliday => 'Remove Holiday';
+
+  @override
+  String get fromTimezone => 'From Timezone';
+
+  @override
+  String get toTimezone => 'To Timezone';
+
+  @override
+  String get convertedTime => 'Converted Time';
+
+  @override
+  String get recurringPattern => 'Pattern';
+
+  @override
+  String get interval => 'Interval';
+
+  @override
+  String get occurrences => 'Occurrences';
+
+  @override
+  String get daily => 'Daily';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get yearly => 'Yearly';
+
+  @override
+  String get generatedDates => 'Generated Dates';
+
+  @override
+  String get eventName => 'Event Name';
+
+  @override
+  String timeRemaining(Object seconds) {
+    return 'Time remaining: ${seconds}s';
+  }
+
+  @override
+  String get expired => 'Expired';
+
+  @override
+  String get daysRemaining => 'Days Remaining';
+
+  @override
+  String get hoursRemaining => 'Hours Remaining';
+
+  @override
+  String get minutesRemaining => 'Minutes Remaining';
+
+  @override
+  String get currentWeek => 'Current Week';
+
+  @override
+  String weekOf(int year) {
+    return 'Week of $year';
+  }
+
+  @override
+  String get currentDay => 'Current Day';
+
+  @override
+  String dayOf(int day, int year) {
+    return 'Day $day of $year';
+  }
+
+  @override
+  String get convertValue => 'Convert Value';
+
+  @override
+  String get toUnit => 'To Unit';
+
+  @override
+  String get convertedValue => 'Converted Value';
+
+  @override
+  String get timeUnits => 'Time Units';
+
+  @override
+  String get findWeekday => 'Find Weekday';
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get weekday => 'Weekday';
+
+  @override
+  String get occurrence => 'Occurrence';
+
+  @override
+  String get first => 'First';
+
+  @override
+  String get second => 'Second';
+
+  @override
+  String get third => 'Third';
+
+  @override
+  String get fourth => 'Fourth';
+
+  @override
+  String get last => 'Last';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get tuesday => 'Tuesday';
+
+  @override
+  String get wednesday => 'Wednesday';
+
+  @override
+  String get thursday => 'Thursday';
+
+  @override
+  String get friday => 'Friday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get january => 'January';
+
+  @override
+  String get february => 'February';
+
+  @override
+  String get march => 'March';
+
+  @override
+  String get april => 'April';
+
+  @override
+  String get may => 'May';
+
+  @override
+  String get june => 'June';
+
+  @override
+  String get july => 'July';
+
+  @override
+  String get august => 'August';
+
+  @override
+  String get september => 'September';
+
+  @override
+  String get october => 'October';
+
+  @override
+  String get november => 'November';
+
+  @override
+  String get december => 'December';
+
+  @override
+  String get dateNotFound => 'Date not found';
+
+  @override
+  String get invalidDate => 'Invalid date';
+
+  @override
+  String get calculationError => 'Calculation error';
+
+  @override
+  String get noHistoryYet => 'No history yet';
+
+  @override
+  String get performCalculation => 'Perform your first calculation to see history here';
+
+  @override
+  String get confirmClearHistory => 'Are you sure you want to clear all BMI history?';
+
+  @override
+  String get confirmClearTabData => 'Are you sure you want to clear the data for the current tab?';
+
+  @override
+  String get historyCleared => 'BMI history cleared';
+
+  @override
+  String get historyItem => 'History Item';
+
+  @override
+  String get loadFromHistory => 'Load from History';
+
+  @override
+  String get deleteFromHistory => 'Delete from History';
+
+  @override
+  String get historyItemDeleted => 'History item deleted';
+
+  @override
   String get restoreExpression => 'Restore Expression';
 
   @override
@@ -746,9 +1139,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRatesAvailable => 'No exchange rate information available, fetching rates...';
 
   @override
-  String get liveRates => 'Live Exchange Rates';
-
-  @override
   String get staticRates => 'Static';
 
   @override
@@ -765,9 +1155,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirm => 'Confirm';
-
-  @override
-  String get customizeCurrencies => 'Customize Currencies';
 
   @override
   String get addCard => 'Add Card';
@@ -880,9 +1267,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutThisFeatureDesc => 'The Currency Converter allows you to convert between different currencies using live or static exchange rates. It supports over 80 currencies worldwide.';
 
   @override
-  String get howToUse => 'How to Use';
-
-  @override
   String get howToUseDesc => '• Add or remove cards/rows for multiple conversions\n• Customize visible currencies\n• Switch between card and table view\n• Rates update automatically based on your settings';
 
   @override
@@ -922,9 +1306,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get presetNameRequired => 'Preset name is required';
 
   @override
-  String get presetSaved => 'Preset saved successfully';
-
-  @override
   String get presetLoaded => 'Preset loaded successfully';
 
   @override
@@ -947,9 +1328,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noPresetsFound => 'No presets found';
-
-  @override
-  String get select => 'Select';
 
   @override
   String get delete => 'Delete';
@@ -1026,11 +1404,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String timeRemaining(Object seconds) {
-    return 'Time remaining: ${seconds}s';
-  }
-
-  @override
   String get fetchingStatus => 'Status';
 
   @override
@@ -1046,12 +1419,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateGenerator => 'Date Generator';
-
-  @override
-  String get startDate => 'Start Date';
-
-  @override
-  String get endDate => 'End Date';
 
   @override
   String get dateCount => 'Number of dates';
@@ -1127,9 +1494,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get generatedAt => 'Generated at';
-
-  @override
-  String get noHistoryYet => 'No calculations yet';
 
   @override
   String get noHistoryMessage => 'Your BMI calculation history will appear here';
@@ -1387,27 +1751,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get knots => 'Knots';
-
-  @override
-  String get seconds => 'Seconds';
-
-  @override
-  String get minutes => 'Minutes';
-
-  @override
-  String get hours => 'Hours';
-
-  @override
-  String get days => 'Days';
-
-  @override
-  String get weeks => 'Weeks';
-
-  @override
-  String get months => 'Months';
-
-  @override
-  String get years => 'Years';
 
   @override
   String get bytes => 'Bytes';
@@ -2060,13 +2403,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearBmiHistory => 'Clear BMI History';
 
   @override
-  String get confirmClearHistory => 'Are you sure you want to clear all BMI history?';
-
-  @override
   String get confirmClearCalculatorHistory => 'Are you sure you want to clear all calculation history?';
-
-  @override
-  String get historyCleared => 'BMI history cleared';
 
   @override
   String get calculatorHistoryCleared => 'Calculator history cleared';
@@ -2406,6 +2743,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maximumSelectionExceeded => 'Maximum selection exceeded';
 
   @override
+  String get presetSaved => 'Preset saved successfully';
+
+  @override
   String errorSavingPreset(String error) {
     return 'Error saving preset: $error';
   }
@@ -2451,7 +2791,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get multipleCardsDesc => 'Create multiple converter cards, each with its own set of currencies and amounts.';
 
   @override
+  String get liveRates => 'Live Exchange Rates';
+
+  @override
   String get liveRatesDesc => 'Get real-time exchange rates from reliable financial sources.';
+
+  @override
+  String get customizeCurrencies => 'Customize Currencies';
 
   @override
   String get customizeCurrenciesDesc => 'Choose which currencies to display and save custom presets.';
@@ -2473,6 +2819,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stateManagementDesc => 'Your converter state is automatically saved and restored.';
+
+  @override
+  String get howToUse => 'How to Use';
 
   @override
   String get step1 => '1. Add Cards';
@@ -3766,6 +4115,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customColor => 'Custom Color';
 
   @override
+  String get select => 'Select';
+
+  @override
   String get hue => 'Hue';
 
   @override
@@ -3943,9 +4295,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bmiGrowthPattern => 'Consult with pediatrician to evaluate growth patterns and overall health.';
 
   @override
-  String get age => 'Age';
-
-  @override
   String get ageYears => 'Age (years)';
 
   @override
@@ -4090,6 +4439,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get financialHistory => 'Financial History';
 
   @override
+  String get historyTab => 'History';
+
+  @override
   String get loanTab => 'Loan';
 
   @override
@@ -4191,4 +4543,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get financialTip5 => 'Higher compounding frequency increases returns';
+
+  @override
+  String get selectedDate => 'Selected Date';
+
+  @override
+  String get weekdayName => 'Day of Week';
+
+  @override
+  String get dayInMonth => 'Day in Month';
+
+  @override
+  String get dayInYear => 'Day in Year';
+
+  @override
+  String get weekInMonth => 'Week in Month';
+
+  @override
+  String get weekInYear => 'Week in Year';
+
+  @override
+  String get monthName => 'Month';
+
+  @override
+  String get monthOfYear => 'Month Of Year';
+
+  @override
+  String get yearValue => 'Year';
+
+  @override
+  String get quarter => 'Quarter';
+
+  @override
+  String get quarterOfYear => 'Quarter Of Year';
+
+  @override
+  String get isLeapYear => 'Leap Year';
+
+  @override
+  String get daysInMonth => 'Days in Month';
+
+  @override
+  String get daysInYear => 'Days in Year';
+
+  @override
+  String get dateInfoResults => 'Date Information Results';
+
+  @override
+  String quarterValue(int number) {
+    return 'Q$number';
+  }
+
+  @override
+  String leapYearStatus(String status) {
+    return '$status';
+  }
+
+  @override
+  String get dateDistance => 'Distance';
+
+  @override
+  String get dateCalculatorInfoHeaderTitle => 'Date Calculator Information';
+
+  @override
+  String get dateCalculatorInfoHeaderSubtitle => 'A powerful tool for all your date and time calculations.';
+
+  @override
+  String get dateCalculatorMainFeatures => 'Main Features';
+
+  @override
+  String get dateCalculatorUsage => 'How to Use';
 }

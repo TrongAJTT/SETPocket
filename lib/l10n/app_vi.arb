@@ -49,6 +49,7 @@
     "cancel": "Hủy",    
     "search": "Tìm kiếm",
     "searchHint": "Tìm kiếm...",
+    "history": "Lịch sử",
     "total": "Tổng cộng",
     "selectTool": "Chọn một chức năng ở thanh bên",
     "selectToolDesc": "Chọn một công cụ từ thanh bên trái để bắt đầu",
@@ -332,6 +333,8 @@
     "dateGenerator": "Tạo ngày ngẫu nhiên",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
+    "baseDate": "Ngày cơ sở",
+    "duration": "Thời lượng",
     "dateCount": "Số lượng ngày",
     
     "timeGenerator": "Tạo giờ ngẫu nhiên",
@@ -506,13 +509,40 @@
     "milesPerHour": "Dặm/giờ",
     "knots": "Hải lý/giờ",
     
+    "resultDate": "Ngày kết quả",
+    "dayOfWeek": "Ngày trong tuần",
     "seconds": "Giây",
     "minutes": "Phút",
     "hours": "Giờ",
     "days": "Ngày",
     "weeks": "Tuần",
-    "months": "Tháng",
+    "months": "Tháng", 
     "years": "Năm",
+    
+    "addSubtractValues": "Giá trị Cộng/Trừ",
+    "operationSummary": "Tóm tắt Phép tính",
+    "calculation": "Phép tính",
+    "calculationDescription": "{baseDate} {operation} {years}Y {months}M {days}D",
+    "@calculationDescription": {
+        "placeholders": {
+            "baseDate": {
+                "type": "String"
+            },
+            "operation": {
+                "type": "String"
+            },
+            "years": {
+                "type": "int"
+            },
+            "months": {
+                "type": "int"
+            },
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "addSubtractResultsTitle": "Kết quả Cộng/Trừ Ngày",
     
     "bytes": "Byte",
     "kilobytes": "Kilobyte",
@@ -1735,5 +1765,121 @@
     "financialTip4": "Đóng góp thường xuyên có thể tăng đáng kể tăng trưởng đầu tư",
     "financialTip5": "Tần suất tính lãi cao hơn sẽ tăng lợi nhuận",
 
-    "bmiKeyFeatures": "Tính năng chính"
+    "bmiKeyFeatures": "Tính năng chính",
+
+    "selectedDate": "Ngày được chọn",
+    "weekdayName": "Thứ trong tuần",
+    "dayInMonth": "Ngày trong tháng",
+    "dayInYear": "Ngày trong năm",
+    "weekInMonth": "Tuần trong tháng",
+    "weekInYear": "Tuần trong năm",
+    "monthName": "Tháng",
+    "monthOfYear": "Tháng trong năm",
+    "yearValue": "Năm",
+    "quarter": "Quý",
+    "quarterOfYear": "Quý trong năm",
+    "isLeapYear": "Năm nhuận",
+    "daysInMonth": "Số ngày trong tháng",
+    "daysInYear": "Số ngày trong năm",
+    "dateInfoResults": "Kết quả Thông tin Ngày",
+    "selectDateToView": "Chọn một ngày để xem thông tin chi tiết",
+    "quarterValue": "Q{number}",
+    "@quarterValue": {
+        "description": "Định dạng số quý",
+        "placeholders": {
+            "number": {
+                "type": "int",
+                "example": "1"
+            }
+        }
+    },
+    "leapYearStatus": "{status}",
+    "@leapYearStatus": {
+        "description": "Trạng thái năm nhuận",
+        "placeholders": {
+            "status": {
+                "type": "String",
+                "example": "Có"
+            }
+        }
+    },
+    "yes": "Có",
+    "no": "Không",
+
+    "monday": "Thứ hai",
+    "tuesday": "Thứ ba",
+    "wednesday": "Thứ tư", 
+    "thursday": "Thứ năm",
+    "friday": "Thứ sáu",
+    "saturday": "Thứ bảy",
+    "sunday": "Chủ nhật",
+    
+    "january": "Tháng 1",
+    "february": "Tháng 2",
+    "march": "Tháng 3",
+    "april": "Tháng 4",
+    "may": "Tháng 5",
+    "june": "Tháng 6",
+    "july": "Tháng 7",
+    "august": "Tháng 8",
+    "september": "Tháng 9",
+    "october": "Tháng 10",
+    "november": "Tháng 11",
+    "december": "Tháng 12",
+
+    "dateDistance": "Khoảng cách",
+    "dateDistanceSection": "Khoảng cách ngày",
+    "unitConversionSection": "Chuyển đổi sang từng đơn vị",
+    "totalWeeks": "Tổng số tuần",
+    "totalMonths": "Tổng số tháng",
+    "weeks": "tuần",
+    "totalDays": "Tổng số ngày",
+    "totalHours": "Tổng số giờ",
+    "totalMinutes": "Tổng số phút",
+
+    "ageCalculator": "Tính tuổi",
+    "ageCalculatorDesc": "Tính tuổi dựa trên ngày sinh và xem chi tiết về sinh nhật tiếp theo.",
+    "ageCalculatorResultsTitle": "Kết quả tính tuổi",
+    "birthDate": "Ngày sinh",
+    "age": "Tuổi hiện tại",
+    "daysLived": "Tổng số ngày đã sống",
+    "daysUntilBirthday": "Số ngày đến sinh nhật",
+    "nextBirthday": "Sinh nhật tiếp theo",
+    "dateCalculator": "Máy tính ngày",
+    "@dateCalculator": {
+        "description": "Tiêu đề cho công cụ Máy tính Ngày"
+    },
+    "dateCalculatorDesc": "Một công cụ linh hoạt để xử lý mọi tính toán liên quan đến ngày tháng của bạn. Dưới đây là tổng quan về các tính năng của nó:",
+    "@dateCalculatorDesc": {
+        "description": "Mô tả cho công cụ Máy tính Ngày"
+    },
+    "dateInfoTabDescription": "Cung cấp thông tin chi tiết cho một ngày bất kỳ, bao gồm thứ trong tuần, ngày trong năm, số tuần, quý và trạng thái năm nhuận.",
+    "dateDifferenceTabDescription": "Tính toán khoảng thời gian giữa hai ngày, hiển thị kết quả dưới dạng kết hợp năm, tháng, ngày, cũng như trong các đơn vị tổng cộng như tháng, tuần, ngày, v.v.",
+    "addSubtractTabDescription": "Thêm hoặc bớt một số năm, tháng, và ngày cụ thể từ một ngày cho trước để xác định ngày kết quả.",
+    "ageCalculatorTabDescription": "Tính tuổi từ ngày sinh và hiển thị tổng số ngày đã sống, số ngày còn lại đến sinh nhật tiếp theo và ngày sinh nhật tiếp theo.",
+    "dateCalculatorHistory": "Lịch sử Máy tính Ngày",
+    "@dateCalculatorHistory": {
+        "description": "Tiêu đề cho bảng lịch sử trong Máy tính Ngày"
+    },
+    "dateDifference": "Chênh lệch",
+    "addSubtractDate": "Thêm/bớt",
+    "ageCalculator": "Sinh nhật",
+    "ageCalculatorDesc": "Tính tuổi và theo dõi các ngày sinh nhật sắp tới.",
+    "workingDays": "Ngày làm việc",
+    "timezoneConverter": "Múi giờ",
+    "recurringDates": "Ngày định kỳ",
+    "countdown": "Đếm ngược",
+    "dateInfo": "Chi tiết",
+    "dateInfoDesc": "Nhận thông tin chi tiết về bất kỳ ngày nào được chọn",
+    "timeUnitConverter": "Đơn vị thời gian",
+    "addSubtractValues": "Thêm/bớt giá trị",
+    "addSubtractResultsTitle": "Kết quả",
+    "ageCalculatorResultsTitle": "Chi tiết sinh nhật",
+    "birthDate": "Ngày sinh",
+    "age": "Tuổi hiện tại",
+    "dateCalculatorInfoHeaderTitle": "Thông tin Máy tính Ngày",
+    "dateCalculatorInfoHeaderSubtitle": "Công cụ mạnh mẽ cho mọi phép tính về ngày tháng và thời gian.",
+    "dateCalculatorMainFeatures": "Tính năng chính",
+    "dateCalculatorUsage": "Cách sử dụng",
+    "showCalculatorInfo": "Xem thông tin máy tính"
 }

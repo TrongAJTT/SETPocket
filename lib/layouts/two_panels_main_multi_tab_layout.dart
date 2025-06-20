@@ -43,6 +43,9 @@ class TwoPanelsMainMultiTabLayout extends StatefulWidget {
   /// Main panel actions (appear on title bar)
   final List<Widget>? mainPanelActions;
 
+  /// Main tab index
+  final int mainTabIndex;
+
   const TwoPanelsMainMultiTabLayout({
     super.key,
     required this.mainTabs,
@@ -59,6 +62,7 @@ class TwoPanelsMainMultiTabLayout extends StatefulWidget {
     this.floatingActionButton,
     this.mainPanelTitle,
     this.mainPanelActions,
+    this.mainTabIndex = 0,
   }) : assert(mainTabs.length >= 2, 'Must have at least 2 main tabs');
 
   @override
@@ -82,7 +86,7 @@ class _TwoPanelsMainMultiTabLayoutState
     _mainTabController = TabController(
       length: widget.mainTabs.length,
       vsync: this,
-      initialIndex: _currentMainTabIndex,
+      initialIndex: widget.mainTabIndex,
     );
     _mainTabController.addListener(_onMainTabChanged);
   }
@@ -97,19 +101,24 @@ class _TwoPanelsMainMultiTabLayoutState
   void didUpdateWidget(TwoPanelsMainMultiTabLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Handle main tabs length change
-    if (oldWidget.mainTabs.length != widget.mainTabs.length) {
-      final oldIndex = _mainTabController.index;
+    if (widget.mainTabs.length != oldWidget.mainTabs.length) {
       _mainTabController.removeListener(_onMainTabChanged);
       _mainTabController.dispose();
-
-      _currentMainTabIndex = oldIndex.clamp(0, widget.mainTabs.length - 1);
       _mainTabController = TabController(
-        length: widget.mainTabs.length,
-        vsync: this,
-        initialIndex: _currentMainTabIndex,
-      );
+          length: widget.mainTabs.length,
+          vsync: this,
+          initialIndex: widget.mainTabIndex);
       _mainTabController.addListener(_onMainTabChanged);
+
+      _mobileTabController?.removeListener(_onMobileTabChanged);
+      _mobileTabController?.dispose();
+      _setupMobileTabController();
+    }
+
+    if (widget.mainTabIndex != oldWidget.mainTabIndex &&
+        widget.mainTabIndex != _mobileTabController?.index) {
+      _mainTabController.animateTo(widget.mainTabIndex);
+      _mobileTabController?.animateTo(widget.mainTabIndex);
     }
 
     // Handle secondary tab enable/disable change
@@ -119,30 +128,12 @@ class _TwoPanelsMainMultiTabLayoutState
   }
 
   void _setupMobileTabController() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 1200;
-
-    if (isMobile) {
-      final totalTabs = widget.mainTabs.length +
-          (widget.secondaryEnabled && widget.secondaryTab != null ? 1 : 0);
-
-      if (_mobileTabController?.length != totalTabs) {
-        final oldIndex = _mobileTabController?.index ?? 0;
-        _mobileTabController?.dispose();
-
-        if (totalTabs > 0) {
-          _mobileTabController = TabController(
-            length: totalTabs,
-            vsync: this,
-            initialIndex: oldIndex.clamp(0, totalTabs - 1),
-          );
-          _mobileTabController!.addListener(_onMobileTabChanged);
-        }
-      }
-    } else {
-      _mobileTabController?.dispose();
-      _mobileTabController = null;
-    }
+    _mobileTabController = TabController(
+      length: widget.mainTabs.length + 1,
+      vsync: this,
+      initialIndex: widget.mainTabIndex,
+    );
+    _mobileTabController?.addListener(_onMobileTabChanged);
   }
 
   void _onMainTabChanged() {
@@ -158,7 +149,8 @@ class _TwoPanelsMainMultiTabLayoutState
   }
 
   void _onMobileTabChanged() {
-    if (_mobileTabController?.indexIsChanging ?? true) return;
+    if (_mobileTabController == null || _mobileTabController!.indexIsChanging)
+      return;
 
     final currentIndex = _mobileTabController!.index;
     final isSecondaryTab = widget.secondaryEnabled &&

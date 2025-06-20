@@ -163,7 +163,7 @@ class _GraphPanelState extends State<GraphPanel> {
                   mode: JoystickMode.all,
                   listener: (details) {
                     // Add null safety check
-                    if (mounted && widget.onJoystickMove != null) {
+                    if (mounted) {
                       widget.onJoystickMove(details.x, details.y);
                     }
                   },

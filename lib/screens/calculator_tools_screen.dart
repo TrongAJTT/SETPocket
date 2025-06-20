@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/screens/calculators/date_calculator_screen.dart';
 import 'calculators/bmi_calculator_screen.dart';
 import 'calculators/financial_calculator_screen.dart';
-import 'calculators/date_calculator_screen.dart';
 import 'calculators/discount_calculator_screen.dart';
 import 'calculators/scientific_calculator_screen.dart';
 import 'calculators/graphing_calculator_screen.dart';
@@ -65,11 +65,11 @@ class CalculatorToolsScreen extends StatelessWidget {
         'builder': () => FinancialCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
-        'title': "Date Calculator",
-        'description': "Calculate date differences and add/subtract dates",
+        'title': localizations.dateCalculator,
+        'description': localizations.dateCalculatorDesc,
         'icon': Icons.calendar_today,
         'color': Colors.orange,
-        'builder': () => const DateCalculatorScreen(),
+        'builder': () => DateCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
         'title': "Discount Calculator",

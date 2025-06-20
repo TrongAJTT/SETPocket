@@ -1,240 +1,513 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
+import 'package:setpocket/controllers/date_calculator_controller.dart';
+import 'package:setpocket/models/date_calculator_models.dart';
+import 'package:setpocket/services/date_calculator_service.dart';
+import 'package:setpocket/utils/localization_utils.dart';
+import 'package:setpocket/widgets/numeric_stepper_widget.dart';
 
 class DateCalculatorScreen extends StatefulWidget {
-  const DateCalculatorScreen({super.key});
+  final bool isEmbedded;
+
+  const DateCalculatorScreen({super.key, this.isEmbedded = false});
 
   @override
   State<DateCalculatorScreen> createState() => _DateCalculatorScreenState();
 }
 
-class _DateCalculatorScreenState extends State<DateCalculatorScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  // Date Difference Calculator
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now().add(const Duration(days: 30));
-  String? _dateDifference;
-
-  // Add/Subtract Date Calculator
-  DateTime _baseDate = DateTime.now();
-  int _daysToAdd = 0;
-  int _monthsToAdd = 0;
-  int _yearsToAdd = 0;
-  DateTime? _resultDate;
-
-  // Age Calculator
-  DateTime _birthDate = DateTime.now().subtract(const Duration(days: 365 * 25));
-  String? _ageResult;
+class _DateCalculatorScreenState extends State<DateCalculatorScreen> {
+  late DateCalculatorController _controller;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _calculateDateDifference();
-    _calculateNewDate();
-    _calculateAge();
+    final dateCalculatorService = DateCalculatorService();
+    _controller =
+        DateCalculatorController(dateCalculatorService: dateCalculatorService);
+    _controller.addListener(_onControllerChanged);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _controller.removeListener(_onControllerChanged);
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Date Calculator'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Difference', icon: Icon(Icons.date_range)),
-            Tab(text: 'Add/Subtract', icon: Icon(Icons.add_circle)),
-            Tab(text: 'Age', icon: Icon(Icons.cake)),
-          ],
+    final l10n = AppLocalizations.of(context)!;
+    return _buildMainContent(l10n);
+  }
+
+  Widget _buildMainContent(AppLocalizations l10n) {
+    return TwoPanelsMainMultiTabLayout(
+      isEmbedded: widget.isEmbedded,
+      title: l10n.dateCalculator,
+      mainPanelTitle: l10n.dateCalculator,
+      mainTabIndex: _getTabIndex(_controller.activeTab),
+      onMainTabChanged: (index) {
+        final tabType = [
+          DateCalculationType.dateInfo,
+          DateCalculationType.dateDifference,
+          DateCalculationType.addSubtract,
+          DateCalculationType.age,
+        ][index];
+        _controller.setActiveTab(tabType);
+      },
+      mainPanelActions: [
+        IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: () => _showInfoDialog(context, l10n),
+          tooltip: l10n.showCalculatorInfo,
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildDateDifferenceCalculator(),
-          _buildAddSubtractCalculator(),
-          _buildAgeCalculator(),
-        ],
+        IconButton(
+          icon: const Icon(Icons.clear_all),
+          onPressed: () => _showClearDataDialog(context, l10n),
+          tooltip: l10n.clearTabData,
+        ),
+      ],
+      secondaryPanelActions: [
+        IconButton(
+          icon: const Icon(Icons.delete_outline),
+          onPressed: () => _showClearHistoryDialog(context, l10n),
+          tooltip: l10n.clearCalculationHistory,
+        ),
+      ],
+      mainTabs: _buildMainTabs(l10n),
+      secondaryPanel: _buildHistoryPanel(),
+      secondaryPanelTitle: l10n.dateCalculatorHistory,
+      secondaryTab: TabData(
+        label: l10n.history,
+        icon: Icons.history,
+        content: _buildHistoryPanel(),
       ),
     );
   }
 
-  Widget _buildDateDifferenceCalculator() {
+  int _getTabIndex(DateCalculationType type) {
+    return [
+      DateCalculationType.dateInfo,
+      DateCalculationType.dateDifference,
+      DateCalculationType.addSubtract,
+      DateCalculationType.age,
+    ].indexOf(type);
+  }
+
+  List<TabData> _buildMainTabs(AppLocalizations l10n) {
+    return [
+      TabData(
+        label: l10n.dateInfo,
+        icon: Icons.info_outline,
+        content: _buildDateInfoTab(),
+      ),
+      TabData(
+        label: l10n.dateDifference,
+        icon: Icons.date_range,
+        content: _buildDateDifferenceTab(),
+      ),
+      TabData(
+        label: l10n.addSubtractDate,
+        icon: Icons.add_circle,
+        content: _buildAddSubtractTab(),
+      ),
+      TabData(
+        label: l10n.ageCalculator,
+        icon: Icons.cake,
+        content: _buildAgeCalculatorTab(),
+      ),
+    ];
+  }
+
+  Widget _buildDateInfoTab() {
+    final l10n = AppLocalizations.of(context)!;
+    final dateInfoState = _controller.dateInfoState;
+    final result = _controller.currentResult;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Date Difference Calculator',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
           _buildDateSelector(
-            label: 'Start Date',
-            date: _startDate,
+            label: l10n.selectedDate,
+            date: dateInfoState.selectedDate,
+            icon: Icons.info_outline,
+            onChanged: (selectedDate) {
+              _controller.updateDateInfo(selectedDate);
+            },
+          ),
+          const SizedBox(height: 24),
+          if (result != null && !result.containsKey('error')) ...[
+            _buildDateInfoResultsTable(l10n, result),
+          ] else ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  l10n.selectDateToView,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateDifferenceTab() {
+    final l10n = AppLocalizations.of(context)!;
+    final state = _controller.dateDifferenceState;
+    final result = _controller.currentResult;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildDateSelector(
+            label: l10n.startDate,
+            date: state.startDate,
             icon: Icons.start,
             onChanged: (date) {
-              setState(() {
-                _startDate = date;
-                _calculateDateDifference();
-              });
+              _controller.updateDateDifferenceState(startDate: date);
             },
           ),
           const SizedBox(height: 16),
           _buildDateSelector(
-            label: 'End Date',
-            date: _endDate,
+            label: l10n.endDate,
+            date: state.endDate,
             icon: Icons.event,
+            quickOptionDate: DateTime.now().add(const Duration(days: 7)),
+            quickOptionTooltip: '+1 week',
             onChanged: (date) {
-              setState(() {
-                _endDate = date;
-                _calculateDateDifference();
-              });
+              _controller.updateDateDifferenceState(endDate: date);
             },
           ),
           const SizedBox(height: 24),
-          if (_dateDifference != null) ...[
-            _buildResultCard([
-              _buildResultText('Duration', _dateDifference!),
-            ]),
+          if (result != null && !result.containsKey('error')) ...[
+            _buildDateDifferenceResultsTable(l10n, result),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildAddSubtractCalculator() {
+  Widget _buildAddSubtractTab() {
+    final l10n = AppLocalizations.of(context)!;
+    final state = _controller.addSubtractState;
+    final result = _controller.currentResult;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Add/Subtract Date Calculator',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
           _buildDateSelector(
-            label: 'Base Date',
-            date: _baseDate,
+            label: l10n.baseDate,
+            date: state.baseDate,
             icon: Icons.calendar_today,
             onChanged: (date) {
-              setState(() {
-                _baseDate = date;
-                _calculateNewDate();
-              });
+              _controller.updateAddSubtractState(baseDate: date);
             },
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Add/Subtract:',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          _buildNumberInput(
-            label: 'Years',
-            value: _yearsToAdd,
-            icon: Icons.calendar_today,
-            onChanged: (value) {
-              setState(() {
-                _yearsToAdd = value;
-                _calculateNewDate();
-              });
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildNumberInput(
-            label: 'Months',
-            value: _monthsToAdd,
-            icon: Icons.calendar_view_month,
-            onChanged: (value) {
-              setState(() {
-                _monthsToAdd = value;
-                _calculateNewDate();
-              });
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildNumberInput(
-            label: 'Days',
-            value: _daysToAdd,
-            icon: Icons.calendar_view_day,
-            onChanged: (value) {
-              setState(() {
-                _daysToAdd = value;
-                _calculateNewDate();
-              });
-            },
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.addSubtractValues,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.link),
+                        style: _controller.isDataConstraintEnabled
+                            ? IconButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.12),
+                              )
+                            : null,
+                        color: _controller.isDataConstraintEnabled
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                        onPressed: () {
+                          _controller.setDataConstraint(
+                              !_controller.isDataConstraintEnabled);
+                        },
+                        tooltip: _controller.isDataConstraintEnabled
+                            ? 'Disable data constraints'
+                            : 'Enable data constraints',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  NumericStepper(
+                    min: 0,
+                    max: _controller.isDataConstraintEnabled
+                        ? double.infinity
+                        : 100,
+                    initialValue: state.years.toDouble(),
+                    label: l10n.years,
+                    icon: Icons.calendar_today,
+                    onChanged: (value) {
+                      _controller.updateAddSubtractState(years: value.toInt());
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  NumericStepper(
+                    min: 0,
+                    max: _controller.isDataConstraintEnabled ? 11 : 120,
+                    initialValue: state.months.toDouble(),
+                    label: l10n.months,
+                    icon: Icons.calendar_view_month,
+                    onWrapAroundMin: _controller.isDataConstraintEnabled
+                        ? () => _controller.updateAddSubtractState(
+                            months: state.months - 1)
+                        : null,
+                    onWrapAroundMax: _controller.isDataConstraintEnabled
+                        ? () => _controller.updateAddSubtractState(
+                            months: state.months + 1)
+                        : null,
+                    onChanged: (value) {
+                      _controller.updateAddSubtractState(months: value.toInt());
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  NumericStepper(
+                    min: 0,
+                    max: _controller.isDataConstraintEnabled ? 30 : 36525,
+                    initialValue: state.days.toDouble(),
+                    label: l10n.days,
+                    icon: Icons.calendar_view_day,
+                    onWrapAroundMin: _controller.isDataConstraintEnabled
+                        ? () => _controller.updateAddSubtractState(
+                            days: state.days - 1)
+                        : null,
+                    onWrapAroundMax: _controller.isDataConstraintEnabled
+                        ? () => _controller.updateAddSubtractState(
+                            days: state.days + 1)
+                        : null,
+                    onChanged: (value) {
+                      _controller.updateAddSubtractState(days: value.toInt());
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 24),
-          if (_resultDate != null) ...[
-            _buildResultCard([
-              _buildResultText(
-                'Result Date',
-                '${_resultDate!.day}/${_resultDate!.month}/${_resultDate!.year}',
-              ),
-              _buildResultText(
-                'Day of Week',
-                _getDayOfWeek(_resultDate!),
-              ),
-            ]),
+          if (result != null && !result.containsKey('error')) ...[
+            _buildAddSubtractResultsTable(l10n, result, state),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildAgeCalculator() {
+  Widget _buildAgeCalculatorTab() {
+    final l10n = AppLocalizations.of(context)!;
+    final state = _controller.ageState;
+    final result = _controller.currentResult;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Age Calculator',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
           _buildDateSelector(
-            label: 'Birth Date',
-            date: _birthDate,
+            label: l10n.birthDate,
+            date: state.birthDate,
             icon: Icons.cake,
             onChanged: (date) {
-              setState(() {
-                _birthDate = date;
-                _calculateAge();
-              });
+              _controller.updateAgeState(birthDate: date);
             },
           ),
           const SizedBox(height: 24),
-          if (_ageResult != null) ...[
-            _buildResultCard([
-              _buildResultText('Your Age', _ageResult!),
-              _buildResultText(
-                'Days Lived',
-                '${DateTime.now().difference(_birthDate).inDays} days',
+          if (_controller.isCalculating)
+            const Center(child: CircularProgressIndicator())
+          else if (result != null && !result.containsKey('error'))
+            _buildAgeCalculatorResultsTable(l10n, result)
+          else
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                  child: Text(
+                    l10n.selectDateToView,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
               ),
-              _buildResultText(
-                'Hours Lived',
-                '${DateTime.now().difference(_birthDate).inHours} hours',
-              ),
-              _buildResultText(
-                'Next Birthday',
-                _getNextBirthday(),
-              ),
-            ]),
-          ],
+            ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAgeCalculatorResultsTable(
+      AppLocalizations l10n, Map<String, dynamic> result) {
+    return _buildResultCard(
+      title: l10n.ageCalculatorResultsTitle,
+      onBookmark: () {
+        _controller.saveToHistory();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.resultBookmarked)),
+        );
+      },
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).dividerColor,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Table(
+            columnWidths: const {
+              0: MaxColumnWidth(FixedColumnWidth(180), FlexColumnWidth(2)),
+              1: FlexColumnWidth(3),
+            },
+            border: TableBorder(
+              horizontalInside: BorderSide(
+                color: Theme.of(context).dividerColor,
+                width: 0.5,
+              ),
+              verticalInside: BorderSide(
+                color: Theme.of(context).dividerColor,
+                width: 0.5,
+              ),
+            ),
+            children: [
+              _buildTableRow(
+                l10n.age,
+                '${result['years'] ?? 0} ${l10n.years}, ${result['months'] ?? 0} ${l10n.months}, ${result['days'] ?? 0} ${l10n.days}',
+              ),
+              _buildTableRow(
+                l10n.daysLived,
+                '${result['totalDays'] ?? 0} ${l10n.days}',
+              ),
+              _buildTableRow(
+                l10n.daysUntilBirthday,
+                '${result['daysUntilBirthday'] ?? 0} ${l10n.days}',
+              ),
+              _buildTableRow(
+                l10n.nextBirthday,
+                result['nextBirthday'] != null
+                    ? LocalizationUtils.formatDate(
+                        context, DateTime.parse(result['nextBirthday']))
+                    : '',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistoryPanel() {
+    final l10n = AppLocalizations.of(context)!;
+    final history = _controller.history;
+
+    if (history.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.history,
+              size: 64,
+              color: Theme.of(context).disabledColor,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.noHistoryYet,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.performCalculation,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: history.length,
+      itemBuilder: (context, index) {
+        final item = history[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Icon(
+                _getTabIcon(item.type),
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
+            title: Text(item.displayTitle,
+                maxLines: 2, overflow: TextOverflow.ellipsis),
+            subtitle: Text(
+              LocalizationUtils.formatDateTime(context, item.timestamp),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            trailing: PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == 'delete') {
+                  await _controller.removeFromHistory(item.id);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.historyItemDeleted)),
+                    );
+                  }
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.delete),
+                      const SizedBox(width: 8),
+                      Text(l10n.deleteFromHistory),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            onTap: () {
+              _controller.loadFromHistory(item);
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -243,12 +516,33 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen>
     required DateTime date,
     required IconData icon,
     required Function(DateTime) onChanged,
+    DateTime? quickOptionDate,
+    String? quickOptionTooltip,
   }) {
     return Card(
       child: ListTile(
-        leading: Icon(icon),
+        leading: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.today,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              size: 20,
+            ),
+            onPressed: () => onChanged(quickOptionDate ?? DateTime.now()),
+            tooltip: quickOptionTooltip ?? 'Today',
+            constraints: const BoxConstraints(
+              minWidth: 32,
+              minHeight: 32,
+            ),
+            padding: const EdgeInsets.all(4),
+          ),
+        ),
         title: Text(label),
-        subtitle: Text('${date.day}/${date.month}/${date.year}'),
+        subtitle: Text(LocalizationUtils.formatDate(context, date)),
         trailing: const Icon(Icons.calendar_month),
         onTap: () async {
           final picked = await showDatePicker(
@@ -265,49 +559,11 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen>
     );
   }
 
-  Widget _buildNumberInput({
-    required String label,
-    required int value,
-    required IconData icon,
-    required Function(int) onChanged,
+  Widget _buildResultCard({
+    required String title,
+    required List<Widget> children,
+    VoidCallback? onBookmark,
   }) {
-    return Row(
-      children: [
-        Icon(icon, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(label, style: const TextStyle(fontSize: 16)),
-        ),
-        SizedBox(
-          width: 120,
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: () => onChanged(value - 1),
-                icon: const Icon(Icons.remove),
-                iconSize: 20,
-              ),
-              Expanded(
-                child: Text(
-                  value.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              IconButton(
-                onPressed: () => onChanged(value + 1),
-                icon: const Icon(Icons.add),
-                iconSize: 20,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildResultCard(List<Widget> children) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -315,9 +571,22 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Results',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                if (onBookmark != null)
+                  IconButton(
+                    icon: const Icon(Icons.bookmark_border),
+                    onPressed: onBookmark,
+                    tooltip: AppLocalizations.of(context)!.bookmarkResult,
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
             ...children,
@@ -327,7 +596,378 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen>
     );
   }
 
-  Widget _buildResultText(String label, String value) {
+  Widget _buildDateInfoResultsTable(
+      AppLocalizations l10n, Map<String, dynamic> result) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.dateInfoResults,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.bookmark_border),
+                  onPressed: () {
+                    _controller.saveToHistory();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.resultBookmarked)),
+                    );
+                  },
+                  tooltip: l10n.bookmarkResult,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Table(
+                columnWidths: const {
+                  0: MaxColumnWidth(FixedColumnWidth(180), FlexColumnWidth(2)),
+                  1: FlexColumnWidth(3),
+                },
+                border: TableBorder(
+                  horizontalInside: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                  verticalInside: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                ),
+                children: [
+                  _buildTableRow(
+                    l10n.weekdayName,
+                    LocalizationUtils.getLocalizedWeekdayName(
+                        result['weekday'], l10n),
+                  ),
+                  _buildTableRow(
+                    l10n.dayInMonth,
+                    result['dayInMonth']?.toString() ?? '0',
+                  ),
+                  _buildTableRow(
+                    l10n.dayInYear,
+                    result['dayInYear']?.toString() ?? '0',
+                  ),
+                  _buildTableRow(
+                    l10n.weekInMonth,
+                    result['weekInMonth']?.toString() ?? '0',
+                  ),
+                  _buildTableRow(
+                    l10n.weekInYear,
+                    result['weekInYear']?.toString() ?? '0',
+                  ),
+                  _buildTableRow(
+                    l10n.monthOfYear,
+                    LocalizationUtils.getLocalizedMonthName(
+                        result['month'], l10n),
+                  ),
+                  _buildTableRow(
+                    l10n.yearValue,
+                    result['year']?.toString() ?? '0',
+                  ),
+                  _buildTableRow(
+                    l10n.quarterOfYear,
+                    'Q${result['quarter']?.toString() ?? '0'}',
+                  ),
+                  _buildTableRow(
+                    l10n.isLeapYear,
+                    (result['isLeapYear'] == true) ? l10n.yes : l10n.no,
+                  ),
+                  _buildTableRow(
+                    l10n.daysInMonth,
+                    result['daysInMonth']?.toString() ?? '0',
+                  ),
+                  _buildTableRow(
+                    l10n.daysInYear,
+                    result['daysInYear']?.toString() ?? '0',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateDifferenceResultsTable(
+      AppLocalizations l10n, Map<String, dynamic> result) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.duration,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.bookmark_border),
+                  onPressed: () {
+                    _controller.saveToHistory();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.resultBookmarked)),
+                    );
+                  },
+                  tooltip: l10n.bookmarkResult,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  _buildSectionHeader(l10n.dateDistanceSection),
+                  Table(
+                    columnWidths: const {
+                      0: MaxColumnWidth(
+                          FixedColumnWidth(180), FlexColumnWidth(2)),
+                      1: FlexColumnWidth(3),
+                    },
+                    border: TableBorder(
+                      horizontalInside: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 0.5,
+                      ),
+                      verticalInside: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 0.5,
+                      ),
+                    ),
+                    children: [
+                      _buildTableRow(
+                        l10n.years,
+                        '${result['simplifiedYears'] ?? 0} ${l10n.years}',
+                      ),
+                      _buildTableRow(
+                        l10n.months,
+                        '${result['simplifiedMonths'] ?? 0} ${l10n.months}',
+                      ),
+                      _buildTableRow(
+                        l10n.days,
+                        '${result['simplifiedDays'] ?? 0} ${l10n.days}',
+                      ),
+                    ],
+                  ),
+                  _buildSectionHeader(l10n.unitConversionSection),
+                  Table(
+                    columnWidths: const {
+                      0: MaxColumnWidth(
+                          FixedColumnWidth(180), FlexColumnWidth(2)),
+                      1: FlexColumnWidth(3),
+                    },
+                    border: TableBorder(
+                      horizontalInside: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 0.5,
+                      ),
+                      verticalInside: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 0.5,
+                      ),
+                    ),
+                    children: [
+                      _buildTableRow(
+                        l10n.totalMonths,
+                        '${result['totalMonths'] ?? 0} ${l10n.months}',
+                      ),
+                      _buildTableRow(
+                        l10n.totalWeeks,
+                        '${result['totalWeeks'] ?? 0} ${l10n.weeks}',
+                      ),
+                      _buildTableRow(
+                        l10n.totalDays,
+                        '${result['totalDays'] ?? 0} ${l10n.days}',
+                      ),
+                      _buildTableRow(
+                        l10n.totalHours,
+                        '${result['totalHours'] ?? 0} ${l10n.hours}',
+                      ),
+                      _buildTableRow(
+                        l10n.totalMinutes,
+                        '${result['totalMinutes'] ?? 0} ${l10n.minutes}',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddSubtractResultsTable(
+      AppLocalizations l10n, Map<String, dynamic> result, dynamic state) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.addSubtractResultsTitle,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.bookmark_border),
+                  onPressed: () {
+                    _controller.saveToHistory();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.resultBookmarked)),
+                    );
+                  },
+                  tooltip: l10n.bookmarkResult,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Table(
+                columnWidths: const {
+                  0: MaxColumnWidth(FixedColumnWidth(180), FlexColumnWidth(2)),
+                  1: FlexColumnWidth(3),
+                },
+                border: TableBorder(
+                  horizontalInside: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                  verticalInside: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                ),
+                children: [
+                  _buildTableRow(
+                    l10n.resultDate,
+                    result['resultDate'] != null
+                        ? LocalizationUtils.formatDate(
+                            context, DateTime.parse(result['resultDate']))
+                        : '',
+                  ),
+                  _buildTableRow(
+                    l10n.dayOfWeek,
+                    LocalizationUtils.getLocalizedWeekdayName(
+                        result['weekday'], l10n),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TableRow _buildTableRow(String label, String value) {
+    return TableRow(
+      children: [
+        TableCell(
+          verticalAlignment: TableCellVerticalAlignment.fill,
+          child: Container(
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color:
+                  Theme.of(context).colorScheme.primaryContainer.withAlpha(50),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ),
+        ),
+        TableCell(
+          // verticalAlignment: TableCellVerticalAlignment.fill,
+          child: Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(String sectionTitle) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer,
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+      child: Text(
+        sectionTitle,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.onPrimaryContainer,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildResultRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -351,89 +991,286 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen>
     );
   }
 
-  void _calculateDateDifference() {
-    final difference = _endDate.difference(_startDate);
-    final days = difference.inDays;
-    final years = days ~/ 365;
-    final remainingDays = days % 365;
-    final months = remainingDays ~/ 30;
-    final finalDays = remainingDays % 30;
-
-    String result = '';
-    if (years > 0) result += '$years year${years > 1 ? 's' : ''} ';
-    if (months > 0) result += '$months month${months > 1 ? 's' : ''} ';
-    if (finalDays > 0 || result.isEmpty) {
-      result += '$finalDays day${finalDays != 1 ? 's' : ''}';
-    }
-
-    _dateDifference = result.trim();
-    _dateDifference = '$_dateDifference\n($days total days)';
-  }
-
-  void _calculateNewDate() {
-    try {
-      DateTime result =
-          DateTime(_baseDate.year, _baseDate.month, _baseDate.day);
-
-      // Add years
-      result = DateTime(result.year + _yearsToAdd, result.month, result.day);
-
-      // Add months
-      result = DateTime(result.year, result.month + _monthsToAdd, result.day);
-
-      // Add days
-      result = result.add(Duration(days: _daysToAdd));
-
-      _resultDate = result;
-    } catch (e) {
-      _resultDate = null;
+  IconData _getTabIcon(DateCalculationType type) {
+    switch (type) {
+      case DateCalculationType.dateInfo:
+        return Icons.info_outline;
+      case DateCalculationType.dateDifference:
+        return Icons.date_range;
+      case DateCalculationType.addSubtract:
+        return Icons.add_circle;
+      case DateCalculationType.age:
+        return Icons.cake;
+      case DateCalculationType.workingDays:
+        return Icons.work;
+      case DateCalculationType.timezone:
+        return Icons.public;
+      case DateCalculationType.recurring:
+        return Icons.repeat;
+      case DateCalculationType.countdown:
+        return Icons.timer;
+      case DateCalculationType.timeUnit:
+        return Icons.schedule;
+      case DateCalculationType.nthWeekday:
+        return Icons.event_note;
     }
   }
 
-  void _calculateAge() {
-    final now = DateTime.now();
-
-    int years = now.year - _birthDate.year;
-    int months = now.month - _birthDate.month;
-    int daysDiff = now.day - _birthDate.day;
-
-    if (daysDiff < 0) {
-      months--;
-      daysDiff += DateTime(now.year, now.month, 0).day;
+  String _getTabDisplayName(DateCalculationType type, AppLocalizations l10n) {
+    switch (type) {
+      case DateCalculationType.dateInfo:
+        return l10n.dateInfo;
+      case DateCalculationType.dateDifference:
+        return l10n.dateDifference;
+      case DateCalculationType.addSubtract:
+        return l10n.addSubtractDate;
+      case DateCalculationType.age:
+        return l10n.ageCalculator;
+      case DateCalculationType.workingDays:
+        return l10n.workingDays;
+      case DateCalculationType.timezone:
+        return l10n.timezoneConverter;
+      case DateCalculationType.recurring:
+        return l10n.recurringDates;
+      case DateCalculationType.countdown:
+        return l10n.countdown;
+      case DateCalculationType.timeUnit:
+        return l10n.timeUnitConverter;
+      case DateCalculationType.nthWeekday:
+        return l10n.nthWeekday;
     }
-
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-
-    _ageResult =
-        '$years year${years != 1 ? 's' : ''}, $months month${months != 1 ? 's' : ''}, $daysDiff day${daysDiff != 1 ? 's' : ''}';
   }
 
-  String _getDayOfWeek(DateTime date) {
-    const days = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-    return days[date.weekday - 1];
+  Widget _buildFeatureRow(
+      BuildContext context, IconData icon, String title, String subtitle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 28, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 
-  String _getNextBirthday() {
-    final now = DateTime.now();
-    DateTime nextBirthday =
-        DateTime(now.year, _birthDate.month, _birthDate.day);
+  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final maxWidth =
+                constraints.maxWidth > 540 ? 540.0 : constraints.maxWidth;
+            return Center(
+              child: Container(
+                width: maxWidth,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).dialogBackgroundColor,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.12),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(Icons.date_range,
+                                color: Colors.white, size: 32),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(l10n.dateCalculatorInfoHeaderTitle,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                            fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 6),
+                                Text(l10n.dateCalculatorInfoHeaderSubtitle,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Main Features Section
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 0, vertical: 0),
+                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withOpacity(0.5),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(0),
+                          bottomRight: Radius.circular(0),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.star,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  size: 22),
+                              const SizedBox(width: 8),
+                              Text(l10n.dateCalculatorMainFeatures,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _buildFeatureRow(
+                            context,
+                            Icons.info_outline,
+                            l10n.dateInfo,
+                            l10n.dateInfoTabDescription,
+                          ),
+                          _buildFeatureRow(
+                            context,
+                            Icons.date_range,
+                            l10n.dateDifference,
+                            l10n.dateDifferenceTabDescription,
+                          ),
+                          _buildFeatureRow(
+                            context,
+                            Icons.add_circle_outline,
+                            l10n.addSubtractDate,
+                            l10n.addSubtractTabDescription,
+                          ),
+                          _buildFeatureRow(
+                            context,
+                            Icons.cake_outlined,
+                            l10n.ageCalculator,
+                            l10n.ageCalculatorTabDescription,
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Actions
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(l10n.close),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
-    if (nextBirthday.isBefore(now)) {
-      nextBirthday = DateTime(now.year + 1, _birthDate.month, _birthDate.day);
-    }
+  void _showClearDataDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearTabData),
+        content: Text(l10n.confirmClearTabData),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              _controller.clearCurrentTabData();
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.tabDataCleared)),
+              );
+            },
+            child: Text(l10n.clearTabData),
+          ),
+        ],
+      ),
+    );
+  }
 
-    final daysUntil = nextBirthday.difference(now).inDays;
-    return 'In $daysUntil days (${nextBirthday.day}/${nextBirthday.month}/${nextBirthday.year})';
+  void _showClearHistoryDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clearCalculationHistory),
+        content: Text(l10n.confirmClearHistory),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              _controller.clearHistory();
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.historyCleared)),
+              );
+            },
+            child: Text(l10n.clearCalculationHistory),
+          ),
+        ],
+      ),
+    );
   }
 }

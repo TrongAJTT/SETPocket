@@ -383,6 +383,12 @@ abstract class AppLocalizations {
   /// **'Search...'**
   String get searchHint;
 
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
   /// No description provided for @total.
   ///
   /// In en, this message translates to:
@@ -1229,6 +1235,774 @@ abstract class AppLocalizations {
   /// **'Restored!'**
   String get restored;
 
+  /// Title for the Date Calculator tool
+  ///
+  /// In en, this message translates to:
+  /// **'Date Calculator'**
+  String get dateCalculator;
+
+  /// Description for the Date Calculator tool
+  ///
+  /// In en, this message translates to:
+  /// **'A versatile tool for handling all your date-related calculations. Below is an overview of its features:'**
+  String get dateCalculatorDesc;
+
+  /// No description provided for @dateInfoTabDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Provides detailed information for any date, including day of the week, day of the year, week number, quarter, and leap year status.'**
+  String get dateInfoTabDescription;
+
+  /// No description provided for @dateDifferenceTabDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculates the duration between two dates, showing the result in a combination of years, months, and days, as well as in total units like months, weeks, days, etc.'**
+  String get dateDifferenceTabDescription;
+
+  /// No description provided for @addSubtractTabDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds or subtracts a specific number of years, months, and days from a given date to determine the resulting date.'**
+  String get addSubtractTabDescription;
+
+  /// No description provided for @ageCalculatorTabDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculates the age from a birth date and shows the total days lived, days until the next birthday, and the date of the next birthday.'**
+  String get ageCalculatorTabDescription;
+
+  /// Title for the history panel in the Date Calculator
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get dateCalculatorHistory;
+
+  /// No description provided for @dateDifference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference'**
+  String get dateDifference;
+
+  /// No description provided for @addSubtractDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add/Subtract'**
+  String get addSubtractDate;
+
+  /// No description provided for @ageCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday'**
+  String get ageCalculator;
+
+  /// No description provided for @ageCalculatorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate age and track upcoming birthdays.'**
+  String get ageCalculatorDesc;
+
+  /// No description provided for @workingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Working Days'**
+  String get workingDays;
+
+  /// No description provided for @timezoneConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get timezoneConverter;
+
+  /// No description provided for @recurringDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring'**
+  String get recurringDates;
+
+  /// No description provided for @countdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown'**
+  String get countdown;
+
+  /// No description provided for @dateInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get dateInfo;
+
+  /// No description provided for @dateInfoDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get detailed information about any selected date'**
+  String get dateInfoDesc;
+
+  /// No description provided for @timeUnitConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Unit'**
+  String get timeUnitConverter;
+
+  /// No description provided for @nthWeekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Nth Weekday'**
+  String get nthWeekday;
+
+  /// No description provided for @allCalculations.
+  ///
+  /// In en, this message translates to:
+  /// **'All Calculations'**
+  String get allCalculations;
+
+  /// No description provided for @filterByType.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by type'**
+  String get filterByType;
+
+  /// No description provided for @clearCalculationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear History'**
+  String get clearCalculationHistory;
+
+  /// No description provided for @bookmarkResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark Result'**
+  String get bookmarkResult;
+
+  /// No description provided for @resultBookmarked.
+  ///
+  /// In en, this message translates to:
+  /// **'Result bookmarked to history'**
+  String get resultBookmarked;
+
+  /// No description provided for @clearTabData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Data'**
+  String get clearTabData;
+
+  /// No description provided for @tabDataCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Data cleared for current tab'**
+  String get tabDataCleared;
+
+  /// No description provided for @showCalculatorInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Show calculator information'**
+  String get showCalculatorInfo;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @baseDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Base Date'**
+  String get baseDate;
+
+  /// No description provided for @birthDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Date'**
+  String get birthDate;
+
+  /// No description provided for @targetDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Date'**
+  String get targetDate;
+
+  /// No description provided for @selectDateToView.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a date to view detailed information'**
+  String get selectDateToView;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @dateDistanceSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Distance'**
+  String get dateDistanceSection;
+
+  /// No description provided for @unitConversionSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Conversion'**
+  String get unitConversionSection;
+
+  /// No description provided for @totalMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Months'**
+  String get totalMonths;
+
+  /// No description provided for @totalWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Weeks'**
+  String get totalWeeks;
+
+  /// No description provided for @totalDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Days'**
+  String get totalDays;
+
+  /// No description provided for @totalHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Hours'**
+  String get totalHours;
+
+  /// No description provided for @totalMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Minutes'**
+  String get totalMinutes;
+
+  /// No description provided for @resultDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Result Date'**
+  String get resultDate;
+
+  /// No description provided for @dayOfWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of the week'**
+  String get dayOfWeek;
+
+  /// No description provided for @years.
+  ///
+  /// In en, this message translates to:
+  /// **'Years'**
+  String get years;
+
+  /// No description provided for @months.
+  ///
+  /// In en, this message translates to:
+  /// **'Months'**
+  String get months;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get days;
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours'**
+  String get hours;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get minutes;
+
+  /// No description provided for @seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Seconds'**
+  String get seconds;
+
+  /// No description provided for @weeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get weeks;
+
+  /// No description provided for @addSubtractValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Add/Subtract Values'**
+  String get addSubtractValues;
+
+  /// No description provided for @addSubtractResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get addSubtractResultsTitle;
+
+  /// Title for the age calculator results card
+  ///
+  /// In en, this message translates to:
+  /// **'Age Calculation Results'**
+  String get ageCalculatorResultsTitle;
+
+  /// Label for age in age calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Your Current Age'**
+  String get age;
+
+  /// Label for total days lived in age calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Total Days Lived'**
+  String get daysLived;
+
+  /// Label for the date of the next birthday
+  ///
+  /// In en, this message translates to:
+  /// **'Next Birthday On'**
+  String get nextBirthday;
+
+  /// Label for days until next birthday in age calculator
+  ///
+  /// In en, this message translates to:
+  /// **'Days Until Next Birthday'**
+  String get daysUntilBirthday;
+
+  /// No description provided for @workingDaysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Working Days'**
+  String get workingDaysCount;
+
+  /// No description provided for @excludeWeekends.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude Weekends'**
+  String get excludeWeekends;
+
+  /// No description provided for @customHolidays.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Holidays'**
+  String get customHolidays;
+
+  /// No description provided for @addHoliday.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Holiday'**
+  String get addHoliday;
+
+  /// No description provided for @removeHoliday.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Holiday'**
+  String get removeHoliday;
+
+  /// No description provided for @fromTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'From Timezone'**
+  String get fromTimezone;
+
+  /// No description provided for @toTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'To Timezone'**
+  String get toTimezone;
+
+  /// No description provided for @convertedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Converted Time'**
+  String get convertedTime;
+
+  /// No description provided for @recurringPattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern'**
+  String get recurringPattern;
+
+  /// No description provided for @interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval'**
+  String get interval;
+
+  /// No description provided for @occurrences.
+  ///
+  /// In en, this message translates to:
+  /// **'Occurrences'**
+  String get occurrences;
+
+  /// No description provided for @daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get daily;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
+  /// No description provided for @monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthly;
+
+  /// No description provided for @yearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get yearly;
+
+  /// No description provided for @generatedDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated Dates'**
+  String get generatedDates;
+
+  /// No description provided for @eventName.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Name'**
+  String get eventName;
+
+  /// No description provided for @timeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining: {seconds}s'**
+  String timeRemaining(Object seconds);
+
+  /// No description provided for @expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
+
+  /// No description provided for @daysRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Days Remaining'**
+  String get daysRemaining;
+
+  /// No description provided for @hoursRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours Remaining'**
+  String get hoursRemaining;
+
+  /// No description provided for @minutesRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes Remaining'**
+  String get minutesRemaining;
+
+  /// No description provided for @currentWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Week'**
+  String get currentWeek;
+
+  /// No description provided for @weekOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Week of {year}'**
+  String weekOf(int year);
+
+  /// No description provided for @currentDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Day'**
+  String get currentDay;
+
+  /// No description provided for @dayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of {year}'**
+  String dayOf(int day, int year);
+
+  /// No description provided for @convertValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert Value'**
+  String get convertValue;
+
+  /// No description provided for @toUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'To Unit'**
+  String get toUnit;
+
+  /// No description provided for @convertedValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Converted Value'**
+  String get convertedValue;
+
+  /// No description provided for @timeUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Units'**
+  String get timeUnits;
+
+  /// No description provided for @findWeekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Weekday'**
+  String get findWeekday;
+
+  /// No description provided for @year.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get year;
+
+  /// No description provided for @month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get month;
+
+  /// No description provided for @weekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday'**
+  String get weekday;
+
+  /// No description provided for @occurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Occurrence'**
+  String get occurrence;
+
+  /// No description provided for @first.
+  ///
+  /// In en, this message translates to:
+  /// **'First'**
+  String get first;
+
+  /// No description provided for @second.
+  ///
+  /// In en, this message translates to:
+  /// **'Second'**
+  String get second;
+
+  /// No description provided for @third.
+  ///
+  /// In en, this message translates to:
+  /// **'Third'**
+  String get third;
+
+  /// No description provided for @fourth.
+  ///
+  /// In en, this message translates to:
+  /// **'Fourth'**
+  String get fourth;
+
+  /// No description provided for @last.
+  ///
+  /// In en, this message translates to:
+  /// **'Last'**
+  String get last;
+
+  /// No description provided for @monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get monday;
+
+  /// No description provided for @tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get tuesday;
+
+  /// No description provided for @wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get wednesday;
+
+  /// No description provided for @thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get thursday;
+
+  /// No description provided for @friday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get friday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get saturday;
+
+  /// No description provided for @sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get sunday;
+
+  /// No description provided for @january.
+  ///
+  /// In en, this message translates to:
+  /// **'January'**
+  String get january;
+
+  /// No description provided for @february.
+  ///
+  /// In en, this message translates to:
+  /// **'February'**
+  String get february;
+
+  /// No description provided for @march.
+  ///
+  /// In en, this message translates to:
+  /// **'March'**
+  String get march;
+
+  /// No description provided for @april.
+  ///
+  /// In en, this message translates to:
+  /// **'April'**
+  String get april;
+
+  /// No description provided for @may.
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get may;
+
+  /// No description provided for @june.
+  ///
+  /// In en, this message translates to:
+  /// **'June'**
+  String get june;
+
+  /// No description provided for @july.
+  ///
+  /// In en, this message translates to:
+  /// **'July'**
+  String get july;
+
+  /// No description provided for @august.
+  ///
+  /// In en, this message translates to:
+  /// **'August'**
+  String get august;
+
+  /// No description provided for @september.
+  ///
+  /// In en, this message translates to:
+  /// **'September'**
+  String get september;
+
+  /// No description provided for @october.
+  ///
+  /// In en, this message translates to:
+  /// **'October'**
+  String get october;
+
+  /// No description provided for @november.
+  ///
+  /// In en, this message translates to:
+  /// **'November'**
+  String get november;
+
+  /// No description provided for @december.
+  ///
+  /// In en, this message translates to:
+  /// **'December'**
+  String get december;
+
+  /// No description provided for @dateNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Date not found'**
+  String get dateNotFound;
+
+  /// No description provided for @invalidDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid date'**
+  String get invalidDate;
+
+  /// No description provided for @calculationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation error'**
+  String get calculationError;
+
+  /// No description provided for @noHistoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get noHistoryYet;
+
+  /// No description provided for @performCalculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Perform your first calculation to see history here'**
+  String get performCalculation;
+
+  /// No description provided for @confirmClearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all BMI history?'**
+  String get confirmClearHistory;
+
+  /// No description provided for @confirmClearTabData.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear the data for the current tab?'**
+  String get confirmClearTabData;
+
+  /// No description provided for @historyCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI history cleared'**
+  String get historyCleared;
+
+  /// No description provided for @historyItem.
+  ///
+  /// In en, this message translates to:
+  /// **'History Item'**
+  String get historyItem;
+
+  /// No description provided for @loadFromHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Load from History'**
+  String get loadFromHistory;
+
+  /// No description provided for @deleteFromHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete from History'**
+  String get deleteFromHistory;
+
+  /// No description provided for @historyItemDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'History item deleted'**
+  String get historyItemDeleted;
+
   /// No description provided for @restoreExpression.
   ///
   /// In en, this message translates to:
@@ -1433,12 +2207,6 @@ abstract class AppLocalizations {
   /// **'No exchange rate information available, fetching rates...'**
   String get noRatesAvailable;
 
-  /// No description provided for @liveRates.
-  ///
-  /// In en, this message translates to:
-  /// **'Live Exchange Rates'**
-  String get liveRates;
-
   /// No description provided for @staticRates.
   ///
   /// In en, this message translates to:
@@ -1474,12 +2242,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirm;
-
-  /// No description provided for @customizeCurrencies.
-  ///
-  /// In en, this message translates to:
-  /// **'Customize Currencies'**
-  String get customizeCurrencies;
 
   /// No description provided for @addCard.
   ///
@@ -1697,12 +2459,6 @@ abstract class AppLocalizations {
   /// **'The Currency Converter allows you to convert between different currencies using live or static exchange rates. It supports over 80 currencies worldwide.'**
   String get aboutThisFeatureDesc;
 
-  /// No description provided for @howToUse.
-  ///
-  /// In en, this message translates to:
-  /// **'How to Use'**
-  String get howToUse;
-
   /// No description provided for @howToUseDesc.
   ///
   /// In en, this message translates to:
@@ -1781,12 +2537,6 @@ abstract class AppLocalizations {
   /// **'Preset name is required'**
   String get presetNameRequired;
 
-  /// No description provided for @presetSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Preset saved successfully'**
-  String get presetSaved;
-
   /// No description provided for @presetLoaded.
   ///
   /// In en, this message translates to:
@@ -1834,12 +2584,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No presets found'**
   String get noPresetsFound;
-
-  /// No description provided for @select.
-  ///
-  /// In en, this message translates to:
-  /// **'Select'**
-  String get select;
 
   /// No description provided for @delete.
   ///
@@ -1961,12 +2705,6 @@ abstract class AppLocalizations {
   /// **'Fetching progress: {completed}/{total}'**
   String fetchingProgress(Object completed, Object total);
 
-  /// No description provided for @timeRemaining.
-  ///
-  /// In en, this message translates to:
-  /// **'Time remaining: {seconds}s'**
-  String timeRemaining(Object seconds);
-
   /// No description provided for @fetchingStatus.
   ///
   /// In en, this message translates to:
@@ -1996,18 +2734,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date Generator'**
   String get dateGenerator;
-
-  /// No description provided for @startDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Start Date'**
-  String get startDate;
-
-  /// No description provided for @endDate.
-  ///
-  /// In en, this message translates to:
-  /// **'End Date'**
-  String get endDate;
 
   /// No description provided for @dateCount.
   ///
@@ -2158,12 +2884,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generated at'**
   String get generatedAt;
-
-  /// No description provided for @noHistoryYet.
-  ///
-  /// In en, this message translates to:
-  /// **'No calculations yet'**
-  String get noHistoryYet;
 
   /// No description provided for @noHistoryMessage.
   ///
@@ -2674,48 +3394,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Knots'**
   String get knots;
-
-  /// No description provided for @seconds.
-  ///
-  /// In en, this message translates to:
-  /// **'Seconds'**
-  String get seconds;
-
-  /// No description provided for @minutes.
-  ///
-  /// In en, this message translates to:
-  /// **'Minutes'**
-  String get minutes;
-
-  /// No description provided for @hours.
-  ///
-  /// In en, this message translates to:
-  /// **'Hours'**
-  String get hours;
-
-  /// No description provided for @days.
-  ///
-  /// In en, this message translates to:
-  /// **'Days'**
-  String get days;
-
-  /// No description provided for @weeks.
-  ///
-  /// In en, this message translates to:
-  /// **'Weeks'**
-  String get weeks;
-
-  /// No description provided for @months.
-  ///
-  /// In en, this message translates to:
-  /// **'Months'**
-  String get months;
-
-  /// No description provided for @years.
-  ///
-  /// In en, this message translates to:
-  /// **'Years'**
-  String get years;
 
   /// No description provided for @bytes.
   ///
@@ -4001,23 +4679,11 @@ abstract class AppLocalizations {
   /// **'Clear BMI History'**
   String get clearBmiHistory;
 
-  /// No description provided for @confirmClearHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to clear all BMI history?'**
-  String get confirmClearHistory;
-
   /// No description provided for @confirmClearCalculatorHistory.
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to clear all calculation history?'**
   String get confirmClearCalculatorHistory;
-
-  /// No description provided for @historyCleared.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI history cleared'**
-  String get historyCleared;
 
   /// No description provided for @calculatorHistoryCleared.
   ///
@@ -4625,6 +5291,12 @@ abstract class AppLocalizations {
   /// **'Maximum selection exceeded'**
   String get maximumSelectionExceeded;
 
+  /// No description provided for @presetSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset saved successfully'**
+  String get presetSaved;
+
   /// No description provided for @errorSavingPreset.
   ///
   /// In en, this message translates to:
@@ -4703,11 +5375,23 @@ abstract class AppLocalizations {
   /// **'Create multiple converter cards, each with its own set of currencies and amounts.'**
   String get multipleCardsDesc;
 
+  /// No description provided for @liveRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Exchange Rates'**
+  String get liveRates;
+
   /// No description provided for @liveRatesDesc.
   ///
   /// In en, this message translates to:
   /// **'Get real-time exchange rates from reliable financial sources.'**
   String get liveRatesDesc;
+
+  /// No description provided for @customizeCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Currencies'**
+  String get customizeCurrencies;
 
   /// No description provided for @customizeCurrenciesDesc.
   ///
@@ -4750,6 +5434,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your converter state is automatically saved and restored.'**
   String get stateManagementDesc;
+
+  /// No description provided for @howToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get howToUse;
 
   /// No description provided for @step1.
   ///
@@ -7277,6 +7967,12 @@ abstract class AppLocalizations {
   /// **'Custom Color'**
   String get customColor;
 
+  /// No description provided for @select.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get select;
+
   /// No description provided for @hue.
   ///
   /// In en, this message translates to:
@@ -7607,12 +8303,6 @@ abstract class AppLocalizations {
   /// **'Consult with pediatrician to evaluate growth patterns and overall health.'**
   String get bmiGrowthPattern;
 
-  /// No description provided for @age.
-  ///
-  /// In en, this message translates to:
-  /// **'Age'**
-  String get age;
-
   /// No description provided for @ageYears.
   ///
   /// In en, this message translates to:
@@ -7901,6 +8591,12 @@ abstract class AppLocalizations {
   /// **'Financial History'**
   String get financialHistory;
 
+  /// No description provided for @historyTab.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTab;
+
   /// No description provided for @loanTab.
   ///
   /// In en, this message translates to:
@@ -8098,6 +8794,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Higher compounding frequency increases returns'**
   String get financialTip5;
+
+  /// No description provided for @selectedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Date'**
+  String get selectedDate;
+
+  /// No description provided for @weekdayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of Week'**
+  String get weekdayName;
+
+  /// No description provided for @dayInMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Day in Month'**
+  String get dayInMonth;
+
+  /// No description provided for @dayInYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Day in Year'**
+  String get dayInYear;
+
+  /// No description provided for @weekInMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Week in Month'**
+  String get weekInMonth;
+
+  /// No description provided for @weekInYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Week in Year'**
+  String get weekInYear;
+
+  /// No description provided for @monthName.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get monthName;
+
+  /// No description provided for @monthOfYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Month Of Year'**
+  String get monthOfYear;
+
+  /// No description provided for @yearValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get yearValue;
+
+  /// No description provided for @quarter.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarter'**
+  String get quarter;
+
+  /// No description provided for @quarterOfYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarter Of Year'**
+  String get quarterOfYear;
+
+  /// No description provided for @isLeapYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Leap Year'**
+  String get isLeapYear;
+
+  /// No description provided for @daysInMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in Month'**
+  String get daysInMonth;
+
+  /// No description provided for @daysInYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in Year'**
+  String get daysInYear;
+
+  /// No description provided for @dateInfoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Information Results'**
+  String get dateInfoResults;
+
+  /// Quarter number format
+  ///
+  /// In en, this message translates to:
+  /// **'Q{number}'**
+  String quarterValue(int number);
+
+  /// Leap year status
+  ///
+  /// In en, this message translates to:
+  /// **'{status}'**
+  String leapYearStatus(String status);
+
+  /// No description provided for @dateDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get dateDistance;
+
+  /// No description provided for @dateCalculatorInfoHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Calculator Information'**
+  String get dateCalculatorInfoHeaderTitle;
+
+  /// No description provided for @dateCalculatorInfoHeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A powerful tool for all your date and time calculations.'**
+  String get dateCalculatorInfoHeaderSubtitle;
+
+  /// No description provided for @dateCalculatorMainFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Main Features'**
+  String get dateCalculatorMainFeatures;
+
+  /// No description provided for @dateCalculatorUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get dateCalculatorUsage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

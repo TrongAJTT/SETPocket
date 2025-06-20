@@ -22,6 +22,8 @@ import 'converter_services/data_state_service.dart';
 import 'converter_services/generic_preset_service.dart';
 import 'random_services/random_state_service.dart';
 import 'financial_calculator_service.dart';
+import 'scientific_calculator_service.dart';
+import 'date_calculator_service.dart';
 import 'package:hive/hive.dart';
 
 class CacheInfo {
@@ -193,26 +195,58 @@ class CacheService {
         logError('CacheService: Error checking financial calculator cache: $e');
       }
 
+      // Include scientific calculator cache
+      int scientificSize = 0;
+      int scientificCount = 0;
+      try {
+        final scientificCache =
+            await ScientificCalculatorService.getCacheInfo();
+        scientificSize = scientificCache['size'] as int;
+        scientificCount = scientificCache['items'] as int;
+      } catch (e) {
+        logError(
+            'CacheService: Error checking scientific calculator cache: $e');
+      }
+
+      // Include date calculator cache
+      int dateCalculatorSize = 0;
+      int dateCalculatorCount = 0;
+      try {
+        final dateCalculatorService = DateCalculatorService();
+        final dateCalculatorCache = await dateCalculatorService.getCacheInfo();
+        dateCalculatorSize = dateCalculatorCache['size'] as int;
+        dateCalculatorCount = dateCalculatorCache['items'] as int;
+      } catch (e) {
+        logError('CacheService: Error checking date calculator cache: $e');
+      }
+
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: calculatorToolsName ?? 'Calculator Tools',
         description: calculatorToolsDesc ??
-            'Calculation history, graphing calculator data, BMI data, financial calculator data, and settings',
+            'Calculation history, graphing calculator data, BMI data, financial calculator data, scientific calculator data, date calculator data, and settings',
         itemCount: calculatorHistoryCount +
             (calculatorHistoryEnabled ? 1 : 0) +
             (graphingCalculatorCache['items'] as int) +
             bmiCount +
-            financialCount,
+            financialCount +
+            scientificCount +
+            dateCalculatorCount,
         sizeBytes: calculatorHistorySize +
             (calculatorHistoryEnabled ? 4 : 0) +
             (graphingCalculatorCache['size'] as int) +
             bmiSize +
-            financialSize,
+            financialSize +
+            scientificSize +
+            dateCalculatorSize,
         keys: [
           'calculator_history_enabled',
           'graphing_calculator_ask_before_loading',
           'bmi_data', // BMI cache key
           'financial_calculator_history',
           'financial_calculator_state',
+          'scientific_calculator_state',
+          'date_calculator_history',
+          'date_calculator_state',
         ],
       );
     } catch (e) {
@@ -220,13 +254,18 @@ class CacheService {
       cacheInfoMap['calculator_tools'] = CacheInfo(
         name: calculatorToolsName ?? 'Calculator Tools',
         description: calculatorToolsDesc ??
-            'Calculation history, graphing calculator data, BMI data, and settings',
+            'Calculation history, graphing calculator data, BMI data, financial calculator data, scientific calculator data, date calculator data, and settings',
         itemCount: 0,
         sizeBytes: 0,
         keys: [
           'calculator_history_enabled',
           'graphing_calculator_ask_before_loading',
           'bmi_data',
+          'financial_calculator_history',
+          'financial_calculator_state',
+          'scientific_calculator_state',
+          'date_calculator_history',
+          'date_calculator_state',
         ],
       );
     }
@@ -580,6 +619,21 @@ class CacheService {
       } catch (e) {
         logError('CacheService: Error clearing financial calculator cache: $e');
       }
+      // Clear scientific calculator data
+      try {
+        await ScientificCalculatorService.clearAllData();
+      } catch (e) {
+        logError(
+            'CacheService: Error clearing scientific calculator cache: $e');
+      }
+      // Clear date calculator data
+      try {
+        final dateCalculatorService = DateCalculatorService();
+        await dateCalculatorService.clearHistory();
+        await dateCalculatorService.clearCurrentState();
+      } catch (e) {
+        logError('CacheService: Error clearing date calculator cache: $e');
+      }
       // Also clear the history enabled settings
       await prefs.remove('calculator_history_enabled');
       await prefs.remove('graphing_calculator_ask_before_loading');
@@ -652,6 +706,24 @@ class CacheService {
     } catch (e) {
       logError(
           'CacheService: Error clearing financial calculator cache in clearAllCache: $e');
+    }
+
+    // Clear scientific calculator data
+    try {
+      await ScientificCalculatorService.clearAllData();
+    } catch (e) {
+      logError(
+          'CacheService: Error clearing scientific calculator cache in clearAllCache: $e');
+    }
+
+    // Clear date calculator data
+    try {
+      final dateCalculatorService = DateCalculatorService();
+      await dateCalculatorService.clearHistory();
+      await dateCalculatorService.clearCurrentState();
+    } catch (e) {
+      logError(
+          'CacheService: Error clearing date calculator cache in clearAllCache: $e');
     }
 
     // Close all converter boxes first to avoid type conflicts
@@ -756,6 +828,11 @@ class CacheService {
       'generic_temperature_presets',
       'currency_cache',
       'bmi_data', // BMI calculator data box
+      'scientific_calculator_state',
+      'date_calculator_history',
+      'date_calculator_state',
+      'financial_calculator_history',
+      'financial_calculator_state',
     ];
 
     for (final boxName in boxNames) {

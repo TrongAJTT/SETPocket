@@ -54,6 +54,7 @@
     "cancel": "Cancel",
     "search": "Search",
     "searchHint": "Search...",
+    "history": "History",
     "total": "Total",
     "selectTool": "Select a tool from the sidebar",
     "selectToolDesc": "Choose a tool from the left sidebar to get started",
@@ -198,6 +199,192 @@
     "copyToClipboard": "Copy to Clipboard",
     "copied": "Copied!",
     "restored": "Restored!",
+    
+    "dateCalculator": "Date Calculator",
+    "@dateCalculator": {
+        "description": "Title for the Date Calculator tool"
+    },
+    "dateCalculatorDesc": "A versatile tool for handling all your date-related calculations. Below is an overview of its features:",
+    "@dateCalculatorDesc": {
+        "description": "Description for the Date Calculator tool"
+    },
+    "dateInfoTabDescription": "Provides detailed information for any date, including day of the week, day of the year, week number, quarter, and leap year status.",
+    "dateDifferenceTabDescription": "Calculates the duration between two dates, showing the result in a combination of years, months, and days, as well as in total units like months, weeks, days, etc.",
+    "addSubtractTabDescription": "Adds or subtracts a specific number of years, months, and days from a given date to determine the resulting date.",
+    "ageCalculatorTabDescription": "Calculates the age from a birth date and shows the total days lived, days until the next birthday, and the date of the next birthday.",
+    "dateCalculatorHistory": "Date Calculator History",
+    "@dateCalculatorHistory": {
+        "description": "Title for the history panel in the Date Calculator"
+    },
+    "dateDifference": "Difference",
+    "addSubtractDate": "Add/Subtract",
+    "ageCalculator": "Birthday",
+    "ageCalculatorDesc": "Calculate age and track upcoming birthdays.",
+    "workingDays": "Working Days",
+    "timezoneConverter": "Timezone",
+    "recurringDates": "Recurring",
+    "countdown": "Countdown",
+    "dateInfo": "Detail",
+    "dateInfoDesc": "Get detailed information about any selected date",
+    "timeUnitConverter": "Time Unit",
+    "nthWeekday": "Nth Weekday",
+    
+    "dateCalculatorHistory": "History",
+    "allCalculations": "All Calculations",
+    "filterByType": "Filter by type",
+    "clearCalculationHistory": "Clear History",
+    "bookmarkResult": "Bookmark Result",
+    "resultBookmarked": "Result bookmarked to history",
+    "clearTabData": "Clear Data",
+    "tabDataCleared": "Data cleared for current tab",
+    "showCalculatorInfo": "Calculator Information",
+    
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "baseDate": "Base Date",
+    "birthDate": "Birth Date",
+    "targetDate": "Target Date",
+    "selectDateToView": "Select a date to view detailed information",
+    "duration": "Duration",
+    "dateDistanceSection": "Date Distance",
+    "unitConversionSection": "Unit Conversion",
+    "totalMonths": "Total Months",
+    "totalWeeks": "Total Weeks",
+    "totalDays": "Total Days",
+    "totalHours": "Total Hours",
+    "totalMinutes": "Total Minutes",
+    
+    "resultDate": "Result Date",
+    "dayOfWeek": "Day of the week",
+    "years": "Years",
+    "months": "Months",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "weeks": "Weeks",
+    
+    "addSubtractValues": "Add/Subtract Values",
+    "addSubtractResultsTitle": "Result",
+
+    "ageCalculatorResultsTitle": "Birthday Details",
+    "@ageCalculatorResultsTitle": {
+        "description": "Title for the age calculator results card"
+    },
+    "age": "Your Current Age",
+    "@age": {
+        "description": "Label for age in age calculator"
+    },
+    "daysLived": "Total Days Lived",
+    "@daysLived": {
+        "description": "Label for total days lived in age calculator"
+    },
+    "nextBirthday": "Next Birthday On",
+    "@nextBirthday": {
+        "description": "Label for the date of the next birthday"
+    },
+    "daysUntilBirthday": "Days Until Next Birthday",
+    "@daysUntilBirthday": {
+        "description": "Label for days until next birthday in age calculator"
+    },
+    
+    "workingDaysCount": "Working Days",
+    "excludeWeekends": "Exclude Weekends",
+    "customHolidays": "Custom Holidays",
+    "addHoliday": "Add Holiday",
+    "removeHoliday": "Remove Holiday",
+    
+    "fromTimezone": "From Timezone",
+    "toTimezone": "To Timezone",
+    "convertedTime": "Converted Time",
+    
+    "recurringPattern": "Pattern",
+    "interval": "Interval",
+    "occurrences": "Occurrences",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "generatedDates": "Generated Dates",
+    
+    "eventName": "Event Name",
+    "timeRemaining": "Time Remaining",
+    "expired": "Expired",
+    "daysRemaining": "Days Remaining",
+    "hoursRemaining": "Hours Remaining",
+    "minutesRemaining": "Minutes Remaining",
+    
+    "currentWeek": "Current Week",
+    "weekOf": "Week of {year}",
+    "@weekOf": {
+        "placeholders": {
+            "year": {
+                "type": "int"
+            }
+        }
+    },
+    
+    "currentDay": "Current Day",
+    "dayOf": "Day {day} of {year}",
+    "@dayOf": {
+        "placeholders": {
+            "day": {
+                "type": "int"
+            },
+            "year": {
+                "type": "int"
+            }
+        }
+    },
+    
+    "convertValue": "Convert Value",
+    "toUnit": "To Unit",
+    "convertedValue": "Converted Value",
+    "timeUnits": "Time Units",
+    
+    "findWeekday": "Find Weekday",
+    "year": "Year",
+    "month": "Month",
+    "weekday": "Weekday",
+    "occurrence": "Occurrence",
+    "first": "First",
+    "second": "Second",
+    "third": "Third",
+    "fourth": "Fourth",
+    "last": "Last",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December",
+    
+    "dateNotFound": "Date not found",
+    "invalidDate": "Invalid date",
+    "calculationError": "Calculation error",
+    "noHistoryYet": "No calculation history yet",
+    "performCalculation": "Perform your first calculation to see history here",
+    
+    "confirmClearHistory": "Are you sure you want to clear the calculation history?",
+    "confirmClearTabData": "Are you sure you want to clear the data for the current tab?",
+    "historyCleared": "History cleared successfully",
+    "historyItem": "History Item",
+    "loadFromHistory": "Load from History",
+    "deleteFromHistory": "Delete from History",
+    "historyItemDeleted": "History item deleted",
     "restoreExpression": "Restore Expression",
     "restoreResult": "Restore Result",
     
@@ -238,14 +425,12 @@
     "updatingRates": "Updating exchange rates...",
     "lastUpdatedAt": "Last updated: {date} at {time}",
     "noRatesAvailable": "No exchange rate information available, fetching rates...",
-    "liveRates": "Live",
     "staticRates": "Static",
     "refreshRates": "Refresh rates",
     "resetLayout": "Reset Layout",
     "confirmResetLayout": "Confirm Reset Layout",
     "confirmResetLayoutMessage": "Are you sure you want to reset the layout? This will remove all cards and restore default settings.",
     "confirm": "Confirm",
-    "customizeCurrencies": "Customize currencies",
     "addCard": "Add Card",
     "addRow": "Add Row", 
     "cardView": "Card View",
@@ -253,7 +438,6 @@
     "rows": "Rows",
     "converter": "Converter",
     "amount": "Amount",
-    "quantity": "Quantity",
     "from": "From",
     "fromCurrency": "From Currency",
     "convertedTo": "Converted to",
@@ -283,7 +467,6 @@
     "currencyConverterInfo": "Currency Converter Info",
     "aboutThisFeature": "About This Feature",
     "aboutThisFeatureDesc": "The Currency Converter allows you to convert between different currencies using live or static exchange rates. It supports over 80 currencies worldwide.",
-    "howToUse": "How to Use",
     "howToUseDesc": "• Add or remove cards/rows for multiple conversions\n• Customize visible currencies\n• Switch between card and table view\n• Rates update automatically based on your settings",
     "staticRatesInfo": "Static Exchange Rates",
     "staticRatesInfoDesc": "Static rates are fallback values used when live rates cannot be fetched. These rates are updated periodically and may not reflect real-time market prices.",
@@ -297,7 +480,6 @@
     "presetName": "Preset Name",
     "enterPresetName": "Enter preset name",
     "presetNameRequired": "Preset name is required",
-    "presetSaved": "Preset saved successfully",
     "presetLoaded": "Preset loaded successfully",
     "presetDeleted": "Preset deleted successfully",
     "deletePreset": "Delete Preset",
@@ -306,7 +488,6 @@
     "sortByName": "Name",
     "sortByDate": "Date",
     "noPresetsFound": "No presets found",
-    "select": "Select",
     "delete": "Delete",
     "createdOn": "Created on {date}",
     "currencies": "{count} currencies",
@@ -341,8 +522,6 @@
     "fetchCancelled": "Fetch Cancelled",
     
     "dateGenerator": "Date Generator",
-    "startDate": "Start Date",
-    "endDate": "End Date",
     "dateCount": "Number of dates",
     
     "timeGenerator": "Time Generator",
@@ -765,9 +944,9 @@
     "bmiObeseRec3": "Regular medical monitoring may be necessary for optimal health",
     
     "bmiUnderweightDesc": "Below normal weight range, may indicate nutritional deficiency",
-    "bmiNormalDesc": "Optimal weight range associated with lowest health risks",
-    "bmiOverweightDesc": "Above normal weight range, increased risk of health issues",
-    "bmiObeseDesc": "Significantly above normal weight range, higher health risks",
+    "bmiNormalDesc": "Associated with lowest risk of weight-related health problems",
+    "bmiOverweightDesc": "Increased risk of cardiovascular disease, diabetes, and other health issues",
+    "bmiObeseDesc": "Significantly increased risk of serious health complications",
     
     "bmiKeyFeatures": "Key Features",
     "comprehensiveBmiCalc": "Comprehensive BMI Calculation",
@@ -804,7 +983,6 @@
     "bmiPracticalApplications": "Practical Applications",
     "bmiPracticalApplicationsDesc": "Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.",
     
-    "noHistoryYet": "No calculations yet",
     "noHistoryMessage": "Your BMI calculation history will appear here",
     "clearBmiHistory": "Clear BMI History",
     "confirmClearHistory": "Are you sure you want to clear all BMI history?",
@@ -1892,5 +2070,79 @@
     "financialTip2": "Start investing early to maximize compound interest",
     "financialTip3": "Consider additional payments to reduce loan interest",
     "financialTip4": "Regular contributions can significantly boost investment growth",
-    "financialTip5": "Higher compounding frequency increases returns"
+    "financialTip5": "Higher compounding frequency increases returns",
+
+    "selectedDate": "Selected Date",
+    "weekdayName": "Day of Week",
+    "dayInMonth": "Day in Month",
+    "dayInYear": "Day in Year",
+    "weekInMonth": "Week in Month", 
+    "weekInYear": "Week in Year",
+    "monthName": "Month",
+    "monthOfYear": "Month Of Year",
+    "yearValue": "Year",
+    "quarter": "Quarter",
+    "quarterOfYear": "Quarter Of Year",
+    "isLeapYear": "Leap Year",
+    "daysInMonth": "Days in Month",
+    "daysInYear": "Days in Year",
+    "dateInfoResults": "Date Information Results",
+    "selectDateToView": "Select a date to view detailed information",
+    "quarterValue": "Q{number}",
+    "@quarterValue": {
+        "description": "Quarter number format",
+        "placeholders": {
+            "number": {
+                "type": "int",
+                "example": "1"
+            }
+        }
+    },
+    "leapYearStatus": "{status}",
+    "@leapYearStatus": {
+        "description": "Leap year status",
+        "placeholders": {
+            "status": {
+                "type": "String",
+                "example": "Yes"
+            }
+        }
+    },
+
+    "dateDistance": "Distance",
+    "dateDistanceSection": "Date Distance",
+    "unitConversionSection": "Unit Conversion",
+    "totalMonths": "Total Months",
+    "totalWeeks": "Total Weeks",
+    "totalDays": "Total Days",
+    "totalHours": "Total Hours",
+    "totalMinutes": "Total Minutes",
+    "addSubtractResultsTitle": "Result",
+    "resultDate": "Result Date",
+    "dayOfWeek": "Day of the week",
+    "ageCalculatorResultsTitle": "Age Calculation Results",
+    "@ageCalculatorResultsTitle": {
+        "description": "Title for the age calculator results card"
+    },
+    "daysLived": "Total Days Lived",
+    "@daysLived": {
+        "description": "Label for total days lived in age calculator"
+    },
+    "daysUntilBirthday": "Days Until Next Birthday",
+    "@daysUntilBirthday": {
+        "description": "Label for days until next birthday in age calculator"
+    },
+    "nextBirthday": "Next Birthday On",
+    "@nextBirthday": {
+        "description": "Label for the date of the next birthday"
+    },
+    "age": "Your Current Age",
+    "@age": {
+        "description": "Label for age in age calculator"
+    },
+    "dateCalculatorInfoHeaderTitle": "Date Calculator Information",
+    "dateCalculatorInfoHeaderSubtitle": "A powerful tool for all your date and time calculations.",
+    "dateCalculatorMainFeatures": "Main Features",
+    "dateCalculatorUsage": "How to Use",
+    "showCalculatorInfo": "Show calculator information"
 }

@@ -3,6 +3,7 @@ import 'package:math_expressions/math_expressions.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_history_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
+import 'package:setpocket/services/scientific_calculator_service.dart';
 import 'package:setpocket/widgets/calculator_layout.dart';
 import 'dart:math' as math;
 
@@ -36,6 +37,7 @@ class _ScientificCalculatorScreenState
   void initState() {
     super.initState();
     _loadHistory();
+    _loadState();
   }
 
   @override
@@ -45,6 +47,12 @@ class _ScientificCalculatorScreenState
     _loadHistory();
   }
 
+  @override
+  void dispose() {
+    _saveState();
+    super.dispose();
+  }
+
   Future<void> _loadHistory() async {
     final enabled = await GraphingCalculatorService.getRememberHistory();
     final history = await CalculatorHistoryService.getHistory('scientific');
@@ -52,6 +60,38 @@ class _ScientificCalculatorScreenState
       _historyEnabled = enabled;
       _history = history;
     });
+  }
+
+  Future<void> _loadState() async {
+    final state = await ScientificCalculatorService.getCurrentState();
+    if (state != null) {
+      setState(() {
+        _display = state.display;
+        _expression = state.expression;
+        _realTimeResult = state.realTimeResult;
+        _isRadians = state.isRadians;
+        _showSecondaryFunctions = state.showSecondaryFunctions;
+        _calculationStack = List<String>.from(state.calculationStack);
+        _justCalculated = state.justCalculated;
+      });
+    }
+  }
+
+  Future<void> _saveState() async {
+    try {
+      final state = ScientificCalculatorState(
+        display: _display,
+        expression: _expression,
+        realTimeResult: _realTimeResult,
+        isRadians: _isRadians,
+        showSecondaryFunctions: _showSecondaryFunctions,
+        calculationStack: _calculationStack,
+        justCalculated: _justCalculated,
+      );
+      await ScientificCalculatorService.saveCurrentState(state);
+    } catch (e) {
+      // Silently fail to avoid breaking the app
+    }
   }
 
   void _onButtonPressed(String value) {
@@ -77,8 +117,12 @@ class _ScientificCalculatorScreenState
         _isRadians = !_isRadians;
         // Recalculate with new angle mode
         _updateRealTimeResult();
+        // Save state for mode change
+        _saveState();
       } else if (value == '2nd') {
         _showSecondaryFunctions = !_showSecondaryFunctions;
+        // Save state for function toggle
+        _saveState();
       } else if (value == '+/-') {
         _toggleSign();
       } else if (_isSpecialFunction(value)) {
@@ -104,6 +148,9 @@ class _ScientificCalculatorScreenState
         _updateRealTimeResult();
       }
     });
+
+    // Save state after any changes (debounced)
+    _saveState();
   }
 
   void _toggleSign() {
@@ -254,13 +301,15 @@ class _ScientificCalculatorScreenState
 
         // Save to history if enabled
         if (_historyEnabled && originalExpression.isNotEmpty) {
-          await CalculatorHistoryService.addHistoryItem(
+          await ScientificCalculatorService.addToHistory(
             originalExpression,
             resultString,
-            'scientific',
           );
           await _loadHistory(); // Refresh history
         }
+
+        // Save current state after calculation
+        await _saveState();
       }
     } catch (e) {
       setState(() {
@@ -446,37 +495,6 @@ class _ScientificCalculatorScreenState
     expression = expression.replaceAll('exp(', 'exp(');
 
     return expression;
-  }
-
-  void _restoreFromHistory(
-      CalculatorHistoryItem item, BuildContext historyContext) {
-    setState(() {
-      _expression = item.expression;
-      _display = item.result;
-      _justCalculated = true;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context)!.restored)),
-    );
-
-    // Switch to calculator tab on mobile
-    final tabSwitcher = CalculatorTabSwitcher.of(historyContext);
-    tabSwitcher?.onSwitchToCalculator?.call();
-  }
-
-  void _restoreExpression(String expression, BuildContext historyContext) {
-    setState(() {
-      _expression = expression;
-      _display = expression; // Show the expression in display
-      _justCalculated = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context)!.restored)),
-    );
-
-    // Switch to calculator tab on mobile
-    final tabSwitcher = CalculatorTabSwitcher.of(historyContext);
-    tabSwitcher?.onSwitchToCalculator?.call();
   }
 
   Widget _buildDisplayContent() {
@@ -719,6 +737,9 @@ class _ScientificCalculatorScreenState
           _expression = item.result;
           _justCalculated = true;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.restored)),
+        );
         // Switch to calculator tab on mobile if available
         // This would need TabController access in a more complex implementation
       },
@@ -728,6 +749,9 @@ class _ScientificCalculatorScreenState
           _display = expression;
           _justCalculated = false;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.restored)),
+        );
         // Switch to calculator tab on mobile if available
       },
       showHeader:
@@ -793,7 +817,7 @@ class _ScientificCalculatorScreenState
       title: l10n.scientificCalculator,
       onShowInfo: _showScientificCalculatorInfo,
       onClearHistory: () async {
-        await CalculatorHistoryService.clearHistory('scientific');
+        await ScientificCalculatorService.clearHistory();
         await _loadHistory();
       },
       hasHistoryData: _history.isNotEmpty,

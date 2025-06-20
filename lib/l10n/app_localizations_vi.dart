@@ -161,6 +161,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get searchHint => 'Tìm kiếm...';
 
   @override
+  String get history => 'Lịch sử';
+
+  @override
   String get total => 'Tổng cộng';
 
   @override
@@ -642,6 +645,396 @@ class AppLocalizationsVi extends AppLocalizations {
   String get restored => 'Đã khôi phục!';
 
   @override
+  String get dateCalculator => 'Máy tính ngày';
+
+  @override
+  String get dateCalculatorDesc => 'Một công cụ linh hoạt để xử lý mọi tính toán liên quan đến ngày tháng của bạn. Dưới đây là tổng quan về các tính năng của nó:';
+
+  @override
+  String get dateInfoTabDescription => 'Cung cấp thông tin chi tiết cho một ngày bất kỳ, bao gồm thứ trong tuần, ngày trong năm, số tuần, quý và trạng thái năm nhuận.';
+
+  @override
+  String get dateDifferenceTabDescription => 'Tính toán khoảng thời gian giữa hai ngày, hiển thị kết quả dưới dạng kết hợp năm, tháng, ngày, cũng như trong các đơn vị tổng cộng như tháng, tuần, ngày, v.v.';
+
+  @override
+  String get addSubtractTabDescription => 'Thêm hoặc bớt một số năm, tháng, và ngày cụ thể từ một ngày cho trước để xác định ngày kết quả.';
+
+  @override
+  String get ageCalculatorTabDescription => 'Tính tuổi từ ngày sinh và hiển thị tổng số ngày đã sống, số ngày còn lại đến sinh nhật tiếp theo và ngày sinh nhật tiếp theo.';
+
+  @override
+  String get dateCalculatorHistory => 'Lịch sử Máy tính Ngày';
+
+  @override
+  String get dateDifference => 'Chênh lệch';
+
+  @override
+  String get addSubtractDate => 'Thêm/bớt';
+
+  @override
+  String get ageCalculator => 'Sinh nhật';
+
+  @override
+  String get ageCalculatorDesc => 'Tính tuổi và theo dõi các ngày sinh nhật sắp tới.';
+
+  @override
+  String get workingDays => 'Ngày làm việc';
+
+  @override
+  String get timezoneConverter => 'Múi giờ';
+
+  @override
+  String get recurringDates => 'Ngày định kỳ';
+
+  @override
+  String get countdown => 'Đếm ngược';
+
+  @override
+  String get dateInfo => 'Chi tiết';
+
+  @override
+  String get dateInfoDesc => 'Nhận thông tin chi tiết về bất kỳ ngày nào được chọn';
+
+  @override
+  String get timeUnitConverter => 'Đơn vị thời gian';
+
+  @override
+  String get nthWeekday => 'Nth Weekday';
+
+  @override
+  String get allCalculations => 'All Calculations';
+
+  @override
+  String get filterByType => 'Filter by type';
+
+  @override
+  String get clearCalculationHistory => 'Clear History';
+
+  @override
+  String get bookmarkResult => 'Bookmark Result';
+
+  @override
+  String get resultBookmarked => 'Result bookmarked to history';
+
+  @override
+  String get clearTabData => 'Clear Data';
+
+  @override
+  String get tabDataCleared => 'Data cleared for current tab';
+
+  @override
+  String get showCalculatorInfo => 'Xem thông tin máy tính';
+
+  @override
+  String get startDate => 'Ngày bắt đầu';
+
+  @override
+  String get endDate => 'Ngày kết thúc';
+
+  @override
+  String get baseDate => 'Ngày cơ sở';
+
+  @override
+  String get birthDate => 'Ngày sinh';
+
+  @override
+  String get targetDate => 'Target Date';
+
+  @override
+  String get selectDateToView => 'Chọn một ngày để xem thông tin chi tiết';
+
+  @override
+  String get duration => 'Thời lượng';
+
+  @override
+  String get dateDistanceSection => 'Khoảng cách ngày';
+
+  @override
+  String get unitConversionSection => 'Chuyển đổi sang từng đơn vị';
+
+  @override
+  String get totalMonths => 'Tổng số tháng';
+
+  @override
+  String get totalWeeks => 'Tổng số tuần';
+
+  @override
+  String get totalDays => 'Tổng số ngày';
+
+  @override
+  String get totalHours => 'Tổng số giờ';
+
+  @override
+  String get totalMinutes => 'Tổng số phút';
+
+  @override
+  String get resultDate => 'Ngày kết quả';
+
+  @override
+  String get dayOfWeek => 'Ngày trong tuần';
+
+  @override
+  String get years => 'Năm';
+
+  @override
+  String get months => 'Tháng';
+
+  @override
+  String get days => 'Ngày';
+
+  @override
+  String get hours => 'Giờ';
+
+  @override
+  String get minutes => 'Phút';
+
+  @override
+  String get seconds => 'Giây';
+
+  @override
+  String get weeks => 'tuần';
+
+  @override
+  String get addSubtractValues => 'Thêm/bớt giá trị';
+
+  @override
+  String get addSubtractResultsTitle => 'Kết quả';
+
+  @override
+  String get ageCalculatorResultsTitle => 'Chi tiết sinh nhật';
+
+  @override
+  String get age => 'Tuổi hiện tại';
+
+  @override
+  String get daysLived => 'Tổng số ngày đã sống';
+
+  @override
+  String get nextBirthday => 'Sinh nhật tiếp theo';
+
+  @override
+  String get daysUntilBirthday => 'Số ngày đến sinh nhật';
+
+  @override
+  String get workingDaysCount => 'Working Days';
+
+  @override
+  String get excludeWeekends => 'Exclude Weekends';
+
+  @override
+  String get customHolidays => 'Custom Holidays';
+
+  @override
+  String get addHoliday => 'Add Holiday';
+
+  @override
+  String get removeHoliday => 'Remove Holiday';
+
+  @override
+  String get fromTimezone => 'From Timezone';
+
+  @override
+  String get toTimezone => 'To Timezone';
+
+  @override
+  String get convertedTime => 'Converted Time';
+
+  @override
+  String get recurringPattern => 'Pattern';
+
+  @override
+  String get interval => 'Interval';
+
+  @override
+  String get occurrences => 'Occurrences';
+
+  @override
+  String get daily => 'Daily';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get yearly => 'Yearly';
+
+  @override
+  String get generatedDates => 'Generated Dates';
+
+  @override
+  String get eventName => 'Event Name';
+
+  @override
+  String timeRemaining(Object seconds) {
+    return 'Thời gian còn lại: ${seconds}s';
+  }
+
+  @override
+  String get expired => 'Expired';
+
+  @override
+  String get daysRemaining => 'Days Remaining';
+
+  @override
+  String get hoursRemaining => 'Hours Remaining';
+
+  @override
+  String get minutesRemaining => 'Minutes Remaining';
+
+  @override
+  String get currentWeek => 'Current Week';
+
+  @override
+  String weekOf(int year) {
+    return 'Week of $year';
+  }
+
+  @override
+  String get currentDay => 'Current Day';
+
+  @override
+  String dayOf(int day, int year) {
+    return 'Day $day of $year';
+  }
+
+  @override
+  String get convertValue => 'Convert Value';
+
+  @override
+  String get toUnit => 'To Unit';
+
+  @override
+  String get convertedValue => 'Converted Value';
+
+  @override
+  String get timeUnits => 'Time Units';
+
+  @override
+  String get findWeekday => 'Find Weekday';
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get weekday => 'Weekday';
+
+  @override
+  String get occurrence => 'Occurrence';
+
+  @override
+  String get first => 'First';
+
+  @override
+  String get second => 'Second';
+
+  @override
+  String get third => 'Third';
+
+  @override
+  String get fourth => 'Fourth';
+
+  @override
+  String get last => 'Last';
+
+  @override
+  String get monday => 'Thứ hai';
+
+  @override
+  String get tuesday => 'Thứ ba';
+
+  @override
+  String get wednesday => 'Thứ tư';
+
+  @override
+  String get thursday => 'Thứ năm';
+
+  @override
+  String get friday => 'Thứ sáu';
+
+  @override
+  String get saturday => 'Thứ bảy';
+
+  @override
+  String get sunday => 'Chủ nhật';
+
+  @override
+  String get january => 'Tháng 1';
+
+  @override
+  String get february => 'Tháng 2';
+
+  @override
+  String get march => 'Tháng 3';
+
+  @override
+  String get april => 'Tháng 4';
+
+  @override
+  String get may => 'Tháng 5';
+
+  @override
+  String get june => 'Tháng 6';
+
+  @override
+  String get july => 'Tháng 7';
+
+  @override
+  String get august => 'Tháng 8';
+
+  @override
+  String get september => 'Tháng 9';
+
+  @override
+  String get october => 'Tháng 10';
+
+  @override
+  String get november => 'Tháng 11';
+
+  @override
+  String get december => 'Tháng 12';
+
+  @override
+  String get dateNotFound => 'Date not found';
+
+  @override
+  String get invalidDate => 'Invalid date';
+
+  @override
+  String get calculationError => 'Calculation error';
+
+  @override
+  String get noHistoryYet => 'Chưa có phép tính nào';
+
+  @override
+  String get performCalculation => 'Perform your first calculation to see history here';
+
+  @override
+  String get confirmClearHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử BMI không?';
+
+  @override
+  String get confirmClearTabData => 'Are you sure you want to clear the data for the current tab?';
+
+  @override
+  String get historyCleared => 'Đã xóa lịch sử BMI';
+
+  @override
+  String get historyItem => 'History Item';
+
+  @override
+  String get loadFromHistory => 'Load from History';
+
+  @override
+  String get deleteFromHistory => 'Delete from History';
+
+  @override
+  String get historyItemDeleted => 'History item deleted';
+
+  @override
   String get restoreExpression => 'Khôi phục biểu thức';
 
   @override
@@ -746,9 +1139,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get noRatesAvailable => 'Chưa có thông tin tỷ giá tiền tệ, đang lấy tỷ giá...';
 
   @override
-  String get liveRates => 'Tỷ giá thời gian thực';
-
-  @override
   String get staticRates => 'Tĩnh';
 
   @override
@@ -765,9 +1155,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get confirm => 'Xác nhận';
-
-  @override
-  String get customizeCurrencies => 'Tùy chỉnh tiền tệ';
 
   @override
   String get addCard => 'Thêm thẻ';
@@ -880,9 +1267,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get aboutThisFeatureDesc => 'Chuyển đổi tiền tệ cho phép bạn quy đổi giữa các loại tiền khác nhau bằng tỷ giá trực tiếp hoặc tỷ giá tĩnh. Hỗ trợ hơn 80 loại tiền tệ trên thế giới.';
 
   @override
-  String get howToUse => 'Cách sử dụng';
-
-  @override
   String get howToUseDesc => '• Thêm hoặc xóa thẻ/dòng cho nhiều phép chuyển đổi\n• Tùy chỉnh các loại tiền hiển thị\n• Chuyển đổi giữa chế độ thẻ và bảng\n• Tỷ giá tự động cập nhật theo cài đặt của bạn';
 
   @override
@@ -922,9 +1306,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get presetNameRequired => 'Tên cấu hình là bắt buộc';
 
   @override
-  String get presetSaved => 'Đã lưu cấu hình thành công';
-
-  @override
   String get presetLoaded => 'Cấu hình đã được tải thành công';
 
   @override
@@ -947,9 +1328,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get noPresetsFound => 'Không tìm thấy cấu hình nào';
-
-  @override
-  String get select => 'Chọn';
 
   @override
   String get delete => 'Xóa';
@@ -1026,11 +1404,6 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String timeRemaining(Object seconds) {
-    return 'Thời gian còn lại: ${seconds}s';
-  }
-
-  @override
   String get fetchingStatus => 'Tình Trạng';
 
   @override
@@ -1046,12 +1419,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dateGenerator => 'Tạo ngày ngẫu nhiên';
-
-  @override
-  String get startDate => 'Ngày bắt đầu';
-
-  @override
-  String get endDate => 'Ngày kết thúc';
 
   @override
   String get dateCount => 'Số lượng ngày';
@@ -1127,9 +1494,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get generatedAt => 'Tạo lúc';
-
-  @override
-  String get noHistoryYet => 'Chưa có phép tính nào';
 
   @override
   String get noHistoryMessage => 'Lịch sử tính toán BMI của bạn sẽ xuất hiện ở đây';
@@ -1387,27 +1751,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get knots => 'Hải lý/giờ';
-
-  @override
-  String get seconds => 'Giây';
-
-  @override
-  String get minutes => 'Phút';
-
-  @override
-  String get hours => 'Giờ';
-
-  @override
-  String get days => 'Ngày';
-
-  @override
-  String get weeks => 'Tuần';
-
-  @override
-  String get months => 'Tháng';
-
-  @override
-  String get years => 'Năm';
 
   @override
   String get bytes => 'Byte';
@@ -2060,13 +2403,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearBmiHistory => 'Xóa lịch sử BMI';
 
   @override
-  String get confirmClearHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử BMI không?';
-
-  @override
   String get confirmClearCalculatorHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử tính toán không?';
-
-  @override
-  String get historyCleared => 'Đã xóa lịch sử BMI';
 
   @override
   String get calculatorHistoryCleared => 'Đã xóa lịch sử tính toán';
@@ -2406,6 +2743,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get maximumSelectionExceeded => 'Vượt quá giới hạn lựa chọn tối đa';
 
   @override
+  String get presetSaved => 'Đã lưu cấu hình thành công';
+
+  @override
   String errorSavingPreset(String error) {
     return 'Lỗi lưu cấu hình: $error';
   }
@@ -2451,7 +2791,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get multipleCardsDesc => 'Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riêng.';
 
   @override
+  String get liveRates => 'Tỷ giá thời gian thực';
+
+  @override
   String get liveRatesDesc => 'Nhận tỷ giá hối đoái thời gian thực từ các nguồn tài chính đáng tin cậy.';
+
+  @override
+  String get customizeCurrencies => 'Tùy chỉnh tiền tệ';
 
   @override
   String get customizeCurrenciesDesc => 'Chọn tiền tệ hiển thị và lưu cấu hình tùy chỉnh.';
@@ -2473,6 +2819,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get stateManagementDesc => 'Trạng thái chuyển đổi của bạn được tự động lưu và khôi phục.';
+
+  @override
+  String get howToUse => 'Cách sử dụng';
 
   @override
   String get step1 => '1. Thêm thẻ';
@@ -3766,6 +4115,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customColor => 'Màu tùy chỉnh';
 
   @override
+  String get select => 'Chọn';
+
+  @override
   String get hue => 'Sắc độ';
 
   @override
@@ -3943,9 +4295,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bmiGrowthPattern => 'Tham khảo ý kiến bác sĩ nhi khoa để đánh giá mô hình tăng trưởng và sức khỏe tổng thể.';
 
   @override
-  String get age => 'Tuổi';
-
-  @override
   String get ageYears => 'Tuổi';
 
   @override
@@ -4090,6 +4439,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get financialHistory => 'Lịch sử Tài chính';
 
   @override
+  String get historyTab => 'Lịch sử';
+
+  @override
   String get loanTab => 'Vay';
 
   @override
@@ -4191,4 +4543,74 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get financialTip5 => 'Tần suất tính lãi cao hơn sẽ tăng lợi nhuận';
+
+  @override
+  String get selectedDate => 'Ngày được chọn';
+
+  @override
+  String get weekdayName => 'Thứ trong tuần';
+
+  @override
+  String get dayInMonth => 'Ngày trong tháng';
+
+  @override
+  String get dayInYear => 'Ngày trong năm';
+
+  @override
+  String get weekInMonth => 'Tuần trong tháng';
+
+  @override
+  String get weekInYear => 'Tuần trong năm';
+
+  @override
+  String get monthName => 'Tháng';
+
+  @override
+  String get monthOfYear => 'Tháng trong năm';
+
+  @override
+  String get yearValue => 'Năm';
+
+  @override
+  String get quarter => 'Quý';
+
+  @override
+  String get quarterOfYear => 'Quý trong năm';
+
+  @override
+  String get isLeapYear => 'Năm nhuận';
+
+  @override
+  String get daysInMonth => 'Số ngày trong tháng';
+
+  @override
+  String get daysInYear => 'Số ngày trong năm';
+
+  @override
+  String get dateInfoResults => 'Kết quả Thông tin Ngày';
+
+  @override
+  String quarterValue(int number) {
+    return 'Q$number';
+  }
+
+  @override
+  String leapYearStatus(String status) {
+    return '$status';
+  }
+
+  @override
+  String get dateDistance => 'Khoảng cách';
+
+  @override
+  String get dateCalculatorInfoHeaderTitle => 'Thông tin Máy tính Ngày';
+
+  @override
+  String get dateCalculatorInfoHeaderSubtitle => 'Công cụ mạnh mẽ cho mọi phép tính về ngày tháng và thời gian.';
+
+  @override
+  String get dateCalculatorMainFeatures => 'Tính năng chính';
+
+  @override
+  String get dateCalculatorUsage => 'Cách sử dụng';
 }

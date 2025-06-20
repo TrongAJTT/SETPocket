@@ -6,6 +6,7 @@ import 'package:setpocket/models/date_calculator_models.dart';
 import 'package:setpocket/services/date_calculator_service.dart';
 import 'package:setpocket/utils/localization_utils.dart';
 import 'package:setpocket/widgets/numeric_stepper_widget.dart';
+import 'package:setpocket/widgets/generic_info_dialog.dart';
 
 class DateCalculatorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -967,30 +968,6 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen> {
     );
   }
 
-  Widget _buildResultRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              '$label:',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   IconData _getTabIcon(DateCalculationType type) {
     switch (type) {
       case DateCalculationType.dateInfo:
@@ -1016,209 +993,169 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen> {
     }
   }
 
-  String _getTabDisplayName(DateCalculationType type, AppLocalizations l10n) {
-    switch (type) {
-      case DateCalculationType.dateInfo:
-        return l10n.dateInfo;
-      case DateCalculationType.dateDifference:
-        return l10n.dateDifference;
-      case DateCalculationType.addSubtract:
-        return l10n.addSubtractDate;
-      case DateCalculationType.age:
-        return l10n.ageCalculator;
-      case DateCalculationType.workingDays:
-        return l10n.workingDays;
-      case DateCalculationType.timezone:
-        return l10n.timezoneConverter;
-      case DateCalculationType.recurring:
-        return l10n.recurringDates;
-      case DateCalculationType.countdown:
-        return l10n.countdown;
-      case DateCalculationType.timeUnit:
-        return l10n.timeUnitConverter;
-      case DateCalculationType.nthWeekday:
-        return l10n.nthWeekday;
-    }
-  }
+  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
 
-  Widget _buildFeatureRow(
-      BuildContext context, IconData icon, String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 28, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+    GenericInfoDialog.show(
+      context: context,
+      title: l10n.dateCalculatorDetailedInfo,
+      overview: l10n.dateCalculatorOverview,
+      headerIcon: Icons.date_range,
+      sections: [
+        // Key Features
+        InfoSection(
+          title: l10n.dateKeyFeatures,
+          icon: Icons.star_outline,
+          color: Colors.indigo,
+          children: [
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.comprehensiveDateCalc,
+                description: l10n.comprehensiveDateCalcDesc,
+                icon: Icons.date_range,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.multipleCalculationModes,
+                description: l10n.multipleCalculationModesDesc,
+                icon: Icons.tab,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.detailedDateInfo,
+                description: l10n.detailedDateInfoDesc,
+                icon: Icons.info_outline,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.flexibleDateInput,
+                description: l10n.flexibleDateInputDesc,
+                icon: Icons.input,
+              ),
+            ),
+          ],
+        ),
+
+        // How to Use
+        InfoSection(
+          title: l10n.dateHowToUse,
+          icon: Icons.help_outline,
+          color: Colors.blue,
+          children: [
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step1Date, description: l10n.step1DateDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step2Date, description: l10n.step2DateDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step3Date, description: l10n.step3DateDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step4Date, description: l10n.step4DateDesc),
+            ),
+          ],
+        ),
+
+        // Calculation Modes
+        InfoSection(
+          title: l10n.dateCalculationModes,
+          icon: Icons.category,
+          color: Colors.orange,
+          children: [
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.dateInfoMode,
+                description: l10n.dateInfoModeDesc,
+                icon: Icons.info_outline,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.dateDifferenceMode,
+                description: l10n.dateDifferenceModeDesc,
+                icon: Icons.compare_arrows,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.addSubtractMode,
+                description: l10n.addSubtractModeDesc,
+                icon: Icons.add_circle_outline,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.ageCalculatorMode,
+                description: l10n.ageCalculatorModeDesc,
+                icon: Icons.cake_outlined,
+              ),
+            ),
+          ],
+        ),
+
+        // Usage Tips
+        InfoSection(
+          title: l10n.dateTips,
+          icon: Icons.lightbulb_outline,
+          color: Colors.green,
+          children: [
+            GenericInfoDialog.buildTipItem(theme, l10n.dateTip1),
+            GenericInfoDialog.buildTipItem(theme, l10n.dateTip2),
+            GenericInfoDialog.buildTipItem(theme, l10n.dateTip3),
+            GenericInfoDialog.buildTipItem(theme, l10n.dateTip4),
+            GenericInfoDialog.buildTipItem(theme, l10n.dateTip5),
+          ],
+        ),
+
+        // Limitations
+        InfoSection(
+          title: l10n.dateLimitations,
+          icon: Icons.warning_outlined,
+          color: Colors.amber,
+          children: [
+            GenericInfoDialog.buildBulletList(
+              theme: theme,
+              description: l10n.dateLimitationsDesc,
+              items: [
+                l10n.dateLimitation1,
+                l10n.dateLimitation2,
+                l10n.dateLimitation3,
+                l10n.dateLimitation4,
+                l10n.dateLimitation5,
               ],
             ),
-          )
-        ],
-      ),
-    );
-  }
-
-  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final maxWidth =
-                constraints.maxWidth > 540 ? 540.0 : constraints.maxWidth;
-            return Center(
-              child: Container(
-                width: maxWidth,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).dialogBackgroundColor,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.12),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(Icons.date_range,
-                                color: Colors.white, size: 32),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(l10n.dateCalculatorInfoHeaderTitle,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                            fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 6),
-                                Text(l10n.dateCalculatorInfoHeaderSubtitle,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Main Features Section
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 0, vertical: 0),
-                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceVariant
-                            .withOpacity(0.5),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(0),
-                          bottomRight: Radius.circular(0),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.star,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 22),
-                              const SizedBox(width: 8),
-                              Text(l10n.dateCalculatorMainFeatures,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          _buildFeatureRow(
-                            context,
-                            Icons.info_outline,
-                            l10n.dateInfo,
-                            l10n.dateInfoTabDescription,
-                          ),
-                          _buildFeatureRow(
-                            context,
-                            Icons.date_range,
-                            l10n.dateDifference,
-                            l10n.dateDifferenceTabDescription,
-                          ),
-                          _buildFeatureRow(
-                            context,
-                            Icons.add_circle_outline,
-                            l10n.addSubtractDate,
-                            l10n.addSubtractTabDescription,
-                          ),
-                          _buildFeatureRow(
-                            context,
-                            Icons.cake_outlined,
-                            l10n.ageCalculator,
-                            l10n.ageCalculatorTabDescription,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Actions
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text(l10n.close),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
+          ],
         ),
-      ),
+
+        // Disclaimer
+        InfoSection(
+          title: 'Lưu ý quan trọng',
+          icon: Icons.info_outline,
+          color: Colors.red,
+          children: [
+            GenericInfoDialog.buildDisclaimer(
+              theme: theme,
+              text: l10n.dateDisclaimer,
+            ),
+          ],
+        ),
+      ],
     );
   }
 

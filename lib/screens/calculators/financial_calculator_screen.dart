@@ -6,6 +6,7 @@ import 'package:setpocket/models/financial_models.dart';
 import 'package:setpocket/services/financial_calculator_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
+import 'package:setpocket/widgets/generic_info_dialog.dart';
 
 class FinancialCalculatorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -1007,57 +1008,221 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
 
   void _showFinancialCalculatorInfo(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
-    showDialog(
+    GenericInfoDialog.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.financialCalculatorDetailedInfo),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.financialCalculatorOverview,
-                style: Theme.of(context).textTheme.bodyMedium,
+      title: l10n.financialCalculatorDetailedInfo,
+      overview: l10n.financialCalculatorOverview,
+      headerIcon: Icons.calculate,
+      sections: [
+        // Key Features
+        InfoSection(
+          title: l10n.financialKeyFeatures,
+          icon: Icons.star_outline,
+          color: Colors.indigo,
+          children: [
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.comprehensiveFinancialCalc,
+                description: l10n.comprehensiveFinancialCalcDesc,
+                icon: Icons.calculate,
               ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.financialCalculationTypes,
-                style: Theme.of(context).textTheme.titleMedium,
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.multipleCalculationTypes,
+                description: l10n.multipleCalculationTypesDesc,
+                icon: Icons.category,
               ),
-              const SizedBox(height: 8),
-              Text('• ${l10n.loanCalculator}'),
-              Text('• ${l10n.investmentCalculator}'),
-              Text('• ${l10n.compoundInterestCalculator}'),
-              const SizedBox(height: 16),
-              Text(
-                l10n.practicalFinancialApplications,
-                style: Theme.of(context).textTheme.titleMedium,
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.realTimeResults,
+                description: l10n.realTimeResultsDesc,
+                icon: Icons.speed,
               ),
-              const SizedBox(height: 8),
-              Text(l10n.financialApplicationsDesc),
-              const SizedBox(height: 16),
-              Text(
-                l10n.financialTips,
-                style: Theme.of(context).textTheme.titleMedium,
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.historySaving,
+                description: l10n.historySavingDesc,
+                icon: Icons.history,
               ),
-              const SizedBox(height: 8),
-              Text('• ${l10n.financialTip1}'),
-              Text('• ${l10n.financialTip2}'),
-              Text('• ${l10n.financialTip3}'),
-              Text('• ${l10n.financialTip4}'),
-              Text('• ${l10n.financialTip5}'),
-            ],
-          ),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.close),
-          ),
-        ],
-      ),
+
+        // How to Use
+        InfoSection(
+          title: l10n.financialHowToUse,
+          icon: Icons.help_outline,
+          color: Colors.blue,
+          children: [
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(
+                  step: l10n.step1Financial,
+                  description: l10n.step1FinancialDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(
+                  step: l10n.step2Financial,
+                  description: l10n.step2FinancialDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(
+                  step: l10n.step3Financial,
+                  description: l10n.step3FinancialDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(
+                  step: l10n.step4Financial,
+                  description: l10n.step4FinancialDesc),
+            ),
+          ],
+        ), // Financial Formulas
+        InfoSection(
+          title: l10n.financialFormulas,
+          icon: Icons.functions,
+          color: Colors.purple,
+          children: [
+            // Loan Formula
+            _buildFormulaCard(
+              theme: theme,
+              title: l10n.loanFormula,
+              formula: l10n.loanFormulaText,
+              description: l10n.loanFormulaDesc,
+            ),
+            const SizedBox(height: 12),
+
+            // Investment Formula
+            _buildFormulaCard(
+              theme: theme,
+              title: l10n.investmentFormula,
+              formula: l10n.investmentFormulaText,
+              description: l10n.investmentFormulaDesc,
+            ),
+            const SizedBox(height: 12),
+
+            // Compound Interest Formula
+            _buildFormulaCard(
+              theme: theme,
+              title: l10n.compoundInterestFormula,
+              formula: l10n.compoundInterestFormulaText,
+              description: l10n.compoundInterestFormulaDesc,
+            ),
+          ],
+        ),
+
+        // Calculation Types
+        InfoSection(
+          title: l10n.financialCalculationTypes,
+          icon: Icons.category,
+          color: Colors.orange,
+          children: [
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.loanCalculator,
+                description: l10n.loanCalculationDesc,
+                icon: Icons.home,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.investmentCalculator,
+                description: l10n.investmentCalculationDesc,
+                icon: Icons.trending_up,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.compoundInterestCalculator,
+                description: l10n.compoundInterestDesc,
+                icon: Icons.savings,
+              ),
+            ),
+          ],
+        ),
+
+        // Practical Applications
+        InfoSection(
+          title: l10n.practicalFinancialApplications,
+          icon: Icons.business_center,
+          color: Colors.teal,
+          children: [
+            GenericInfoDialog.buildBulletList(
+              theme: theme,
+              description: l10n.financialApplicationsDesc,
+              items: [
+                'Thế chấp và vay mua nhà',
+                'Vay mua xe và tài sản',
+                'Kế hoạch tiết kiệm hưu trí',
+                'Quỹ giáo dục con em',
+                'Đầu tư kinh doanh',
+                'Lập kế hoạch tài chính cá nhân',
+              ],
+            ),
+          ],
+        ),
+
+        // Financial Tips
+        InfoSection(
+          title: l10n.financialTips,
+          icon: Icons.lightbulb_outline,
+          color: Colors.green,
+          children: [
+            GenericInfoDialog.buildTipItem(theme, l10n.financialTip1),
+            GenericInfoDialog.buildTipItem(theme, l10n.financialTip2),
+            GenericInfoDialog.buildTipItem(theme, l10n.financialTip3),
+            GenericInfoDialog.buildTipItem(theme, l10n.financialTip4),
+            GenericInfoDialog.buildTipItem(theme, l10n.financialTip5),
+          ],
+        ),
+
+        // Limitations
+        InfoSection(
+          title: l10n.financialLimitations,
+          icon: Icons.warning_outlined,
+          color: Colors.amber,
+          children: [
+            GenericInfoDialog.buildBulletList(
+              theme: theme,
+              description: l10n.financialLimitationsDesc,
+              items: [
+                l10n.financialLimitation1,
+                l10n.financialLimitation2,
+                l10n.financialLimitation3,
+                l10n.financialLimitation4,
+                l10n.financialLimitation5,
+              ],
+            ),
+          ],
+        ),
+
+        // Disclaimer
+        InfoSection(
+          title: 'Lưu ý quan trọng',
+          icon: Icons.info_outline,
+          color: Colors.red,
+          children: [
+            GenericInfoDialog.buildDisclaimer(
+              theme: theme,
+              text: l10n.financialDisclaimer,
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -1071,6 +1236,64 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(AppLocalizations.of(context)!.ok),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormulaCard({
+    required ThemeData theme,
+    required String title,
+    required String formula,
+    required String description,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: theme.colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            child: Text(
+              formula,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

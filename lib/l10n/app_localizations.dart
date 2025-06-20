@@ -8926,6 +8926,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How to Use'**
   String get dateCalculatorUsage;
+
+  /// No description provided for @dateCalculatorDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Calculator Information'**
+  String get dateCalculatorDetailedInfo;
+
+  /// No description provided for @dateCalculatorOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive tool for all date, time, and age calculations with many useful features'**
+  String get dateCalculatorOverview;
+
+  /// No description provided for @dateKeyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get dateKeyFeatures;
+
+  /// No description provided for @comprehensiveDateCalc.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive Calculations'**
+  String get comprehensiveDateCalc;
+
+  /// No description provided for @comprehensiveDateCalcDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Full support for date, time, and age calculations'**
+  String get comprehensiveDateCalcDesc;
+
+  /// No description provided for @multipleCalculationModes.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Calculation Modes'**
+  String get multipleCalculationModes;
+
+  /// No description provided for @multipleCalculationModesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'4 different modes: date info, date difference, add/subtract dates, age calculation'**
+  String get multipleCalculationModesDesc;
+
+  /// No description provided for @detailedDateInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed Information'**
+  String get detailedDateInfo;
+
+  /// No description provided for @detailedDateInfoDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Display complete date information: weekday, week, quarter, leap year'**
+  String get detailedDateInfoDesc;
+
+  /// No description provided for @flexibleDateInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Flexible Input'**
+  String get flexibleDateInput;
+
+  /// No description provided for @flexibleDateInputDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support multiple ways to input dates with easy adjustments'**
+  String get flexibleDateInputDesc;
+
+  /// No description provided for @dateHowToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get dateHowToUse;
+
+  /// No description provided for @step1Date.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Select calculation mode'**
+  String get step1Date;
+
+  /// No description provided for @step1DateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose appropriate tab: Date Info, Date Difference, Add/Subtract Date, or Age Calculator'**
+  String get step1DateDesc;
+
+  /// No description provided for @step2Date.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Input dates'**
+  String get step2Date;
+
+  /// No description provided for @step2DateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use date picker or stepper to input the dates for calculation'**
+  String get step2DateDesc;
+
+  /// No description provided for @step3Date.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: View results'**
+  String get step3Date;
+
+  /// No description provided for @step3DateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Results will be displayed immediately with detailed information'**
+  String get step3DateDesc;
+
+  /// No description provided for @step4Date.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Save to history'**
+  String get step4Date;
+
+  /// No description provided for @step4DateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are automatically saved to history for future reference'**
+  String get step4DateDesc;
+
+  /// No description provided for @dateCalculationModes.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation Modes'**
+  String get dateCalculationModes;
+
+  /// No description provided for @dateInfoMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Information'**
+  String get dateInfoMode;
+
+  /// No description provided for @dateInfoModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Display detailed information about a specific date'**
+  String get dateInfoModeDesc;
+
+  /// No description provided for @dateDifferenceMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Difference'**
+  String get dateDifferenceMode;
+
+  /// No description provided for @dateDifferenceModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate the difference between any two dates'**
+  String get dateDifferenceModeDesc;
+
+  /// No description provided for @addSubtractMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Add/Subtract Date'**
+  String get addSubtractMode;
+
+  /// No description provided for @addSubtractModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or subtract days/months/years from a date'**
+  String get addSubtractModeDesc;
+
+  /// No description provided for @ageCalculatorMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Age Calculator'**
+  String get ageCalculatorMode;
+
+  /// No description provided for @ageCalculatorModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate exact age from birth date to present or another date'**
+  String get ageCalculatorModeDesc;
+
+  /// No description provided for @dateTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage Tips'**
+  String get dateTips;
+
+  /// No description provided for @dateTip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Use date picker to select dates quickly'**
+  String get dateTip1;
+
+  /// No description provided for @dateTip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Use stepper to adjust individual date/month/year components'**
+  String get dateTip2;
+
+  /// No description provided for @dateTip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Check history to review previous calculations'**
+  String get dateTip3;
+
+  /// No description provided for @dateTip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay attention to leap years when calculating long periods'**
+  String get dateTip4;
+
+  /// No description provided for @dateTip5.
+  ///
+  /// In en, this message translates to:
+  /// **'Use date info mode to check weekday of important dates'**
+  String get dateTip5;
+
+  /// No description provided for @dateLimitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Important Notes'**
+  String get dateLimitations;
+
+  /// No description provided for @dateLimitationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Some important points to consider when using the date calculator:'**
+  String get dateLimitationsDesc;
+
+  /// No description provided for @dateLimitation1.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are based on the Gregorian calendar'**
+  String get dateLimitation1;
+
+  /// No description provided for @dateLimitation2.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not account for time zones in calculations'**
+  String get dateLimitation2;
+
+  /// No description provided for @dateLimitation3.
+  ///
+  /// In en, this message translates to:
+  /// **'Leap years are calculated according to international standards'**
+  String get dateLimitation3;
+
+  /// No description provided for @dateLimitation4.
+  ///
+  /// In en, this message translates to:
+  /// **'Results may differ from other calendar systems'**
+  String get dateLimitation4;
+
+  /// No description provided for @dateLimitation5.
+  ///
+  /// In en, this message translates to:
+  /// **'Should double-check results for important calculations'**
+  String get dateLimitation5;
+
+  /// No description provided for @dateDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This tool provides date information based on the standard Gregorian calendar. Results are for reference only and may require additional verification for important applications.'**
+  String get dateDisclaimer;
+
+  /// No description provided for @financialKeyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get financialKeyFeatures;
+
+  /// No description provided for @comprehensiveFinancialCalc.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive Calculations'**
+  String get comprehensiveFinancialCalc;
+
+  /// No description provided for @comprehensiveFinancialCalcDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Versatile financial calculator for loans, investments, and compound interest'**
+  String get comprehensiveFinancialCalcDesc;
+
+  /// No description provided for @multipleCalculationTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Calculation Types'**
+  String get multipleCalculationTypes;
+
+  /// No description provided for @multipleCalculationTypesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support for loan, investment, and compound interest calculations in one app'**
+  String get multipleCalculationTypesDesc;
+
+  /// No description provided for @realTimeResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Results'**
+  String get realTimeResults;
+
+  /// No description provided for @realTimeResultsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get detailed results instantly as you input data'**
+  String get realTimeResultsDesc;
+
+  /// No description provided for @historySaving.
+  ///
+  /// In en, this message translates to:
+  /// **'History Saving'**
+  String get historySaving;
+
+  /// No description provided for @historySavingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and review previous calculations for reference'**
+  String get historySavingDesc;
+
+  /// No description provided for @financialHowToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get financialHowToUse;
+
+  /// No description provided for @step1Financial.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Select calculation type'**
+  String get step1Financial;
+
+  /// No description provided for @step1FinancialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Loan, Investment, or Compound Interest tab based on your needs'**
+  String get step1FinancialDesc;
+
+  /// No description provided for @step2Financial.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Enter information'**
+  String get step2Financial;
+
+  /// No description provided for @step2FinancialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in required information like amount, interest rate, time period'**
+  String get step2FinancialDesc;
+
+  /// No description provided for @step3Financial.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Calculate'**
+  String get step3Financial;
+
+  /// No description provided for @step3FinancialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Press the calculate button to view detailed results'**
+  String get step3FinancialDesc;
+
+  /// No description provided for @step4Financial.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Save results'**
+  String get step4Financial;
+
+  /// No description provided for @step4FinancialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save results to history for future reference'**
+  String get step4FinancialDesc;
+
+  /// No description provided for @financialFormulas.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Formulas'**
+  String get financialFormulas;
+
+  /// No description provided for @loanFormula.
+  ///
+  /// In en, this message translates to:
+  /// **'Loan Formula'**
+  String get loanFormula;
+
+  /// No description provided for @loanFormulaText.
+  ///
+  /// In en, this message translates to:
+  /// **'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]'**
+  String get loanFormulaText;
+
+  /// No description provided for @loanFormulaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'M: Monthly payment, P: Loan amount, r: Monthly interest rate, n: Number of months'**
+  String get loanFormulaDesc;
+
+  /// No description provided for @investmentFormula.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Formula'**
+  String get investmentFormula;
+
+  /// No description provided for @investmentFormulaText.
+  ///
+  /// In en, this message translates to:
+  /// **'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]'**
+  String get investmentFormulaText;
+
+  /// No description provided for @investmentFormulaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'FV: Future value, PV: Initial investment, PMT: Monthly contribution, r: Interest rate, n: Number of periods'**
+  String get investmentFormulaDesc;
+
+  /// No description provided for @compoundInterestFormula.
+  ///
+  /// In en, this message translates to:
+  /// **'Compound Interest Formula'**
+  String get compoundInterestFormula;
+
+  /// No description provided for @compoundInterestFormulaText.
+  ///
+  /// In en, this message translates to:
+  /// **'A = P(1 + r/n)^(nt)'**
+  String get compoundInterestFormulaText;
+
+  /// No description provided for @compoundInterestFormulaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A: Final amount, P: Principal, r: Interest rate, n: Compounding frequency, t: Time'**
+  String get compoundInterestFormulaDesc;
+
+  /// No description provided for @financialLimitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Important Notes'**
+  String get financialLimitations;
+
+  /// No description provided for @financialLimitationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The calculation results are for reference only and may not accurately reflect real-world situations:'**
+  String get financialLimitationsDesc;
+
+  /// No description provided for @financialLimitation1.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not account for inflation and market volatility'**
+  String get financialLimitation1;
+
+  /// No description provided for @financialLimitation2.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest rates may change over time'**
+  String get financialLimitation2;
+
+  /// No description provided for @financialLimitation3.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not include fees and additional costs'**
+  String get financialLimitation3;
+
+  /// No description provided for @financialLimitation4.
+  ///
+  /// In en, this message translates to:
+  /// **'Results may differ based on actual terms and conditions'**
+  String get financialLimitation4;
+
+  /// No description provided for @financialLimitation5.
+  ///
+  /// In en, this message translates to:
+  /// **'Should consult financial professionals for advice'**
+  String get financialLimitation5;
+
+  /// No description provided for @financialDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.'**
+  String get financialDisclaimer;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

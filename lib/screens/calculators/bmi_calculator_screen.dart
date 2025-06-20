@@ -6,6 +6,7 @@ import 'package:setpocket/services/bmi_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/widgets/calculator_layout.dart';
 import 'package:setpocket/widgets/calculator_content/bmi_calculator_content.dart';
+import 'package:setpocket/widgets/generic_info_dialog.dart';
 
 class BmiCalculatorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -108,627 +109,208 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
   void _showBmiInfo(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 800;
 
-    showDialog(
+    GenericInfoDialog.show(
       context: context,
-      builder: (context) => Dialog(
-        child: Container(
-          width: isDesktop ? 700 : screenWidth * 0.9,
-          height: isDesktop ? 800 : MediaQuery.of(context).size.height * 0.85,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.primary.withValues(alpha: 0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color:
-                            theme.colorScheme.onPrimary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.monitor_weight,
-                        color: theme.colorScheme.onPrimary,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.bmiDetailedInfo,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              color: theme.colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            l10n.bmiOverview,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onPrimary
-                                  .withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // BMI Formula
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiFormula,
-                        Icons.calculate,
-                        Colors.indigo,
-                        [
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.indigo.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    color:
-                                        Colors.indigo.withValues(alpha: 0.3)),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'BMI = Weight (kg) / [Height (m)]²',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontFamily: 'monospace',
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.indigo,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Key Features
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiKeyFeatures,
-                        Icons.star_outline,
-                        Colors.orange,
-                        [
-                          _buildFeatureItem(theme, l10n.comprehensiveBmiCalc,
-                              l10n.comprehensiveBmiCalcDesc, Icons.calculate),
-                          _buildFeatureItem(theme, l10n.multipleUnitSystems,
-                              l10n.multipleUnitSystemsDesc, Icons.straighten),
-                          _buildFeatureItem(theme, l10n.healthInsights,
-                              l10n.healthInsightsDesc, Icons.insights),
-                          _buildFeatureItem(theme, l10n.calculationHistory,
-                              l10n.calculationHistoryDesc, Icons.history),
-                          _buildFeatureItem(theme, l10n.ageGenderConsideration,
-                              l10n.ageGenderConsiderationDesc, Icons.people),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // How to Use
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiHowToUse,
-                        Icons.help_outline,
-                        Colors.blue,
-                        [
-                          _buildStepItem(
-                              theme, l10n.step1Bmi, l10n.step1BmiDesc),
-                          _buildStepItem(
-                              theme, l10n.step2Bmi, l10n.step2BmiDesc),
-                          _buildStepItem(
-                              theme, l10n.step3Bmi, l10n.step3BmiDesc),
-                          _buildStepItem(
-                              theme, l10n.step4Bmi, l10n.step4BmiDesc),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // BMI Scale with enhanced information
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiScale,
-                        Icons.category,
-                        Colors.purple,
-                        [
-                          // Adult BMI Scale
-                          _buildBmiScaleHeader(theme, l10n.bmiAdultTitle),
-                          ...BmiService.getBmiRangesForAge(l10n, 18)
-                              .map((range) => _buildBmiRangeItem(
-                                    theme,
-                                    range['category'],
-                                    range['range'],
-                                    range['color'],
-                                    range['description'],
-                                  ))
-                              .toList(),
-
-                          const SizedBox(height: 16),
-
-                          // Pediatric BMI Scale
-                          _buildBmiScaleHeader(theme, l10n.bmiPediatricTitle),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            child: Text(
-                              l10n.bmiPercentileNote,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                          ...BmiService.getBmiRangesForAge(l10n, 16)
-                              .map((range) => _buildBmiRangeItem(
-                                    theme,
-                                    range['category'],
-                                    range['range'],
-                                    range['color'],
-                                    range['description'],
-                                  ))
-                              .toList(),
-
-                          _buildAgeConsiderations(theme, l10n),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Health Tips
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiTips,
-                        Icons.lightbulb_outline,
-                        Colors.green,
-                        [
-                          _buildTipItem(theme, l10n.tip1Bmi),
-                          _buildTipItem(theme, l10n.tip2Bmi),
-                          _buildTipItem(theme, l10n.tip3Bmi),
-                          _buildTipItem(theme, l10n.tip4Bmi),
-                          _buildTipItem(theme, l10n.tip5Bmi),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Limitations with detailed information
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiLimitations,
-                        Icons.warning_outlined,
-                        Colors.amber,
-                        [
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.bmiLimitationsDesc,
-                                  style: theme.textTheme.bodyMedium,
-                                ),
-                                const SizedBox(height: 12),
-                                ...BmiService.getBmiDetailedInfo(
-                                        l10n)['limitations']
-                                    .map<Widget>((limitation) => Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 2),
-                                          child: Text(
-                                            "• $limitation",
-                                            style: theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                              color: theme
-                                                  .colorScheme.onSurfaceVariant,
-                                            ),
-                                          ),
-                                        ))
-                                    .toList(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // When to Consult Healthcare Professionals
-                      _buildInfoSection(
-                        theme,
-                        l10n.bmiPracticalApplications,
-                        Icons.medical_services,
-                        Colors.teal,
-                        [
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.bmiPracticalApplicationsDesc,
-                                  style: theme.textTheme.bodyMedium,
-                                ),
-                                const SizedBox(height: 12),
-                                ...BmiService.getBmiDetailedInfo(
-                                        l10n)['whenToConsult']
-                                    .map<Widget>((consultation) => Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 2),
-                                          child: Text(
-                                            "• $consultation",
-                                            style: theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                              color: theme
-                                                  .colorScheme.onSurfaceVariant,
-                                            ),
-                                          ),
-                                        ))
-                                    .toList(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Disclaimer
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer
-                              .withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color:
-                                theme.colorScheme.error.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: theme.colorScheme.error,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                l10n.bmiLimitationReminder,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.error,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Footer
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.3),
-                  border: Border(
-                    top: BorderSide(
-                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.check),
-                      label: Text(l10n.close),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+      title: l10n.bmiDetailedInfo,
+      overview: l10n.bmiOverview,
+      headerIcon: Icons.monitor_weight,
+      sections: [
+        // BMI Formula
+        InfoSection(
+          title: l10n.bmiFormula,
+          icon: Icons.calculate,
+          color: Colors.indigo,
+          children: [
+            GenericInfoDialog.buildBmiFormula(
+                theme, 'BMI = Weight (kg) / [Height (m)]²'),
+          ],
         ),
-      ),
-    );
-  }
 
-  Widget _buildInfoSection(ThemeData theme, String title, IconData icon,
-      Color color, List<Widget> children) {
-    return Card(
-      elevation: 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+        // Key Features
+        InfoSection(
+          title: l10n.bmiKeyFeatures,
+          icon: Icons.star_outline,
+          color: Colors.orange,
+          children: [
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.comprehensiveBmiCalc,
+                description: l10n.comprehensiveBmiCalcDesc,
+                icon: Icons.calculate,
               ),
             ),
-            child: Row(
-              children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ],
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.multipleUnitSystems,
+                description: l10n.multipleUnitSystemsDesc,
+                icon: Icons.straighten,
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4),
-            child: Column(children: children),
-          ),
-        ],
-      ),
-    );
-  }
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.healthInsights,
+                description: l10n.healthInsightsDesc,
+                icon: Icons.insights,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.calculationHistory,
+                description: l10n.calculationHistoryDesc,
+                icon: Icons.history,
+              ),
+            ),
+            GenericInfoDialog.buildFeatureItem(
+              theme,
+              FeatureItem(
+                title: l10n.ageGenderConsideration,
+                description: l10n.ageGenderConsiderationDesc,
+                icon: Icons.people,
+              ),
+            ),
+          ],
+        ),
 
-  Widget _buildFeatureItem(
-      ThemeData theme, String title, String description, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+        // How to Use
+        InfoSection(
+          title: l10n.bmiHowToUse,
+          icon: Icons.help_outline,
+          color: Colors.blue,
+          children: [
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step1Bmi, description: l10n.step1BmiDesc),
             ),
-            child: Icon(icon, size: 16, color: theme.colorScheme.primary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step2Bmi, description: l10n.step2BmiDesc),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step3Bmi, description: l10n.step3BmiDesc),
+            ),
+            GenericInfoDialog.buildStepItem(
+              theme,
+              StepItem(step: l10n.step4Bmi, description: l10n.step4BmiDesc),
+            ),
+          ],
+        ),
 
-  Widget _buildStepItem(ThemeData theme, String step, String description) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
+        // BMI Scale
+        InfoSection(
+          title: l10n.bmiScale,
+          icon: Icons.category,
+          color: Colors.purple,
+          children: [
+            // Adult BMI Scale
+            GenericInfoDialog.buildBmiScaleHeader(theme, l10n.bmiAdultTitle),
+            ...BmiService.getBmiRangesForAge(l10n, 18)
+                .map((range) => GenericInfoDialog.buildBmiRangeItem(
+                      theme: theme,
+                      category: range['category'],
+                      range: range['range'],
+                      color: range['color'],
+                      description: range['description'],
+                    ))
+                .toList(),
+
+            const SizedBox(height: 16),
+
+            // Pediatric BMI Scale
+            GenericInfoDialog.buildBmiScaleHeader(
+                theme, l10n.bmiPediatricTitle),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: Text(
-                step.substring(5, 6), // Extract step number
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
+                l10n.bmiPercentileNote,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  step,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+            ...BmiService.getBmiRangesForAge(l10n, 16)
+                .map((range) => GenericInfoDialog.buildBmiRangeItem(
+                      theme: theme,
+                      category: range['category'],
+                      range: range['range'],
+                      color: range['color'],
+                      description: range['description'],
+                    ))
+                .toList(),
 
-  Widget _buildTipItem(ThemeData theme, String tip) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-      child: Text(
-        "• $tip",
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
+            GenericInfoDialog.buildAgeConsiderations(
+              theme: theme,
+              elderlyNote: l10n.bmiElderlyNote,
+              youthNote: l10n.bmiYouthNote,
+            ),
+          ],
         ),
-      ),
-    );
-  }
 
-  Widget _buildBmiRangeItem(ThemeData theme, String category, String range,
-      Color color, String description) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      category,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      range,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        // Health Tips
+        InfoSection(
+          title: l10n.bmiTips,
+          icon: Icons.lightbulb_outline,
+          color: Colors.green,
+          children: [
+            GenericInfoDialog.buildTipItem(theme, l10n.tip1Bmi),
+            GenericInfoDialog.buildTipItem(theme, l10n.tip2Bmi),
+            GenericInfoDialog.buildTipItem(theme, l10n.tip3Bmi),
+            GenericInfoDialog.buildTipItem(theme, l10n.tip4Bmi),
+            GenericInfoDialog.buildTipItem(theme, l10n.tip5Bmi),
+          ],
+        ),
 
-  Widget _buildBmiScaleHeader(ThemeData theme, String title) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+        // Limitations
+        InfoSection(
+          title: l10n.bmiLimitations,
+          icon: Icons.warning_outlined,
+          color: Colors.amber,
+          children: [
+            GenericInfoDialog.buildBulletList(
+              theme: theme,
+              description: l10n.bmiLimitationsDesc,
+              items: BmiService.getBmiDetailedInfo(l10n)['limitations']
+                  .map<String>((limitation) => limitation.toString())
+                  .toList(),
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
 
-  Widget _buildAgeConsiderations(ThemeData theme, AppLocalizations l10n) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
-          Text(
-            'Age Considerations:',
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.purple,
+        // When to Consult Healthcare Professionals
+        InfoSection(
+          title: l10n.bmiPracticalApplications,
+          icon: Icons.medical_services,
+          color: Colors.teal,
+          children: [
+            GenericInfoDialog.buildBulletList(
+              theme: theme,
+              description: l10n.bmiPracticalApplicationsDesc,
+              items: BmiService.getBmiDetailedInfo(l10n)['whenToConsult']
+                  .map<String>((consultation) => consultation.toString())
+                  .toList(),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.bmiElderlyNote,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          ],
+        ),
+
+        // Disclaimer
+        InfoSection(
+          title: 'Important Notice',
+          icon: Icons.info_outline,
+          color: Colors.red,
+          children: [
+            GenericInfoDialog.buildDisclaimer(
+              theme: theme,
+              text: l10n.bmiLimitationReminder,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.bmiYouthNote,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

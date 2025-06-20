@@ -4613,4 +4613,241 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dateCalculatorUsage => 'Cách sử dụng';
+
+  @override
+  String get dateCalculatorDetailedInfo => 'Thông tin Máy tính Ngày';
+
+  @override
+  String get dateCalculatorOverview => 'Công cụ toàn diện cho mọi phép tính về ngày tháng, thời gian và tuổi với nhiều tính năng hữu ích';
+
+  @override
+  String get dateKeyFeatures => 'Tính năng chính';
+
+  @override
+  String get comprehensiveDateCalc => 'Tính toán Toàn diện';
+
+  @override
+  String get comprehensiveDateCalcDesc => 'Hỗ trợ đầy đủ các phép tính về ngày tháng, thời gian và tuổi';
+
+  @override
+  String get multipleCalculationModes => 'Nhiều chế độ Tính toán';
+
+  @override
+  String get multipleCalculationModesDesc => '4 chế độ khác nhau: thông tin ngày, hiệu số ngày, cộng/trừ ngày, tính tuổi';
+
+  @override
+  String get detailedDateInfo => 'Thông tin Chi tiết';
+
+  @override
+  String get detailedDateInfoDesc => 'Hiển thị đầy đủ thông tin về ngày: thứ, tuần, quý, năm nhuận';
+
+  @override
+  String get flexibleDateInput => 'Nhập linh hoạt';
+
+  @override
+  String get flexibleDateInputDesc => 'Hỗ trợ nhiều cách nhập ngày và điều chỉnh dễ dàng';
+
+  @override
+  String get dateHowToUse => 'Cách sử dụng';
+
+  @override
+  String get step1Date => 'Bước 1: Chọn chế độ tính toán';
+
+  @override
+  String get step1DateDesc => 'Chọn tab phù hợp: Thông tin ngày, Hiệu số ngày, Cộng/trừ ngày, hoặc Tính tuổi';
+
+  @override
+  String get step2Date => 'Bước 2: Nhập ngày tháng';
+
+  @override
+  String get step2DateDesc => 'Sử dụng date picker hoặc stepper để nhập ngày cần tính toán';
+
+  @override
+  String get step3Date => 'Bước 3: Xem kết quả';
+
+  @override
+  String get step3DateDesc => 'Kết quả sẽ được hiển thị ngay lập tức với thông tin chi tiết';
+
+  @override
+  String get step4Date => 'Bước 4: Lưu vào lịch sử';
+
+  @override
+  String get step4DateDesc => 'Kết quả được tự động lưu vào lịch sử để tham khảo sau này';
+
+  @override
+  String get dateCalculationModes => 'Chế độ Tính toán';
+
+  @override
+  String get dateInfoMode => 'Thông tin Ngày';
+
+  @override
+  String get dateInfoModeDesc => 'Hiển thị thông tin chi tiết về một ngày cụ thể';
+
+  @override
+  String get dateDifferenceMode => 'Hiệu số Ngày';
+
+  @override
+  String get dateDifferenceModeDesc => 'Tính khoảng cách giữa hai ngày bất kỳ';
+
+  @override
+  String get addSubtractMode => 'Cộng/Trừ Ngày';
+
+  @override
+  String get addSubtractModeDesc => 'Cộng hoặc trừ số ngày/tháng/năm từ một ngày';
+
+  @override
+  String get ageCalculatorMode => 'Tính Tuổi';
+
+  @override
+  String get ageCalculatorModeDesc => 'Tính tuổi chính xác từ ngày sinh đến hiện tại hoặc ngày khác';
+
+  @override
+  String get dateTips => 'Mẹo sử dụng';
+
+  @override
+  String get dateTip1 => 'Sử dụng date picker để chọn ngày nhanh chóng';
+
+  @override
+  String get dateTip2 => 'Dùng stepper để điều chỉnh từng thành phần ngày/tháng/năm';
+
+  @override
+  String get dateTip3 => 'Kiểm tra lịch sử để xem lại các tính toán trước đó';
+
+  @override
+  String get dateTip4 => 'Chú ý đến năm nhuận khi tính toán các khoảng thời gian dài';
+
+  @override
+  String get dateTip5 => 'Sử dụng chế độ thông tin ngày để kiểm tra thứ của ngày quan trọng';
+
+  @override
+  String get dateLimitations => 'Lưu ý quan trọng';
+
+  @override
+  String get dateLimitationsDesc => 'Một số điểm cần lưu ý khi sử dụng máy tính ngày:';
+
+  @override
+  String get dateLimitation1 => 'Kết quả dựa trên lịch Gregorian (lịch dương)';
+
+  @override
+  String get dateLimitation2 => 'Không tính đến múi giờ trong các phép tính';
+
+  @override
+  String get dateLimitation3 => 'Năm nhuận được tính theo quy tắc chuẩn quốc tế';
+
+  @override
+  String get dateLimitation4 => 'Kết quả có thể khác biệt với một số hệ thống lịch khác';
+
+  @override
+  String get dateLimitation5 => 'Nên kiểm tra lại kết quả cho các tính toán quan trọng';
+
+  @override
+  String get dateDisclaimer => 'Công cụ này cung cấp thông tin ngày tháng dựa trên lịch Gregorian tiêu chuẩn. Kết quả chỉ mang tính chất tham khảo và có thể cần xác minh thêm cho các ứng dụng quan trọng.';
+
+  @override
+  String get financialKeyFeatures => 'Tính năng chính';
+
+  @override
+  String get comprehensiveFinancialCalc => 'Tính toán Toàn diện';
+
+  @override
+  String get comprehensiveFinancialCalcDesc => 'Công cụ tính toán tài chính đa năng cho vay, đầu tư và lãi kép';
+
+  @override
+  String get multipleCalculationTypes => 'Nhiều loại Tính toán';
+
+  @override
+  String get multipleCalculationTypesDesc => 'Hỗ trợ tính toán vay, đầu tư và lãi kép trong một ứng dụng';
+
+  @override
+  String get realTimeResults => 'Kết quả Thời gian thực';
+
+  @override
+  String get realTimeResultsDesc => 'Nhận ngay kết quả chi tiết khi nhập dữ liệu';
+
+  @override
+  String get historySaving => 'Lưu Lịch sử';
+
+  @override
+  String get historySavingDesc => 'Lưu và xem lại các tính toán trước đó cho tham khảo';
+
+  @override
+  String get financialHowToUse => 'Cách sử dụng';
+
+  @override
+  String get step1Financial => 'Bước 1: Chọn loại tính toán';
+
+  @override
+  String get step1FinancialDesc => 'Chọn tab Vay, Đầu tư hoặc Lãi kép tùy theo nhu cầu';
+
+  @override
+  String get step2Financial => 'Bước 2: Nhập thông tin';
+
+  @override
+  String get step2FinancialDesc => 'Điền các thông tin cần thiết như số tiền, lãi suất, thời gian';
+
+  @override
+  String get step3Financial => 'Bước 3: Tính toán';
+
+  @override
+  String get step3FinancialDesc => 'Nhấn nút tính toán để xem kết quả chi tiết';
+
+  @override
+  String get step4Financial => 'Bước 4: Lưu kết quả';
+
+  @override
+  String get step4FinancialDesc => 'Lưu kết quả vào lịch sử để tham khảo sau này';
+
+  @override
+  String get financialFormulas => 'Công thức Tài chính';
+
+  @override
+  String get loanFormula => 'Công thức Vay';
+
+  @override
+  String get loanFormulaText => 'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]';
+
+  @override
+  String get loanFormulaDesc => 'M: Thanh toán hàng tháng, P: Số tiền vay, r: Lãi suất hàng tháng, n: Số tháng';
+
+  @override
+  String get investmentFormula => 'Công thức Đầu tư';
+
+  @override
+  String get investmentFormulaText => 'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]';
+
+  @override
+  String get investmentFormulaDesc => 'FV: Giá trị tương lai, PV: Đầu tư ban đầu, PMT: Đóng góp hàng tháng, r: Lãi suất, n: Số kỳ';
+
+  @override
+  String get compoundInterestFormula => 'Công thức Lãi kép';
+
+  @override
+  String get compoundInterestFormulaText => 'A = P(1 + r/n)^(nt)';
+
+  @override
+  String get compoundInterestFormulaDesc => 'A: Số tiền cuối, P: Tiền gốc, r: Lãi suất, n: Tần suất ghép, t: Thời gian';
+
+  @override
+  String get financialLimitations => 'Lưu ý quan trọng';
+
+  @override
+  String get financialLimitationsDesc => 'Các kết quả tính toán chỉ mang tính chất tham khảo và có thể không phản ánh chính xác tình hình thực tế:';
+
+  @override
+  String get financialLimitation1 => 'Không tính đến lạm phát và biến động thị trường';
+
+  @override
+  String get financialLimitation2 => 'Lãi suất có thể thay đổi theo thời gian';
+
+  @override
+  String get financialLimitation3 => 'Không bao gồm phí và chi phí phát sinh';
+
+  @override
+  String get financialLimitation4 => 'Kết quả có thể khác biệt tùy theo điều khoản thực tế';
+
+  @override
+  String get financialLimitation5 => 'Nên tham khảo ý kiến chuyên gia tài chính';
+
+  @override
+  String get financialDisclaimer => 'Công cụ này chỉ mang tính chất hỗ trợ tính toán và không thay thế cho lời khuyên tài chính chuyên nghiệp. Hãy tham khảo ý kiến chuyên gia trước khi đưa ra quyết định tài chính quan trọng.';
 }

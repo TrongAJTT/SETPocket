@@ -4613,4 +4613,241 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateCalculatorUsage => 'How to Use';
+
+  @override
+  String get dateCalculatorDetailedInfo => 'Date Calculator Information';
+
+  @override
+  String get dateCalculatorOverview => 'Comprehensive tool for all date, time, and age calculations with many useful features';
+
+  @override
+  String get dateKeyFeatures => 'Key Features';
+
+  @override
+  String get comprehensiveDateCalc => 'Comprehensive Calculations';
+
+  @override
+  String get comprehensiveDateCalcDesc => 'Full support for date, time, and age calculations';
+
+  @override
+  String get multipleCalculationModes => 'Multiple Calculation Modes';
+
+  @override
+  String get multipleCalculationModesDesc => '4 different modes: date info, date difference, add/subtract dates, age calculation';
+
+  @override
+  String get detailedDateInfo => 'Detailed Information';
+
+  @override
+  String get detailedDateInfoDesc => 'Display complete date information: weekday, week, quarter, leap year';
+
+  @override
+  String get flexibleDateInput => 'Flexible Input';
+
+  @override
+  String get flexibleDateInputDesc => 'Support multiple ways to input dates with easy adjustments';
+
+  @override
+  String get dateHowToUse => 'How to Use';
+
+  @override
+  String get step1Date => 'Step 1: Select calculation mode';
+
+  @override
+  String get step1DateDesc => 'Choose appropriate tab: Date Info, Date Difference, Add/Subtract Date, or Age Calculator';
+
+  @override
+  String get step2Date => 'Step 2: Input dates';
+
+  @override
+  String get step2DateDesc => 'Use date picker or stepper to input the dates for calculation';
+
+  @override
+  String get step3Date => 'Step 3: View results';
+
+  @override
+  String get step3DateDesc => 'Results will be displayed immediately with detailed information';
+
+  @override
+  String get step4Date => 'Step 4: Save to history';
+
+  @override
+  String get step4DateDesc => 'Results are automatically saved to history for future reference';
+
+  @override
+  String get dateCalculationModes => 'Calculation Modes';
+
+  @override
+  String get dateInfoMode => 'Date Information';
+
+  @override
+  String get dateInfoModeDesc => 'Display detailed information about a specific date';
+
+  @override
+  String get dateDifferenceMode => 'Date Difference';
+
+  @override
+  String get dateDifferenceModeDesc => 'Calculate the difference between any two dates';
+
+  @override
+  String get addSubtractMode => 'Add/Subtract Date';
+
+  @override
+  String get addSubtractModeDesc => 'Add or subtract days/months/years from a date';
+
+  @override
+  String get ageCalculatorMode => 'Age Calculator';
+
+  @override
+  String get ageCalculatorModeDesc => 'Calculate exact age from birth date to present or another date';
+
+  @override
+  String get dateTips => 'Usage Tips';
+
+  @override
+  String get dateTip1 => 'Use date picker to select dates quickly';
+
+  @override
+  String get dateTip2 => 'Use stepper to adjust individual date/month/year components';
+
+  @override
+  String get dateTip3 => 'Check history to review previous calculations';
+
+  @override
+  String get dateTip4 => 'Pay attention to leap years when calculating long periods';
+
+  @override
+  String get dateTip5 => 'Use date info mode to check weekday of important dates';
+
+  @override
+  String get dateLimitations => 'Important Notes';
+
+  @override
+  String get dateLimitationsDesc => 'Some important points to consider when using the date calculator:';
+
+  @override
+  String get dateLimitation1 => 'Results are based on the Gregorian calendar';
+
+  @override
+  String get dateLimitation2 => 'Does not account for time zones in calculations';
+
+  @override
+  String get dateLimitation3 => 'Leap years are calculated according to international standards';
+
+  @override
+  String get dateLimitation4 => 'Results may differ from other calendar systems';
+
+  @override
+  String get dateLimitation5 => 'Should double-check results for important calculations';
+
+  @override
+  String get dateDisclaimer => 'This tool provides date information based on the standard Gregorian calendar. Results are for reference only and may require additional verification for important applications.';
+
+  @override
+  String get financialKeyFeatures => 'Key Features';
+
+  @override
+  String get comprehensiveFinancialCalc => 'Comprehensive Calculations';
+
+  @override
+  String get comprehensiveFinancialCalcDesc => 'Versatile financial calculator for loans, investments, and compound interest';
+
+  @override
+  String get multipleCalculationTypes => 'Multiple Calculation Types';
+
+  @override
+  String get multipleCalculationTypesDesc => 'Support for loan, investment, and compound interest calculations in one app';
+
+  @override
+  String get realTimeResults => 'Real-time Results';
+
+  @override
+  String get realTimeResultsDesc => 'Get detailed results instantly as you input data';
+
+  @override
+  String get historySaving => 'History Saving';
+
+  @override
+  String get historySavingDesc => 'Save and review previous calculations for reference';
+
+  @override
+  String get financialHowToUse => 'How to Use';
+
+  @override
+  String get step1Financial => 'Step 1: Select calculation type';
+
+  @override
+  String get step1FinancialDesc => 'Choose Loan, Investment, or Compound Interest tab based on your needs';
+
+  @override
+  String get step2Financial => 'Step 2: Enter information';
+
+  @override
+  String get step2FinancialDesc => 'Fill in required information like amount, interest rate, time period';
+
+  @override
+  String get step3Financial => 'Step 3: Calculate';
+
+  @override
+  String get step3FinancialDesc => 'Press the calculate button to view detailed results';
+
+  @override
+  String get step4Financial => 'Step 4: Save results';
+
+  @override
+  String get step4FinancialDesc => 'Save results to history for future reference';
+
+  @override
+  String get financialFormulas => 'Financial Formulas';
+
+  @override
+  String get loanFormula => 'Loan Formula';
+
+  @override
+  String get loanFormulaText => 'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]';
+
+  @override
+  String get loanFormulaDesc => 'M: Monthly payment, P: Loan amount, r: Monthly interest rate, n: Number of months';
+
+  @override
+  String get investmentFormula => 'Investment Formula';
+
+  @override
+  String get investmentFormulaText => 'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]';
+
+  @override
+  String get investmentFormulaDesc => 'FV: Future value, PV: Initial investment, PMT: Monthly contribution, r: Interest rate, n: Number of periods';
+
+  @override
+  String get compoundInterestFormula => 'Compound Interest Formula';
+
+  @override
+  String get compoundInterestFormulaText => 'A = P(1 + r/n)^(nt)';
+
+  @override
+  String get compoundInterestFormulaDesc => 'A: Final amount, P: Principal, r: Interest rate, n: Compounding frequency, t: Time';
+
+  @override
+  String get financialLimitations => 'Important Notes';
+
+  @override
+  String get financialLimitationsDesc => 'The calculation results are for reference only and may not accurately reflect real-world situations:';
+
+  @override
+  String get financialLimitation1 => 'Does not account for inflation and market volatility';
+
+  @override
+  String get financialLimitation2 => 'Interest rates may change over time';
+
+  @override
+  String get financialLimitation3 => 'Does not include fees and additional costs';
+
+  @override
+  String get financialLimitation4 => 'Results may differ based on actual terms and conditions';
+
+  @override
+  String get financialLimitation5 => 'Should consult financial professionals for advice';
+
+  @override
+  String get financialDisclaimer => 'This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.';
 }

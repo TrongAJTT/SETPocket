@@ -5126,4 +5126,136 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startCalculatingToSeeHistory => 'Start calculating to see history';
+
+  @override
+  String get p2pFileTransfer => 'P2P File Transfer';
+
+  @override
+  String get p2pFileTransferDesc => 'Transfer files directly between devices on the same network';
+
+  @override
+  String get networkSecurityWarning => 'Network Security Warning';
+
+  @override
+  String get unsecureNetworkDetected => 'Unsecure network detected';
+
+  @override
+  String get currentNetwork => 'Current Network';
+
+  @override
+  String get securityLevel => 'Security Level';
+
+  @override
+  String get securityRisks => 'Security Risks';
+
+  @override
+  String get unsecureNetworkRisks => 'On unsecure networks, your data transmissions may be intercepted by malicious users. Only proceed if you trust the network and other users.';
+
+  @override
+  String get proceedAnyway => 'Proceed Anyway';
+
+  @override
+  String get secureNetwork => 'Secure (WPA/WPA2)';
+
+  @override
+  String get unsecureNetwork => 'Unsecure (Open/No Password)';
+
+  @override
+  String get unknownSecurity => 'Unknown Security';
+
+  @override
+  String get startNetworking => 'Start Networking';
+
+  @override
+  String get stopNetworking => 'Stop Networking';
+
+  @override
+  String get pairingRequests => 'Pairing Requests';
+
+  @override
+  String get devices => 'Devices';
+
+  @override
+  String get transfers => 'Transfers';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get connectionStatus => 'Connection Status';
+
+  @override
+  String get networkInfo => 'Network Info';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get discoveredDevices => 'Discovered devices';
+
+  @override
+  String get pairedDevices => 'Paired devices';
+
+  @override
+  String get activeTransfers => 'Active transfers';
+
+  @override
+  String get noDevicesFound => 'No devices found';
+
+  @override
+  String get searchingForDevices => 'Searching for devices...';
+
+  @override
+  String get startNetworkingToDiscover => 'Start networking to discover devices';
+
+  @override
+  String get noActiveTransfers => 'No active transfers';
+
+  @override
+  String get transfersWillAppearHere => 'File transfers will appear here';
+
+  @override
+  String get paired => 'Paired';
+
+  @override
+  String get trusted => 'Trusted';
+
+  @override
+  String get pair => 'Pair';
+
+  @override
+  String get sendFile => 'Send File';
+
+  @override
+  String get cancelTransfer => 'Cancel Transfer';
+
+  @override
+  String get confirmCancelTransfer => 'Are you sure you want to cancel this transfer?';
+
+  @override
+  String get p2pPairingRequest => 'P2P Pairing Request';
+
+  @override
+  String get p2pPairingResponse => 'P2P Pairing Response';
+
+  @override
+  String get p2pHeartbeat => 'P2P Heartbeat';
+
+  @override
+  String get p2pPermissionRequiredTitle => 'Permission Required';
+
+  @override
+  String get p2pPermissionExplanation => 'To discover nearby devices using WiFi, this app needs access to your location. This is an Android requirement for scanning WiFi networks. Your location data is not stored or shared. The app is client-side and we do not collect any user data.';
+
+  @override
+  String get p2pPermissionContinue => 'Continue';
+
+  @override
+  String get p2pPermissionCancel => 'Cancel';
+
+  @override
+  String get fileTransferRequest => 'File Transfer Request';
+
+  @override
+  String get fileTransferResponse => 'File Transfer Response';
 }

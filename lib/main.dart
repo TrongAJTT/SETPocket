@@ -21,6 +21,7 @@ import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
 import 'screens/converter_tools_screen.dart';
 import 'screens/calculator_tools_screen.dart';
+import 'screens/p2p_file_transfer_screen.dart';
 import 'package:flutter/services.dart';
 
 // Global navigation key for deep linking
@@ -132,6 +133,8 @@ Widget _getToolScreen(ToolConfig tool) {
       return const ConverterToolsScreen();
     case 'calculatorTools':
       return const CalculatorToolsScreen();
+    case 'p2pFileTransfer':
+      return const P2PFileTransferScreen();
     default:
       return const HomePage(); // Fallback to home
   }
@@ -795,6 +798,10 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
                   parentCategory: parentCategory ?? 'CalculatorToolsScreen',
                   icon: icon),
         );
+      case 'p2pFileTransfer':
+        return P2PFileTransferScreen(
+          isEmbedded: widget.isDesktop,
+        );
       default:
         return const SizedBox.shrink();
     }
@@ -810,6 +817,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return Icons.swap_horiz;
       case 'calculate':
         return Icons.calculate;
+      case 'share':
+        return Icons.share;
       default:
         return Icons.extension;
     }
@@ -825,6 +834,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return Colors.green;
       case 'orange':
         return Colors.orange;
+      case 'teal':
+        return Colors.teal;
       default:
         return Colors.grey;
     }
@@ -841,6 +852,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return l10n.converterTools;
       case 'calculatorTools':
         return l10n.calculatorTools;
+      case 'p2pFileTransfer':
+        return l10n.p2pFileTransfer;
       default:
         return nameKey;
     }
@@ -857,6 +870,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return l10n.converterToolsDesc;
       case 'calculatorToolsDesc':
         return l10n.calculatorToolsDesc;
+      case 'p2pFileTransferDesc':
+        return l10n.p2pFileTransferDesc;
       default:
         return descKey;
     }
@@ -872,6 +887,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return 'ConverterToolsScreen';
       case 'calculatorTools':
         return 'CalculatorToolsScreen';
+      case 'p2pFileTransfer':
+        return 'P2PFileTransferScreen';
       default:
         return '';
     }

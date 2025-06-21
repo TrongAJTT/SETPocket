@@ -19,6 +19,7 @@ import 'package:setpocket/models/converter_models/number_system_state_model.dart
 import 'package:setpocket/models/converter_models/speed_state_model.dart';
 import 'package:setpocket/models/converter_models/temperature_state_model.dart';
 import 'package:setpocket/models/converter_models/data_state_model.dart';
+import 'package:setpocket/models/p2p_models.dart';
 
 class HiveService {
   // Box names
@@ -139,6 +140,20 @@ class HiveService {
       }
       if (!Hive.isAdapterRegistered(35)) {
         Hive.registerAdapter(DataStateModelAdapter());
+      }
+
+      // P2P adapters
+      if (!Hive.isAdapterRegistered(47)) {
+        Hive.registerAdapter(P2PUserAdapter());
+      }
+      if (!Hive.isAdapterRegistered(48)) {
+        Hive.registerAdapter(PairingRequestAdapter());
+      }
+      if (!Hive.isAdapterRegistered(49)) {
+        Hive.registerAdapter(FileTransferTaskAdapter());
+      }
+      if (!Hive.isAdapterRegistered(52)) {
+        Hive.registerAdapter(P2PFileStorageSettingsAdapter());
       }
 
       // Open boxes

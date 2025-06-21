@@ -45,6 +45,16 @@ class ToolVisibilityService {
       isVisible: true,
       order: 3,
     ),
+    'p2pFileTransfer': ToolConfig(
+      id: 'p2pFileTransfer',
+      fixName: 'P2P File Transfer',
+      nameKey: 'p2pFileTransfer',
+      descKey: 'p2pFileTransferDesc',
+      icon: 'share',
+      iconColor: 'teal',
+      isVisible: true,
+      order: 4,
+    ),
   };
 
   static Future<Map<String, bool>> getToolVisibility() async {

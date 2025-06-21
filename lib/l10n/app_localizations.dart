@@ -9952,6 +9952,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start calculating to see history'**
   String get startCalculatingToSeeHistory;
+
+  /// No description provided for @p2pFileTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'P2P File Transfer'**
+  String get p2pFileTransfer;
+
+  /// No description provided for @p2pFileTransferDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer files directly between devices on the same network'**
+  String get p2pFileTransferDesc;
+
+  /// No description provided for @networkSecurityWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Security Warning'**
+  String get networkSecurityWarning;
+
+  /// No description provided for @unsecureNetworkDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsecure network detected'**
+  String get unsecureNetworkDetected;
+
+  /// No description provided for @currentNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Network'**
+  String get currentNetwork;
+
+  /// No description provided for @securityLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Level'**
+  String get securityLevel;
+
+  /// No description provided for @securityRisks.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Risks'**
+  String get securityRisks;
+
+  /// No description provided for @unsecureNetworkRisks.
+  ///
+  /// In en, this message translates to:
+  /// **'On unsecure networks, your data transmissions may be intercepted by malicious users. Only proceed if you trust the network and other users.'**
+  String get unsecureNetworkRisks;
+
+  /// No description provided for @proceedAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed Anyway'**
+  String get proceedAnyway;
+
+  /// No description provided for @secureNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure (WPA/WPA2)'**
+  String get secureNetwork;
+
+  /// No description provided for @unsecureNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsecure (Open/No Password)'**
+  String get unsecureNetwork;
+
+  /// No description provided for @unknownSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Security'**
+  String get unknownSecurity;
+
+  /// No description provided for @startNetworking.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Networking'**
+  String get startNetworking;
+
+  /// No description provided for @stopNetworking.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Networking'**
+  String get stopNetworking;
+
+  /// No description provided for @pairingRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing Requests'**
+  String get pairingRequests;
+
+  /// No description provided for @devices.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get devices;
+
+  /// No description provided for @transfers.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers'**
+  String get transfers;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @connectionStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Status'**
+  String get connectionStatus;
+
+  /// No description provided for @networkInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Info'**
+  String get networkInfo;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @discoveredDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovered devices'**
+  String get discoveredDevices;
+
+  /// No description provided for @pairedDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired devices'**
+  String get pairedDevices;
+
+  /// No description provided for @activeTransfers.
+  ///
+  /// In en, this message translates to:
+  /// **'Active transfers'**
+  String get activeTransfers;
+
+  /// No description provided for @noDevicesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No devices found'**
+  String get noDevicesFound;
+
+  /// No description provided for @searchingForDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for devices...'**
+  String get searchingForDevices;
+
+  /// No description provided for @startNetworkingToDiscover.
+  ///
+  /// In en, this message translates to:
+  /// **'Start networking to discover devices'**
+  String get startNetworkingToDiscover;
+
+  /// No description provided for @noActiveTransfers.
+  ///
+  /// In en, this message translates to:
+  /// **'No active transfers'**
+  String get noActiveTransfers;
+
+  /// No description provided for @transfersWillAppearHere.
+  ///
+  /// In en, this message translates to:
+  /// **'File transfers will appear here'**
+  String get transfersWillAppearHere;
+
+  /// No description provided for @paired.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired'**
+  String get paired;
+
+  /// No description provided for @trusted.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted'**
+  String get trusted;
+
+  /// No description provided for @pair.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair'**
+  String get pair;
+
+  /// No description provided for @sendFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Send File'**
+  String get sendFile;
+
+  /// No description provided for @cancelTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Transfer'**
+  String get cancelTransfer;
+
+  /// No description provided for @confirmCancelTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this transfer?'**
+  String get confirmCancelTransfer;
+
+  /// No description provided for @p2pPairingRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'P2P Pairing Request'**
+  String get p2pPairingRequest;
+
+  /// No description provided for @p2pPairingResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'P2P Pairing Response'**
+  String get p2pPairingResponse;
+
+  /// No description provided for @p2pHeartbeat.
+  ///
+  /// In en, this message translates to:
+  /// **'P2P Heartbeat'**
+  String get p2pHeartbeat;
+
+  /// Title for the permission request dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Required'**
+  String get p2pPermissionRequiredTitle;
+
+  /// Explanation for why location permission is needed for P2P
+  ///
+  /// In en, this message translates to:
+  /// **'To discover nearby devices using WiFi, this app needs access to your location. This is an Android requirement for scanning WiFi networks. Your location data is not stored or shared. The app is client-side and we do not collect any user data.'**
+  String get p2pPermissionExplanation;
+
+  /// Button text to continue with granting permission
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get p2pPermissionContinue;
+
+  /// Button text to cancel the permission request
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get p2pPermissionCancel;
+
+  /// No description provided for @fileTransferRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'File Transfer Request'**
+  String get fileTransferRequest;
+
+  /// No description provided for @fileTransferResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'File Transfer Response'**
+  String get fileTransferResponse;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -2,7 +2,16 @@
     <!-- Internet permission for currency fetching -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <!-- Location permissions are required for WiFi scanning on Android 9+ -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     
+    <!-- Nearby devices permission for Android 12+ -->
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+                     android:usesPermissionFlags="neverForLocation" />
+
     <!-- Storage permissions for importing/exporting templates -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

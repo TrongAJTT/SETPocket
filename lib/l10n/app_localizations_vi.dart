@@ -5126,4 +5126,136 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get startCalculatingToSeeHistory => 'Bắt đầu tính toán để xem lịch sử';
+
+  @override
+  String get p2pFileTransfer => 'Truyền File P2P';
+
+  @override
+  String get p2pFileTransferDesc => 'Truyền file trực tiếp giữa các thiết bị trong cùng mạng';
+
+  @override
+  String get networkSecurityWarning => 'Cảnh báo Bảo mật Mạng';
+
+  @override
+  String get unsecureNetworkDetected => 'Phát hiện mạng không bảo mật';
+
+  @override
+  String get currentNetwork => 'Mạng hiện tại';
+
+  @override
+  String get securityLevel => 'Mức độ Bảo mật';
+
+  @override
+  String get securityRisks => 'Rủi ro Bảo mật';
+
+  @override
+  String get unsecureNetworkRisks => 'Trên mạng không bảo mật, dữ liệu của bạn có thể bị người dùng độc hại chặn bắt. Chỉ tiếp tục nếu bạn tin tưởng mạng và những người dùng khác.';
+
+  @override
+  String get proceedAnyway => 'Vẫn Tiếp tục';
+
+  @override
+  String get secureNetwork => 'Bảo mật (WPA/WPA2)';
+
+  @override
+  String get unsecureNetwork => 'Không bảo mật (Mở/Không mật khẩu)';
+
+  @override
+  String get unknownSecurity => 'Bảo mật Không rõ';
+
+  @override
+  String get startNetworking => 'Bắt đầu Mạng';
+
+  @override
+  String get stopNetworking => 'Dừng Mạng';
+
+  @override
+  String get pairingRequests => 'Yêu cầu Ghép nối';
+
+  @override
+  String get devices => 'Thiết bị';
+
+  @override
+  String get transfers => 'Truyền tải';
+
+  @override
+  String get status => 'Trạng thái';
+
+  @override
+  String get connectionStatus => 'Trạng thái Kết nối';
+
+  @override
+  String get networkInfo => 'Thông tin Mạng';
+
+  @override
+  String get statistics => 'Thống kê';
+
+  @override
+  String get discoveredDevices => 'Thiết bị đã phát hiện';
+
+  @override
+  String get pairedDevices => 'Thiết bị đã ghép nối';
+
+  @override
+  String get activeTransfers => 'Truyền tải đang hoạt động';
+
+  @override
+  String get noDevicesFound => 'Không tìm thấy thiết bị';
+
+  @override
+  String get searchingForDevices => 'Đang tìm kiếm thiết bị...';
+
+  @override
+  String get startNetworkingToDiscover => 'Bắt đầu mạng để phát hiện thiết bị';
+
+  @override
+  String get noActiveTransfers => 'Không có truyền tải đang hoạt động';
+
+  @override
+  String get transfersWillAppearHere => 'Các truyền tải file sẽ xuất hiện ở đây';
+
+  @override
+  String get paired => 'Đã ghép nối';
+
+  @override
+  String get trusted => 'Tin cậy';
+
+  @override
+  String get pair => 'Ghép nối';
+
+  @override
+  String get sendFile => 'Gửi File';
+
+  @override
+  String get cancelTransfer => 'Hủy Truyền tải';
+
+  @override
+  String get confirmCancelTransfer => 'Bạn có chắc muốn hủy truyền tải này không?';
+
+  @override
+  String get p2pPairingRequest => 'Yêu cầu ghép nối P2P';
+
+  @override
+  String get p2pPairingResponse => 'Phản hồi ghép nối P2P';
+
+  @override
+  String get p2pHeartbeat => 'Nhịp tim P2P';
+
+  @override
+  String get p2pPermissionRequiredTitle => 'Yêu cầu quyền truy cập';
+
+  @override
+  String get p2pPermissionExplanation => 'Để khám phá các thiết bị lân cận bằng WiFi, ứng dụng này cần quyền truy cập vị trí của bạn. Đây là yêu cầu của Android để quét các mạng WiFi. Dữ liệu vị trí của bạn không được lưu trữ hoặc chia sẻ. Ứng dụng hoạt động phía máy khách và chúng tôi không thu thập bất kỳ dữ liệu người dùng nào.';
+
+  @override
+  String get p2pPermissionContinue => 'Tiếp tục';
+
+  @override
+  String get p2pPermissionCancel => 'Hủy';
+
+  @override
+  String get fileTransferRequest => 'Yêu cầu chuyển tệp';
+
+  @override
+  String get fileTransferResponse => 'Phản hồi chuyển tệp';
 }

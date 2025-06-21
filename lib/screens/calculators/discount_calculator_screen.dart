@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/widgets/generic_info_dialog.dart';

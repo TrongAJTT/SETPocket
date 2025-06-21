@@ -2340,5 +2340,62 @@
     "taxResultSavedToHistory": "Tax result saved to history",
     "markupResultSavedToHistory": "Markup result saved to history",
     "startCalculatingToSeeHistory": "Start calculating to see history",
-    "noHistoryAvailable": "No history available"
+    "noHistoryAvailable": "No history available",
+
+    "p2pFileTransfer": "P2P File Transfer",
+    "p2pFileTransferDesc": "Transfer files directly between devices on the same network",
+    "networkSecurityWarning": "Network Security Warning",
+    "unsecureNetworkDetected": "Unsecure network detected",
+    "currentNetwork": "Current Network",
+    "securityLevel": "Security Level",
+    "securityRisks": "Security Risks",
+    "unsecureNetworkRisks": "On unsecure networks, your data transmissions may be intercepted by malicious users. Only proceed if you trust the network and other users.",
+    "proceedAnyway": "Proceed Anyway",
+    "secureNetwork": "Secure (WPA/WPA2)",
+    "unsecureNetwork": "Unsecure (Open/No Password)",
+    "unknownSecurity": "Unknown Security",
+    "startNetworking": "Start Networking",
+    "stopNetworking": "Stop Networking",
+    "pairingRequests": "Pairing Requests",
+    "devices": "Devices",
+    "transfers": "Transfers",
+    "status": "Status",
+    "connectionStatus": "Connection Status",
+    "networkInfo": "Network Info",
+    "statistics": "Statistics",
+    "discoveredDevices": "Discovered devices",
+    "pairedDevices": "Paired devices",
+    "activeTransfers": "Active transfers",
+    "noDevicesFound": "No devices found",
+    "searchingForDevices": "Searching for devices...",
+    "startNetworkingToDiscover": "Start networking to discover devices",
+    "noActiveTransfers": "No active transfers",
+    "transfersWillAppearHere": "File transfers will appear here",
+    "paired": "Paired",
+    "trusted": "Trusted",
+    "pair": "Pair",
+    "sendFile": "Send File",
+    "cancelTransfer": "Cancel Transfer",
+    "confirmCancelTransfer": "Are you sure you want to cancel this transfer?",
+    "p2pPairingRequest": "P2P Pairing Request",
+    "p2pPairingResponse": "P2P Pairing Response",
+    "p2pHeartbeat": "P2P Heartbeat",
+    "p2pPermissionRequiredTitle": "Permission Required",
+    "@p2pPermissionRequiredTitle": {
+        "description": "Title for the permission request dialog"
+    },
+    "p2pPermissionExplanation": "To discover nearby devices using WiFi, this app needs access to your location. This is an Android requirement for scanning WiFi networks. Your location data is not stored or shared. The app is client-side and we do not collect any user data.",
+    "@p2pPermissionExplanation": {
+        "description": "Explanation for why location permission is needed for P2P"
+    },
+    "p2pPermissionContinue": "Continue",
+    "@p2pPermissionContinue": {
+        "description": "Button text to continue with granting permission"
+    },
+    "p2pPermissionCancel": "Cancel",
+    "@p2pPermissionCancel": {
+        "description": "Button text to cancel the permission request"
+    },
+    "fileTransferRequest": "File Transfer Request",
+    "fileTransferResponse": "File Transfer Response"
 }

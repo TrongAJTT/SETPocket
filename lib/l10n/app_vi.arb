@@ -927,7 +927,7 @@
     "dateTip2": "Dùng stepper để điều chỉnh từng thành phần ngày/tháng/năm",
     "dateTip3": "Kiểm tra lịch sử để xem lại các tính toán trước đó",
     "dateTip4": "Chú ý đến năm nhuận khi tính toán các khoảng thời gian dài",
-    "dateTip5": "Sử dụng chế độ thông tin ngày để kiểm tra thứ của ngày quan trọng",
+    "dateTip5": "Sử dụng chế độ thông tin để hiểu rõ hơn về các tính năng",
 
     "dateLimitations": "Lưu ý quan trọng",
     "dateLimitationsDesc": "Một số điểm cần lưu ý khi sử dụng máy tính ngày:",
@@ -2265,5 +2265,63 @@
     "taxResultSavedToHistory": "Kết quả tính thuế đã lưu vào lịch sử",
     "markupResultSavedToHistory": "Kết quả tính markup đã lưu vào lịch sử",
     "startCalculatingToSeeHistory": "Bắt đầu tính toán để xem lịch sử",
-    "noHistoryAvailable": "Không có lịch sử"
+    "noHistoryAvailable": "Không có lịch sử",
+
+    "p2pFileTransfer": "Truyền File P2P",
+    "p2pFileTransferDesc": "Truyền file trực tiếp giữa các thiết bị trong cùng mạng",
+    "networkSecurityWarning": "Cảnh báo Bảo mật Mạng",
+    "unsecureNetworkDetected": "Phát hiện mạng không bảo mật",
+    "currentNetwork": "Mạng hiện tại",
+    "securityLevel": "Mức độ Bảo mật",
+    "securityRisks": "Rủi ro Bảo mật",
+    "unsecureNetworkRisks": "Trên mạng không bảo mật, dữ liệu của bạn có thể bị người dùng độc hại chặn bắt. Chỉ tiếp tục nếu bạn tin tưởng mạng và những người dùng khác.",
+    "proceedAnyway": "Vẫn Tiếp tục",
+    "secureNetwork": "Bảo mật (WPA/WPA2)",
+    "unsecureNetwork": "Không bảo mật (Mở/Không mật khẩu)",
+    "unknownSecurity": "Bảo mật Không rõ",
+    "startNetworking": "Bắt đầu Mạng",
+    "stopNetworking": "Dừng Mạng",
+    "pairingRequests": "Yêu cầu Ghép nối",
+    "devices": "Thiết bị",
+    "transfers": "Truyền tải",
+    "status": "Trạng thái",
+    "connectionStatus": "Trạng thái Kết nối",
+    "networkInfo": "Thông tin Mạng",
+    "statistics": "Thống kê",
+    "discoveredDevices": "Thiết bị đã phát hiện",
+    "pairedDevices": "Thiết bị đã ghép nối",
+    "activeTransfers": "Truyền tải đang hoạt động",
+    "noDevicesFound": "Không tìm thấy thiết bị",
+    "searchingForDevices": "Đang tìm kiếm thiết bị...",
+    "startNetworkingToDiscover": "Bắt đầu mạng để phát hiện thiết bị",
+    "noActiveTransfers": "Không có truyền tải đang hoạt động",
+    "transfersWillAppearHere": "Các truyền tải file sẽ xuất hiện ở đây",
+    "paired": "Đã ghép nối",
+    "trusted": "Tin cậy",
+    "pair": "Ghép nối",
+    "sendFile": "Gửi File",
+    "cancelTransfer": "Hủy Truyền tải",
+    "confirmCancelTransfer": "Bạn có chắc muốn hủy truyền tải này không?",
+    "p2pPairingRequest": "Yêu cầu ghép nối P2P",
+    "p2pPairingResponse": "Phản hồi ghép nối P2P",
+    "p2pHeartbeat": "Nhịp tim P2P",
+    "p2pPermissionRequiredTitle": "Yêu cầu quyền truy cập",
+    "@p2pPermissionRequiredTitle": {
+        "description": "Tiêu đề cho hộp thoại yêu cầu quyền"
+    },
+    "p2pPermissionExplanation": "Để khám phá các thiết bị lân cận bằng WiFi, ứng dụng này cần quyền truy cập vị trí của bạn. Đây là yêu cầu của Android để quét các mạng WiFi. Dữ liệu vị trí của bạn không được lưu trữ hoặc chia sẻ. Ứng dụng hoạt động phía máy khách và chúng tôi không thu thập bất kỳ dữ liệu người dùng nào.",
+    "@p2pPermissionExplanation": {
+        "description": "Giải thích tại sao cần có quyền vị trí cho P2P"
+    },
+    "p2pPermissionContinue": "Tiếp tục",
+    "@p2pPermissionContinue": {
+        "description": "Nút để tiếp tục cấp quyền"
+    },
+    "p2pPermissionCancel": "Hủy",
+    "@p2pPermissionCancel": {
+        "description": "Nút để hủy yêu cầu cấp quyền"
+    },
+    "fileTransferRequest": "Yêu cầu chuyển tệp",
+    "fileTransferResponse": "Phản hồi chuyển tệp",
+    "fileTransferCancel": "Hủy chuyển tệp"
 }

@@ -7,6 +7,7 @@ import 'package:setpocket/services/financial_calculator_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/widgets/generic_info_dialog.dart';
+import 'package:setpocket/utils/percentage_input_utils.dart';
 
 class FinancialCalculatorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -591,19 +592,14 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+        if (isPercentageField)
+          const PercentageInputFormatter()
+        else
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
       ],
-      onChanged: (value) {
-        if (isPercentageField && value.isNotEmpty) {
-          final doubleValue = double.tryParse(value);
-          if (doubleValue != null && doubleValue > 100) {
-            controller.text = '100';
-            controller.selection = TextSelection.fromPosition(
-              TextPosition(offset: controller.text.length),
-            );
-          }
-        }
-      },
+      onChanged: isPercentageField
+          ? PercentageInputUtils.createPercentageOnChanged(controller)
+          : null,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -974,9 +970,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
               _loanControllers[key]!.text = value;
             }
           });
-          if (item.results != null) {
-            _loanResult = LoanCalculationResult.fromMap(item.results!);
-          }
+          _loanResult = LoanCalculationResult.fromMap(item.results);
           break;
         case FinancialCalculationType.investment:
           _currentMainTabIndex = 1;
@@ -985,10 +979,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
               _investmentControllers[key]!.text = value;
             }
           });
-          if (item.results != null) {
-            _investmentResult =
-                InvestmentCalculationResult.fromMap(item.results!);
-          }
+          _investmentResult = InvestmentCalculationResult.fromMap(item.results);
           break;
         case FinancialCalculationType.compoundInterest:
           _currentMainTabIndex = 2;
@@ -997,10 +988,8 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
               _compoundControllers[key]!.text = value;
             }
           });
-          if (item.results != null) {
-            _compoundResult =
-                CompoundInterestCalculationResult.fromMap(item.results!);
-          }
+          _compoundResult =
+              CompoundInterestCalculationResult.fromMap(item.results);
           break;
       }
     });

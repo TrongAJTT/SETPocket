@@ -149,8 +149,9 @@ class _TwoPanelsMainMultiTabLayoutState
   }
 
   void _onMobileTabChanged() {
-    if (_mobileTabController == null || _mobileTabController!.indexIsChanging)
+    if (_mobileTabController == null || _mobileTabController!.indexIsChanging) {
       return;
+    }
 
     final currentIndex = _mobileTabController!.index;
     final isSecondaryTab = widget.secondaryEnabled &&
@@ -230,7 +231,8 @@ class _TwoPanelsMainMultiTabLayoutState
           // Main panel title bar
           if (widget.mainPanelTitle != null)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              height: 48, // Fixed height for consistency
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: const BorderRadius.only(
@@ -378,7 +380,8 @@ class _TwoPanelsMainMultiTabLayoutState
         // Secondary panel title bar
         if (widget.secondaryPanelTitle != null)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            height: 48, // Fixed height to match main panel
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: const BorderRadius.only(

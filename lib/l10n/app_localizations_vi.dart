@@ -1008,19 +1008,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get calculationError => 'Calculation error';
 
   @override
-  String get noHistoryYet => 'Chưa có phép tính nào';
+  String get noHistoryYet => 'Chưa có lịch sử';
 
   @override
   String get performCalculation => 'Perform your first calculation to see history here';
 
   @override
-  String get confirmClearHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử BMI không?';
+  String get confirmClearHistory => 'Are you sure you want to clear all BMI history?';
 
   @override
   String get confirmClearTabData => 'Are you sure you want to clear the data for the current tab?';
 
   @override
-  String get historyCleared => 'Đã xóa lịch sử BMI';
+  String get historyCleared => 'Đã xóa lịch sử tính toán';
 
   @override
   String get historyItem => 'History Item';
@@ -1496,7 +1496,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get generatedAt => 'Tạo lúc';
 
   @override
-  String get noHistoryMessage => 'Lịch sử tính toán BMI của bạn sẽ xuất hiện ở đây';
+  String get noHistoryMessage => 'Tạo một số kết quả ngẫu nhiên để xem chúng ở đây';
 
   @override
   String get clearHistory => 'Xóa lịch sử';
@@ -2271,7 +2271,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bmiUnderweightRec1 => 'Tăng lượng calo nạp vào với thực phẩm bổ dưỡng, nhiều calo';
 
   @override
-  String get bmiUnderweightRec2 => 'Bao gồm chất béo lành mạnh, protein và carbohydrate phức hợp trong chế độ ăn';
+  String get bmiUnderweightRec2 => 'Bao gồm chất béo lành mạnh, protein và carbohydrate phức tạp trong chế độ ăn';
 
   @override
   String get bmiUnderweightRec3 => 'Tham khảo ý kiến nhà cung cấp chăm sóc sức khỏe để loại trừ các vấn đề sức khỏe tiềm ẩn';
@@ -2307,110 +2307,110 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bmiUnderweightDesc => 'Có thể chỉ ra suy dinh dưỡng, rối loạn ăn uống, hoặc các vấn đề sức khỏe tiềm ẩn';
 
   @override
-  String get bmiNormalDesc => 'Có liên quan đến nguy cơ thấp nhất về các vấn đề sức khỏe liên quan đến cân nặng';
+  String get bmiNormalDesc => 'Associated with lowest risk of weight-related health problems';
 
   @override
-  String get bmiOverweightDesc => 'Tăng nguy cơ bệnh tim mạch, tiểu đường và các vấn đề sức khỏe khác';
+  String get bmiOverweightDesc => 'Increased risk of cardiovascular disease, diabetes, and other health issues';
 
   @override
-  String get bmiObeseDesc => 'Tăng đáng kể nguy cơ các biến chứng sức khỏe nghiêm trọng';
+  String get bmiObeseDesc => 'Significantly increased risk of serious health complications';
 
   @override
   String get bmiKeyFeatures => 'Tính năng chính';
 
   @override
-  String get comprehensiveBmiCalc => 'Tính toán BMI toàn diện';
+  String get comprehensiveBmiCalc => 'Comprehensive BMI Calculation';
 
   @override
-  String get comprehensiveBmiCalcDesc => 'Tính BMI sử dụng chiều cao, cân nặng, tuổi và giới tính để có kết quả chính xác';
+  String get comprehensiveBmiCalcDesc => 'Calculate BMI using height, weight, age, and gender for accurate results';
 
   @override
-  String get multipleUnitSystems => 'Nhiều hệ thống đơn vị';
+  String get multipleUnitSystems => 'Multiple Unit Systems';
 
   @override
-  String get multipleUnitSystemsDesc => 'Hỗ trợ cả hệ mét (cm/kg) và hệ Anh (ft-in/lbs)';
+  String get multipleUnitSystemsDesc => 'Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements';
 
   @override
-  String get healthInsights => 'Thông tin sức khỏe';
+  String get healthInsights => 'Health Insights';
 
   @override
-  String get healthInsightsDesc => 'Nhận khuyến nghị cá nhân hóa dựa trên danh mục BMI của bạn';
+  String get healthInsightsDesc => 'Get personalized recommendations based on your BMI category';
 
   @override
-  String get ageGenderConsideration => 'Cân nhắc tuổi & giới tính';
+  String get ageGenderConsideration => 'Age & Gender Consideration';
 
   @override
-  String get ageGenderConsiderationDesc => 'Diễn giải BMI được điều chỉnh cho các yếu tố tuổi và giới tính';
+  String get ageGenderConsiderationDesc => 'BMI interpretation adjusted for age and gender factors';
 
   @override
-  String get bmiHowToUse => 'Cách sử dụng';
+  String get bmiHowToUse => 'How to Use';
 
   @override
-  String get step1Bmi => 'Bước 1: Chọn hệ thống đơn vị';
+  String get step1Bmi => 'Step 1: Select Unit System';
 
   @override
-  String get step1BmiDesc => 'Chọn giữa hệ mét (cm/kg) hoặc hệ Anh (ft-in/lbs)';
+  String get step1BmiDesc => 'Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements';
 
   @override
-  String get step2Bmi => 'Bước 2: Nhập thông tin của bạn';
+  String get step2Bmi => 'Step 2: Enter Your Information';
 
   @override
-  String get step2BmiDesc => 'Nhập chiều cao, cân nặng, tuổi và giới tính để tính toán chính xác';
+  String get step2BmiDesc => 'Input your height, weight, age, and gender for accurate calculation';
 
   @override
-  String get step3Bmi => 'Bước 3: Xem kết quả';
+  String get step3Bmi => 'Step 3: View Results';
 
   @override
-  String get step3BmiDesc => 'Xem giá trị BMI, danh mục và khuyến nghị sức khỏe cá nhân hóa';
+  String get step3BmiDesc => 'See your BMI value, category, and personalized health recommendations';
 
   @override
-  String get step4Bmi => 'Bước 4: Theo dõi tiến trình';
+  String get step4Bmi => 'Step 4: Track Progress';
 
   @override
-  String get step4BmiDesc => 'Lưu phép tính vào lịch sử và theo dõi thay đổi theo thời gian';
+  String get step4BmiDesc => 'Save calculations to history and monitor changes over time';
 
   @override
-  String get bmiTips => 'Mẹo sức khỏe';
+  String get bmiTips => 'Health Tips';
 
   @override
-  String get tip1Bmi => 'BMI là công cụ sàng lọc - hãy tham khảo ý kiến nhà cung cấp chăm sóc sức khỏe để đánh giá sức khỏe toàn diện';
+  String get tip1Bmi => 'BMI is a screening tool - consult healthcare providers for complete health assessment';
 
   @override
-  String get tip2Bmi => 'Theo dõi thường xuyên giúp theo dõi tiến trình hướng tới mục tiêu sức khỏe';
+  String get tip2Bmi => 'Regular monitoring helps track progress toward health goals';
 
   @override
-  String get tip3Bmi => 'BMI có thể không phản ánh chính xác thành phần cơ thể đối với vận động viên hoặc người cao tuổi';
+  String get tip3Bmi => 'BMI may not accurately reflect body composition for athletes or elderly';
 
   @override
-  String get tip4Bmi => 'Tập trung vào thay đổi lối sống lành mạnh hơn là chỉ tập trung vào con số';
+  String get tip4Bmi => 'Focus on healthy lifestyle changes rather than just the number';
 
   @override
-  String get tip5Bmi => 'Kết hợp BMI với các chỉ số sức khỏe khác để hiểu rõ hơn';
+  String get tip5Bmi => 'Combine BMI with other health indicators for better understanding';
 
   @override
-  String get bmiLimitations => 'Hiểu về giới hạn của BMI';
+  String get bmiLimitations => 'Understanding BMI Limitations';
 
   @override
-  String get bmiLimitationsDesc => 'BMI là công cụ sàng lọc hữu ích nhưng có giới hạn. Nó không phân biệt giữa khối lượng cơ và chất béo, và có thể không chính xác đối với vận động viên, người cao tuổi hoặc một số nhóm dân tộc nhất định. Luôn tham khảo ý kiến chuyên gia chăm sóc sức khỏe để đánh giá sức khỏe toàn diện.';
+  String get bmiLimitationsDesc => 'BMI is a useful screening tool but has limitations. It doesn\'t distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.';
 
   @override
-  String get bmiPracticalApplications => 'Ứng dụng thực tế';
+  String get bmiPracticalApplications => 'Practical Applications';
 
   @override
-  String get bmiPracticalApplicationsDesc => 'Hữu ích cho sàng lọc sức khỏe, lập kế hoạch quản lý cân nặng, đặt mục tiêu thể dục và theo dõi tiến trình sức khỏe theo thời gian.';
+  String get bmiPracticalApplicationsDesc => 'Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.';
 
   @override
-  String get clearBmiHistory => 'Xóa lịch sử BMI';
+  String get clearBmiHistory => 'Clear BMI History';
 
   @override
-  String get confirmClearCalculatorHistory => 'Bạn có chắc chắn muốn xóa tất cả lịch sử tính toán không?';
+  String get confirmClearCalculatorHistory => 'Are you sure you want to clear all calculation history?';
 
   @override
-  String get calculatorHistoryCleared => 'Đã xóa lịch sử tính toán';
+  String get calculatorHistoryCleared => 'Calculator history cleared';
 
   @override
   String calculatedOn(String date) {
-    return 'Được tính vào $date';
+    return 'Calculated on $date';
   }
 
   @override
@@ -2419,28 +2419,28 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get personalInfo => 'Thông tin cá nhân';
+  String get personalInfo => 'Personal Information';
 
   @override
-  String get measurements => 'Số đo';
+  String get measurements => 'Measurements';
 
   @override
-  String get bmiResults => 'Kết quả BMI';
+  String get bmiResults => 'BMI Results';
 
   @override
-  String get recommendations => 'Khuyến nghị';
+  String get recommendations => 'Recommendations';
 
   @override
-  String get autoSaveToHistory => 'Tự động lưu vào lịch sử';
+  String get autoSaveToHistory => 'Auto-save to History';
 
   @override
-  String get autoSaveToHistoryDesc => 'Tự động lưu các phép tính vào lịch sử';
+  String get autoSaveToHistoryDesc => 'Automatically save calculations to history';
 
   @override
-  String get rememberLastValues => 'Nhớ giá trị cuối cùng';
+  String get rememberLastValues => 'Remember Last Values';
 
   @override
-  String get rememberLastValuesDesc => 'Nhớ các giá trị bạn đã nhập lần cuối';
+  String get rememberLastValuesDesc => 'Remember your last entered values';
 
   @override
   String get currencyFetchMode => 'Tải tỷ giá Tiền tệ';
@@ -2508,6 +2508,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get progressDialogInfo => 'Điều này sẽ hiện dialog tiến trình trong khi tải tỷ giá.';
+
+  @override
+  String get calculate => 'Tính toán';
 
   @override
   String get calculating => 'Đang tính toán...';
@@ -3405,7 +3408,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get tip6Volume => '• Chế độ tập trung giúp tập trung vào các phép tính thể tích phức tạp';
 
   @override
-  String get volumeUnitCategories => 'Danh Mục Đơn Vị';
+  String get volumeUnitCategories => 'Danh Mục Đơn Vị Tốc Độ';
 
   @override
   String get commonUnitsVolumeDesc => 'Mét khối (m³), Lít (L), Mililít (mL) - các đơn vị hệ mét được sử dụng thường xuyên nhất.';
@@ -3423,61 +3426,61 @@ class AppLocalizationsVi extends AppLocalizations {
   String get practicalApplicationsVolumeDesc => 'Hữu ích cho việc nấu ăn, làm bánh và đo thể tích cơ bản.';
 
   @override
-  String get volumeConverterInfo => 'Thông tin Chuyển đổi Thể tích';
+  String get volumeConverterInfo => 'Volume Converter Information';
 
   @override
-  String get customizeVolumeUnits => 'Tùy chỉnh đơn vị thể tích';
+  String get customizeVolumeUnits => 'Customize Volume Units';
 
   @override
-  String get selectVolumeUnits => 'Chọn đơn vị thể tích để hiển thị';
+  String get selectVolumeUnits => 'Select volume units to display';
 
   @override
-  String get volumeUnits => 'Đơn vị Thể tích';
+  String get volumeUnits => 'Volume Units';
 
   @override
-  String get cubicMeter => 'Mét khối';
+  String get cubicMeter => 'Cubic Meter';
 
   @override
-  String get liter => 'Lít';
+  String get liter => 'Liter';
 
   @override
-  String get milliliter => 'Mililít';
+  String get milliliter => 'Milliliter';
 
   @override
-  String get cubicCentimeter => 'Centimet khối';
+  String get cubicCentimeter => 'Cubic Centimeter';
 
   @override
-  String get hectoliter => 'Héc-tô-lít';
+  String get hectoliter => 'Hectoliter';
 
   @override
-  String get gallonUS => 'Gallon (Mỹ)';
+  String get gallonUS => 'Gallon (US)';
 
   @override
-  String get gallonUK => 'Gallon (Anh)';
+  String get gallonUK => 'Gallon (UK)';
 
   @override
-  String get quartUS => 'Quart (Mỹ)';
+  String get quartUS => 'Quart (US)';
 
   @override
-  String get pintUS => 'Pint (Mỹ)';
+  String get pintUS => 'Pint (US)';
 
   @override
   String get cup => 'Cup';
 
   @override
-  String get fluidOunceUS => 'Ounce chất lỏng (Mỹ)';
+  String get fluidOunceUS => 'Fluid Ounce (US)';
 
   @override
-  String get cubicInch => 'Inch khối';
+  String get cubicInch => 'Cubic Inch';
 
   @override
-  String get cubicFoot => 'Foot khối';
+  String get cubicFoot => 'Cubic Foot';
 
   @override
-  String get cubicYard => 'Yard khối';
+  String get cubicYard => 'Cubic Yard';
 
   @override
-  String get barrel => 'Thùng (Dầu)';
+  String get barrel => 'Barrel (Oil)';
 
   @override
   String get numberSystemConverterDetailedInfo => 'Bộ Chuyển Đổi Hệ Số - Thông Tin Chi Tiết';
@@ -4717,7 +4720,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dateTip4 => 'Chú ý đến năm nhuận khi tính toán các khoảng thời gian dài';
 
   @override
-  String get dateTip5 => 'Sử dụng chế độ thông tin ngày để kiểm tra thứ của ngày quan trọng';
+  String get dateTip5 => 'Sử dụng chế độ thông tin để hiểu rõ hơn về các tính năng';
 
   @override
   String get dateLimitations => 'Lưu ý quan trọng';
@@ -4744,31 +4747,289 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dateDisclaimer => 'Công cụ này cung cấp thông tin ngày tháng dựa trên lịch Gregorian tiêu chuẩn. Kết quả chỉ mang tính chất tham khảo và có thể cần xác minh thêm cho các ứng dụng quan trọng.';
 
   @override
+  String get discountCalculator => 'Máy tính Giảm giá';
+
+  @override
+  String get discountCalculatorDesc => 'Tính toán giảm giá, tip, thuế và lãi suất một cách nhanh chóng và chính xác';
+
+  @override
+  String get discountTab => 'Giảm giá';
+
+  @override
+  String get tipTab => 'Tip';
+
+  @override
+  String get taxTab => 'Thuế';
+
+  @override
+  String get markupTab => 'Lãi suất';
+
+  @override
+  String get originalPrice => 'Giá gốc (\$)';
+
+  @override
+  String get enterOriginalPrice => 'Nhập giá gốc';
+
+  @override
+  String get discountPercent => 'Phần trăm giảm giá (%)';
+
+  @override
+  String get enterDiscountPercent => 'Nhập phần trăm giảm giá';
+
+  @override
+  String get discountAmount => 'Số tiền giảm';
+
+  @override
+  String get finalPrice => 'Giá cuối cùng';
+
+  @override
+  String get savedAmount => 'Số tiền tiết kiệm';
+
+  @override
+  String get billAmount => 'Số tiền hóa đơn (\$)';
+
+  @override
+  String get enterBillAmount => 'Nhập số tiền hóa đơn';
+
+  @override
+  String get tipPercent => 'Phần trăm tip (%)';
+
+  @override
+  String get enterTipPercent => 'Nhập phần trăm tip';
+
+  @override
+  String get numberOfPeople => 'Số người';
+
+  @override
+  String get enterNumberOfPeople => 'Nhập số người';
+
+  @override
+  String get tipAmount => 'Số tiền tip';
+
+  @override
+  String get totalBill => 'Tổng hóa đơn';
+
+  @override
+  String get perPersonAmount => 'Số tiền mỗi người';
+
+  @override
+  String get priceBeforeTax => 'Giá trước thuế (\$)';
+
+  @override
+  String get enterPriceBeforeTax => 'Nhập giá trước thuế';
+
+  @override
+  String get taxRate => 'Tỷ lệ thuế (%)';
+
+  @override
+  String get enterTaxRate => 'Nhập tỷ lệ thuế';
+
+  @override
+  String get taxAmount => 'Số tiền thuế';
+
+  @override
+  String get priceAfterTax => 'Giá sau thuế';
+
+  @override
+  String get costPrice => 'Giá vốn (\$)';
+
+  @override
+  String get enterCostPrice => 'Nhập giá vốn';
+
+  @override
+  String get markupPercent => 'Phần trăm lãi (%)';
+
+  @override
+  String get enterMarkupPercent => 'Nhập phần trăm lãi';
+
+  @override
+  String get markupAmount => 'Số tiền lãi';
+
+  @override
+  String get sellingPrice => 'Giá bán';
+
+  @override
+  String get profitMargin => 'Biên lợi nhuận';
+
+  @override
+  String get calculateDiscount => 'Tính Giảm giá';
+
+  @override
+  String get calculateTip => 'Tính Tip';
+
+  @override
+  String get calculateTax => 'Tính Thuế';
+
+  @override
+  String get calculateMarkup => 'Tính Lãi suất';
+
+  @override
+  String get discountCalculatorResults => 'Kết quả tính toán';
+
+  @override
+  String get tipCalculatorResults => 'Kết quả tính Tip';
+
+  @override
+  String get taxCalculatorResults => 'Kết quả tính Thuế';
+
+  @override
+  String get markupCalculatorResults => 'Kết quả tính Lãi suất';
+
+  @override
+  String get discountCalculatorDetailedInfo => 'Discount Calculator Information';
+
+  @override
+  String get discountCalculatorOverview => 'Comprehensive tool for discount, tip, tax, and markup calculations with many useful features';
+
+  @override
+  String get discountKeyFeatures => 'Key Features';
+
+  @override
+  String get comprehensiveDiscountCalc => 'Comprehensive Calculations';
+
+  @override
+  String get comprehensiveDiscountCalcDesc => 'Full support for discount, tip, tax, and markup calculations';
+
+  @override
+  String get multipleDiscountModes => 'Multiple Calculation Modes';
+
+  @override
+  String get multipleDiscountModesDesc => '4 different modes: discount, tip, tax, markup';
+
+  @override
+  String get realTimeDiscountResults => 'Real-time Results';
+
+  @override
+  String get realTimeDiscountResultsDesc => 'Get detailed results instantly as you input data';
+
+  @override
+  String get discountHistorySaving => 'History Saving';
+
+  @override
+  String get discountHistorySavingDesc => 'Save and review previous calculations for reference';
+
+  @override
+  String get discountHowToUse => 'How to Use';
+
+  @override
+  String get step1Discount => 'Step 1: Select calculation type';
+
+  @override
+  String get step1DiscountDesc => 'Choose appropriate tab: Discount, Tip, Tax, or Markup';
+
+  @override
+  String get step2Discount => 'Step 2: Enter information';
+
+  @override
+  String get step2DiscountDesc => 'Fill in required information like price, percentage, quantity';
+
+  @override
+  String get step3Discount => 'Step 3: View results';
+
+  @override
+  String get step3DiscountDesc => 'Results will be displayed immediately with detailed information';
+
+  @override
+  String get step4Discount => 'Step 4: Save to history';
+
+  @override
+  String get step4DiscountDesc => 'Results are automatically saved to history for future reference';
+
+  @override
+  String get discountCalculationModes => 'Calculation Modes';
+
+  @override
+  String get discountMode => 'Discount Calculator';
+
+  @override
+  String get discountModeDesc => 'Calculate final price after discount and savings amount';
+
+  @override
+  String get tipMode => 'Tip Calculator';
+
+  @override
+  String get tipModeDesc => 'Calculate tip and split bill among multiple people';
+
+  @override
+  String get taxMode => 'Tax Calculator';
+
+  @override
+  String get taxModeDesc => 'Calculate tax amount and final price after tax';
+
+  @override
+  String get markupMode => 'Markup Calculator';
+
+  @override
+  String get markupModeDesc => 'Calculate selling price and profit margin from cost price';
+
+  @override
+  String get discountTips => 'Usage Tips';
+
+  @override
+  String get discountTip1 => 'Use discount calculator when shopping to know real prices';
+
+  @override
+  String get discountTip2 => 'Calculate appropriate tip based on service quality';
+
+  @override
+  String get discountTip3 => 'Check tax to know actual total cost';
+
+  @override
+  String get discountTip4 => 'Use markup calculator for business pricing';
+
+  @override
+  String get discountTip5 => 'Save calculations for comparison and reference';
+
+  @override
+  String get discountLimitations => 'Ghi chú Quan trọng';
+
+  @override
+  String get discountLimitationsDesc => 'Kết quả tính toán là tham khảo và có thể không phản ánh chính xác thực tế do các yếu tố khác:';
+
+  @override
+  String get discountLimitation1 => 'Kết quả chỉ mang tính chất tham khảo';
+
+  @override
+  String get discountLimitation2 => 'Thuế suất có thể khác nhau tùy địa phương';
+
+  @override
+  String get discountLimitation3 => 'Tiền tip có thể thay đổi theo văn hóa';
+
+  @override
+  String get discountLimitation4 => 'Lãi suất có thể bị ảnh hưởng bởi các chi phí khác';
+
+  @override
+  String get discountLimitation5 => 'Nên kiểm tra lại với hóa đơn thực tế';
+
+  @override
+  String get discountDisclaimer => 'Công cụ này chỉ hỗ trợ tính toán và không thay thế tư vấn tài chính chuyên nghiệp. Kết quả có thể khác thực tế do các yếu tố khác.';
+
+  @override
   String get financialKeyFeatures => 'Tính năng chính';
 
   @override
-  String get comprehensiveFinancialCalc => 'Tính toán Toàn diện';
+  String get comprehensiveFinancialCalc => 'Tính toán toàn diện';
 
   @override
-  String get comprehensiveFinancialCalcDesc => 'Công cụ tính toán tài chính đa năng cho vay, đầu tư và lãi kép';
+  String get comprehensiveFinancialCalcDesc => 'Máy tính tài chính đa năng cho vay, đầu tư và lãi kép';
 
   @override
-  String get multipleCalculationTypes => 'Nhiều loại Tính toán';
+  String get multipleCalculationTypes => 'Nhiều loại tính toán';
 
   @override
   String get multipleCalculationTypesDesc => 'Hỗ trợ tính toán vay, đầu tư và lãi kép trong một ứng dụng';
 
   @override
-  String get realTimeResults => 'Kết quả Thời gian thực';
+  String get realTimeResults => 'Kết quả thời gian thực';
 
   @override
-  String get realTimeResultsDesc => 'Nhận ngay kết quả chi tiết khi nhập dữ liệu';
+  String get realTimeResultsDesc => 'Nhận kết quả chi tiết ngay lập tức khi bạn nhập dữ liệu';
 
   @override
-  String get historySaving => 'Lưu Lịch sử';
+  String get historySaving => 'Lưu lịch sử';
 
   @override
-  String get historySavingDesc => 'Lưu và xem lại các tính toán trước đó cho tham khảo';
+  String get historySavingDesc => 'Lưu và xem lại các phép tính trước đó để tham khảo';
 
   @override
   String get financialHowToUse => 'Cách sử dụng';
@@ -4777,7 +5038,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get step1Financial => 'Bước 1: Chọn loại tính toán';
 
   @override
-  String get step1FinancialDesc => 'Chọn tab Vay, Đầu tư hoặc Lãi kép tùy theo nhu cầu';
+  String get step1FinancialDesc => 'Chọn tab Vay, Đầu tư hoặc Lãi kép theo nhu cầu của bạn';
 
   @override
   String get step2Financial => 'Bước 2: Nhập thông tin';
@@ -4795,13 +5056,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get step4Financial => 'Bước 4: Lưu kết quả';
 
   @override
-  String get step4FinancialDesc => 'Lưu kết quả vào lịch sử để tham khảo sau này';
+  String get step4FinancialDesc => 'Lưu kết quả vào lịch sử để tham khảo sau';
 
   @override
-  String get financialFormulas => 'Công thức Tài chính';
+  String get financialFormulas => 'Công thức tài chính';
 
   @override
-  String get loanFormula => 'Công thức Vay';
+  String get loanFormula => 'Công thức vay';
 
   @override
   String get loanFormulaText => 'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]';
@@ -4810,7 +5071,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loanFormulaDesc => 'M: Thanh toán hàng tháng, P: Số tiền vay, r: Lãi suất hàng tháng, n: Số tháng';
 
   @override
-  String get investmentFormula => 'Công thức Đầu tư';
+  String get investmentFormula => 'Công thức đầu tư';
 
   @override
   String get investmentFormulaText => 'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]';
@@ -4819,19 +5080,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get investmentFormulaDesc => 'FV: Giá trị tương lai, PV: Đầu tư ban đầu, PMT: Đóng góp hàng tháng, r: Lãi suất, n: Số kỳ';
 
   @override
-  String get compoundInterestFormula => 'Công thức Lãi kép';
+  String get compoundInterestFormula => 'Công thức lãi kép';
 
   @override
   String get compoundInterestFormulaText => 'A = P(1 + r/n)^(nt)';
 
   @override
-  String get compoundInterestFormulaDesc => 'A: Số tiền cuối, P: Tiền gốc, r: Lãi suất, n: Tần suất ghép, t: Thời gian';
+  String get compoundInterestFormulaDesc => 'A: Số tiền cuối cùng, P: Số tiền gốc, r: Lãi suất, n: Số lần ghép lãi/năm, t: Thời gian';
 
   @override
   String get financialLimitations => 'Lưu ý quan trọng';
 
   @override
-  String get financialLimitationsDesc => 'Các kết quả tính toán chỉ mang tính chất tham khảo và có thể không phản ánh chính xác tình hình thực tế:';
+  String get financialLimitationsDesc => 'Kết quả tính toán chỉ mang tính chất tham khảo và có thể không phản ánh chính xác thực tế:';
 
   @override
   String get financialLimitation1 => 'Không tính đến lạm phát và biến động thị trường';
@@ -4840,14 +5101,29 @@ class AppLocalizationsVi extends AppLocalizations {
   String get financialLimitation2 => 'Lãi suất có thể thay đổi theo thời gian';
 
   @override
-  String get financialLimitation3 => 'Không bao gồm phí và chi phí phát sinh';
+  String get financialLimitation3 => 'Không bao gồm phí và các chi phí bổ sung';
 
   @override
-  String get financialLimitation4 => 'Kết quả có thể khác biệt tùy theo điều khoản thực tế';
+  String get financialLimitation4 => 'Kết quả có thể khác tùy theo điều khoản thực tế';
 
   @override
   String get financialLimitation5 => 'Nên tham khảo ý kiến chuyên gia tài chính';
 
   @override
-  String get financialDisclaimer => 'Công cụ này chỉ mang tính chất hỗ trợ tính toán và không thay thế cho lời khuyên tài chính chuyên nghiệp. Hãy tham khảo ý kiến chuyên gia trước khi đưa ra quyết định tài chính quan trọng.';
+  String get financialDisclaimer => 'Công cụ này chỉ hỗ trợ tính toán và không thay thế tư vấn tài chính chuyên nghiệp. Vui lòng tham khảo chuyên gia trước khi đưa ra quyết định tài chính quan trọng.';
+
+  @override
+  String get discountResultSavedToHistory => 'Kết quả tính giảm giá đã lưu vào lịch sử';
+
+  @override
+  String get tipResultSavedToHistory => 'Kết quả tính tiền tip đã lưu vào lịch sử';
+
+  @override
+  String get taxResultSavedToHistory => 'Kết quả tính thuế đã lưu vào lịch sử';
+
+  @override
+  String get markupResultSavedToHistory => 'Kết quả tính markup đã lưu vào lịch sử';
+
+  @override
+  String get startCalculatingToSeeHistory => 'Bắt đầu tính toán để xem lịch sử';
 }

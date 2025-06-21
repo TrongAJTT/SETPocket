@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:setpocket/models/bmi_models.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'hive_service.dart';
+import 'package:setpocket/services/hive_service.dart';
 
 class BmiService {
   static const String _historyKey = 'bmi_history';

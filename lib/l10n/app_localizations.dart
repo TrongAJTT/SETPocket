@@ -4877,6 +4877,12 @@ abstract class AppLocalizations {
   /// **'This will show a progress dialog while fetching rates.'**
   String get progressDialogInfo;
 
+  /// No description provided for @calculate.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate'**
+  String get calculate;
+
   /// No description provided for @calculating.
   ///
   /// In en, this message translates to:
@@ -9185,6 +9191,522 @@ abstract class AppLocalizations {
   /// **'This tool provides date information based on the standard Gregorian calendar. Results are for reference only and may require additional verification for important applications.'**
   String get dateDisclaimer;
 
+  /// No description provided for @discountCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Calculator'**
+  String get discountCalculator;
+
+  /// No description provided for @discountCalculatorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate discounts, tips, taxes, and markups quickly and accurately'**
+  String get discountCalculatorDesc;
+
+  /// No description provided for @discountTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get discountTab;
+
+  /// No description provided for @tipTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip'**
+  String get tipTab;
+
+  /// No description provided for @taxTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax'**
+  String get taxTab;
+
+  /// No description provided for @markupTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup'**
+  String get markupTab;
+
+  /// No description provided for @originalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Original Price (\$)'**
+  String get originalPrice;
+
+  /// No description provided for @enterOriginalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter original price'**
+  String get enterOriginalPrice;
+
+  /// No description provided for @discountPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Percent (%)'**
+  String get discountPercent;
+
+  /// No description provided for @enterDiscountPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter discount percent'**
+  String get enterDiscountPercent;
+
+  /// No description provided for @discountAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Amount'**
+  String get discountAmount;
+
+  /// No description provided for @finalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Price'**
+  String get finalPrice;
+
+  /// No description provided for @savedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Amount'**
+  String get savedAmount;
+
+  /// No description provided for @billAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Amount (\$)'**
+  String get billAmount;
+
+  /// No description provided for @enterBillAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter bill amount'**
+  String get enterBillAmount;
+
+  /// No description provided for @tipPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip Percent (%)'**
+  String get tipPercent;
+
+  /// No description provided for @enterTipPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tip percent'**
+  String get enterTipPercent;
+
+  /// No description provided for @numberOfPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of People'**
+  String get numberOfPeople;
+
+  /// No description provided for @enterNumberOfPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter number of people'**
+  String get enterNumberOfPeople;
+
+  /// No description provided for @tipAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip Amount'**
+  String get tipAmount;
+
+  /// No description provided for @totalBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Bill'**
+  String get totalBill;
+
+  /// No description provided for @perPersonAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Per Person Amount'**
+  String get perPersonAmount;
+
+  /// No description provided for @priceBeforeTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Before Tax (\$)'**
+  String get priceBeforeTax;
+
+  /// No description provided for @enterPriceBeforeTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter price before tax'**
+  String get enterPriceBeforeTax;
+
+  /// No description provided for @taxRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Rate (%)'**
+  String get taxRate;
+
+  /// No description provided for @enterTaxRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tax rate'**
+  String get enterTaxRate;
+
+  /// No description provided for @taxAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Amount'**
+  String get taxAmount;
+
+  /// No description provided for @priceAfterTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Price After Tax'**
+  String get priceAfterTax;
+
+  /// No description provided for @costPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost Price (\$)'**
+  String get costPrice;
+
+  /// No description provided for @enterCostPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter cost price'**
+  String get enterCostPrice;
+
+  /// No description provided for @markupPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup Percent (%)'**
+  String get markupPercent;
+
+  /// No description provided for @enterMarkupPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter markup percent'**
+  String get enterMarkupPercent;
+
+  /// No description provided for @markupAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup Amount'**
+  String get markupAmount;
+
+  /// No description provided for @sellingPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Selling Price'**
+  String get sellingPrice;
+
+  /// No description provided for @profitMargin.
+  ///
+  /// In en, this message translates to:
+  /// **'Profit Margin (%)'**
+  String get profitMargin;
+
+  /// No description provided for @calculateDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Discount'**
+  String get calculateDiscount;
+
+  /// No description provided for @calculateTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Tip'**
+  String get calculateTip;
+
+  /// No description provided for @calculateTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Tax'**
+  String get calculateTax;
+
+  /// No description provided for @calculateMarkup.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Markup'**
+  String get calculateMarkup;
+
+  /// No description provided for @discountCalculatorResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Calculator Results'**
+  String get discountCalculatorResults;
+
+  /// No description provided for @tipCalculatorResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip Calculation Results'**
+  String get tipCalculatorResults;
+
+  /// No description provided for @taxCalculatorResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Calculation Results'**
+  String get taxCalculatorResults;
+
+  /// No description provided for @markupCalculatorResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup Calculation Results'**
+  String get markupCalculatorResults;
+
+  /// No description provided for @discountCalculatorDetailedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Calculator Information'**
+  String get discountCalculatorDetailedInfo;
+
+  /// No description provided for @discountCalculatorOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive tool for discount, tip, tax, and markup calculations with many useful features'**
+  String get discountCalculatorOverview;
+
+  /// No description provided for @discountKeyFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Features'**
+  String get discountKeyFeatures;
+
+  /// No description provided for @comprehensiveDiscountCalc.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive Calculations'**
+  String get comprehensiveDiscountCalc;
+
+  /// No description provided for @comprehensiveDiscountCalcDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Full support for discount, tip, tax, and markup calculations'**
+  String get comprehensiveDiscountCalcDesc;
+
+  /// No description provided for @multipleDiscountModes.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Calculation Modes'**
+  String get multipleDiscountModes;
+
+  /// No description provided for @multipleDiscountModesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'4 different modes: discount, tip, tax, markup'**
+  String get multipleDiscountModesDesc;
+
+  /// No description provided for @realTimeDiscountResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Results'**
+  String get realTimeDiscountResults;
+
+  /// No description provided for @realTimeDiscountResultsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get detailed results instantly as you input data'**
+  String get realTimeDiscountResultsDesc;
+
+  /// No description provided for @discountHistorySaving.
+  ///
+  /// In en, this message translates to:
+  /// **'History Saving'**
+  String get discountHistorySaving;
+
+  /// No description provided for @discountHistorySavingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and review previous calculations for reference'**
+  String get discountHistorySavingDesc;
+
+  /// No description provided for @discountHowToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Use'**
+  String get discountHowToUse;
+
+  /// No description provided for @step1Discount.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Select calculation type'**
+  String get step1Discount;
+
+  /// No description provided for @step1DiscountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose appropriate tab: Discount, Tip, Tax, or Markup'**
+  String get step1DiscountDesc;
+
+  /// No description provided for @step2Discount.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Enter information'**
+  String get step2Discount;
+
+  /// No description provided for @step2DiscountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in required information like price, percentage, quantity'**
+  String get step2DiscountDesc;
+
+  /// No description provided for @step3Discount.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: View results'**
+  String get step3Discount;
+
+  /// No description provided for @step3DiscountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Results will be displayed immediately with detailed information'**
+  String get step3DiscountDesc;
+
+  /// No description provided for @step4Discount.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Save to history'**
+  String get step4Discount;
+
+  /// No description provided for @step4DiscountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are automatically saved to history for future reference'**
+  String get step4DiscountDesc;
+
+  /// No description provided for @discountCalculationModes.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation Modes'**
+  String get discountCalculationModes;
+
+  /// No description provided for @discountMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Calculator'**
+  String get discountMode;
+
+  /// No description provided for @discountModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate final price after discount and savings amount'**
+  String get discountModeDesc;
+
+  /// No description provided for @tipMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip Calculator'**
+  String get tipMode;
+
+  /// No description provided for @tipModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate tip and split bill among multiple people'**
+  String get tipModeDesc;
+
+  /// No description provided for @taxMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Calculator'**
+  String get taxMode;
+
+  /// No description provided for @taxModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate tax amount and final price after tax'**
+  String get taxModeDesc;
+
+  /// No description provided for @markupMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup Calculator'**
+  String get markupMode;
+
+  /// No description provided for @markupModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate selling price and profit margin from cost price'**
+  String get markupModeDesc;
+
+  /// No description provided for @discountTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage Tips'**
+  String get discountTips;
+
+  /// No description provided for @discountTip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Use discount calculator when shopping to know real prices'**
+  String get discountTip1;
+
+  /// No description provided for @discountTip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate appropriate tip based on service quality'**
+  String get discountTip2;
+
+  /// No description provided for @discountTip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Check tax to know actual total cost'**
+  String get discountTip3;
+
+  /// No description provided for @discountTip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Use markup calculator for business pricing'**
+  String get discountTip4;
+
+  /// No description provided for @discountTip5.
+  ///
+  /// In en, this message translates to:
+  /// **'Save calculations for comparison and reference'**
+  String get discountTip5;
+
+  /// No description provided for @discountLimitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Important Notes'**
+  String get discountLimitations;
+
+  /// No description provided for @discountLimitationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Some important points to consider when using the discount calculator:'**
+  String get discountLimitationsDesc;
+
+  /// No description provided for @discountLimitation1.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are for reference only'**
+  String get discountLimitation1;
+
+  /// No description provided for @discountLimitation2.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax rates may vary by location'**
+  String get discountLimitation2;
+
+  /// No description provided for @discountLimitation3.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip amounts may vary by culture'**
+  String get discountLimitation3;
+
+  /// No description provided for @discountLimitation4.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup may be affected by other costs'**
+  String get discountLimitation4;
+
+  /// No description provided for @discountLimitation5.
+  ///
+  /// In en, this message translates to:
+  /// **'Should verify with actual receipts'**
+  String get discountLimitation5;
+
+  /// No description provided for @discountDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This tool is for calculation assistance only and does not replace professional financial advice. Results may differ from reality due to other factors.'**
+  String get discountDisclaimer;
+
   /// No description provided for @financialKeyFeatures.
   ///
   /// In en, this message translates to:
@@ -9400,6 +9922,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.'**
   String get financialDisclaimer;
+
+  /// No description provided for @discountResultSavedToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount result saved to history'**
+  String get discountResultSavedToHistory;
+
+  /// No description provided for @tipResultSavedToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip result saved to history'**
+  String get tipResultSavedToHistory;
+
+  /// No description provided for @taxResultSavedToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax result saved to history'**
+  String get taxResultSavedToHistory;
+
+  /// No description provided for @markupResultSavedToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Markup result saved to history'**
+  String get markupResultSavedToHistory;
+
+  /// No description provided for @startCalculatingToSeeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Start calculating to see history'**
+  String get startCalculatingToSeeHistory;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

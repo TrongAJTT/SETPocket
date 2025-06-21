@@ -2510,6 +2510,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressDialogInfo => 'This will show a progress dialog while fetching rates.';
 
   @override
+  String get calculate => 'Calculate';
+
+  @override
   String get calculating => 'Calculating...';
 
   @override
@@ -4744,6 +4747,264 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dateDisclaimer => 'This tool provides date information based on the standard Gregorian calendar. Results are for reference only and may require additional verification for important applications.';
 
   @override
+  String get discountCalculator => 'Discount Calculator';
+
+  @override
+  String get discountCalculatorDesc => 'Calculate discounts, tips, taxes, and markups quickly and accurately';
+
+  @override
+  String get discountTab => 'Discount';
+
+  @override
+  String get tipTab => 'Tip';
+
+  @override
+  String get taxTab => 'Tax';
+
+  @override
+  String get markupTab => 'Markup';
+
+  @override
+  String get originalPrice => 'Original Price (\$)';
+
+  @override
+  String get enterOriginalPrice => 'Enter original price';
+
+  @override
+  String get discountPercent => 'Discount Percent (%)';
+
+  @override
+  String get enterDiscountPercent => 'Enter discount percent';
+
+  @override
+  String get discountAmount => 'Discount Amount';
+
+  @override
+  String get finalPrice => 'Final Price';
+
+  @override
+  String get savedAmount => 'Saved Amount';
+
+  @override
+  String get billAmount => 'Bill Amount (\$)';
+
+  @override
+  String get enterBillAmount => 'Enter bill amount';
+
+  @override
+  String get tipPercent => 'Tip Percent (%)';
+
+  @override
+  String get enterTipPercent => 'Enter tip percent';
+
+  @override
+  String get numberOfPeople => 'Number of People';
+
+  @override
+  String get enterNumberOfPeople => 'Enter number of people';
+
+  @override
+  String get tipAmount => 'Tip Amount';
+
+  @override
+  String get totalBill => 'Total Bill';
+
+  @override
+  String get perPersonAmount => 'Per Person Amount';
+
+  @override
+  String get priceBeforeTax => 'Price Before Tax (\$)';
+
+  @override
+  String get enterPriceBeforeTax => 'Enter price before tax';
+
+  @override
+  String get taxRate => 'Tax Rate (%)';
+
+  @override
+  String get enterTaxRate => 'Enter tax rate';
+
+  @override
+  String get taxAmount => 'Tax Amount';
+
+  @override
+  String get priceAfterTax => 'Price After Tax';
+
+  @override
+  String get costPrice => 'Cost Price (\$)';
+
+  @override
+  String get enterCostPrice => 'Enter cost price';
+
+  @override
+  String get markupPercent => 'Markup Percent (%)';
+
+  @override
+  String get enterMarkupPercent => 'Enter markup percent';
+
+  @override
+  String get markupAmount => 'Markup Amount';
+
+  @override
+  String get sellingPrice => 'Selling Price';
+
+  @override
+  String get profitMargin => 'Profit Margin (%)';
+
+  @override
+  String get calculateDiscount => 'Calculate Discount';
+
+  @override
+  String get calculateTip => 'Calculate Tip';
+
+  @override
+  String get calculateTax => 'Calculate Tax';
+
+  @override
+  String get calculateMarkup => 'Calculate Markup';
+
+  @override
+  String get discountCalculatorResults => 'Discount Calculator Results';
+
+  @override
+  String get tipCalculatorResults => 'Tip Calculation Results';
+
+  @override
+  String get taxCalculatorResults => 'Tax Calculation Results';
+
+  @override
+  String get markupCalculatorResults => 'Markup Calculation Results';
+
+  @override
+  String get discountCalculatorDetailedInfo => 'Discount Calculator Information';
+
+  @override
+  String get discountCalculatorOverview => 'Comprehensive tool for discount, tip, tax, and markup calculations with many useful features';
+
+  @override
+  String get discountKeyFeatures => 'Key Features';
+
+  @override
+  String get comprehensiveDiscountCalc => 'Comprehensive Calculations';
+
+  @override
+  String get comprehensiveDiscountCalcDesc => 'Full support for discount, tip, tax, and markup calculations';
+
+  @override
+  String get multipleDiscountModes => 'Multiple Calculation Modes';
+
+  @override
+  String get multipleDiscountModesDesc => '4 different modes: discount, tip, tax, markup';
+
+  @override
+  String get realTimeDiscountResults => 'Real-time Results';
+
+  @override
+  String get realTimeDiscountResultsDesc => 'Get detailed results instantly as you input data';
+
+  @override
+  String get discountHistorySaving => 'History Saving';
+
+  @override
+  String get discountHistorySavingDesc => 'Save and review previous calculations for reference';
+
+  @override
+  String get discountHowToUse => 'How to Use';
+
+  @override
+  String get step1Discount => 'Step 1: Select calculation type';
+
+  @override
+  String get step1DiscountDesc => 'Choose appropriate tab: Discount, Tip, Tax, or Markup';
+
+  @override
+  String get step2Discount => 'Step 2: Enter information';
+
+  @override
+  String get step2DiscountDesc => 'Fill in required information like price, percentage, quantity';
+
+  @override
+  String get step3Discount => 'Step 3: View results';
+
+  @override
+  String get step3DiscountDesc => 'Results will be displayed immediately with detailed information';
+
+  @override
+  String get step4Discount => 'Step 4: Save to history';
+
+  @override
+  String get step4DiscountDesc => 'Results are automatically saved to history for future reference';
+
+  @override
+  String get discountCalculationModes => 'Calculation Modes';
+
+  @override
+  String get discountMode => 'Discount Calculator';
+
+  @override
+  String get discountModeDesc => 'Calculate final price after discount and savings amount';
+
+  @override
+  String get tipMode => 'Tip Calculator';
+
+  @override
+  String get tipModeDesc => 'Calculate tip and split bill among multiple people';
+
+  @override
+  String get taxMode => 'Tax Calculator';
+
+  @override
+  String get taxModeDesc => 'Calculate tax amount and final price after tax';
+
+  @override
+  String get markupMode => 'Markup Calculator';
+
+  @override
+  String get markupModeDesc => 'Calculate selling price and profit margin from cost price';
+
+  @override
+  String get discountTips => 'Usage Tips';
+
+  @override
+  String get discountTip1 => 'Use discount calculator when shopping to know real prices';
+
+  @override
+  String get discountTip2 => 'Calculate appropriate tip based on service quality';
+
+  @override
+  String get discountTip3 => 'Check tax to know actual total cost';
+
+  @override
+  String get discountTip4 => 'Use markup calculator for business pricing';
+
+  @override
+  String get discountTip5 => 'Save calculations for comparison and reference';
+
+  @override
+  String get discountLimitations => 'Important Notes';
+
+  @override
+  String get discountLimitationsDesc => 'Some important points to consider when using the discount calculator:';
+
+  @override
+  String get discountLimitation1 => 'Results are for reference only';
+
+  @override
+  String get discountLimitation2 => 'Tax rates may vary by location';
+
+  @override
+  String get discountLimitation3 => 'Tip amounts may vary by culture';
+
+  @override
+  String get discountLimitation4 => 'Markup may be affected by other costs';
+
+  @override
+  String get discountLimitation5 => 'Should verify with actual receipts';
+
+  @override
+  String get discountDisclaimer => 'This tool is for calculation assistance only and does not replace professional financial advice. Results may differ from reality due to other factors.';
+
+  @override
   String get financialKeyFeatures => 'Key Features';
 
   @override
@@ -4850,4 +5111,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get financialDisclaimer => 'This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.';
+
+  @override
+  String get discountResultSavedToHistory => 'Discount result saved to history';
+
+  @override
+  String get tipResultSavedToHistory => 'Tip result saved to history';
+
+  @override
+  String get taxResultSavedToHistory => 'Tax result saved to history';
+
+  @override
+  String get markupResultSavedToHistory => 'Markup result saved to history';
+
+  @override
+  String get startCalculatingToSeeHistory => 'Start calculating to see history';
 }

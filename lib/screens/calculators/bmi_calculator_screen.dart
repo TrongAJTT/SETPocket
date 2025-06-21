@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/bmi_models.dart';
-import 'package:setpocket/services/bmi_service.dart';
+import 'package:setpocket/services/calculator_services/bmi_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/widgets/calculator_layout.dart';
 import 'package:setpocket/widgets/calculator_content/bmi_calculator_content.dart';

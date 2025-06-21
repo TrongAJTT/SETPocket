@@ -72,11 +72,11 @@ class CalculatorToolsScreen extends StatelessWidget {
         'builder': () => DateCalculatorScreen(isEmbedded: isEmbedded),
       },
       {
-        'title': "Discount Calculator",
-        'description': "Calculate discounts, tips, and tax",
+        'title': localizations.discountCalculator,
+        'description': localizations.discountCalculatorDesc,
         'icon': Icons.local_offer,
         'color': Colors.purple,
-        'builder': () => const DiscountCalculatorScreen(),
+        'builder': () => DiscountCalculatorScreen(isEmbedded: isEmbedded),
       },
     ];
 

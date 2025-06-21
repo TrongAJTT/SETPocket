@@ -4,7 +4,7 @@ import 'template_service.dart';
 import 'generation_history_service.dart';
 import 'calculator_history_service.dart';
 import 'graphing_calculator_service.dart';
-import 'bmi_service.dart';
+import 'calculator_services/bmi_service.dart';
 import 'hive_service.dart';
 import 'converter_services/currency_state_service.dart';
 import 'converter_services/currency_preset_service.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/bmi_models.dart';
-import 'package:setpocket/services/bmi_service.dart';
+import 'package:setpocket/services/calculator_services/bmi_service.dart';
 
 /// BMI Calculator content widget - separated from main screen for better organization
 class BmiCalculatorContent extends StatefulWidget {

@@ -48,6 +48,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         calculatorToolsDesc: loc.cacheTypeCalculatorToolsDesc,
         converterToolsName: loc.cacheTypeConverterTools,
         converterToolsDesc: loc.cacheTypeConverterToolsDesc,
+        p2pDataTransferName: loc.p2pDataTransfer,
+        p2pDataTransferDesc: 'P2P users, pairing data, and transfer settings',
       );
       setState(() {
         _cacheInfo = cacheInfo;
@@ -76,6 +78,36 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
 
   Future<void> _clearCache(String cacheType, String cacheName) async {
     final loc = AppLocalizations.of(context)!;
+
+    // Check if cache can be cleared
+    final canClear = await CacheService.canClearCache(cacheType);
+    if (!canClear) {
+      final reason = await CacheService.getClearCacheBlockReason(cacheType);
+
+      // Show blocking dialog
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.orange),
+              SizedBox(width: 8),
+              Text('Cannot Clear Cache'),
+            ],
+          ),
+          content:
+              Text(reason ?? 'This cache cannot be cleared at the moment.'),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -152,6 +184,18 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
     final loc = AppLocalizations.of(context)!;
     final textController = TextEditingController();
 
+    // Check for blocked caches
+    final blockedCaches = <String, String>{};
+    for (final entry in _cacheInfo.entries) {
+      final canClear = await CacheService.canClearCache(entry.key);
+      if (!canClear) {
+        final reason = await CacheService.getClearCacheBlockReason(entry.key);
+        if (reason != null) {
+          blockedCaches[entry.value.name] = reason;
+        }
+      }
+    }
+
     return await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -163,6 +207,61 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(loc.confirmClearAllCache),
+
+              // Show blocked caches if any
+              if (blockedCaches.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.warning, color: Colors.orange, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'These caches will NOT be cleared:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ...blockedCaches.entries.map((entry) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '• ${entry.key}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ),
+                                Text(
+                                  '  ${entry.value}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.orange.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 16),
               Text(
                 loc.typeConfirmToProceed,
@@ -261,6 +360,107 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
     }
   }
 
+  Future<void> _debugP2PCache() async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text('Debugging P2P cache...'),
+            ],
+          ),
+        ),
+      );
+
+      // Force sync P2P data and debug
+      await CacheService.syncP2PDataToCache();
+      final debugInfo = await CacheService.debugP2PCache();
+
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
+
+      // Show debug results
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('P2P Cache Debug'),
+          content: SingleChildScrollView(
+            child: Text(
+              'Service Status:\n'
+              '  - Enabled: ${debugInfo['service_enabled']}\n'
+              '  - Discovered: ${debugInfo['discovered_users']}\n'
+              '  - Paired: ${debugInfo['paired_users']}\n'
+              '  - Stored: ${debugInfo['stored_users']}\n\n'
+              'Hive Boxes:\n${_formatHiveBoxes(debugInfo['hive_boxes'])}\n\n'
+              'Cache Info:\n'
+              '  - Items: ${debugInfo['cache_info']?['item_count']}\n'
+              '  - Size: ${debugInfo['cache_info']?['size_bytes']} bytes\n\n'
+              '${debugInfo['error'] != null ? 'Error: ${debugInfo['error']}' : ''}',
+              style: const TextStyle(fontFamily: 'monospace'),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _loadCacheInfo(); // Refresh cache display
+              },
+              child: const Text('Refresh'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) Navigator.of(context).pop();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Debug error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  String _formatHiveBoxes(dynamic boxes) {
+    if (boxes == null) return 'No data';
+
+    final Map<String, dynamic> boxMap = boxes as Map<String, dynamic>;
+    final buffer = StringBuffer();
+
+    for (final entry in boxMap.entries) {
+      final boxName = entry.key;
+      final boxData = entry.value as Map<String, dynamic>;
+
+      buffer.write('  $boxName:\n');
+      buffer.write('    - Exists: ${boxData['exists']}\n');
+      if (boxData['length'] != null) {
+        buffer.write('    - Length: ${boxData['length']}\n');
+      }
+      if (boxData['keys'] != null) {
+        buffer.write('    - Keys: ${boxData['keys']}\n');
+      }
+      if (boxData['error'] != null) {
+        buffer.write('    - Error: ${boxData['error']}\n');
+      }
+      buffer.write('\n');
+    }
+
+    return buffer.toString().trim();
+  }
+
   Widget _buildCacheSection(String cacheType, CacheInfo info) {
     return Card(
       child: Padding(
@@ -297,22 +497,61 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                     ],
                   ),
                 ),
-                if (cacheType !=
-                    'settings') // Don't allow clearing settings cache
-                  IconButton(
-                    onPressed: info.itemCount > 0
-                        ? () => _clearCache(cacheType, info.name)
-                        : null,
-                    icon: const Icon(Icons.delete_outline, size: 16),
-                    tooltip: AppLocalizations.of(context)!.clearCache,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Debug button for P2P cache
+                    if (cacheType == 'p2p_data_transfer')
+                      IconButton(
+                        onPressed: () => _debugP2PCache(),
+                        icon: Icon(Icons.bug_report, size: 16),
+                        tooltip: 'Debug P2P Cache',
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.orange.shade600,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                    if (cacheType == 'p2p_data_transfer')
+                      const SizedBox(width: 8),
+
+                    // Clear cache button
+                    if (cacheType !=
+                        'settings') // Don't allow clearing settings cache
+                      FutureBuilder<bool>(
+                        future: CacheService.canClearCache(cacheType),
+                        builder: (context, snapshot) {
+                          final canClear = snapshot.data ?? true;
+
+                          return IconButton(
+                            onPressed: info.itemCount > 0 && canClear
+                                ? () => _clearCache(cacheType, info.name)
+                                : null,
+                            icon: Icon(
+                              canClear
+                                  ? Icons.delete_outline
+                                  : Icons.lock_outline,
+                              size: 16,
+                            ),
+                            tooltip: canClear
+                                ? AppLocalizations.of(context)!.clearCache
+                                : 'Cannot clear (service active)',
+                            style: FilledButton.styleFrom(
+                              backgroundColor: canClear
+                                  ? Colors.red.shade600
+                                  : Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -403,6 +642,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Icons.casino;
       case 'converter_tools':
         return Icons.swap_horiz;
+      case 'p2p_data_transfer':
+        return Icons.wifi;
       default:
         return Icons.storage;
     }
@@ -418,6 +659,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Colors.purple;
       case 'converter_tools':
         return Colors.green;
+      case 'p2p_data_transfer':
+        return Colors.indigo;
       default:
         return Colors.grey;
     }

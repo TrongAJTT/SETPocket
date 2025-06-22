@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class P2PController with ChangeNotifier {
   final P2PService _p2pService = P2PService.instance;
@@ -22,6 +23,9 @@ class P2PController with ChangeNotifier {
   bool _isRefreshing = false;
   bool _hasPerformedInitialDiscovery = false;
 
+  // Callback for new pairing requests
+  Function(PairingRequest)? _onNewPairingRequest;
+
   P2PController() {
     _p2pService.addListener(_onP2PServiceChanged);
   }
@@ -37,10 +41,124 @@ class P2PController with ChangeNotifier {
   P2PUser? get currentUser => _p2pService.currentUser;
   List<P2PUser> get discoveredUsers => _p2pService.discoveredUsers;
   List<P2PUser> get pairedUsers => _p2pService.pairedUsers;
-  List<P2PUser> get connectedUsers => _p2pService.connectedUsers;
-  List<P2PUser> get unconnectedUsers => _p2pService.unconnectedUsers;
+
+  /// Saved devices (stored connections) - ensure no duplicates
+  List<P2PUser> get connectedUsers {
+    final users = _p2pService.connectedUsers; // This returns isStored users
+    return _deduplicateUsers(users);
+  }
+
+  /// Available devices (discovered but not stored) - ensure no duplicates
+  List<P2PUser> get unconnectedUsers {
+    final users = _p2pService.unconnectedUsers; // This returns !isStored users
+    final connectedUserIds = connectedUsers.map((u) => u.id).toSet();
+
+    // Filter out users that are already in connected list
+    final filteredUsers =
+        users.where((u) => !connectedUserIds.contains(u.id)).toList();
+
+    return _deduplicateUsers(filteredUsers);
+  }
+
+  /// Deduplicate users by multiple criteria to prevent UI duplicates
+  List<P2PUser> _deduplicateUsers(List<P2PUser> users) {
+    final uniqueUsers = <String, P2PUser>{};
+    final ipPortCombos = <String, P2PUser>{};
+
+    for (final user in users) {
+      final ipPortKey = '${user.ipAddress}:${user.port}';
+
+      // Check for duplicates by ID first
+      final existingById = uniqueUsers[user.id];
+      if (existingById == null) {
+        // Check for duplicates by IP:Port
+        final existingByIpPort = ipPortCombos[ipPortKey];
+        if (existingByIpPort == null) {
+          // No duplicates found, add user
+          uniqueUsers[user.id] = user;
+          ipPortCombos[ipPortKey] = user;
+        } else {
+          // Found duplicate by IP:Port, keep the better one
+          final betterUser = _chooseBetterUser(existingByIpPort, user);
+
+          // Remove old entries
+          uniqueUsers.remove(existingByIpPort.id);
+          ipPortCombos.remove(ipPortKey);
+
+          // Add better user
+          uniqueUsers[betterUser.id] = betterUser;
+          ipPortCombos[ipPortKey] = betterUser;
+        }
+      } else {
+        // Found duplicate by ID, merge data and keep the better one
+        final mergedUser = _mergeUserData(existingById, user);
+        uniqueUsers[user.id] = mergedUser;
+        ipPortCombos[ipPortKey] = mergedUser;
+      }
+    }
+
+    return uniqueUsers.values.toList();
+  }
+
+  /// Choose the better user when duplicates are found
+  P2PUser _chooseBetterUser(P2PUser user1, P2PUser user2) {
+    // Priority order:
+    // 1. Stored users over non-stored
+    // 2. Paired users over non-paired
+    // 3. Trusted users over non-trusted
+    // 4. Online users over offline
+    // 5. More recent lastSeen
+
+    if (user1.isStored != user2.isStored) {
+      return user1.isStored ? user1 : user2;
+    }
+
+    if (user1.isPaired != user2.isPaired) {
+      return user1.isPaired ? user1 : user2;
+    }
+
+    if (user1.isTrusted != user2.isTrusted) {
+      return user1.isTrusted ? user1 : user2;
+    }
+
+    if (user1.isOnline != user2.isOnline) {
+      return user1.isOnline ? user1 : user2;
+    }
+
+    // Choose more recent
+    return user1.lastSeen.isAfter(user2.lastSeen) ? user1 : user2;
+  }
+
+  /// Merge data from two user objects
+  P2PUser _mergeUserData(P2PUser primary, P2PUser secondary) {
+    // Use primary as base and update with better data from secondary
+    if (secondary.isStored && !primary.isStored) {
+      primary.isStored = secondary.isStored;
+      primary.isPaired = secondary.isPaired;
+      primary.isTrusted = secondary.isTrusted;
+      primary.autoConnect = secondary.autoConnect;
+      primary.pairedAt = secondary.pairedAt;
+    }
+
+    // Update network info if secondary is more recent
+    if (secondary.lastSeen.isAfter(primary.lastSeen)) {
+      primary.ipAddress = secondary.ipAddress;
+      primary.port = secondary.port;
+      primary.lastSeen = secondary.lastSeen;
+      primary.isOnline = secondary.isOnline;
+    }
+
+    // Update display name if secondary has a better name
+    if (primary.displayName.startsWith('Device-') &&
+        !secondary.displayName.startsWith('Device-')) {
+      primary.displayName = secondary.displayName;
+    }
+
+    return primary;
+  }
+
   List<PairingRequest> get pendingRequests => _p2pService.pendingRequests;
-  List<FileTransferTask> get activeTransfers => _p2pService.activeTransfers;
+  List<DataTransferTask> get activeTransfers => _p2pService.activeTransfers;
   P2PUser? get selectedUser => _selectedUser;
   String? get selectedFile => _selectedFile;
   bool get isRefreshing => _isRefreshing;
@@ -141,7 +259,7 @@ class P2PController with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Select user for pairing or file transfer
+  /// Select user for pairing or data transfer
   void selectUser(P2PUser user) {
     _selectedUser = user;
     notifyListeners();
@@ -198,12 +316,12 @@ class P2PController with ChangeNotifier {
   }
 
   /// Send file to selected user
-  Future<bool> sendFileToUser(String filePath, P2PUser targetUser) async {
+  Future<bool> sendDataToUser(String filePath, P2PUser targetUser) async {
     try {
       _errorMessage = null;
-      final success = await _p2pService.sendFile(filePath, targetUser);
+      final success = await _p2pService.sendData(filePath, targetUser);
       if (!success) {
-        _errorMessage = 'Failed to start file transfer';
+        _errorMessage = 'Failed to start data transfer';
       }
       notifyListeners();
       return success;
@@ -214,13 +332,13 @@ class P2PController with ChangeNotifier {
     }
   }
 
-  /// Cancel file transfer
-  Future<bool> cancelFileTransfer(String taskId) async {
+  /// Cancel data transfer
+  Future<bool> cancelDataTransfer(String taskId) async {
     try {
       _errorMessage = null;
-      final success = await _p2pService.cancelFileTransfer(taskId);
+      final success = await _p2pService.cancelDataTransfer(taskId);
       if (!success) {
-        _errorMessage = 'Failed to cancel file transfer';
+        _errorMessage = 'Failed to cancel data transfer';
       }
       notifyListeners();
       return success;
@@ -264,8 +382,8 @@ class P2PController with ChangeNotifier {
     }
   }
 
-  /// Get file transfer progress text
-  String getTransferProgressText(FileTransferTask task) {
+  /// Get data transfer progress text
+  String getTransferProgressText(DataTransferTask task) {
     final progress = (task.progress * 100).toStringAsFixed(1);
     final transferred = _formatBytes(task.transferredBytes);
     final total = _formatBytes(task.fileSize);
@@ -303,37 +421,37 @@ class P2PController with ChangeNotifier {
   }
 
   /// Get transfer status icon
-  IconData getTransferStatusIcon(FileTransferTask task) {
+  IconData getTransferStatusIcon(DataTransferTask task) {
     switch (task.status) {
-      case FileTransferStatus.pending:
+      case DataTransferStatus.pending:
         return Icons.schedule;
-      case FileTransferStatus.requesting:
+      case DataTransferStatus.requesting:
         return Icons.help_outline;
-      case FileTransferStatus.transferring:
+      case DataTransferStatus.transferring:
         return Icons.sync;
-      case FileTransferStatus.completed:
+      case DataTransferStatus.completed:
         return Icons.check_circle;
-      case FileTransferStatus.failed:
+      case DataTransferStatus.failed:
         return Icons.error;
-      case FileTransferStatus.cancelled:
+      case DataTransferStatus.cancelled:
         return Icons.cancel;
     }
   }
 
   /// Get transfer status color
-  Color getTransferStatusColor(FileTransferTask task) {
+  Color getTransferStatusColor(DataTransferTask task) {
     switch (task.status) {
-      case FileTransferStatus.pending:
+      case DataTransferStatus.pending:
         return Colors.orange;
-      case FileTransferStatus.requesting:
+      case DataTransferStatus.requesting:
         return Colors.blue;
-      case FileTransferStatus.transferring:
+      case DataTransferStatus.transferring:
         return Colors.green;
-      case FileTransferStatus.completed:
+      case DataTransferStatus.completed:
         return Colors.green;
-      case FileTransferStatus.failed:
+      case DataTransferStatus.failed:
         return Colors.red;
-      case FileTransferStatus.cancelled:
+      case DataTransferStatus.cancelled:
         return Colors.grey;
     }
   }
@@ -358,14 +476,18 @@ class P2PController with ChangeNotifier {
 
   /// Manual discovery for refresh button
   Future<void> manualDiscovery() async {
-    if (!isEnabled) return;
-
-    _isRefreshing = true;
-    _errorMessage = null;
-    notifyListeners();
+    if (_isRefreshing) return;
 
     try {
+      _isRefreshing = true;
+      notifyListeners();
+
       await _p2pService.manualDiscovery();
+      _p2pService.lastDiscoveryTime =
+          DateTime.now(); // Update time after discovery runs
+
+      // Add a short cooldown to prevent spamming
+      await Future.delayed(const Duration(seconds: 10));
     } catch (e) {
       _errorMessage = 'Discovery failed: $e';
     } finally {
@@ -465,13 +587,28 @@ class P2PController with ChangeNotifier {
   P2PFileStorageSettings? get fileStorageSettings =>
       _p2pService.fileStorageSettings;
 
+  /// Set callback for new pairing requests (for auto-showing dialogs)
+  void setNewPairingRequestCallback(Function(PairingRequest)? callback) {
+    _onNewPairingRequest = callback;
+    _p2pService.setNewPairingRequestCallback(callback);
+  }
+
+  /// Clear new pairing request callback
+  void clearNewPairingRequestCallback() {
+    _onNewPairingRequest = null;
+    _p2pService.setNewPairingRequestCallback(null);
+  }
+
   void _onP2PServiceChanged() {
+    logInfo(
+        '🔄 P2PController: Service changed - discovered users: ${_p2pService.discoveredUsers.length}, connected: ${_p2pService.connectedUsers.length}');
     notifyListeners();
   }
 
   @override
   void dispose() {
     _p2pService.removeListener(_onP2PServiceChanged);
+    clearNewPairingRequestCallback(); // Clean up callback
     super.dispose();
   }
 }

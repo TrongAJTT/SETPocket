@@ -131,24 +131,24 @@ class PairingRequestAdapter extends TypeAdapter<PairingRequest> {
           typeId == other.typeId;
 }
 
-class FileTransferTaskAdapter extends TypeAdapter<FileTransferTask> {
+class DataTransferTaskAdapter extends TypeAdapter<DataTransferTask> {
   @override
   final int typeId = 49;
 
   @override
-  FileTransferTask read(BinaryReader reader) {
+  DataTransferTask read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return FileTransferTask(
+    return DataTransferTask(
       id: fields[0] as String?,
       fileName: fields[1] as String,
       filePath: fields[2] as String,
       fileSize: fields[3] as int,
       targetUserId: fields[4] as String,
       targetUserName: fields[5] as String,
-      status: fields[6] as FileTransferStatus,
+      status: fields[6] as DataTransferStatus,
       transferredBytes: fields[7] as int,
       createdAt: fields[8] as DateTime?,
       startedAt: fields[9] as DateTime?,
@@ -160,7 +160,7 @@ class FileTransferTaskAdapter extends TypeAdapter<FileTransferTask> {
   }
 
   @override
-  void write(BinaryWriter writer, FileTransferTask obj) {
+  void write(BinaryWriter writer, DataTransferTask obj) {
     writer
       ..writeByte(14)
       ..writeByte(0)
@@ -199,7 +199,7 @@ class FileTransferTaskAdapter extends TypeAdapter<FileTransferTask> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FileTransferTaskAdapter &&
+      other is DataTransferTaskAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

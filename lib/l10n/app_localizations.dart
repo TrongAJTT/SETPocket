@@ -9953,17 +9953,17 @@ abstract class AppLocalizations {
   /// **'Start calculating to see history'**
   String get startCalculatingToSeeHistory;
 
-  /// No description provided for @p2pFileTransfer.
+  /// No description provided for @p2pDataTransfer.
   ///
   /// In en, this message translates to:
-  /// **'P2P File Transfer'**
-  String get p2pFileTransfer;
+  /// **'P2P Data Transfer'**
+  String get p2pDataTransfer;
 
-  /// No description provided for @p2pFileTransferDesc.
+  /// No description provided for @p2pDataTransferDesc.
   ///
   /// In en, this message translates to:
-  /// **'Transfer files directly between devices on the same network'**
-  String get p2pFileTransferDesc;
+  /// **'Transfer data directly between devices on the same network'**
+  String get p2pDataTransferDesc;
 
   /// No description provided for @networkSecurityWarning.
   ///
@@ -10124,7 +10124,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfersWillAppearHere.
   ///
   /// In en, this message translates to:
-  /// **'File transfers will appear here'**
+  /// **'Data transfers will appear here'**
   String get transfersWillAppearHere;
 
   /// No description provided for @paired.
@@ -10205,17 +10205,23 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get p2pPermissionCancel;
 
-  /// No description provided for @fileTransferRequest.
+  /// No description provided for @dataTransferRequest.
   ///
   /// In en, this message translates to:
-  /// **'File Transfer Request'**
-  String get fileTransferRequest;
+  /// **'Data Transfer Request'**
+  String get dataTransferRequest;
 
-  /// No description provided for @fileTransferResponse.
+  /// No description provided for @dataTransferResponse.
   ///
   /// In en, this message translates to:
-  /// **'File Transfer Response'**
-  String get fileTransferResponse;
+  /// **'Data Transfer Response'**
+  String get dataTransferResponse;
+
+  /// No description provided for @sendData.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Data'**
+  String get sendData;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

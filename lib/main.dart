@@ -14,6 +14,8 @@ import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
 import 'package:setpocket/services/draft_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
+import 'package:setpocket/services/p2p_service.dart';
+import 'package:setpocket/models/p2p_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/text_template_gen_list_screen.dart';
@@ -21,7 +23,7 @@ import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
 import 'screens/converter_tools_screen.dart';
 import 'screens/calculator_tools_screen.dart';
-import 'screens/p2p_file_transfer_screen.dart';
+import 'screens/p2p_data_transfer_screen.dart';
 import 'package:flutter/services.dart';
 
 // Global navigation key for deep linking
@@ -133,8 +135,8 @@ Widget _getToolScreen(ToolConfig tool) {
       return const ConverterToolsScreen();
     case 'calculatorTools':
       return const CalculatorToolsScreen();
-    case 'p2pFileTransfer':
-      return const P2PFileTransferScreen();
+    case 'p2pDataTransfer':
+      return const P2PDataTransferScreen();
     default:
       return const HomePage(); // Fallback to home
   }
@@ -179,8 +181,139 @@ class SettingsController extends ChangeNotifier {
 
 final SettingsController settingsController = SettingsController();
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.detached:
+        // App is being terminated
+        _handleAppTermination();
+        break;
+      case AppLifecycleState.paused:
+        // App goes to background (might be killed)
+        _handleAppPaused();
+        break;
+      case AppLifecycleState.resumed:
+        // App comes back to foreground
+        _handleAppResumed();
+        break;
+      case AppLifecycleState.inactive:
+        // App loses focus but still visible (e.g., incoming call)
+        break;
+      case AppLifecycleState.hidden:
+        // App is hidden but still running
+        break;
+    }
+  }
+
+  Future<void> _handleAppTermination() async {
+    logInfo(
+        '🚨 App termination detected - sending emergency disconnect signals');
+    await _sendEmergencyDisconnectSignals();
+  }
+
+  Future<void> _handleAppPaused() async {
+    logInfo('⏸️ App paused - preparing for potential termination');
+    // Don't immediately disconnect on pause as user might switch back
+    // Instead, set a flag that we're potentially closing
+  }
+
+  Future<void> _handleAppResumed() async {
+    logInfo('▶️ App resumed');
+    // Cancel any pending emergency disconnect if app resumes quickly
+  }
+
+  Future<void> _sendEmergencyDisconnectSignals() async {
+    try {
+      final p2pService = P2PService.instance;
+
+      if (!p2pService.isEnabled || p2pService.currentUser == null) {
+        return;
+      }
+
+      // Get all connected/paired users
+      final connectedUsers = p2pService.discoveredUsers
+          .where((user) => user.isPaired && user.isOnline)
+          .toList();
+
+      if (connectedUsers.isEmpty) {
+        logInfo('No connected users to notify');
+        return;
+      }
+
+      logInfo('Sending emergency disconnect to ${connectedUsers.length} users');
+
+      // Send disconnect message to all connected users simultaneously
+      final disconnectFutures = connectedUsers.map((user) async {
+        try {
+          final message = P2PMessage(
+            type: P2PMessageTypes.disconnect,
+            fromUserId: p2pService.currentUser!.id,
+            toUserId: user.id,
+            data: {
+              'reason': 'app_termination',
+              'message': 'App is closing',
+              'fromUserName': p2pService.currentUser!.displayName,
+              'emergency': true,
+            },
+          );
+
+          // Send emergency disconnect message
+          await _sendEmergencyMessage(p2pService, user, message);
+
+          logInfo('✅ Emergency disconnect sent to ${user.displayName}');
+        } catch (e) {
+          logWarning(
+              '❌ Failed to send emergency disconnect to ${user.displayName}: $e');
+        }
+      });
+
+      // Wait for all disconnect messages with a maximum timeout
+      await Future.wait(disconnectFutures).timeout(const Duration(seconds: 5),
+          onTimeout: () {
+        logWarning(
+            'Emergency disconnect timeout - some messages may not have been sent');
+        return [];
+      });
+
+      logInfo('Emergency disconnect sequence completed');
+    } catch (e) {
+      logError('Error during emergency disconnect: $e');
+    }
+  }
+
+  Future<bool> _sendEmergencyMessage(
+      P2PService p2pService, P2PUser user, P2PMessage message) async {
+    try {
+      // Try to send emergency disconnect with short timeout
+      return await p2pService.sendEmergencyDisconnect(user, message);
+    } catch (e) {
+      logError('Failed to send emergency message to ${user.displayName}: $e');
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -251,8 +384,22 @@ class _HomePageState extends State<HomePage> with WindowListener {
   void onWindowClose() async {
     // Trigger emergency save before window closes
     DraftService.triggerEmergencySave();
+
+    // Send emergency disconnect signals
+    await _sendEmergencyP2PDisconnect();
+
     // Allow window to close
     await windowManager.destroy();
+  }
+
+  Future<void> _sendEmergencyP2PDisconnect() async {
+    try {
+      final p2pService = P2PService.instance;
+      await p2pService.sendEmergencyDisconnectToAll();
+      logInfo('Window close: Emergency P2P disconnect signals sent');
+    } catch (e) {
+      logError('Error sending emergency P2P disconnect on window close: $e');
+    }
   }
 
   @override
@@ -798,8 +945,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
                   parentCategory: parentCategory ?? 'CalculatorToolsScreen',
                   icon: icon),
         );
-      case 'p2pFileTransfer':
-        return P2PFileTransferScreen(
+      case 'p2pDataTransfer':
+        return P2PDataTransferScreen(
           isEmbedded: widget.isDesktop,
         );
       default:
@@ -852,8 +999,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return l10n.converterTools;
       case 'calculatorTools':
         return l10n.calculatorTools;
-      case 'p2pFileTransfer':
-        return l10n.p2pFileTransfer;
+      case 'p2pDataTransfer':
+        return l10n.p2pDataTransfer;
       default:
         return nameKey;
     }
@@ -870,8 +1017,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return l10n.converterToolsDesc;
       case 'calculatorToolsDesc':
         return l10n.calculatorToolsDesc;
-      case 'p2pFileTransferDesc':
-        return l10n.p2pFileTransferDesc;
+      case 'p2pDataTransferDesc':
+        return l10n.p2pDataTransferDesc;
       default:
         return descKey;
     }
@@ -887,8 +1034,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return 'ConverterToolsScreen';
       case 'calculatorTools':
         return 'CalculatorToolsScreen';
-      case 'p2pFileTransfer':
-        return 'P2PFileTransferScreen';
+      case 'p2pDataTransfer':
+        return 'P2PDataTransferScreen';
       default:
         return '';
     }

@@ -10,21 +10,23 @@ import 'package:setpocket/utils/network_debug_utils.dart';
 import 'package:setpocket/widgets/p2p/network_security_warning_dialog.dart';
 import 'package:setpocket/widgets/p2p/pairing_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/user_pairing_dialog.dart';
-import 'package:setpocket/widgets/p2p/file_transfer_progress_widget.dart';
+import 'package:setpocket/widgets/p2p/data_transfer_progress_widget.dart';
 import 'package:setpocket/widgets/p2p/permission_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/file_storage_settings_dialog.dart';
+import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
+import 'package:setpocket/services/app_logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class P2PFileTransferScreen extends StatefulWidget {
+class P2PDataTransferScreen extends StatefulWidget {
   final bool isEmbedded;
 
-  const P2PFileTransferScreen({super.key, this.isEmbedded = false});
+  const P2PDataTransferScreen({super.key, this.isEmbedded = false});
 
   @override
-  State<P2PFileTransferScreen> createState() => _P2PFileTransferScreenState();
+  State<P2PDataTransferScreen> createState() => _P2PDataTransferScreenState();
 }
 
-class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
+class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
   late P2PController _controller;
   int _currentTabIndex = 0;
 
@@ -33,12 +35,17 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
     super.initState();
     _controller = P2PController();
     _controller.addListener(_onControllerChanged);
+
+    // Set up callback for auto-showing pairing request dialogs
+    _controller.setNewPairingRequestCallback(_onNewPairingRequest);
+
     _initializeController();
   }
 
   @override
   void dispose() {
     _controller.removeListener(_onControllerChanged);
+    _controller.clearNewPairingRequestCallback(); // Clear callback
     _controller.dispose();
     super.dispose();
   }
@@ -60,21 +67,33 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
     }
   }
 
+  /// Handle new pairing request - auto-show dialog if screen is visible
+  void _onNewPairingRequest(PairingRequest request) {
+    if (mounted) {
+      logInfo(
+          'Auto-showing pairing request dialog for: ${request.fromUserName}');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Show dialog immediately for new requests
+        _showSinglePairingRequestDialog(request);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     if (!_controller.isInitialized) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.p2pFileTransfer)),
+        appBar: AppBar(title: Text(l10n.p2pDataTransfer)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return TwoPanelsMainMultiTabLayout(
       isEmbedded: widget.isEmbedded,
-      title: l10n.p2pFileTransfer,
-      mainPanelTitle: l10n.p2pFileTransfer,
+      title: l10n.p2pDataTransfer,
+      mainPanelTitle: l10n.p2pDataTransfer,
       mainTabIndex: _currentTabIndex,
       onMainTabChanged: (index) {
         setState(() {
@@ -82,19 +101,12 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
         });
       },
       mainPanelActions: [
-        IconButton(
-          icon: Icon(_controller.isEnabled ? Icons.wifi_off : Icons.wifi),
-          onPressed: _toggleNetworking,
-          tooltip: _controller.isEnabled
-              ? l10n.stopNetworking
-              : l10n.startNetworking,
-        ),
         // Refresh button - show only when networking is enabled and not currently refreshing
         if (_controller.isEnabled && !_controller.isRefreshing)
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.wifi_tethering),
             onPressed: _manualRefresh,
-            tooltip: 'Refresh Devices',
+            tooltip: 'Broadcast Signal',
           ),
         // Loading indicator when refreshing
         if (_controller.isRefreshing)
@@ -158,16 +170,16 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
-                    // Connected devices section
+                    // Saved devices section
                     if (_controller.connectedUsers.isNotEmpty) ...[
-                      _buildSectionHeader('Đã kết nối'),
+                      _buildSectionHeader('Saved Devices'),
                       ..._controller.connectedUsers
                           .map((user) => _buildUserCard(user)),
                       const SizedBox(height: 16),
                     ],
-                    // Unconnected devices section
+                    // Available devices section
                     if (_controller.unconnectedUsers.isNotEmpty) ...[
-                      _buildSectionHeader('Chưa kết nối'),
+                      _buildSectionHeader('Available Devices'),
                       ..._controller.unconnectedUsers
                           .map((user) => _buildUserCard(user)),
                     ],
@@ -188,7 +200,7 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
       itemCount: _controller.activeTransfers.length,
       itemBuilder: (context, index) {
         final transfer = _controller.activeTransfers[index];
-        return FileTransferProgressWidget(
+        return DataTransferProgressWidget(
           task: transfer,
           onCancel: () => _cancelTransfer(transfer.id),
         );
@@ -295,40 +307,60 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
 
   Widget _buildNetworkStatusCard() {
     final l10n = AppLocalizations.of(context)!;
+    final isDesktop = MediaQuery.of(context).size.width > 1200;
+
+    final toggleNetworkBtn = ElevatedButton.icon(
+      onPressed: _toggleNetworking,
+      icon: Icon(_controller.isEnabled ? Icons.wifi_off : Icons.wifi),
+      label: Text(_controller.isEnabled
+          ? (l10n.stopNetworking)
+          : (l10n.startNetworking)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _controller.isEnabled ? Colors.red[700] : null,
+        foregroundColor: _controller.isEnabled ? Colors.white : null,
+      ),
+    );
 
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        child: Column(
           children: [
-            Icon(
-              _getNetworkStatusIcon(),
-              color: _getNetworkStatusColor(),
-              size: 32,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _controller.getNetworkStatusDescription(),
-                    style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Icon(
+                  _getNetworkStatusIcon(),
+                  color: _getNetworkStatusColor(),
+                  size: 32,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _controller.getNetworkStatusDescription(),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _controller.getConnectionStatusDescription(),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _controller.getConnectionStatusDescription(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
+                ),
+                if (isDesktop) toggleNetworkBtn
+              ],
             ),
-            if (!_controller.isEnabled)
-              ElevatedButton(
-                onPressed: _startNetworking,
-                child: Text(l10n.startNetworking ?? 'Start'),
-              ),
+            if (!isDesktop) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [toggleNetworkBtn],
+              )
+            ]
           ],
         ),
       ),
@@ -366,26 +398,27 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${user.ipAddress}:${user.port}'),
-            if (user.isPaired)
-              Row(
+            if (user.isPaired || user.isTrusted)
+              Wrap(
+                spacing: 6.0,
+                runSpacing: 4.0,
                 children: [
-                  Icon(Icons.link, size: 16, color: Colors.blue),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.paired ?? 'Paired',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                  if (user.isTrusted) ...[
-                    const SizedBox(width: 8),
-                    Icon(Icons.verified_user, size: 16, color: Colors.green),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.trusted ?? 'Trusted',
-                      style: TextStyle(color: Colors.green),
+                  if (user.isPaired)
+                    const Chip(
+                      label: Text('Paired'),
+                      avatar: Icon(Icons.link, size: 14),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
                     ),
-                  ],
+                  if (user.isTrusted)
+                    const Chip(
+                      label: Text('Trusted'),
+                      avatar: Icon(Icons.verified_user, size: 14),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                    ),
                 ],
-              ),
+              )
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -410,7 +443,7 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
                   children: [
                     const Icon(Icons.send),
                     const SizedBox(width: 8),
-                    Text(l10n.sendFile ?? 'Send File'),
+                    Text(l10n.sendData ?? 'Send File'),
                   ],
                 ),
               ),
@@ -477,14 +510,14 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _controller.isEnabled
-                ? (_controller.isRefreshing
-                    ? 'Searching for devices...'
-                    : (_controller.hasPerformedInitialDiscovery
+            _controller.isRefreshing
+                ? 'Searching for devices...'
+                : (_controller.isEnabled
+                    ? (_controller.hasPerformedInitialDiscovery
                         ? 'No devices in range. Try refreshing.'
-                        : 'Initial discovery in progress...'))
-                : (l10n.startNetworkingToDiscover ??
-                    'Start networking to discover devices'),
+                        : 'Initial discovery in progress...')
+                    : (l10n.startNetworkingToDiscover ??
+                        'Start networking to discover devices')),
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -501,8 +534,8 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
             if (!_controller.isRefreshing)
               ElevatedButton.icon(
                 onPressed: _manualRefresh,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Refresh'),
+                icon: const Icon(Icons.signal_cellular_alt),
+                label: const Text('Broadcast Signal'),
               ),
             if (_controller.isRefreshing)
               const Row(
@@ -542,7 +575,7 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.transfersWillAppearHere ?? 'File transfers will appear here',
+            l10n.transfersWillAppearHere ?? 'Data transfers will appear here',
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -609,7 +642,7 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
         _showPairingDialog(user);
         break;
       case 'send_file':
-        _sendFileToUser(user);
+        _sendDataToUser(user);
         break;
       case 'request_trust':
         _requestTrust(user);
@@ -623,11 +656,11 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
     }
   }
 
-  void _sendFileToUser(P2PUser user) async {
+  void _sendDataToUser(P2PUser user) async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null && result.files.isNotEmpty) {
       final filePath = result.files.first.path!;
-      final success = await _controller.sendFileToUser(filePath, user);
+      final success = await _controller.sendDataToUser(filePath, user);
       if (!success && _controller.errorMessage != null) {
         _showErrorSnackBar(_controller.errorMessage!);
       }
@@ -650,7 +683,7 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _controller.cancelFileTransfer(taskId);
+              _controller.cancelDataTransfer(taskId);
             },
             child: Text(AppLocalizations.of(context)!.cancelTransfer ??
                 'Cancel Transfer'),
@@ -681,6 +714,23 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
       context: context,
       builder: (context) => PairingRequestDialog(
         requests: _controller.pendingRequests,
+        onRespond: (requestId, accept, trustUser, saveConnection) async {
+          final success = await _controller.respondToPairingRequest(
+              requestId, accept, trustUser, saveConnection);
+          if (!success && _controller.errorMessage != null) {
+            _showErrorSnackBar(_controller.errorMessage!);
+          }
+        },
+      ),
+    );
+  }
+
+  /// Show dialog for a single pairing request (for auto-showing new requests)
+  void _showSinglePairingRequestDialog(PairingRequest request) {
+    showDialog(
+      context: context,
+      builder: (context) => PairingRequestDialog(
+        requests: [request], // Show only this specific request
         onRespond: (requestId, accept, trustUser, saveConnection) async {
           final success = await _controller.respondToPairingRequest(
               requestId, accept, trustUser, saveConnection);
@@ -787,7 +837,7 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
 
   void _manualRefresh() async {
     await _controller.manualDiscovery();
-    if (_controller.errorMessage != null) {
+    if (mounted && _controller.errorMessage != null) {
       _showErrorSnackBar(_controller.errorMessage!);
     }
   }
@@ -862,119 +912,32 @@ class _P2PFileTransferScreenState extends State<P2PFileTransferScreen> {
   }
 
   void _showDisconnectDialog(P2PUser user) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Disconnect'),
-        content: Text(
-            'Disconnect from ${user.displayName}?\n\nThis will remove the saved connection and you will need to pair again in the future.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
+      builder: (context) => HoldToConfirmDialog(
+        title: 'Disconnect from ${user.displayName}',
+        content:
+            'This will remove the saved connection and you will need to pair again in the future.\n\nThe other device will also be notified of this disconnection.',
+        actionText: 'Hold to Disconnect',
+        holdText: 'Hold to Disconnect',
+        processingText: 'Disconnecting...',
+        instructionText: 'Hold the button for 1 second to confirm disconnect',
+        actionIcon: Icons.link_off,
+        holdDuration: const Duration(seconds: 1),
+        l10n: l10n,
+        onConfirmed: () async {
+          Navigator.of(context).pop();
 
-              // Show countdown timer
-              await showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => _DisconnectCountdownDialog(
-                  user: user,
-                  onConfirm: () async {
-                    final success = await _controller.disconnectUser(user.id);
-                    if (success) {
-                      _showErrorSnackBar(
-                          'Disconnected from ${user.displayName}');
-                    } else if (_controller.errorMessage != null) {
-                      _showErrorSnackBar(_controller.errorMessage!);
-                    }
-                  },
-                ),
-              );
-            },
-            child: const Text('Disconnect'),
-          ),
-        ],
+          final success = await _controller.disconnectUser(user.id);
+          if (success) {
+            _showErrorSnackBar('Disconnected from ${user.displayName}');
+          } else if (_controller.errorMessage != null) {
+            _showErrorSnackBar(_controller.errorMessage!);
+          }
+        },
       ),
-    );
-  }
-}
-
-class _DisconnectCountdownDialog extends StatefulWidget {
-  final P2PUser user;
-  final VoidCallback onConfirm;
-
-  const _DisconnectCountdownDialog({
-    required this.user,
-    required this.onConfirm,
-  });
-
-  @override
-  State<_DisconnectCountdownDialog> createState() =>
-      _DisconnectCountdownDialogState();
-}
-
-class _DisconnectCountdownDialogState
-    extends State<_DisconnectCountdownDialog> {
-  int _countdown = 3;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
-  }
-
-  void _startCountdown() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdown > 1) {
-        setState(() {
-          _countdown--;
-        });
-      } else {
-        timer.cancel();
-        Navigator.of(context).pop();
-        widget.onConfirm();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Disconnecting...'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Disconnecting from ${widget.user.displayName} in:'),
-          const SizedBox(height: 16),
-          Text(
-            '$_countdown',
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            _timer?.cancel();
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-      ],
     );
   }
 }

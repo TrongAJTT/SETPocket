@@ -23,7 +23,7 @@ enum ConnectionDisplayStatus {
   connectedOffline, // Stored connection, offline (gray)
 }
 
-enum FileTransferStatus {
+enum DataTransferStatus {
   pending,
   requesting,
   transferring,
@@ -197,7 +197,7 @@ class PairingRequest extends HiveObject {
 }
 
 @HiveType(typeId: 49)
-class FileTransferTask extends HiveObject {
+class DataTransferTask extends HiveObject {
   @HiveField(0)
   String id;
 
@@ -217,7 +217,7 @@ class FileTransferTask extends HiveObject {
   String targetUserName;
 
   @HiveField(6)
-  FileTransferStatus status;
+  DataTransferStatus status;
 
   @HiveField(7)
   int transferredBytes;
@@ -240,14 +240,14 @@ class FileTransferTask extends HiveObject {
   @HiveField(13)
   String? savePath;
 
-  FileTransferTask({
+  DataTransferTask({
     String? id,
     required this.fileName,
     required this.filePath,
     required this.fileSize,
     required this.targetUserId,
     required this.targetUserName,
-    this.status = FileTransferStatus.pending,
+    this.status = DataTransferStatus.pending,
     this.transferredBytes = 0,
     DateTime? createdAt,
     this.startedAt,
@@ -277,15 +277,15 @@ class FileTransferTask extends HiveObject {
         'savePath': savePath,
       };
 
-  factory FileTransferTask.fromJson(Map<String, dynamic> json) =>
-      FileTransferTask(
+  factory DataTransferTask.fromJson(Map<String, dynamic> json) =>
+      DataTransferTask(
         id: json['id'],
         fileName: json['fileName'],
         filePath: json['filePath'],
         fileSize: json['fileSize'],
         targetUserId: json['targetUserId'],
         targetUserName: json['targetUserName'],
-        status: FileTransferStatus.values[json['status']],
+        status: DataTransferStatus.values[json['status']],
         transferredBytes: json['transferredBytes'],
         createdAt: DateTime.parse(json['createdAt']),
         startedAt: json['startedAt'] != null
@@ -364,11 +364,11 @@ class P2PMessageTypes {
   static const String discoveryResponse = 'discovery_response';
   static const String pairingRequest = 'pairing_request';
   static const String pairingResponse = 'pairing_response';
-  static const String fileTransferRequest = 'file_transfer_request';
-  static const String fileTransferResponse = 'file_transfer_response';
-  static const String fileChunk = 'file_chunk';
-  static const String fileTransferComplete = 'file_transfer_complete';
-  static const String fileTransferCancel = 'file_transfer_cancel';
+  static const String dataTransferRequest = 'data_transfer_request';
+  static const String dataTransferResponse = 'data_transfer_response';
+  static const String dataChunk = 'data_chunk';
+  static const String dataTransferComplete = 'data_transfer_complete';
+  static const String dataTransferCancel = 'data_transfer_cancel';
   static const String heartbeat = 'heartbeat';
   static const String disconnect = 'disconnect';
   static const String trustRequest = 'trust_request';

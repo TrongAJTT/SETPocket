@@ -21,8 +21,8 @@ class BackgroundTransferService {
     }
   }
 
-  /// Schedule a file transfer to continue in background (placeholder)
-  static Future<void> scheduleFileTransfer({
+  /// Schedule a data transfer to continue in background (placeholder)
+  static Future<void> scheduleDataTransfer({
     required String taskId,
     required String filePath,
     required String targetUserId,
@@ -37,7 +37,7 @@ class BackgroundTransferService {
           .info('Background transfer scheduled (placeholder): $taskId');
       // TODO: Implement with compatible background task library
     } catch (e) {
-      AppLogger.instance.error('Failed to schedule file transfer: $e');
+      AppLogger.instance.error('Failed to schedule data transfer: $e');
     }
   }
 

@@ -29,7 +29,7 @@ dependencies:
   window_manager: ^0.5.0
   flutter_colorpicker: ^1.1.0
   flutter_joystick: ^0.2.2
-  # P2P File Transfer dependencies
+  # P2P Data Transfer dependencies
   connectivity_plus: ^6.0.5
   network_info_plus: ^5.0.3
   permission_handler: ^11.3.1

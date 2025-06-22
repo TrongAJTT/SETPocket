@@ -2267,8 +2267,8 @@
     "startCalculatingToSeeHistory": "Bắt đầu tính toán để xem lịch sử",
     "noHistoryAvailable": "Không có lịch sử",
 
-    "p2pFileTransfer": "Truyền File P2P",
-    "p2pFileTransferDesc": "Truyền file trực tiếp giữa các thiết bị trong cùng mạng",
+      "p2pDataTransfer": "Truyền Dữ Liệu P2P",
+  "p2pDataTransferDesc": "Truyền dữ liệu trực tiếp giữa các thiết bị trong cùng mạng",
     "networkSecurityWarning": "Cảnh báo Bảo mật Mạng",
     "unsecureNetworkDetected": "Phát hiện mạng không bảo mật",
     "currentNetwork": "Mạng hiện tại",
@@ -2321,7 +2321,10 @@
     "@p2pPermissionCancel": {
         "description": "Nút để hủy yêu cầu cấp quyền"
     },
-    "fileTransferRequest": "Yêu cầu chuyển tệp",
-    "fileTransferResponse": "Phản hồi chuyển tệp",
-    "fileTransferCancel": "Hủy chuyển tệp"
+      "dataTransferRequest": "Yêu cầu truyền dữ liệu",
+  "dataTransferResponse": "Phản hồi truyền dữ liệu",
+  "dataTransferCancel": "Hủy truyền dữ liệu",
+  "sendData": "Gửi Dữ Liệu",
+  "savedDevices": "Thiết bị đã lưu",
+  "availableDevices": "Thiết bị có sẵn"
 }

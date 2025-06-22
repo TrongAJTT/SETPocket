@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/models/p2p_models.dart';
 
-class FileTransferProgressWidget extends StatelessWidget {
-  final FileTransferTask task;
+class DataTransferProgressWidget extends StatelessWidget {
+  final DataTransferTask task;
   final VoidCallback? onCancel;
 
-  const FileTransferProgressWidget({
+  const DataTransferProgressWidget({
     super.key,
     required this.task,
     this.onCancel,
@@ -54,7 +54,7 @@ class FileTransferProgressWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (task.status == FileTransferStatus.transferring &&
+                if (task.status == DataTransferStatus.transferring &&
                     onCancel != null)
                   IconButton(
                     onPressed: onCancel,
@@ -67,7 +67,7 @@ class FileTransferProgressWidget extends StatelessWidget {
             const SizedBox(height: 12),
 
             // Progress bar (only for transferring status)
-            if (task.status == FileTransferStatus.transferring) ...[
+            if (task.status == DataTransferStatus.transferring) ...[
               LinearProgressIndicator(
                 value: task.progress,
                 backgroundColor: Colors.grey[300],
@@ -90,7 +90,7 @@ class FileTransferProgressWidget extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      if (task.status == FileTransferStatus.transferring)
+                      if (task.status == DataTransferStatus.transferring)
                         Text(
                           _getProgressText(),
                           style: Theme.of(context).textTheme.bodySmall,
@@ -113,7 +113,7 @@ class FileTransferProgressWidget extends StatelessWidget {
                       _formatFileSize(task.fileSize),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    if (task.status == FileTransferStatus.transferring)
+                    if (task.status == DataTransferStatus.transferring)
                       Text(
                         _getTransferSpeed(),
                         style: Theme.of(context).textTheme.bodySmall,
@@ -141,51 +141,51 @@ class FileTransferProgressWidget extends StatelessWidget {
 
   IconData _getStatusIcon() {
     switch (task.status) {
-      case FileTransferStatus.pending:
+      case DataTransferStatus.pending:
         return Icons.schedule;
-      case FileTransferStatus.requesting:
+      case DataTransferStatus.requesting:
         return Icons.help_outline;
-      case FileTransferStatus.transferring:
+      case DataTransferStatus.transferring:
         return Icons.sync;
-      case FileTransferStatus.completed:
+      case DataTransferStatus.completed:
         return Icons.check_circle;
-      case FileTransferStatus.failed:
+      case DataTransferStatus.failed:
         return Icons.error;
-      case FileTransferStatus.cancelled:
+      case DataTransferStatus.cancelled:
         return Icons.cancel;
     }
   }
 
   Color _getStatusColor() {
     switch (task.status) {
-      case FileTransferStatus.pending:
+      case DataTransferStatus.pending:
         return Colors.orange;
-      case FileTransferStatus.requesting:
+      case DataTransferStatus.requesting:
         return Colors.blue;
-      case FileTransferStatus.transferring:
+      case DataTransferStatus.transferring:
         return Colors.green;
-      case FileTransferStatus.completed:
+      case DataTransferStatus.completed:
         return Colors.green;
-      case FileTransferStatus.failed:
+      case DataTransferStatus.failed:
         return Colors.red;
-      case FileTransferStatus.cancelled:
+      case DataTransferStatus.cancelled:
         return Colors.grey;
     }
   }
 
   String _getStatusText() {
     switch (task.status) {
-      case FileTransferStatus.pending:
+      case DataTransferStatus.pending:
         return 'Đang chờ';
-      case FileTransferStatus.requesting:
+      case DataTransferStatus.requesting:
         return 'Đang yêu cầu';
-      case FileTransferStatus.transferring:
+      case DataTransferStatus.transferring:
         return 'Đang truyền';
-      case FileTransferStatus.completed:
+      case DataTransferStatus.completed:
         return 'Hoàn thành';
-      case FileTransferStatus.failed:
+      case DataTransferStatus.failed:
         return 'Thất bại';
-      case FileTransferStatus.cancelled:
+      case DataTransferStatus.cancelled:
         return 'Đã hủy';
     }
   }

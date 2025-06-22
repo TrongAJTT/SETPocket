@@ -1,5 +1,6 @@
 import 'package:setpocket/services/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:setpocket/models/p2p_models.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
 import 'calculator_history_service.dart';
@@ -24,6 +25,7 @@ import 'random_services/random_state_service.dart';
 import 'financial_calculator_service.dart';
 import 'scientific_calculator_service.dart';
 import 'date_calculator_service.dart';
+import 'p2p_service.dart';
 import 'package:hive/hive.dart';
 
 class CacheInfo {
@@ -70,6 +72,7 @@ class CacheService {
       'generation_history_rock_paper_scissors',
     ],
     'converter_tools': [],
+    'p2p_data_transfer': [],
   };
   static Future<Map<String, CacheInfo>> getAllCacheInfo({
     String? textTemplatesName,
@@ -82,6 +85,8 @@ class CacheService {
     String? calculatorToolsDesc,
     String? converterToolsName,
     String? converterToolsDesc,
+    String? p2pDataTransferName,
+    String? p2pDataTransferDesc,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, CacheInfo> cacheInfoMap =
@@ -591,6 +596,139 @@ class CacheService {
       );
     }
 
+    // P2P Data Transfer Cache
+    try {
+      int p2pSize = 0;
+      int p2pCount = 0;
+
+      // Check if P2P service has cached data
+      final p2pBoxNames = [
+        'p2p_users',
+        'pairing_requests',
+        'p2p_storage_settings'
+      ];
+
+      logInfo('CacheService: Checking P2P cache...');
+
+      for (final boxName in p2pBoxNames) {
+        try {
+          logInfo('CacheService: Checking box $boxName...');
+
+          final boxExists = await Hive.boxExists(boxName);
+          logInfo('CacheService: Box $boxName exists: $boxExists');
+
+          if (boxExists) {
+            // Try to open box and read data - check if already open first
+            Box box;
+            bool wasAlreadyOpen = false;
+
+            try {
+              if (Hive.isBoxOpen(boxName)) {
+                box = Hive.box(boxName);
+                wasAlreadyOpen = true;
+                logInfo('CacheService: Box $boxName was already open');
+              } else {
+                box = await Hive.openBox(boxName);
+                logInfo('CacheService: Opened box $boxName');
+              }
+
+              final boxLength = box.length;
+
+              // Calculate size manually since HiveService.getBoxSize doesn't support P2P boxes
+              int boxSize = 0;
+              try {
+                for (var key in box.keys) {
+                  final value = box.get(key);
+                  if (value != null) {
+                    // Estimate size based on JSON representation
+                    final jsonString = value.toString();
+                    boxSize += jsonString.length * 2; // UTF-16 estimate
+                  }
+                }
+              } catch (e) {
+                logError(
+                    'CacheService: Error calculating size for $boxName: $e');
+                boxSize = boxLength * 100; // Fallback estimate
+              }
+
+              logInfo(
+                  'CacheService: Box $boxName has $boxLength items, size: $boxSize bytes');
+
+              p2pSize += boxSize;
+              p2pCount += boxLength;
+
+              // Log some details about the content
+              if (boxLength > 0) {
+                logInfo(
+                    'CacheService: Box $boxName keys: ${box.keys.take(5).toList()}');
+
+                // Log first item details for debugging
+                final firstKey = box.keys.first;
+                final firstValue = box.get(firstKey);
+                logInfo(
+                    'CacheService: First item in $boxName: $firstKey -> ${firstValue.runtimeType}');
+              }
+
+              // Only close if we opened it ourselves
+              if (!wasAlreadyOpen) {
+                await box.close();
+              }
+            } catch (e) {
+              logError('CacheService: Error accessing box $boxName: $e');
+            }
+          } else {
+            logInfo(
+                'CacheService: Box $boxName does not exist, checking if P2P service has data...');
+
+            // Also check if P2P service has users that might not be saved yet
+            if (boxName == 'p2p_users') {
+              try {
+                final p2pService = P2PService.instance;
+                final pairedUsers = p2pService.pairedUsers;
+                logInfo(
+                    'CacheService: P2P service has ${pairedUsers.length} paired users');
+
+                if (pairedUsers.isNotEmpty) {
+                  // Estimate size for users that exist in memory but not in cache
+                  p2pCount += pairedUsers.length;
+                  p2pSize +=
+                      pairedUsers.length * 200; // Approximate size per user
+                  logInfo(
+                      'CacheService: Added ${pairedUsers.length} in-memory users to cache count');
+                }
+              } catch (e) {
+                logWarning('CacheService: Could not access P2P service: $e');
+              }
+            }
+          }
+        } catch (e) {
+          logError('CacheService: Error checking P2P box $boxName: $e');
+        }
+      }
+
+      logInfo(
+          'CacheService: P2P cache total - Count: $p2pCount, Size: $p2pSize bytes');
+
+      cacheInfoMap['p2p_data_transfer'] = CacheInfo(
+        name: p2pDataTransferName ?? 'P2P Data Transfer',
+        description: p2pDataTransferDesc ??
+            'P2P users, pairing data, and transfer settings',
+        itemCount: p2pCount,
+        sizeBytes: p2pSize,
+        keys: _cacheKeys['p2p_data_transfer'] ?? [],
+      );
+    } catch (e) {
+      logError('CacheService: Error getting P2P cache info: $e');
+      cacheInfoMap['p2p_data_transfer'] = CacheInfo(
+        name: p2pDataTransferName ?? 'P2P Data Transfer',
+        description: p2pDataTransferDesc ??
+            'P2P users, pairing data, and transfer settings',
+        itemCount: 0,
+        sizeBytes: 0,
+        keys: _cacheKeys['p2p_data_transfer'] ?? [],
+      );
+    }
+
     return cacheInfoMap;
   }
 
@@ -674,6 +812,9 @@ class CacheService {
       await GenericPresetService.clearAllPresets('speed');
       await GenericPresetService.clearAllPresets('temperature');
       await GenericPresetService.clearAllPresets('data_storage');
+    } else if (cacheType == 'p2p_data_transfer') {
+      // Clear P2P data transfer cache
+      await clearP2PCache();
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -760,6 +901,19 @@ class CacheService {
     await GenericPresetService.clearAllPresets('temperature');
     await GenericPresetService.clearAllPresets('data_storage');
 
+    // Clear P2P data transfer cache only if not enabled
+    try {
+      if (!(await isP2PEnabled())) {
+        await clearP2PCache();
+        logInfo('CacheService: Cleared P2P cache in clearAllCache');
+      } else {
+        logInfo(
+            'CacheService: Skipped P2P cache in clearAllCache (service enabled)');
+      }
+    } catch (e) {
+      logError('CacheService: Error handling P2P cache in clearAllCache: $e');
+    }
+
     // Get all cache keys from SharedPreferences (except settings)
     final allKeys = <String>{};
     for (final keyList in _cacheKeys.values) {
@@ -801,6 +955,58 @@ class CacheService {
   // Method to add cache tracking for other features in the future
   static Future<void> addCacheKey(String cacheType, String key) async {
     // This can be used to dynamically add cache keys for new features
+  }
+
+  /// Clear P2P Data Transfer cache
+  static Future<void> clearP2PCache() async {
+    final p2pBoxNames = [
+      'p2p_users',
+      'pairing_requests',
+      'p2p_storage_settings'
+    ];
+
+    for (final boxName in p2pBoxNames) {
+      try {
+        await HiveService.clearBox(boxName);
+        logInfo('CacheService: Cleared P2P box: $boxName');
+      } catch (e) {
+        logError('CacheService: Error clearing P2P box $boxName: $e');
+      }
+    }
+  }
+
+  /// Check if P2P Data Transfer is currently enabled
+  static Future<bool> isP2PEnabled() async {
+    try {
+      return P2PService.instance.isEnabled;
+    } catch (e) {
+      logError('CacheService: Error checking P2P status: $e');
+      return false;
+    }
+  }
+
+  /// Check if a cache type can be cleared (conditional clearing)
+  static Future<bool> canClearCache(String cacheType) async {
+    switch (cacheType) {
+      case 'p2p_data_transfer':
+        // Can't clear P2P cache if service is currently enabled
+        return !(await isP2PEnabled());
+      default:
+        return true; // Other caches can always be cleared
+    }
+  }
+
+  /// Get the reason why a cache type cannot be cleared
+  static Future<String?> getClearCacheBlockReason(String cacheType) async {
+    switch (cacheType) {
+      case 'p2p_data_transfer':
+        if (await isP2PEnabled()) {
+          return 'P2P Data Transfer is currently active. Stop the service to clear cache.';
+        }
+        return null;
+      default:
+        return null;
+    }
   }
 
   static Future<void> _closeConverterBoxes() async {
@@ -847,5 +1053,132 @@ class CacheService {
         // Continue with other boxes even if one fails
       }
     }
+  }
+
+  /// Force sync P2P data from memory to cache (if data exists in memory but not in Hive)
+  static Future<void> syncP2PDataToCache() async {
+    try {
+      logInfo('CacheService: Starting P2P data sync...');
+
+      final p2pService = P2PService.instance;
+
+      // Check discovered users
+      final discoveredUsers = p2pService.discoveredUsers;
+      logInfo(
+          'CacheService: P2P service has ${discoveredUsers.length} discovered users');
+
+      // Check paired users specifically
+      final pairedUsers = p2pService.pairedUsers;
+      logInfo(
+          'CacheService: P2P service has ${pairedUsers.length} paired users');
+
+      // Check stored users
+      final storedUsers = discoveredUsers.where((u) => u.isStored).toList();
+      logInfo(
+          'CacheService: P2P service has ${storedUsers.length} stored users');
+
+      if (pairedUsers.isNotEmpty) {
+        logInfo('CacheService: Paired users details:');
+        for (var user in pairedUsers) {
+          logInfo(
+              '  - ${user.displayName} (${user.id}): paired=${user.isPaired}, trusted=${user.isTrusted}, stored=${user.isStored}');
+        }
+
+        // Check if these users are actually saved to Hive
+        try {
+          final box = Hive.isBoxOpen('p2p_users')
+              ? Hive.box<P2PUser>('p2p_users')
+              : await Hive.openBox<P2PUser>('p2p_users');
+          logInfo('CacheService: p2p_users box has ${box.length} items');
+
+          for (var user in pairedUsers) {
+            final savedUser = box.get(user.id);
+            if (savedUser != null) {
+              logInfo('CacheService: User ${user.displayName} found in cache');
+            } else {
+              logInfo(
+                  'CacheService: User ${user.displayName} NOT found in cache - this might be the issue!');
+
+              // Force save user to cache if it's paired but not saved
+              if (user.isPaired && user.isStored) {
+                await box.put(user.id, user);
+                logInfo(
+                    'CacheService: Force saved user ${user.displayName} to cache');
+              }
+            }
+          }
+
+          // Don't close the box if it was already open in the service
+          if (!Hive.isBoxOpen('p2p_users')) {
+            await box.close();
+          }
+        } catch (e) {
+          logError('CacheService: Error checking p2p_users box: $e');
+        }
+      }
+
+      logInfo('CacheService: P2P data sync completed');
+    } catch (e) {
+      logError('CacheService: Error during P2P data sync: $e');
+    }
+  }
+
+  /// Debug P2P cache state
+  static Future<Map<String, dynamic>> debugP2PCache() async {
+    final result = <String, dynamic>{};
+
+    try {
+      // Check P2P service state
+      final p2pService = P2PService.instance;
+      result['service_enabled'] = p2pService.isEnabled;
+      result['discovered_users'] = p2pService.discoveredUsers.length;
+      result['paired_users'] = p2pService.pairedUsers.length;
+      result['stored_users'] =
+          p2pService.discoveredUsers.where((u) => u.isStored).length;
+
+      // Check Hive boxes
+      final boxStates = <String, Map<String, dynamic>>{};
+      final boxNames = [
+        'p2p_users',
+        'pairing_requests',
+        'p2p_storage_settings'
+      ];
+
+      for (final boxName in boxNames) {
+        try {
+          final exists = await Hive.boxExists(boxName);
+          boxStates[boxName] = {'exists': exists};
+
+          if (exists) {
+            final box = Hive.isBoxOpen(boxName)
+                ? Hive.box(boxName)
+                : await Hive.openBox(boxName);
+            boxStates[boxName]!['length'] = box.length;
+            boxStates[boxName]!['keys'] = box.keys.take(5).toList();
+
+            // Don't close if it was already open
+            if (!Hive.isBoxOpen(boxName)) {
+              await box.close();
+            }
+          }
+        } catch (e) {
+          boxStates[boxName] = {'error': e.toString()};
+        }
+      }
+
+      result['hive_boxes'] = boxStates;
+
+      // Get cache info
+      final cacheInfo = await getAllCacheInfo();
+      final p2pCache = cacheInfo['p2p_data_transfer'];
+      result['cache_info'] = {
+        'item_count': p2pCache?.itemCount ?? 0,
+        'size_bytes': p2pCache?.sizeBytes ?? 0,
+      };
+    } catch (e) {
+      result['error'] = e.toString();
+    }
+
+    return result;
   }
 }

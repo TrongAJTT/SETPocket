@@ -150,7 +150,7 @@ class HiveService {
         Hive.registerAdapter(PairingRequestAdapter());
       }
       if (!Hive.isAdapterRegistered(49)) {
-        Hive.registerAdapter(FileTransferTaskAdapter());
+        Hive.registerAdapter(DataTransferTaskAdapter());
       }
       if (!Hive.isAdapterRegistered(52)) {
         Hive.registerAdapter(P2PFileStorageSettingsAdapter());

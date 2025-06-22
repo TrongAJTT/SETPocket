@@ -45,11 +45,11 @@ class ToolVisibilityService {
       isVisible: true,
       order: 3,
     ),
-    'p2pFileTransfer': ToolConfig(
-      id: 'p2pFileTransfer',
-      fixName: 'P2P File Transfer',
-      nameKey: 'p2pFileTransfer',
-      descKey: 'p2pFileTransferDesc',
+    'p2pDataTransfer': ToolConfig(
+      id: 'p2pDataTransfer',
+      fixName: 'P2P Data Transfer',
+      nameKey: 'p2pDataTransfer',
+      descKey: 'p2pDataTransferDesc',
       icon: 'share',
       iconColor: 'teal',
       isVisible: true,

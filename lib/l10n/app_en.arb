@@ -2342,8 +2342,8 @@
     "startCalculatingToSeeHistory": "Start calculating to see history",
     "noHistoryAvailable": "No history available",
 
-    "p2pFileTransfer": "P2P File Transfer",
-    "p2pFileTransferDesc": "Transfer files directly between devices on the same network",
+      "p2pDataTransfer": "P2P Data Transfer",
+  "p2pDataTransferDesc": "Transfer data directly between devices on the same network",
     "networkSecurityWarning": "Network Security Warning",
     "unsecureNetworkDetected": "Unsecure network detected",
     "currentNetwork": "Current Network",
@@ -2370,7 +2370,7 @@
     "searchingForDevices": "Searching for devices...",
     "startNetworkingToDiscover": "Start networking to discover devices",
     "noActiveTransfers": "No active transfers",
-    "transfersWillAppearHere": "File transfers will appear here",
+    "transfersWillAppearHere": "Data transfers will appear here",
     "paired": "Paired",
     "trusted": "Trusted",
     "pair": "Pair",
@@ -2396,6 +2396,9 @@
     "@p2pPermissionCancel": {
         "description": "Button text to cancel the permission request"
     },
-    "fileTransferRequest": "File Transfer Request",
-    "fileTransferResponse": "File Transfer Response"
+      "dataTransferRequest": "Data Transfer Request",
+  "dataTransferResponse": "Data Transfer Response",
+  "sendData": "Send Data",
+  "savedDevices": "Saved Devices",
+  "availableDevices": "Available Devices"
 }

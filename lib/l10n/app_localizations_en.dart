@@ -5128,10 +5128,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startCalculatingToSeeHistory => 'Start calculating to see history';
 
   @override
-  String get p2pFileTransfer => 'P2P File Transfer';
+  String get p2pDataTransfer => 'P2P Data Transfer';
 
   @override
-  String get p2pFileTransferDesc => 'Transfer files directly between devices on the same network';
+  String get p2pDataTransferDesc => 'Transfer data directly between devices on the same network';
 
   @override
   String get networkSecurityWarning => 'Network Security Warning';
@@ -5212,7 +5212,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noActiveTransfers => 'No active transfers';
 
   @override
-  String get transfersWillAppearHere => 'File transfers will appear here';
+  String get transfersWillAppearHere => 'Data transfers will appear here';
 
   @override
   String get paired => 'Paired';
@@ -5254,8 +5254,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get p2pPermissionCancel => 'Cancel';
 
   @override
-  String get fileTransferRequest => 'File Transfer Request';
+  String get dataTransferRequest => 'Data Transfer Request';
 
   @override
-  String get fileTransferResponse => 'File Transfer Response';
+  String get dataTransferResponse => 'Data Transfer Response';
+
+  @override
+  String get sendData => 'Send Data';
 }

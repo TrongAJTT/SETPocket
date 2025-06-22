@@ -5128,10 +5128,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get startCalculatingToSeeHistory => 'Bắt đầu tính toán để xem lịch sử';
 
   @override
-  String get p2pFileTransfer => 'Truyền File P2P';
+  String get p2pDataTransfer => 'Truyền Dữ Liệu P2P';
 
   @override
-  String get p2pFileTransferDesc => 'Truyền file trực tiếp giữa các thiết bị trong cùng mạng';
+  String get p2pDataTransferDesc => 'Truyền dữ liệu trực tiếp giữa các thiết bị trong cùng mạng';
 
   @override
   String get networkSecurityWarning => 'Cảnh báo Bảo mật Mạng';
@@ -5254,8 +5254,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get p2pPermissionCancel => 'Hủy';
 
   @override
-  String get fileTransferRequest => 'Yêu cầu chuyển tệp';
+  String get dataTransferRequest => 'Yêu cầu truyền dữ liệu';
 
   @override
-  String get fileTransferResponse => 'Phản hồi chuyển tệp';
+  String get dataTransferResponse => 'Phản hồi truyền dữ liệu';
+
+  @override
+  String get sendData => 'Gửi Dữ Liệu';
 }

@@ -19,7 +19,7 @@ class P2PUserAdapter extends TypeAdapter<P2PUser> {
     return P2PUser(
       id: fields[0] as String?,
       displayName: fields[1] as String,
-      deviceId: fields[2] as String,
+      appInstallationId: fields[2] as String,
       ipAddress: fields[3] as String,
       port: fields[4] as int,
       lastSeen: fields[5] as DateTime?,
@@ -41,7 +41,7 @@ class P2PUserAdapter extends TypeAdapter<P2PUser> {
       ..writeByte(1)
       ..write(obj.displayName)
       ..writeByte(2)
-      ..write(obj.deviceId)
+      ..write(obj.appInstallationId)
       ..writeByte(3)
       ..write(obj.ipAddress)
       ..writeByte(4)
@@ -87,7 +87,7 @@ class PairingRequestAdapter extends TypeAdapter<PairingRequest> {
       id: fields[0] as String?,
       fromUserId: fields[1] as String,
       fromUserName: fields[2] as String,
-      fromDeviceId: fields[3] as String,
+      fromAppInstallationId: fields[3] as String,
       fromIpAddress: fields[4] as String,
       fromPort: fields[5] as int,
       requestTime: fields[6] as DateTime?,
@@ -107,7 +107,7 @@ class PairingRequestAdapter extends TypeAdapter<PairingRequest> {
       ..writeByte(2)
       ..write(obj.fromUserName)
       ..writeByte(3)
-      ..write(obj.fromDeviceId)
+      ..write(obj.fromAppInstallationId)
       ..writeByte(4)
       ..write(obj.fromIpAddress)
       ..writeByte(5)
@@ -244,6 +244,53 @@ class P2PFileStorageSettingsAdapter
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is P2PFileStorageSettingsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class P2PDataTransferSettingsAdapter
+    extends TypeAdapter<P2PDataTransferSettings> {
+  @override
+  final int typeId = 53;
+
+  @override
+  P2PDataTransferSettings read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return P2PDataTransferSettings(
+      downloadPath: fields[0] as String,
+      createDateFolders: fields[1] as bool,
+      maxReceiveFileSize: fields[2] as int,
+      sendProtocol: fields[3] as String,
+      maxChunkSize: fields[4] as int,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, P2PDataTransferSettings obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.downloadPath)
+      ..writeByte(1)
+      ..write(obj.createDateFolders)
+      ..writeByte(2)
+      ..write(obj.maxReceiveFileSize)
+      ..writeByte(3)
+      ..write(obj.sendProtocol)
+      ..writeByte(4)
+      ..write(obj.maxChunkSize);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is P2PDataTransferSettingsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

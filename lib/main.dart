@@ -15,6 +15,7 @@ import 'package:setpocket/services/number_format_service.dart';
 import 'package:setpocket/services/draft_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/services/p2p_service.dart';
+import 'package:setpocket/services/app_installation_service.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -28,6 +29,9 @@ import 'package:flutter/services.dart';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+// Global flag to track first time setup
+bool _isFirstTimeSetup = false;
 
 class BreadcrumbData {
   final String title;
@@ -74,6 +78,10 @@ void main() async {
 
   // Initialize Hive database first
   await HiveService.initialize();
+
+  // Initialize App Installation Service immediately after Hive
+  // This ensures we have a stable app installation ID from the start
+  _isFirstTimeSetup = await AppInstallationService.instance.initialize();
 
   // Initialize settings service
   await SettingsService.initialize();
@@ -372,6 +380,48 @@ class _HomePageState extends State<HomePage> with WindowListener {
   void initState() {
     super.initState();
     windowManager.addListener(this);
+
+    // Show first time setup snackbar if needed
+    if (_isFirstTimeSetup) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showFirstTimeSetupSnackbar();
+      });
+    }
+  }
+
+  void _showFirstTimeSetupSnackbar() {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.construction, color: Colors.white),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'TODO: Installation progress - Setting up your new installation...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.orange[700],
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+
+    // Log for debugging
+    AppLogger.instance.info(
+        'First time setup detected - showed installation progress snackbar');
   }
 
   @override

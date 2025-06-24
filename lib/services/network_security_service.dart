@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/app_installation_service.dart';
 
 class NetworkSecurityService {
   static final network_info_plus.NetworkInfo _networkInfo =
@@ -66,7 +67,6 @@ class NetworkSecurityService {
           if (result is Map) {
             final isConnected = result['isConnected'] as bool? ?? false;
             final isEthernet = result['isEthernet'] as bool? ?? false;
-            final hasInternet = result['hasInternet'] as bool? ?? false;
 
             if (isConnected && isEthernet) {
               final ipAddress = result['ipAddress'] as String?;
@@ -280,21 +280,23 @@ class NetworkSecurityService {
     }
   }
 
-  /// Get device unique identifier
-  static Future<String> getDeviceId() async {
+  /// Get stable app installation ID (replaces device ID with app-specific stable identifier)
+  static Future<String> getAppInstallationId() async {
     try {
-      if (Platform.isAndroid) {
-        final androidInfo = await _deviceInfo.androidInfo;
-        return androidInfo.id;
-      } else if (Platform.isWindows) {
-        final windowsInfo = await _deviceInfo.windowsInfo;
-        return windowsInfo.computerName;
-      } else {
-        return 'unknown_device';
-      }
+      return await AppInstallationService.instance.getAppInstallationId();
     } catch (e) {
-      AppLogger.instance.error('Error getting device ID: $e');
-      return 'unknown_device_${DateTime.now().millisecondsSinceEpoch}';
+      AppLogger.instance.error('Failed to get app installation ID: $e');
+      return 'TEMP${DateTime.now().millisecondsSinceEpoch % 1000000}';
+    }
+  }
+
+  /// Get readable app installation ID
+  static Future<String> getAppInstallationWordId() async {
+    try {
+      return await AppInstallationService.instance.getAppInstallationWordId();
+    } catch (e) {
+      AppLogger.instance.error('Failed to get app installation word ID: $e');
+      return 'temp-device-${DateTime.now().millisecondsSinceEpoch % 10000}';
     }
   }
 
@@ -307,6 +309,12 @@ class NetworkSecurityService {
       } else if (Platform.isWindows) {
         final windowsInfo = await _deviceInfo.windowsInfo;
         return windowsInfo.computerName;
+      } else if (Platform.isLinux) {
+        final linuxInfo = await _deviceInfo.linuxInfo;
+        return linuxInfo.name;
+      } else if (Platform.isMacOS) {
+        final macInfo = await _deviceInfo.macOsInfo;
+        return macInfo.computerName;
       } else {
         return 'Unknown Device';
       }
@@ -320,24 +328,76 @@ class NetworkSecurityService {
   static Future<bool> checkPermissions() async {
     try {
       if (Platform.isAndroid) {
+        // Get Android version to determine required permissions
+        final androidInfo = await _deviceInfo.androidInfo;
+        final sdkInt = androidInfo.version.sdkInt;
+
+        AppLogger.instance.info(
+            'Android SDK: $sdkInt, Model: ${androidInfo.model}, Brand: ${androidInfo.brand}, Manufacturer: ${androidInfo.manufacturer}');
+
+        // Device-specific handling for known problematic manufacturers
+        final isOppo = androidInfo.brand.toLowerCase().contains('oppo') ||
+            androidInfo.manufacturer.toLowerCase().contains('oppo');
+        final isVivo = androidInfo.brand.toLowerCase().contains('vivo') ||
+            androidInfo.manufacturer.toLowerCase().contains('vivo');
+        final isOnePlus = androidInfo.brand.toLowerCase().contains('oneplus') ||
+            androidInfo.manufacturer.toLowerCase().contains('oneplus');
+
+        if (isOppo || isVivo || isOnePlus) {
+          AppLogger.instance.info(
+              'Detected ColorOS/FunTouch/OxygenOS device - using enhanced permissions strategy');
+        }
+
         // We only need Location for WiFi scanning and Nearby Devices for modern Android.
         // Storage permissions should be requested on-demand when sending a file.
         final permissionsToRequest = <Permission>[];
 
+        // Location permission is always needed for WiFi scanning
         if (await Permission.locationWhenInUse.isDenied) {
           permissionsToRequest.add(Permission.locationWhenInUse);
         }
 
         // For Android 12 (SDK 31) and above, NEARBY_WIFI_DEVICES is needed.
-        // permission_handler handles the platform version check internally.
-        if (await Permission.nearbyWifiDevices.isDenied) {
-          permissionsToRequest.add(Permission.nearbyWifiDevices);
+        // Only check this permission on supported Android versions
+        if (sdkInt >= 31) {
+          try {
+            if (await Permission.nearbyWifiDevices.isDenied) {
+              permissionsToRequest.add(Permission.nearbyWifiDevices);
+            }
+          } catch (e) {
+            AppLogger.instance.warning(
+                'nearbyWifiDevices permission not available on this device: $e');
+          }
+        } else {
+          // For Android 11 and below, we might need ACCESS_COARSE_LOCATION
+          // in addition to ACCESS_FINE_LOCATION for some devices
+          try {
+            if (await Permission.location.isDenied) {
+              permissionsToRequest.add(Permission.location);
+            }
+          } catch (e) {
+            AppLogger.instance
+                .warning('Additional location permission not available: $e');
+          }
         }
 
         if (permissionsToRequest.isNotEmpty) {
+          AppLogger.instance.info(
+              'Requesting permissions: ${permissionsToRequest.map((p) => p.toString()).toList()}');
           final statuses = await permissionsToRequest.request();
+
+          // Log permission results
+          for (final entry in statuses.entries) {
+            AppLogger.instance.info('Permission ${entry.key}: ${entry.value}');
+          }
+
           // Check if all requested permissions were granted.
-          return statuses.values.every((status) => status.isGranted);
+          final allGranted =
+              statuses.values.every((status) => status.isGranted);
+          AppLogger.instance.info('All permissions granted: $allGranted');
+          return allGranted;
+        } else {
+          AppLogger.instance.info('No permissions need to be requested');
         }
       }
       // If no permissions needed to be requested, or not on Android, return true.
@@ -351,12 +411,24 @@ class NetworkSecurityService {
   /// Request required permissions
   static Future<Map<Permission, PermissionStatus>> requestPermissions() async {
     if (Platform.isAndroid) {
-      final permissions = [
+      final androidInfo = await _deviceInfo.androidInfo;
+      final sdkInt = androidInfo.version.sdkInt;
+
+      final permissions = <Permission>[
         Permission.storage,
         Permission.manageExternalStorage,
         Permission.locationWhenInUse,
-        Permission.nearbyWifiDevices,
       ];
+
+      // Only add nearbyWifiDevices for Android 12+
+      if (sdkInt >= 31) {
+        try {
+          permissions.add(Permission.nearbyWifiDevices);
+        } catch (e) {
+          AppLogger.instance
+              .warning('nearbyWifiDevices permission not available: $e');
+        }
+      }
 
       return await permissions.request();
     }

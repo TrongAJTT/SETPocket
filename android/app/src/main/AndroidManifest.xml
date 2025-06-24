@@ -6,11 +6,13 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <!-- Location permissions are required for WiFi scanning on Android 9+ -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     
-    <!-- Nearby devices permission for Android 12+ -->
+    <!-- Nearby devices permission for Android 12+ (API 31+) only -->
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
-                     android:usesPermissionFlags="neverForLocation" />
+                     android:usesPermissionFlags="neverForLocation"
+                     android:minSdkVersion="31" />
 
     <!-- Storage permissions for importing/exporting templates -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

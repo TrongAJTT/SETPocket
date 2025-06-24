@@ -45,7 +45,10 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
     return AlertDialog(
       title: Row(
         children: [
-          Icon(Icons.notifications, color: Theme.of(context).primaryColor),
+          Icon(Icons.notifications,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).primaryColor),
           const SizedBox(width: 8),
           Expanded(child: Text(l10n.pairingRequests)),
           if (widget.requests.length > 1)
@@ -85,7 +88,10 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundColor: Theme.of(context).primaryColor,
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).primaryColor,
                         child: Icon(
                           Icons.person,
                           color: Colors.white,

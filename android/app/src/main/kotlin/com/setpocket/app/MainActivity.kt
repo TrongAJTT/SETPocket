@@ -85,8 +85,8 @@ class MainActivity: FlutterActivity() {
         }
         result["ssid"] = ssid
         
-        // Get security type
-        val securityType = getWifiSecurityType(wifiInfo, wifiManager)
+        // Get security type - simplified approach
+        val securityType = "WPA2" // Default assumption for connected networks
         result["securityType"] = securityType
         result["isSecure"] = securityType != "OPEN" && securityType != "NONE"
         
@@ -108,56 +108,7 @@ class MainActivity: FlutterActivity() {
             ipAddress shr 16 and 0xff,
             ipAddress shr 24 and 0xff)
         
-        // Get MAC address (if available)
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                result["macAddress"] = "02:00:00:00:00:00" // Randomized MAC
-            } else {
-                result["macAddress"] = wifiInfo.macAddress ?: "Unknown"
-            }
-        } catch (e: Exception) {
-            result["macAddress"] = "Unknown"
-        }
-        
         return result
-    }
-    
-    private fun getWifiSecurityType(wifiInfo: WifiInfo, wifiManager: WifiManager): String {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // For Android 11+, use new API
-                val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                val network = connectivityManager.activeNetwork
-                val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-                
-                if (networkCapabilities != null && networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    // Try to get security info from network capabilities
-                    return "WPA2" // Default assumption for connected networks
-                }
-            } else {
-                // For older versions, scan for network configurations
-                val configuredNetworks = wifiManager.configuredNetworks
-                if (configuredNetworks != null) {
-                    for (config in configuredNetworks) {
-                        if (config.networkId == wifiInfo.networkId) {
-                            return when {
-                                config.allowedKeyManagement.get(1) -> "WPA_PSK"
-                                config.allowedKeyManagement.get(2) -> "WPA_EAP"
-                                config.allowedKeyManagement.get(3) -> "IEEE8021X"
-                                config.allowedAuthAlgorithms.get(0) -> "OPEN"
-                                config.allowedAuthAlgorithms.get(1) -> "SHARED"
-                                else -> "UNKNOWN"
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            // Fallback: assume WPA2 for connected networks
-            return "WPA2"
-        }
-        
-        return "UNKNOWN"
     }
     
     private fun getNetworkInfo(): Map<String, Any> {

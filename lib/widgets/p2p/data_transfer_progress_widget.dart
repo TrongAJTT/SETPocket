@@ -4,11 +4,13 @@ import 'package:setpocket/models/p2p_models.dart';
 class DataTransferProgressWidget extends StatelessWidget {
   final DataTransferTask task;
   final VoidCallback? onCancel;
+  final VoidCallback? onClear;
 
   const DataTransferProgressWidget({
     super.key,
     required this.task,
     this.onCancel,
+    this.onClear,
   });
 
   @override
@@ -60,6 +62,33 @@ class DataTransferProgressWidget extends StatelessWidget {
                     onPressed: onCancel,
                     icon: const Icon(Icons.cancel),
                     tooltip: 'Hủy truyền tải',
+                  ),
+                if (task.status == DataTransferStatus.cancelled ||
+                    task.status == DataTransferStatus.failed)
+                  IconButton(
+                    onPressed: onClear,
+                    icon: Icon(Icons.clear, color: Colors.grey[700]),
+                    tooltip: 'Xóa tác vụ',
+                  ),
+                if (task.status == DataTransferStatus.completed)
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'clear') {
+                        onClear?.call();
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'clear',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_forever),
+                            SizedBox(width: 8),
+                            Text('Xóa'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),
@@ -180,7 +209,7 @@ class DataTransferProgressWidget extends StatelessWidget {
       case DataTransferStatus.requesting:
         return 'Đang yêu cầu';
       case DataTransferStatus.transferring:
-        return 'Đang truyền';
+        return task.isOutgoing ? 'Đang gửi...' : 'Đang nhận...';
       case DataTransferStatus.completed:
         return 'Hoàn thành';
       case DataTransferStatus.failed:
@@ -198,7 +227,8 @@ class DataTransferProgressWidget extends StatelessWidget {
   }
 
   String _getTransferSpeed() {
-    if (task.startedAt == null) return '';
+    if (task.startedAt == null ||
+        task.status != DataTransferStatus.transferring) return '';
 
     final elapsed = DateTime.now().difference(task.startedAt!);
     if (elapsed.inSeconds == 0) return '';
@@ -208,6 +238,10 @@ class DataTransferProgressWidget extends StatelessWidget {
   }
 
   String _getTimeInfo() {
+    if (task.status == DataTransferStatus.cancelled ||
+        task.status == DataTransferStatus.failed) {
+      return 'Đã dừng';
+    }
     if (task.completedAt != null) {
       final duration =
           task.completedAt!.difference(task.startedAt ?? task.createdAt);

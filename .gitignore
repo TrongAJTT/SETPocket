@@ -91,3 +91,4 @@ app.*.map.json
 
 .l10n-manager
 l10n.yaml
+plan.md

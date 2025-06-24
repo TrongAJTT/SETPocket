@@ -43,7 +43,6 @@ class FlutterWindow : public Win32Window {
   // Network security methods
   flutter::EncodableValue CheckWifiSecurity();
   flutter::EncodableValue GetNetworkInfo();
-  std::string GetSecurityTypeString(DOT11_AUTH_ALGORITHM authAlgo);
 };
 
 #endif  // RUNNER_FLUTTER_WINDOW_H_

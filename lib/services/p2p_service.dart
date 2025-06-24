@@ -35,7 +35,7 @@ class P2PService extends ChangeNotifier {
   final Map<String, Socket> _connectedSockets = {};
 
   // File storage settings
-  P2PFileStorageSettings? _fileStorageSettings;
+  P2PDataTransferSettings? _transferSettings;
 
   // Pairing management
   final List<PairingRequest> _pendingRequests = [];
@@ -50,25 +50,33 @@ class P2PService extends ChangeNotifier {
 
   // File receiving management
   final Map<String, List<Uint8List>> _incomingFileChunks = {};
-  final Map<String, Map<String, dynamic>> _incomingFileMetadata = {};
 
   // Encryption
   late Encrypter _encrypter;
   late Key _encryptionKey;
 
+  // Task creation synchronization to prevent race conditions
+  final Map<String, Completer<DataTransferTask?>> _taskCreationLocks = {};
+
+  // Buffer chunks that arrive before task is created
+  final Map<String, List<Map<String, dynamic>>> _pendingChunks = {};
+
   // Constants
   static const int _basePort = 8080;
   static const int _maxPort = 8090;
   static const String _serviceType = '_setpocket_p2p._tcp';
+  // ignore: unused_field
   static const int _chunkSize = 64 * 1024; // 64KB chunks
+  // ignore: unused_field
   static const Duration _discoveryInterval = Duration(seconds: 30);
-  static const Duration _heartbeatInterval = Duration(seconds: 10);
+  static const Duration _heartbeatInterval = Duration(seconds: 60);
   static const Duration _cleanupInterval =
-      Duration(seconds: 10); // More frequent cleanup
+      Duration(seconds: 5); // More frequent cleanup for faster detection
+  // ignore: unused_field
   static const Duration _announcementInterval =
       Duration(seconds: 15); // Faster announcements
-  static const Duration _offlineTimeout =
-      Duration(seconds: 90); // Mark offline after 90s
+  static const Duration _offlineTimeout = Duration(
+      seconds: 150); // Mark offline after 150s (2.5x heartbeat interval)
 
   // Timers - Keep only essential ones
   Timer? _heartbeatTimer; // Keep for paired devices
@@ -97,7 +105,19 @@ class P2PService extends ChangeNotifier {
       _discoveredUsers.values.where((u) => u.isStored).toList();
   List<P2PUser> get unconnectedUsers =>
       _discoveredUsers.values.where((u) => !u.isStored).toList();
-  P2PFileStorageSettings? get fileStorageSettings => _fileStorageSettings;
+  P2PDataTransferSettings? get transferSettings => _transferSettings;
+
+  // Backward compatibility - keep the old getter
+  P2PFileStorageSettings? get fileStorageSettings {
+    if (_transferSettings == null) return null;
+    return P2PFileStorageSettings(
+      downloadPath: _transferSettings!.downloadPath,
+      askBeforeDownload: true, // Default value for backward compatibility
+      createDateFolders: _transferSettings!.createDateFolders,
+      maxFileSize: _transferSettings!.maxReceiveFileSize,
+    );
+  }
+
   List<PairingRequest> get pendingRequests =>
       List.unmodifiable(_pendingRequests);
   List<DataTransferTask> get activeTransfers =>
@@ -191,6 +211,9 @@ class P2PService extends ChangeNotifier {
       _isDiscovering = false;
       _connectionStatus = ConnectionStatus.disconnected;
 
+      // Send disconnect notifications to all paired users before stopping
+      await _sendDisconnectNotifications();
+
       // Stop timers
       _stopTimers();
 
@@ -206,12 +229,17 @@ class P2PService extends ChangeNotifier {
       // Stop discovery
       await _stopDiscovery();
 
-      // Clear discovered users to ensure a clean state, as in the old logic
-      _discoveredUsers.clear();
+      // Only clear non-stored users, keep stored users but mark them offline
+      _cleanupUsersOnNetworkStop();
 
       // Clean up receiving data
       _incomingFileChunks.clear();
-      _incomingFileMetadata.clear();
+
+      // Clean up task creation locks
+      _taskCreationLocks.clear();
+
+      // Clean up pending chunks buffer
+      _pendingChunks.clear();
 
       notifyListeners();
       logInfo('P2P networking stopped');
@@ -229,7 +257,7 @@ class P2PService extends ChangeNotifier {
       final request = PairingRequest(
         fromUserId: _currentUser!.id,
         fromUserName: _currentUser!.displayName,
-        fromDeviceId: _currentUser!.deviceId,
+        fromAppInstallationId: _currentUser!.appInstallationId,
         fromIpAddress: _currentUser!.ipAddress,
         fromPort: _currentUser!.port,
         wantsSaveConnection: saveConnection,
@@ -262,7 +290,7 @@ class P2PService extends ChangeNotifier {
             P2PUser(
               id: request.fromUserId,
               displayName: request.fromUserName,
-              deviceId: request.fromDeviceId,
+              appInstallationId: request.fromAppInstallationId,
               ipAddress: request.fromIpAddress,
               port: request.fromPort,
             );
@@ -333,7 +361,8 @@ class P2PService extends ChangeNotifier {
       }
 
       final fileSize = await file.length();
-      final fileName = file.path.split('/').last;
+      // Extract filename cross-platform (handles both Windows \ and Unix /)
+      final fileName = file.path.split(Platform.pathSeparator).last;
 
       final task = DataTransferTask(
         fileName: fileName,
@@ -346,25 +375,9 @@ class P2PService extends ChangeNotifier {
 
       _activeTransfers[task.id] = task;
 
-      // Send data transfer request
-      if (!targetUser.isTrusted) {
-        final message = P2PMessage(
-          type: P2PMessageTypes.dataTransferRequest,
-          fromUserId: _currentUser!.id,
-          toUserId: targetUser.id,
-          data: {
-            'taskId': task.id,
-            'fileName': fileName,
-            'fileSize': fileSize,
-          },
-        );
-
-        task.status = DataTransferStatus.requesting;
-        await _sendMessage(targetUser, message);
-      } else {
-        // Start transfer immediately for trusted users
-        await _startDataTransfer(task, targetUser);
-      }
+      // Start data transfer directly for all users
+      // The receiving side will create the task when it receives the first chunk with metadata
+      await _startDataTransfer(task, targetUser);
 
       notifyListeners();
       return true;
@@ -380,25 +393,28 @@ class P2PService extends ChangeNotifier {
       final task = _activeTransfers[taskId];
       if (task == null) return false;
 
-      task.status = DataTransferStatus.cancelled;
+      // Only cancel transfers that are actually in progress
+      if (task.status != DataTransferStatus.transferring) {
+        logInfo(
+            'Skipping cancellation for task ${task.id} with status ${task.status}');
+        return false;
+      }
 
       // Stop isolate if running
       final isolate = _transferIsolates[taskId];
       if (isolate != null) {
-        isolate.kill();
+        isolate.kill(priority: Isolate.immediate);
         _transferIsolates.remove(taskId);
-      }
-
-      // Close port
-      final port = _transferPorts[taskId];
-      if (port != null) {
-        port.close();
+        _transferPorts[taskId]?.close();
         _transferPorts.remove(taskId);
       }
 
+      task.status = DataTransferStatus.cancelled;
+      task.errorMessage = 'Bị hủy bởi người dùng';
+
       // Notify other user
       final targetUser = _discoveredUsers[task.targetUserId];
-      if (targetUser != null) {
+      if (targetUser != null && targetUser.isOnline) {
         final message = P2PMessage(
           type: P2PMessageTypes.dataTransferCancel,
           fromUserId: _currentUser!.id,
@@ -408,7 +424,6 @@ class P2PService extends ChangeNotifier {
         await _sendMessage(targetUser, message);
       }
 
-      _activeTransfers.remove(taskId);
       notifyListeners();
       return true;
     } catch (e) {
@@ -428,6 +443,10 @@ class P2PService extends ChangeNotifier {
 
   Future<void> _loadSavedData() async {
     try {
+      // Clear previous state before loading
+      _discoveredUsers.clear();
+      _pendingRequests.clear();
+
       // Load saved users - same as old logic, simple and direct
       final usersBox = await Hive.openBox<P2PUser>('p2p_users');
       for (final user in usersBox.values) {
@@ -464,11 +483,11 @@ class P2PService extends ChangeNotifier {
             'Cleaned up ${processedRequestIds.length} processed pairing requests from storage on startup');
       }
 
-      // Load file storage settings
-      final storageBox =
-          await Hive.openBox<P2PFileStorageSettings>('p2p_storage_settings');
-      if (storageBox.isNotEmpty) {
-        _fileStorageSettings = storageBox.values.first;
+      // Load transfer settings
+      final settingsBox =
+          await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
+      if (settingsBox.isNotEmpty) {
+        _transferSettings = settingsBox.values.first;
       }
 
       logInfo(
@@ -479,12 +498,14 @@ class P2PService extends ChangeNotifier {
   }
 
   Future<void> _createCurrentUser(NetworkInfo networkInfo) async {
-    final deviceId = await NetworkSecurityService.getDeviceId();
+    final appInstallationId =
+        await NetworkSecurityService.getAppInstallationId();
     final deviceName = await NetworkSecurityService.getDeviceName();
 
     _currentUser = P2PUser(
+      id: appInstallationId,
       displayName: deviceName,
-      deviceId: deviceId,
+      appInstallationId: appInstallationId,
       ipAddress: networkInfo.ipAddress ?? '127.0.0.1',
       port: _basePort,
       isOnline: true,
@@ -734,24 +755,9 @@ class P2PService extends ChangeNotifier {
                   data['userId'] != _currentUser!.id) {
                 logInfo(
                     'Received UDP announcement from ${data['userId']} at ${data['ipAddress']}:${data['port']}');
-                _handleDiscoveredUser(
-                  name: data['userId'] as String,
-                  ipAddress: data['ipAddress'] as String,
-                  port: data['port'] as int,
-                );
 
-                // Update display name if available - same logic as old version
-                final existingUser = _discoveredUsers[data['userId'] as String];
-                final userName = data['userName'] as String?;
-                if (existingUser != null &&
-                    userName != null &&
-                    userName.isNotEmpty &&
-                    existingUser.displayName.startsWith('Device-') &&
-                    !userName.startsWith('Device-')) {
-                  existingUser.displayName = userName;
-                  logInfo(
-                      'Updated display name via UDP: ${data['userId']} -> $userName');
-                }
+                // Process enhanced announcement with user data sync
+                _processEnhancedAnnouncement(data);
               } else if (data['type'] == 'setpocket_service_announcement' &&
                   data['userId'] == _currentUser!.id) {
                 logInfo('Received our own UDP announcement (loopback)');
@@ -768,6 +774,156 @@ class P2PService extends ChangeNotifier {
       logInfo('UDP broadcast announcement started on port 8082');
     } catch (e) {
       logError('Failed to start UDP broadcast announcement: $e');
+    }
+  }
+
+  /// Process enhanced announcement with encrypted user data synchronization
+  Future<void> _processEnhancedAnnouncement(Map<String, dynamic> data) async {
+    try {
+      final userId = data['userId'] as String;
+      final ipAddress = data['ipAddress'] as String;
+      final port = data['port'] as int;
+      final userName = data['userName'] as String?;
+
+      // Handle basic discovery first
+      _handleDiscoveredUser(
+        name: userId,
+        ipAddress: ipAddress,
+        port: port,
+      );
+
+      // Try to process encrypted user data if available
+      final encryptedUserData = data['encryptedUserData'] as String?;
+      final ivBase64 = data['iv'] as String?;
+      // ignore: unused_local_variable
+      final protocolVersion = data['protocolVersion'] as String? ?? '1.0';
+
+      if (encryptedUserData != null && ivBase64 != null) {
+        try {
+          final iv = IV.fromBase64(ivBase64);
+          final encrypted = Encrypted.fromBase64(encryptedUserData);
+          final decryptedJson = _encrypter.decrypt(encrypted, iv: iv);
+          final userData = jsonDecode(decryptedJson) as Map<String, dynamic>;
+
+          // Create P2PUser from decrypted data
+          final announcedUser = P2PUser.fromJson(userData);
+
+          // Sync with existing user data
+          await _syncUserFromAnnouncement(announcedUser);
+
+          logInfo(
+              '✅ Successfully synced user data from encrypted announcement: ${announcedUser.displayName}');
+        } catch (e) {
+          logWarning(
+              'Failed to decrypt or process user data from announcement: $e');
+          // Fallback to basic discovery
+          _updateBasicUserInfo(userId, userName);
+        }
+      } else {
+        // Legacy announcement without encrypted data
+        _updateBasicUserInfo(userId, userName);
+      }
+    } catch (e) {
+      logError('Error processing enhanced announcement: $e');
+    }
+  }
+
+  /// Sync user data from announcement with existing stored data
+  Future<void> _syncUserFromAnnouncement(P2PUser announcedUser) async {
+    final existingUser = _discoveredUsers[announcedUser.id];
+
+    if (existingUser != null) {
+      // User already exists - merge data intelligently
+      bool hasChanges = false;
+
+      // Security check: If a paired user suddenly appears with a new IP, invalidate the pairing.
+      if (existingUser.isPaired &&
+          existingUser.ipAddress != announcedUser.ipAddress) {
+        logWarning(
+            'Paired user ${existingUser.displayName} appeared with a new IP address.');
+        logWarning(
+            'Old IP: ${existingUser.ipAddress}, New IP: ${announcedUser.ipAddress}');
+        // For security, revoke pairing and trust. Re-pairing will be required.
+        existingUser.isPaired = false;
+        existingUser.isTrusted = false;
+        logInfo(
+            'Pairing and trust have been revoked for ${existingUser.displayName} due to IP address change.');
+        hasChanges = true;
+      }
+
+      // Update network info
+      if (existingUser.ipAddress != announcedUser.ipAddress ||
+          existingUser.port != announcedUser.port) {
+        logInfo('🔄 Network info changed for ${existingUser.displayName}: '
+            '${existingUser.ipAddress}:${existingUser.port} -> '
+            '${announcedUser.ipAddress}:${announcedUser.port}');
+        existingUser.ipAddress = announcedUser.ipAddress;
+        existingUser.port = announcedUser.port;
+        hasChanges = true;
+      }
+
+      // Update online status
+      if (!existingUser.isOnline) {
+        existingUser.isOnline = true;
+        hasChanges = true;
+        logInfo(
+            '✅ User ${existingUser.displayName} is back online via announcement');
+      }
+
+      // Update last seen
+      existingUser.lastSeen = DateTime.now();
+
+      // Update appInstallationId if it's different (important for migration from old format)
+      if (existingUser.appInstallationId != announcedUser.appInstallationId) {
+        logInfo(
+            '🔄 Updating appInstallationId for ${existingUser.displayName}: '
+            '${existingUser.appInstallationId} -> ${announcedUser.appInstallationId}');
+        existingUser.appInstallationId = announcedUser.appInstallationId;
+        hasChanges = true;
+      }
+
+      // Preserve stored/paired status from existing user (don't override from announcement)
+      // But update other non-critical info
+      if (existingUser.displayName.startsWith('Device-') &&
+          !announcedUser.displayName.startsWith('Device-')) {
+        existingUser.displayName = announcedUser.displayName;
+        hasChanges = true;
+        logInfo('📝 Updated display name: ${announcedUser.displayName}');
+      }
+
+      if (hasChanges) {
+        notifyListeners();
+
+        // Save to storage if this is a stored user
+        if (existingUser.isStored) {
+          await _saveUser(existingUser);
+        }
+      }
+    } else {
+      // New user - add to discovered list
+      announcedUser.isOnline = true;
+      announcedUser.lastSeen = DateTime.now();
+      announcedUser.isStored = false; // New discovery is not stored
+
+      _discoveredUsers[announcedUser.id] = announcedUser;
+      notifyListeners();
+
+      logInfo(
+          '🆕 Added new user from announcement: ${announcedUser.displayName} (appInstallationId: ${announcedUser.appInstallationId})');
+    }
+  }
+
+  /// Update basic user info for legacy announcements
+  void _updateBasicUserInfo(String userId, String? userName) {
+    final existingUser = _discoveredUsers[userId];
+    if (existingUser != null &&
+        userName != null &&
+        userName.isNotEmpty &&
+        existingUser.displayName.startsWith('Device-') &&
+        !userName.startsWith('Device-')) {
+      existingUser.displayName = userName;
+      logInfo('Updated display name via legacy UDP: $userId -> $userName');
+      notifyListeners();
     }
   }
 
@@ -872,7 +1028,12 @@ class P2PService extends ChangeNotifier {
     if (existingUser != null) {
       // User already exists - update network info and mark online
       bool hasChanges = false;
+      final wasOffline = !existingUser.isOnline;
+
       if (existingUser.ipAddress != ipAddress || existingUser.port != port) {
+        logInfo('🔄 Updated network info for ${existingUser.displayName}: '
+            '${existingUser.ipAddress}:${existingUser.port} -> '
+            '$ipAddress:$port');
         existingUser.ipAddress = ipAddress;
         existingUser.port = port;
         hasChanges = true;
@@ -880,8 +1041,14 @@ class P2PService extends ChangeNotifier {
       if (!existingUser.isOnline) {
         existingUser.isOnline = true;
         hasChanges = true;
+        logInfo('✅ User ${existingUser.displayName} is back online');
       }
       existingUser.lastSeen = DateTime.now();
+
+      if (wasOffline || hasChanges) {
+        logInfo(
+            '📡 Updated lastSeen for ${existingUser.displayName} (was offline: $wasOffline)');
+      }
 
       if (hasChanges) {
         notifyListeners();
@@ -890,8 +1057,9 @@ class P2PService extends ChangeNotifier {
       // New user discovery
       final newUser = P2PUser(
         id: discoveredId,
-        displayName: 'Device-$discoveredId'.substring(0, 8), // Placeholder name
-        deviceId: discoveredId,
+        displayName:
+            'Device-${discoveredId.substring(0, 8)}', // Placeholder name
+        appInstallationId: discoveredId, // Use the stable ID
         ipAddress: ipAddress,
         port: port,
         isOnline: true,
@@ -900,6 +1068,9 @@ class P2PService extends ChangeNotifier {
       );
       _discoveredUsers[discoveredId] = newUser;
       notifyListeners();
+
+      logInfo(
+          '🆕 Discovered new user: ${newUser.displayName} (appInstallationId: ${newUser.appInstallationId})');
     }
   }
 
@@ -975,6 +1146,13 @@ class P2PService extends ChangeNotifier {
     if (_broadcastSocket == null || _currentUser == null) return;
 
     try {
+      // Create comprehensive announcement with encrypted user data
+      final userInfo = _currentUser!.toJson();
+
+      // Encrypt the user info for security
+      final iv = IV.fromSecureRandom(16);
+      final encrypted = _encrypter.encrypt(jsonEncode(userInfo), iv: iv);
+
       final announcement = {
         'type': 'setpocket_service_announcement',
         'service': _serviceType,
@@ -984,6 +1162,11 @@ class P2PService extends ChangeNotifier {
         'ipAddress': _currentUser!.ipAddress,
         'port': _currentUser!.port,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
+        // Add encrypted full user data for automatic sync
+        'encryptedUserData': encrypted.base64,
+        'iv': iv.base64,
+        // Add version for future compatibility
+        'protocolVersion': '1.0',
       };
 
       final data = utf8.encode(jsonEncode(announcement));
@@ -1002,8 +1185,10 @@ class P2PService extends ChangeNotifier {
           // Ignore individual broadcast failures
         }
       }
+
+      logInfo('📡 Sent enhanced UDP announcement with encrypted user data');
     } catch (e) {
-      logError('Failed to send UDP announcement: $e');
+      logError('Failed to send enhanced UDP announcement: $e');
     }
   }
 
@@ -1079,8 +1264,9 @@ class P2PService extends ChangeNotifier {
 
           // Check if user has been unreachable for too long
           final timeSinceLastSeen = DateTime.now().difference(user.lastSeen);
-          if (timeSinceLastSeen > const Duration(minutes: 3) && user.isStored) {
-            // If stored user has been unreachable for 3+ minutes, check if they disconnected
+          if (timeSinceLastSeen > const Duration(seconds: 30) &&
+              user.isStored) {
+            // If stored user has been unreachable for 30+ seconds, check if they disconnected
             await _checkForSilentDisconnect(user);
           }
         } else {
@@ -1134,7 +1320,7 @@ class P2PService extends ChangeNotifier {
     // All attempts failed - treat as silent disconnect
     if (failedAttempts == maxAttempts) {
       logWarning(
-          '${user.displayName} appears to have silently disconnected (${failedAttempts}/$maxAttempts failed attempts)');
+          '${user.displayName} appears to have silently disconnected ($failedAttempts/$maxAttempts failed attempts)');
 
       // Mark as offline but keep stored status in case they come back
       user.isOnline = false;
@@ -1162,12 +1348,12 @@ class P2PService extends ChangeNotifier {
       final user = entry.value;
       final timeSinceLastSeen = now.difference(user.lastSeen);
 
-      // Mark offline if no activity for 90 seconds
+      // Mark offline if no activity for 150 seconds (2.5x heartbeat interval)
       if (timeSinceLastSeen > _offlineTimeout && user.isOnline) {
         user.isOnline = false;
         hasChanges = true;
         logInfo(
-            'Marked user ${user.displayName} as offline (last seen: ${timeSinceLastSeen.inSeconds}s ago)');
+            '⏰ Marked user ${user.displayName} as offline (last seen: ${timeSinceLastSeen.inSeconds}s ago, threshold: ${_offlineTimeout.inSeconds}s)');
       }
 
       // Remove completely if offline for more than 5 minutes and not paired
@@ -1185,7 +1371,6 @@ class P2PService extends ChangeNotifier {
     }
 
     // Remove old unprocessed pairing requests (older than 1 hour)
-    final oldRequestCount = _pendingRequests.length;
     final expiredRequests = <PairingRequest>[];
 
     _pendingRequests.removeWhere((request) {
@@ -1294,17 +1479,8 @@ class P2PService extends ChangeNotifier {
       case P2PMessageTypes.pairingResponse:
         await _handlePairingResponse(message);
         break;
-      case P2PMessageTypes.dataTransferRequest:
-        await _handleDataTransferRequest(message);
-        break;
-      case P2PMessageTypes.dataTransferResponse:
-        await _handleDataTransferResponse(message);
-        break;
       case P2PMessageTypes.dataChunk:
         await _handleDataChunk(message);
-        break;
-      case P2PMessageTypes.dataTransferComplete:
-        await _handleDataTransferComplete(message);
         break;
       case P2PMessageTypes.dataTransferCancel:
         await _handleDataTransferCancel(message);
@@ -1344,15 +1520,38 @@ class P2PService extends ChangeNotifier {
       port: discoveredUser.port,
     );
 
-    // Update display name if we have more info from the discovery message
+    // Update user with full information from discovery message
     final existingUser = _discoveredUsers[discoveredUser.id];
-    if (existingUser != null &&
-        discoveredUser.displayName.isNotEmpty &&
-        existingUser.displayName.startsWith('Device-') &&
-        !discoveredUser.displayName.startsWith('Device-')) {
-      existingUser.displayName = discoveredUser.displayName;
-      logInfo(
-          'Updated display name for ${discoveredUser.id}: ${discoveredUser.displayName}');
+    if (existingUser != null) {
+      bool hasChanges = false;
+
+      // Update display name if we have more info from the discovery message
+      if (discoveredUser.displayName.isNotEmpty &&
+          existingUser.displayName.startsWith('Device-') &&
+          !discoveredUser.displayName.startsWith('Device-')) {
+        existingUser.displayName = discoveredUser.displayName;
+        hasChanges = true;
+        logInfo(
+            'Updated display name for ${discoveredUser.id}: ${discoveredUser.displayName}');
+      }
+
+      // Update appInstallationId if it's available and different
+      if (discoveredUser.appInstallationId.isNotEmpty &&
+          existingUser.appInstallationId != discoveredUser.appInstallationId) {
+        logInfo(
+            '🔄 Updating appInstallationId from discovery for ${existingUser.displayName}: '
+            '${existingUser.appInstallationId} -> ${discoveredUser.appInstallationId}');
+        existingUser.appInstallationId = discoveredUser.appInstallationId;
+        hasChanges = true;
+      }
+
+      if (hasChanges) {
+        notifyListeners();
+        // Save to storage if this is a stored user
+        if (existingUser.isStored) {
+          await _saveUser(existingUser);
+        }
+      }
     }
 
     // Send discovery response
@@ -1404,30 +1603,6 @@ class P2PService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _handleDataTransferRequest(P2PMessage message) async {
-    // Handle incoming data transfer request
-    // Show notification/dialog to user for approval
-  }
-
-  Future<void> _handleDataTransferResponse(P2PMessage message) async {
-    // Handle data transfer response (accept/reject)
-    final data = message.data;
-    final taskId = data['taskId'] as String;
-    final accepted = data['accepted'] as bool;
-
-    final task = _activeTransfers[taskId];
-    if (task != null && accepted) {
-      final targetUser = _discoveredUsers[task.targetUserId];
-      if (targetUser != null) {
-        await _startDataTransfer(task, targetUser);
-      }
-    } else if (task != null) {
-      task.status = DataTransferStatus.failed;
-      task.errorMessage = 'Transfer rejected by recipient';
-      notifyListeners();
-    }
-  }
-
   Future<void> _handleDataChunk(P2PMessage message) async {
     final data = message.data;
     final taskId = data['taskId'] as String;
@@ -1439,11 +1614,36 @@ class P2PService extends ChangeNotifier {
     try {
       final chunkData = base64Decode(chunkDataBase64);
 
+      // Use lock mechanism to prevent race conditions in task creation
+      DataTransferTask? task = await _getOrCreateTask(taskId, message, data);
+      if (task == null) {
+        logError('❌ CHUNK_RX: Could not get or create task for $taskId');
+
+        // Buffer this chunk for later processing
+        _pendingChunks.putIfAbsent(taskId, () => []);
+        _pendingChunks[taskId]!.add({
+          'chunkData': chunkData,
+          'isLast': isLast,
+          'data': data,
+        });
+        logInfo(
+            '📦 BUFFERED: Chunk for task $taskId (buffer size: ${_pendingChunks[taskId]!.length})');
+        return;
+      }
+
       // Initialize chunks list if it's the first chunk
       _incomingFileChunks.putIfAbsent(taskId, () => []);
 
       // Append the new chunk
       _incomingFileChunks[taskId]!.add(chunkData);
+
+      // Update the progress of the active transfer task
+      // task should not be null here because we either found it or created it.
+      task.transferredBytes += chunkData.length;
+      if (task.status != DataTransferStatus.transferring) {
+        task.status = DataTransferStatus.transferring;
+      }
+      notifyListeners();
 
       // If this is the last chunk, assemble the file
       if (isLast) {
@@ -1456,38 +1656,155 @@ class P2PService extends ChangeNotifier {
       logError('Failed to process data chunk for task $taskId: $e');
       // Clean up on error to prevent partial files
       _incomingFileChunks.remove(taskId);
-      _incomingFileMetadata.remove(taskId);
     }
   }
 
-  Future<void> _handleDataTransferComplete(P2PMessage message) async {
-    final data = message.data;
-    final taskId = data['taskId'] as String;
-    final fileName = data['fileName'] as String;
-    final fileSize = data['fileSize'] as int;
+  /// Get existing task or create new one with race condition protection
+  Future<DataTransferTask?> _getOrCreateTask(
+      String taskId, P2PMessage message, Map<String, dynamic> data) async {
+    logInfo(
+        '🔍 GET_OR_CREATE_TASK: Checking task $taskId from ${message.fromUserId}');
+    logInfo(
+        '📋 CHUNK_DATA: keys=${data.keys.toList()}, isLast=${data['isLast']}, hasFileName=${data.containsKey('fileName')}, hasFileSize=${data.containsKey('fileSize')}');
 
-    logInfo('Data transfer completed for task $taskId: $fileName');
-
-    // Store metadata for file assembly
-    _incomingFileMetadata[taskId] = {
-      'fileName': fileName,
-      'fileSize': fileSize,
-      'fromUserId': message.fromUserId,
-    };
-
-    // Try to assemble file if we have chunks
-    if (_incomingFileChunks.containsKey(taskId)) {
-      await _assembleReceivedFile(taskId);
+    // Check if task already exists
+    DataTransferTask? task = _activeTransfers[taskId];
+    if (task != null) {
+      logInfo('✅ TASK_EXISTS: Found existing task $taskId');
+      return task;
     }
 
-    // Update task status if it exists
-    final task = _activeTransfers[taskId];
-    if (task != null) {
-      task.status = DataTransferStatus.completed;
-      task.completedAt = DateTime.now();
-      task.transferredBytes = task.fileSize;
-      _cleanupTransfer(taskId);
-      notifyListeners();
+    logInfo(
+        '❓ TASK_NOT_FOUND: Task $taskId not in active transfers (${_activeTransfers.length} active)');
+
+    // Check if another thread is already creating this task
+    Completer<DataTransferTask?>? existingLock = _taskCreationLocks[taskId];
+    if (existingLock != null) {
+      logInfo('🔒 Task $taskId is being created by another thread, waiting...');
+      return await existingLock.future;
+    }
+
+    // Create lock for this task creation
+    final completer = Completer<DataTransferTask?>();
+    _taskCreationLocks[taskId] = completer;
+
+    try {
+      // Double-check pattern: task might have been created while we were setting up the lock
+      task = _activeTransfers[taskId];
+      if (task != null) {
+        completer.complete(task);
+        return task;
+      }
+
+      // Extract metadata for first chunk
+      final fileName = data['fileName'] as String?;
+      final fileSize = data['fileSize'] as int?;
+
+      if (fileName != null && fileSize != null) {
+        logInfo(
+            '✅ FIRST_CHUNK_RX: First chunk for new task $taskId ($fileName). Creating task.');
+
+        // Check if user exists, if not try to request user info
+        P2PUser? fromUser = _discoveredUsers[message.fromUserId];
+        if (fromUser == null) {
+          logWarning(
+              '❓ UNKNOWN_USER: Received first chunk from unknown user: ${message.fromUserId}');
+
+          // Send a quick discovery request to get user info
+          await _requestUserInfo(message.fromUserId, message);
+
+          // Try again after discovery request
+          fromUser = _discoveredUsers[message.fromUserId];
+
+          if (fromUser == null) {
+            // Create a temporary user entry for this transfer
+            fromUser = P2PUser(
+              id: message.fromUserId,
+              displayName:
+                  'Unknown User (${message.fromUserId.substring(0, 8)})',
+              appInstallationId: message.fromUserId,
+              ipAddress: 'Unknown',
+              port: 0,
+              isOnline: true,
+              lastSeen: DateTime.now(),
+              isStored: false,
+            );
+            _discoveredUsers[message.fromUserId] = fromUser;
+            logInfo(
+                '📝 Created temporary user entry for transfer: ${fromUser.displayName}');
+          }
+        }
+
+        task = DataTransferTask(
+          id: taskId,
+          fileName: fileName,
+          filePath: '', // File path is not known yet on receiver side
+          fileSize: fileSize,
+          targetUserId: fromUser.id,
+          targetUserName: fromUser.displayName,
+          status: DataTransferStatus.transferring,
+          isOutgoing: false,
+          createdAt: DateTime.now(),
+          startedAt: DateTime.now(),
+        );
+
+        // Atomically add task to active transfers
+        _activeTransfers[taskId] = task;
+        logInfo('🔒 Task $taskId created and added to active transfers');
+
+        // Process any buffered chunks for this task
+        final bufferedChunks = _pendingChunks.remove(taskId);
+        if (bufferedChunks != null && bufferedChunks.isNotEmpty) {
+          logInfo(
+              '🔄 PROCESSING ${bufferedChunks.length} buffered chunks for task $taskId');
+          for (final bufferedChunk in bufferedChunks) {
+            final chunkData = bufferedChunk['chunkData'] as Uint8List;
+            final isLast = bufferedChunk['isLast'] as bool;
+
+            // Initialize chunks list if it's the first chunk
+            _incomingFileChunks.putIfAbsent(taskId, () => []);
+
+            // Append the buffered chunk
+            _incomingFileChunks[taskId]!.add(chunkData);
+
+            // Update task progress
+            task.transferredBytes += chunkData.length;
+            if (task.status != DataTransferStatus.transferring) {
+              task.status = DataTransferStatus.transferring;
+            }
+
+            logInfo(
+                '📦 PROCESSED buffered chunk: ${chunkData.length} bytes (total: ${task.transferredBytes}/${task.fileSize})');
+
+            // If this buffered chunk was the last one, assemble the file
+            if (isLast) {
+              logInfo(
+                  '🏁 Last buffered chunk processed for task $taskId, assembling file...');
+              // We need to call this after completing the task creation
+              // Schedule it to run after this method completes
+              Future.microtask(() => _assembleReceivedFile(taskId));
+            }
+          }
+          notifyListeners();
+        }
+
+        completer.complete(task);
+        return task;
+      } else {
+        logError(
+            '❌ CHUNK_RX: Received chunk for task NOT in active transfers, and no metadata found to create it: $taskId');
+        logError('❌ DATA_KEYS: ${data.keys.toList()}');
+        logError('❌ ACTIVE_TRANSFERS: ${_activeTransfers.keys.toList()}');
+        completer.complete(null);
+        return null;
+      }
+    } catch (e) {
+      logError('Failed to create task $taskId: $e');
+      completer.complete(null);
+      return null;
+    } finally {
+      // Always clean up the lock
+      _taskCreationLocks.remove(taskId);
     }
   }
 
@@ -1499,7 +1816,6 @@ class P2PService extends ChangeNotifier {
 
     // Clean up receiving data
     _incomingFileChunks.remove(taskId);
-    _incomingFileMetadata.remove(taskId);
 
     // Update task status if it exists
     final task = _activeTransfers[taskId];
@@ -1514,21 +1830,23 @@ class P2PService extends ChangeNotifier {
   Future<void> _assembleReceivedFile(String taskId) async {
     try {
       final chunks = _incomingFileChunks[taskId];
-      final metadata = _incomingFileMetadata[taskId];
+      final task = _activeTransfers[taskId];
 
-      if (chunks == null || metadata == null) {
-        logError('Missing chunks or metadata for task $taskId');
+      if (chunks == null || task == null) {
+        logError('❌ ASSEMBLE: Missing chunks or task for $taskId');
         return;
       }
 
-      final fileName = metadata['fileName'] as String;
-      final expectedFileSize = metadata['fileSize'] as int;
-      final fromUserId = metadata['fromUserId'] as String;
+      final originalFileName = task.fileName;
+      // Sanitize filename for the receiving platform
+      final fileName = _sanitizeFileName(originalFileName);
+      final expectedFileSize = task.fileSize;
+      final fromUserId = task.targetUserId;
 
       // Get download path from settings
       String downloadPath;
-      if (_fileStorageSettings != null) {
-        downloadPath = _fileStorageSettings!.downloadPath;
+      if (_transferSettings != null) {
+        downloadPath = _transferSettings!.downloadPath;
       } else {
         // Default to Downloads folder
         downloadPath = Platform.isWindows
@@ -1553,7 +1871,7 @@ class P2PService extends ChangeNotifier {
           final baseName =
               fileNameParts.sublist(0, fileNameParts.length - 1).join('.');
           final extension = fileNameParts.last;
-          finalFileName = '${baseName}_$counter.$extension';
+          finalFileName = '${baseName}_${counter}.$extension';
         } else {
           finalFileName = '${fileName}_$counter';
         }
@@ -1583,33 +1901,20 @@ class P2PService extends ChangeNotifier {
       logInfo(
           '✅ File received and saved: $filePath (${fileData.length} bytes)');
 
-      // Create incoming transfer task for UI
-      final fromUser = _discoveredUsers[fromUserId];
-      final incomingTask = DataTransferTask(
-        id: taskId,
-        fileName: finalFileName,
-        filePath: filePath,
-        fileSize: fileData.length,
-        targetUserId: _currentUser!.id,
-        targetUserName: _currentUser!.displayName,
-        status: DataTransferStatus.completed,
-        transferredBytes: fileData.length,
-        isOutgoing: false,
-        savePath: filePath,
-      );
-
-      incomingTask.startedAt =
-          DateTime.now().subtract(const Duration(seconds: 10));
-      incomingTask.completedAt = DateTime.now();
-
-      _activeTransfers[taskId] = incomingTask;
+      // Update the task to completed state
+      task.status = DataTransferStatus.completed;
+      task.completedAt = DateTime.now();
+      task.filePath = filePath; // Update final path
+      task.savePath = filePath;
+      task.transferredBytes = fileData.length; // Finalize byte count
+      logInfo('✅ ASSEMBLE: Updated task $taskId to completed state.');
 
       // Clean up
       _incomingFileChunks.remove(taskId);
-      _incomingFileMetadata.remove(taskId);
 
       notifyListeners();
 
+      final fromUser = _discoveredUsers[fromUserId];
       logInfo(
           '📁 File transfer completed: ${fromUser?.displayName ?? 'Unknown'} sent $finalFileName');
     } catch (e) {
@@ -1617,7 +1922,6 @@ class P2PService extends ChangeNotifier {
 
       // Clean up on error
       _incomingFileChunks.remove(taskId);
-      _incomingFileMetadata.remove(taskId);
     }
   }
 
@@ -1662,61 +1966,60 @@ class P2PService extends ChangeNotifier {
     final data = message.data;
     final reason = data['reason'] as String? ?? 'unknown';
     final fromUserName = data['fromUserName'] as String? ?? 'Unknown User';
-    final isEmergency = data['emergency'] as bool? ?? false;
+    final isUnpair = data['unpair'] as bool? ?? false;
 
     final user = _discoveredUsers[message.fromUserId];
-    if (user != null) {
-      if (isEmergency) {
-        logInfo(
-            '🚨 Received EMERGENCY disconnect from ${user.displayName}: $reason');
-      } else {
-        logInfo(
-            'Received disconnect notification from ${user.displayName}: $reason');
-      }
-
-      // Remove from storage if stored
-      if (user.isStored) {
-        try {
-          final box = await Hive.openBox<P2PUser>('p2p_users');
-          await box.delete(user.id);
-          logInfo('Removed ${user.displayName} from storage due to disconnect');
-        } catch (e) {
-          logError('Failed to remove user from storage: $e');
-        }
-      }
-
-      // Reset connection status
-      user.isPaired = false;
-      user.isTrusted = false;
-      user.isStored = false;
-      user.autoConnect = false;
-      user.pairedAt = null;
-
-      // Mark as offline for any disconnect message (both emergency and normal)
-      user.isOnline = false;
-      if (isEmergency) {
-        user.lastSeen = DateTime.now().subtract(const Duration(minutes: 1));
-      } else {
-        user.lastSeen = DateTime.now().subtract(const Duration(seconds: 30));
-      }
-
-      // Remove from discovered users since they disconnected
-      _discoveredUsers.remove(user.id);
-
-      logInfo(
-          '🔄 Updated user state: ${user.displayName} - paired: ${user.isPaired}, stored: ${user.isStored}, online: ${user.isOnline}, removed from discovered users');
-
-      notifyListeners();
-
-      // Log for user awareness
-      if (isEmergency) {
-        logInfo('$fromUserName\'s app has closed (emergency disconnect).');
-      } else {
-        logInfo('$fromUserName has disconnected from you.');
-      }
-
-      logInfo('📊 Remaining discovered users: ${_discoveredUsers.length}');
+    if (user == null) {
+      logWarning(
+          "Received disconnect from unknown user: ${message.fromUserId}");
+      return;
     }
+
+    if (isUnpair) {
+      await _handleUnpairNotification(user, reason, fromUserName);
+    } else {
+      _handleRegularDisconnect(user, reason, fromUserName);
+    }
+
+    notifyListeners();
+  }
+
+  /// Handles a notification that a user has unpaired.
+  Future<void> _handleUnpairNotification(
+      P2PUser user, String reason, String fromUserName) async {
+    logInfo(
+        '💔 Received UNPAIR notification from ${user.displayName}: $reason');
+
+    // On unpair, remove from storage
+    if (user.isStored) {
+      try {
+        final box = await Hive.openBox<P2PUser>('p2p_users');
+        await box.delete(user.id);
+        logInfo('Removed ${user.displayName} from storage due to unpair');
+      } catch (e) {
+        logError('Failed to remove user from storage on unpair: $e');
+      }
+    }
+
+    // And remove from the current session
+    _discoveredUsers.remove(user.id);
+    logInfo('💔 Unpaired from ${user.displayName}: removed completely.');
+    logInfo('$fromUserName has unpaired from you.');
+  }
+
+  /// Handles a regular disconnect notification (e.g., network stop).
+  void _handleRegularDisconnect(
+      P2PUser user, String reason, String fromUserName) {
+    // This is a regular disconnect (e.g., network stop)
+    logInfo(
+        '🔌 Received disconnect notification from ${user.displayName}: $reason');
+
+    // Just mark the user as offline. Do NOT remove from storage or discovered list.
+    user.isOnline = false;
+    user.lastSeen = DateTime.now();
+
+    logInfo('🔄 Marked user as offline: ${user.displayName}');
+    logInfo('$fromUserName has disconnected.');
   }
 
   Future<bool> _sendMessage(P2PUser targetUser, P2PMessage message) async {
@@ -1859,6 +2162,7 @@ class P2PService extends ChangeNotifier {
 
       final totalBytes = fileBytes.length;
       sendPort.send({'info': 'Starting transfer of $totalBytes bytes.'});
+      bool isFirstChunk = true;
 
       while (totalSent < totalBytes) {
         final remainingBytes = totalBytes - totalSent;
@@ -1867,15 +2171,27 @@ class P2PService extends ChangeNotifier {
             fileBytes.sublist(totalSent, totalSent + currentChunkSize);
 
         try {
+          final dataPayload = {
+            'taskId': task.id,
+            'data': base64Encode(chunk),
+            'isLast': (totalSent + currentChunkSize == totalBytes),
+          };
+
+          if (isFirstChunk) {
+            dataPayload['fileName'] = task.fileName;
+            dataPayload['fileSize'] = task.fileSize;
+            isFirstChunk = false;
+            sendPort.send({
+              'info':
+                  '🔥 SENDING FIRST CHUNK with metadata: ${task.fileName} (${task.fileSize} bytes) for task ${task.id}'
+            });
+          }
+
           final chunkMessage = P2PMessage(
             type: P2PMessageTypes.dataChunk,
             fromUserId: currentUserId,
             toUserId: targetUser.id,
-            data: {
-              'taskId': task.id,
-              'data': base64Encode(chunk),
-              'isLast': (totalSent + currentChunkSize == totalBytes),
-            },
+            data: dataPayload,
           );
 
           final messageBytes = utf8.encode(jsonEncode(chunkMessage.toJson()));
@@ -1923,26 +2239,17 @@ class P2PService extends ChangeNotifier {
           await socket?.close();
           socket = await Socket.connect(targetUser.ipAddress, targetUser.port,
               timeout: const Duration(seconds: 10));
+
+          // IMPORTANT: If this was the first chunk that failed, we need to resend with metadata
+          if (totalSent == 0) {
+            isFirstChunk = true; // Reset to resend metadata
+            sendPort.send({
+              'info':
+                  '🔄 Connection lost on first chunk, will resend with metadata'
+            });
+          }
         }
       }
-
-      // Send completion message
-      final completeMessage = P2PMessage(
-        type: P2PMessageTypes.dataTransferComplete,
-        fromUserId: currentUserId,
-        toUserId: targetUser.id,
-        data: {
-          'taskId': task.id,
-          'fileName': task.fileName,
-          'fileSize': totalBytes
-        },
-      );
-      final messageBytes = utf8.encode(jsonEncode(completeMessage.toJson()));
-      final lengthHeader = ByteData(4)
-        ..setUint32(0, messageBytes.length, Endian.big);
-      socket!.add(lengthHeader.buffer.asUint8List());
-      socket.add(messageBytes);
-      await socket.flush();
 
       sendPort.send({'completed': true});
     } catch (e) {
@@ -2000,55 +2307,48 @@ class P2PService extends ChangeNotifier {
     }
   }
 
-  /// Disconnect from user (remove stored connection)
-  Future<bool> disconnectUser(String userId) async {
+  /// Unpair from user (remove pairing completely from both devices)
+  Future<bool> unpairUser(String userId) async {
     try {
       final user = _discoveredUsers[userId];
       if (user == null) return false;
 
-      // Send disconnect notification to the other user if they're online
+      // Send unpair notification to the other user if they're online
       if (user.isOnline) {
         final message = P2PMessage(
           type: P2PMessageTypes.disconnect,
           fromUserId: _currentUser!.id,
           toUserId: user.id,
           data: {
-            'reason': 'user_initiated',
-            'message': 'User disconnected from you',
+            'reason': 'unpair_initiated',
+            'message': 'User unpaired from you',
             'fromUserName': _currentUser!.displayName,
+            'unpair': true, // Flag to indicate this is an unpair action
           },
         );
 
         try {
           await _sendMessage(user, message);
-          logInfo('Sent disconnect notification to ${user.displayName}');
+          logInfo('Sent unpair notification to ${user.displayName}');
         } catch (e) {
-          logWarning('Failed to send disconnect notification: $e');
-          // Continue with disconnection even if notification fails
+          logWarning('Failed to send unpair notification: $e');
+          // Continue with unpairing even if notification fails
         }
       }
 
-      // Remove from storage
+      // Remove from storage completely
       final box = await Hive.openBox<P2PUser>('p2p_users');
       await box.delete(userId);
 
-      // Reset connection status but keep user as saved device (offline)
-      user.isPaired = false;
-      user.isTrusted = false;
-      user.isStored = true; // Keep as saved device
-      user.autoConnect = false;
-      user.pairedAt = null;
-      user.isOnline = false; // Mark as offline
-
-      // Keep user in discovered list so they appear as saved but offline device
-      // They will show in the "Saved Devices" section with gray color
+      // Remove from discovered users completely - this user should disappear from UI
+      _discoveredUsers.remove(userId);
 
       notifyListeners();
       logInfo(
-          'Disconnected from user: ${user.displayName} (kept as saved offline device)');
+          'Unpaired from user: ${user.displayName} (removed completely from both devices)');
       return true;
     } catch (e) {
-      logError('Failed to disconnect user: $e');
+      logError('Failed to unpair user: $e');
       return false;
     }
   }
@@ -2123,22 +2423,35 @@ class P2PService extends ChangeNotifier {
     }
   }
 
-  /// Update file storage settings
-  Future<bool> updateFileStorageSettings(
-      P2PFileStorageSettings settings) async {
+  /// Update transfer settings
+  Future<bool> updateTransferSettings(P2PDataTransferSettings settings) async {
     try {
       final box =
-          await Hive.openBox<P2PFileStorageSettings>('p2p_storage_settings');
+          await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
       await box.clear();
       await box.add(settings);
-      _fileStorageSettings = settings;
+      _transferSettings = settings;
 
-      logInfo('Updated file storage settings: ${settings.downloadPath}');
+      logInfo('Updated transfer settings: ${settings.downloadPath}');
       return true;
     } catch (e) {
-      logError('Failed to update file storage settings: $e');
+      logError('Failed to update transfer settings: $e');
       return false;
     }
+  }
+
+  /// Update file storage settings (backward compatibility)
+  Future<bool> updateFileStorageSettings(
+      P2PFileStorageSettings settings) async {
+    // Convert old settings to new format
+    final newSettings = P2PDataTransferSettings(
+      downloadPath: settings.downloadPath,
+      createDateFolders: settings.createDateFolders,
+      maxReceiveFileSize: settings.maxFileSize,
+      sendProtocol: 'TCP', // Default
+      maxChunkSize: 512, // Default
+    );
+    return await updateTransferSettings(newSettings);
   }
 
   /// Send emergency disconnect signal (for app termination)
@@ -2172,6 +2485,87 @@ class P2PService extends ChangeNotifier {
           '❌ Failed to send emergency disconnect to ${user.displayName}: $e');
       return false;
     }
+  }
+
+  /// Send disconnect notifications to all paired users when stopping networking
+  Future<void> _sendDisconnectNotifications() async {
+    if (_currentUser == null) return;
+
+    final pairedUsers = _discoveredUsers.values
+        .where((user) => user.isPaired && user.isOnline)
+        .toList();
+
+    if (pairedUsers.isEmpty) {
+      logInfo('No paired users to notify about disconnect');
+      return;
+    }
+
+    logInfo(
+        'Sending disconnect notifications to ${pairedUsers.length} paired users');
+
+    final disconnectFutures = pairedUsers.map((user) async {
+      final message = P2PMessage(
+        type: P2PMessageTypes.disconnect,
+        fromUserId: _currentUser!.id,
+        toUserId: user.id,
+        data: {
+          'reason': 'network_stop',
+          'message': 'User stopped P2P networking',
+          'fromUserName': _currentUser!.displayName,
+          'unpair': false, // Explicitly state this is not an unpair action
+        },
+      );
+
+      try {
+        await _sendMessage(user, message);
+        logInfo('Sent disconnect notification to ${user.displayName}');
+        return true;
+      } catch (e) {
+        logWarning(
+            'Failed to send disconnect notification to ${user.displayName}: $e');
+        return false;
+      }
+    });
+
+    // Wait for all disconnect notifications with timeout
+    await Future.wait(disconnectFutures).timeout(
+      const Duration(seconds: 2),
+      onTimeout: () {
+        logWarning(
+            'Disconnect notification timeout - some messages may not have been sent');
+        return pairedUsers.map((user) => false).toList();
+      },
+    );
+
+    logInfo('Disconnect notification sequence completed');
+  }
+
+  /// Clean up users when network stops - keep stored users, remove discovered ones
+  void _cleanupUsersOnNetworkStop() {
+    final usersToRemove = <String>[];
+
+    for (final entry in _discoveredUsers.entries) {
+      final user = entry.value;
+
+      if (user.isStored) {
+        // Keep stored users but mark them as offline
+        user.isOnline = false;
+        user.lastSeen = DateTime.now().subtract(const Duration(minutes: 1));
+        logInfo('Marked stored user ${user.displayName} as offline');
+      } else {
+        // Remove non-stored (discovered only) users
+        usersToRemove.add(entry.key);
+        logInfo('Removing non-stored user ${user.displayName}');
+      }
+    }
+
+    // Remove non-stored users
+    for (final userId in usersToRemove) {
+      _discoveredUsers.remove(userId);
+    }
+
+    logInfo(
+        'Network stop cleanup: kept ${_discoveredUsers.length} stored users, removed ${usersToRemove.length} discovered users');
   }
 
   /// Send emergency disconnect to all paired users
@@ -2225,5 +2619,73 @@ class P2PService extends ChangeNotifier {
     sendEmergencyDisconnectToAll();
     stopNetworking();
     super.dispose();
+  }
+
+  /// Clear a transfer from the list
+  void clearTransfer(String taskId) {
+    final task = _activeTransfers.remove(taskId);
+    if (task != null) {
+      logInfo('Cleared transfer from UI: ${task.fileName}');
+      notifyListeners();
+    }
+  }
+
+  /// Sanitize filename for cross-platform compatibility
+  String _sanitizeFileName(String fileName) {
+    // Remove invalid characters for file systems
+    String sanitized = fileName
+        .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_') // Windows invalid chars
+        .replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '_'); // Control characters
+
+    // Handle cases where full path might be passed as filename
+    // Extract just the filename part from any path format
+    if (sanitized.contains('\\')) {
+      sanitized = sanitized.split('\\').last;
+    }
+    if (sanitized.contains('/')) {
+      sanitized = sanitized.split('/').last;
+    }
+
+    // Ensure filename is not empty and not just dots
+    if (sanitized.isEmpty || sanitized.replaceAll('.', '').isEmpty) {
+      sanitized = 'received_file_${DateTime.now().millisecondsSinceEpoch}';
+    }
+
+    // Limit filename length to avoid filesystem issues
+    if (sanitized.length > 250) {
+      final extension =
+          sanitized.contains('.') ? sanitized.split('.').last : '';
+      final baseName = sanitized.contains('.')
+          ? sanitized.substring(0, sanitized.lastIndexOf('.'))
+          : sanitized;
+
+      // Keep extension but truncate base name
+      sanitized = extension.isNotEmpty
+          ? '${baseName.substring(0, 250 - extension.length - 1)}.$extension'
+          : baseName.substring(0, 250);
+    }
+
+    logInfo('📝 Sanitized filename: "$fileName" → "$sanitized"');
+    return sanitized;
+  }
+
+  /// Request user info from unknown sender during transfer
+  Future<void> _requestUserInfo(
+      String userId, P2PMessage originalMessage) async {
+    try {
+      // Extract IP from original message if available, otherwise try to respond via broadcast
+      logInfo('🔍 Requesting user info for unknown user: $userId');
+
+      // Send a broadcast announcement to trigger the unknown user to announce themselves
+      await _sendUDPAnnouncement();
+
+      // Give a short time for the user to respond
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      logInfo(
+          '📡 Sent discovery broadcast to help identify unknown user: $userId');
+    } catch (e) {
+      logWarning('Failed to request user info for $userId: $e');
+    }
   }
 }

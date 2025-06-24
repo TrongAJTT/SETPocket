@@ -26,7 +26,10 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
     return AlertDialog(
       title: Row(
         children: [
-          Icon(Icons.link, color: Theme.of(context).primaryColor),
+          Icon(Icons.link,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).primaryColor),
           const SizedBox(width: 8),
           Text('${l10n.pair} ${l10n.devices}'),
         ],
@@ -58,7 +61,10 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
                 Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: Theme.of(context).primaryColor,
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).primaryColor,
                       child: Icon(
                         Icons.devices,
                         color: Colors.white,

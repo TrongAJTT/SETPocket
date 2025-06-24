@@ -20,6 +20,7 @@ import 'package:setpocket/models/converter_models/speed_state_model.dart';
 import 'package:setpocket/models/converter_models/temperature_state_model.dart';
 import 'package:setpocket/models/converter_models/data_state_model.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/services/app_installation_service.dart';
 
 class HiveService {
   // Box names
@@ -155,10 +156,16 @@ class HiveService {
       if (!Hive.isAdapterRegistered(52)) {
         Hive.registerAdapter(P2PFileStorageSettingsAdapter());
       }
+      if (!Hive.isAdapterRegistered(53)) {
+        Hive.registerAdapter(P2PDataTransferSettingsAdapter());
+      }
 
       // Open boxes
       _templatesBox = await Hive.openBox(templatesBoxName);
       _historyBox = await Hive.openBox(historyBoxName);
+
+      // Initialize AppInstallationService to generate stable app installation ID
+      await AppInstallationService.instance.initialize();
 
       logInfo('HiveService: Initialized successfully with custom path');
     } catch (e) {

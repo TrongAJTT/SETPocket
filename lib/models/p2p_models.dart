@@ -41,7 +41,7 @@ class P2PUser extends HiveObject {
   String displayName;
 
   @HiveField(2)
-  String deviceId;
+  String appInstallationId;
 
   @HiveField(3)
   String ipAddress;
@@ -73,7 +73,7 @@ class P2PUser extends HiveObject {
   P2PUser({
     String? id,
     required this.displayName,
-    required this.deviceId,
+    required this.appInstallationId,
     required this.ipAddress,
     required this.port,
     DateTime? lastSeen,
@@ -85,6 +85,9 @@ class P2PUser extends HiveObject {
     this.isStored = false,
   })  : id = id ?? const Uuid().v4(),
         lastSeen = lastSeen ?? DateTime.now();
+
+  // Backward compatibility getter
+  String get deviceId => appInstallationId;
 
   /// Get connection status for UI display
   ConnectionDisplayStatus get connectionDisplayStatus {
@@ -100,7 +103,10 @@ class P2PUser extends HiveObject {
   Map<String, dynamic> toJson() => {
         'id': id,
         'displayName': displayName,
-        'deviceId': deviceId,
+        'appInstallationId': appInstallationId,
+        // Keep old field for backward compatibility
+        'deviceId': appInstallationId,
+        'appSessionId': appInstallationId, // For backward compatibility
         'ipAddress': ipAddress,
         'port': port,
         'lastSeen': lastSeen.toIso8601String(),
@@ -115,7 +121,10 @@ class P2PUser extends HiveObject {
   factory P2PUser.fromJson(Map<String, dynamic> json) => P2PUser(
         id: json['id'],
         displayName: json['displayName'],
-        deviceId: json['deviceId'],
+        // Try new field first, fallback to old fields for backward compatibility
+        appInstallationId: json['appInstallationId'] ??
+            json['appSessionId'] ??
+            json['deviceId'],
         ipAddress: json['ipAddress'],
         port: json['port'],
         lastSeen: DateTime.parse(json['lastSeen']),
@@ -141,7 +150,7 @@ class PairingRequest extends HiveObject {
   String fromUserName;
 
   @HiveField(3)
-  String fromDeviceId;
+  String fromAppInstallationId;
 
   @HiveField(4)
   String fromIpAddress;
@@ -162,7 +171,7 @@ class PairingRequest extends HiveObject {
     String? id,
     required this.fromUserId,
     required this.fromUserName,
-    required this.fromDeviceId,
+    required this.fromAppInstallationId,
     required this.fromIpAddress,
     required this.fromPort,
     DateTime? requestTime,
@@ -171,11 +180,17 @@ class PairingRequest extends HiveObject {
   })  : id = id ?? const Uuid().v4(),
         requestTime = requestTime ?? DateTime.now();
 
+  // Backward compatibility getter
+  String get fromDeviceId => fromAppInstallationId;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'fromUserId': fromUserId,
         'fromUserName': fromUserName,
-        'fromDeviceId': fromDeviceId,
+        'fromAppInstallationId': fromAppInstallationId,
+        // Keep old fields for backward compatibility
+        'fromDeviceId': fromAppInstallationId,
+        'fromAppSessionId': fromAppInstallationId,
         'fromIpAddress': fromIpAddress,
         'fromPort': fromPort,
         'requestTime': requestTime.toIso8601String(),
@@ -187,7 +202,10 @@ class PairingRequest extends HiveObject {
         id: json['id'],
         fromUserId: json['fromUserId'],
         fromUserName: json['fromUserName'],
-        fromDeviceId: json['fromDeviceId'],
+        // Try new field first, fallback to old fields for backward compatibility
+        fromAppInstallationId: json['fromAppInstallationId'] ??
+            json['fromAppSessionId'] ??
+            json['fromDeviceId'],
         fromIpAddress: json['fromIpAddress'],
         fromPort: json['fromPort'],
         requestTime: DateTime.parse(json['requestTime']),
@@ -364,6 +382,7 @@ class P2PMessageTypes {
   static const String discoveryResponse = 'discovery_response';
   static const String pairingRequest = 'pairing_request';
   static const String pairingResponse = 'pairing_response';
+  static const String dataTransferInit = 'data_transfer_init';
   static const String dataTransferRequest = 'data_transfer_request';
   static const String dataTransferResponse = 'data_transfer_response';
   static const String dataChunk = 'data_chunk';
@@ -409,5 +428,48 @@ class P2PFileStorageSettings extends HiveObject {
         askBeforeDownload: json['askBeforeDownload'] ?? true,
         createDateFolders: json['createDateFolders'] ?? false,
         maxFileSize: json['maxFileSize'] ?? 100,
+      );
+}
+
+@HiveType(typeId: 53)
+class P2PDataTransferSettings extends HiveObject {
+  @HiveField(0)
+  String downloadPath;
+
+  @HiveField(1)
+  bool createDateFolders;
+
+  @HiveField(2)
+  int maxReceiveFileSize; // in MB
+
+  @HiveField(3)
+  String sendProtocol; // 'TCP' or 'UDP'
+
+  @HiveField(4)
+  int maxChunkSize; // in KB
+
+  P2PDataTransferSettings({
+    required this.downloadPath,
+    this.createDateFolders = false,
+    this.maxReceiveFileSize = 100, // 100MB default
+    this.sendProtocol = 'TCP',
+    this.maxChunkSize = 512, // 512KB default
+  });
+
+  Map<String, dynamic> toJson() => {
+        'downloadPath': downloadPath,
+        'createDateFolders': createDateFolders,
+        'maxReceiveFileSize': maxReceiveFileSize,
+        'sendProtocol': sendProtocol,
+        'maxChunkSize': maxChunkSize,
+      };
+
+  factory P2PDataTransferSettings.fromJson(Map<String, dynamic> json) =>
+      P2PDataTransferSettings(
+        downloadPath: json['downloadPath'],
+        createDateFolders: json['createDateFolders'] ?? false,
+        maxReceiveFileSize: json['maxReceiveFileSize'] ?? 100,
+        sendProtocol: json['sendProtocol'] ?? 'TCP',
+        maxChunkSize: json['maxChunkSize'] ?? 512,
       );
 }

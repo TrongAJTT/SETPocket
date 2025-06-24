@@ -24,6 +24,7 @@ class P2PController with ChangeNotifier {
   bool _hasPerformedInitialDiscovery = false;
 
   // Callback for new pairing requests
+  // ignore: unused_field
   Function(PairingRequest)? _onNewPairingRequest;
 
   P2PController() {
@@ -169,10 +170,24 @@ class P2PController with ChangeNotifier {
   Future<void> initialize() async {
     try {
       await _p2pService.initialize();
+      // Automatically check network status on initialization
+      await _checkInitialNetworkStatus();
       _isInitialized = true;
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// Check the initial network status without starting networking
+  Future<void> _checkInitialNetworkStatus() async {
+    try {
+      _networkInfo = await NetworkSecurityService.checkNetworkSecurity();
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to check network status: $e';
+      logError(_errorMessage!);
       notifyListeners();
     }
   }
@@ -182,8 +197,14 @@ class P2PController with ChangeNotifier {
     try {
       _errorMessage = null;
 
-      // Check network security
-      _networkInfo = await NetworkSecurityService.checkNetworkSecurity();
+      // Check network security if not already checked
+      if (_networkInfo == null) {
+        await _checkInitialNetworkStatus();
+        if (_errorMessage != null) {
+          // If checking status failed, stop here
+          return false;
+        }
+      }
 
       // Show warning for unsecure networks
       if (_networkInfo!.securityLevel == NetworkSecurityLevel.unsecure) {
@@ -327,6 +348,36 @@ class P2PController with ChangeNotifier {
       return success;
     } catch (e) {
       _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Send multiple files to user
+  Future<bool> sendMultipleFilesToUser(
+      List<String> filePaths, P2PUser targetUser) async {
+    try {
+      _errorMessage = null;
+      bool allSuccess = true;
+
+      for (final filePath in filePaths) {
+        final success = await _p2pService.sendData(filePath, targetUser);
+        if (!success) {
+          allSuccess = false;
+          logError(
+              'Failed to send file: $filePath to ${targetUser.displayName}');
+        }
+      }
+
+      if (!allSuccess) {
+        _errorMessage =
+            'Some files failed to send to ${targetUser.displayName}';
+      }
+
+      notifyListeners();
+      return allSuccess;
+    } catch (e) {
+      _errorMessage = 'Failed to send files: $e';
       notifyListeners();
       return false;
     }
@@ -487,7 +538,7 @@ class P2PController with ChangeNotifier {
           DateTime.now(); // Update time after discovery runs
 
       // Add a short cooldown to prevent spamming
-      await Future.delayed(const Duration(seconds: 10));
+      await Future.delayed(const Duration(seconds: 60));
     } catch (e) {
       _errorMessage = 'Discovery failed: $e';
     } finally {
@@ -514,13 +565,13 @@ class P2PController with ChangeNotifier {
     _isRefreshing = false;
   }
 
-  /// Disconnect from user
-  Future<bool> disconnectUser(String userId) async {
+  /// Unpair from user
+  Future<bool> unpairUser(String userId) async {
     try {
       _errorMessage = null;
-      final success = await _p2pService.disconnectUser(userId);
+      final success = await _p2pService.unpairUser(userId);
       if (!success) {
-        _errorMessage = 'Failed to disconnect user';
+        _errorMessage = 'Failed to unpair user';
       }
       notifyListeners();
       return success;
@@ -569,12 +620,10 @@ class P2PController with ChangeNotifier {
   Future<bool> updateFileStorageSettings(
       P2PFileStorageSettings settings) async {
     try {
-      _errorMessage = null;
       final success = await _p2pService.updateFileStorageSettings(settings);
-      if (!success) {
-        _errorMessage = 'Failed to update file storage settings';
+      if (success) {
+        notifyListeners();
       }
-      notifyListeners();
       return success;
     } catch (e) {
       _errorMessage = e.toString();
@@ -583,7 +632,7 @@ class P2PController with ChangeNotifier {
     }
   }
 
-  /// Get file storage settings
+  /// Get current file storage settings
   P2PFileStorageSettings? get fileStorageSettings =>
       _p2pService.fileStorageSettings;
 
@@ -598,6 +647,29 @@ class P2PController with ChangeNotifier {
     _onNewPairingRequest = null;
     _p2pService.setNewPairingRequestCallback(null);
   }
+
+  /// Clear a transfer from the list
+  void clearTransfer(String taskId) {
+    _p2pService.clearTransfer(taskId);
+  }
+
+  /// Update transfer settings
+  Future<bool> updateTransferSettings(P2PDataTransferSettings settings) async {
+    try {
+      final success = await _p2pService.updateTransferSettings(settings);
+      if (success) {
+        notifyListeners();
+      }
+      return success;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Get current transfer settings
+  P2PDataTransferSettings? get transferSettings => _p2pService.transferSettings;
 
   void _onP2PServiceChanged() {
     logInfo(

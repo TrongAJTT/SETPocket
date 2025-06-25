@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:setpocket/controllers/p2p_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
@@ -6,6 +7,7 @@ import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/utils/network_debug_utils.dart';
 import 'package:setpocket/widgets/p2p/network_security_warning_dialog.dart';
 import 'package:setpocket/widgets/p2p/pairing_request_dialog.dart';
+import 'package:setpocket/widgets/p2p/file_transfer_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/user_pairing_dialog.dart';
 import 'package:setpocket/widgets/p2p/data_transfer_progress_widget.dart';
 import 'package:setpocket/widgets/p2p/permission_request_dialog.dart';
@@ -30,6 +32,8 @@ class P2PDataTransferScreen extends StatefulWidget {
 class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
   late P2PController _controller;
   int _currentTabIndex = 0;
+  bool _isControllerInitialized = false;
+  final ScrollController _transfersScrollController = ScrollController();
 
   @override
   void initState() {
@@ -40,19 +44,48 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     // Set up callback for auto-showing pairing request dialogs
     _controller.setNewPairingRequestCallback(_onNewPairingRequest);
 
-    _initializeController();
+    // Set up callback for auto-showing file transfer request dialogs
+    _controller.setNewFileTransferRequestCallback(_onNewFileTransferRequest);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isControllerInitialized) {
+      _initializeController();
+      _isControllerInitialized = true;
+    }
+  }
+
+  @override
+  void didUpdateWidget(P2PDataTransferScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Process pending file transfer requests when user returns to this screen
+    if (_isControllerInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.processPendingFileTransferRequests();
+      });
+    }
   }
 
   @override
   void dispose() {
     _controller.removeListener(_onControllerChanged);
     _controller.clearNewPairingRequestCallback(); // Clear callback
+    _controller
+        .clearNewFileTransferRequestCallback(); // Clear file transfer callback
     _controller.dispose();
+    _transfersScrollController.dispose();
     super.dispose();
   }
 
   void _initializeController() async {
     await _controller.initialize();
+
+    // Process any pending file transfer requests after initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.processPendingFileTransferRequests();
+    });
   }
 
   void _onControllerChanged() {
@@ -80,6 +113,17 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     }
   }
 
+  /// Handle new file transfer request - auto-show dialog if screen is visible
+  void _onNewFileTransferRequest(FileTransferRequest request) {
+    if (mounted) {
+      logInfo(
+          'Auto-showing file transfer request dialog from: ${request.fromUserName}');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showFileTransferRequestDialog(request);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -102,12 +146,12 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
         });
       },
       mainPanelActions: [
-        // Refresh button - show only when networking is enabled and not currently refreshing
+        // Manual discovery button - show only when networking is enabled and not currently refreshing
         if (_controller.isEnabled && !_controller.isRefreshing)
           IconButton(
-            icon: const Icon(Icons.wifi_tethering),
+            icon: const Icon(Icons.search),
             onPressed: _manualRefresh,
-            tooltip: 'Broadcast Signal',
+            tooltip: 'Manual Discovery',
           ),
         // Loading indicator when refreshing
         if (_controller.isRefreshing)
@@ -164,278 +208,112 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
         _buildNetworkStatusCard(),
         const SizedBox(height: 16),
 
-        // Devices sections
+        // Devices sections with new categorization
         Expanded(
-          child: _controller.discoveredUsers.isEmpty
-              ? _buildEmptyDevicesState()
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    // Saved devices section
-                    if (_controller.connectedUsers.isNotEmpty) ...[
-                      _buildSectionHeader('Saved Devices'),
-                      ..._controller.connectedUsers
-                          .map((user) => _buildUserCard(user)),
-                      const SizedBox(height: 16),
-                    ],
-                    // Available devices section
-                    if (_controller.unconnectedUsers.isNotEmpty) ...[
-                      _buildSectionHeader('Available Devices'),
-                      ..._controller.unconnectedUsers
-                          .map((user) => _buildUserCard(user)),
-                    ],
-                  ],
-                ),
+          child: _buildDevicesSections(),
         ),
       ],
     );
   }
 
-  Widget _buildTransfersTab() {
-    if (_controller.activeTransfers.isEmpty) {
-      return _buildEmptyTransfersState();
+  Widget _buildDevicesSections() {
+    // Check if we have any devices at all
+    if (_controller.discoveredUsers.isEmpty) {
+      return _buildEmptyDevicesState();
     }
 
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.all(16),
-      itemCount: _controller.activeTransfers.length,
-      itemBuilder: (context, index) {
-        final transfer = _controller.activeTransfers[index];
-        return DataTransferProgressWidget(
-          task: transfer,
-          onCancel: () => _cancelTransfer(transfer.id),
-          onClear: () => _clearTransfer(transfer.id),
-        );
-      },
+      children: [
+        // Online devices section (green - saved devices that are online)
+        if (_controller.hasOnlineDevices) ...[
+          _buildSectionHeader(
+              '🟢 Online Devices (${_controller.onlineDevices.length})',
+              subtitle: 'Saved devices currently available'),
+          ..._controller.onlineDevices
+              .map((user) => _buildUserCard(user, isOnline: true)),
+          const SizedBox(height: 24),
+        ],
+
+        // New devices section (blue - newly discovered devices)
+        if (_controller.hasNewDevices) ...[
+          _buildSectionHeader(
+              '🔵 New Devices (${_controller.newDevices.length})',
+              subtitle: 'Recently discovered devices'),
+          ..._controller.newDevices
+              .map((user) => _buildUserCard(user, isNew: true)),
+          const SizedBox(height: 24),
+        ],
+
+        // Saved devices section (gray - saved but offline devices)
+        if (_controller.hasSavedDevices) ...[
+          _buildSectionHeader(
+              '⚫ Saved Devices (${_controller.savedDevices.length})',
+              subtitle: 'Previously paired devices (offline)'),
+          ..._controller.savedDevices
+              .map((user) => _buildUserCard(user, isSaved: true)),
+          const SizedBox(height: 24),
+        ],
+      ],
     );
   }
 
-  Widget _buildStatusPanel() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+  Widget _buildSectionHeader(String title, {String? subtitle}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Connection status
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.connectionStatus,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        _getConnectionStatusIcon(),
-                        color: _getConnectionStatusColor(),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child:
-                            Text(_controller.getConnectionStatusDescription()),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Network info
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.networkInfo,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      TextButton(
-                        onPressed: _debugNetwork,
-                        child: const Text('Debug'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(_controller.getNetworkStatusDescription()),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Statistics
-          if (_controller.currentUser != null)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.statistics,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                        '${l10n.discoveredDevices}: ${_controller.discoveredUsers.length}'),
-                    Text(
-                        '${l10n.pairedDevices}: ${_controller.pairedUsers.length}'),
-                    Text(
-                        '${l10n.activeTransfers}: ${_controller.activeTransfers.length}'),
-                  ],
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.9)
+                      : Theme.of(context).colorScheme.primary,
                 ),
-              ),
-            ),
-
-          const SizedBox(height: 16),
-
-          // Current device info
-          FutureBuilder<Widget>(
-            future: _buildThisDeviceCard(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return snapshot.data!;
-              } else {
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'This Device',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 12),
-                        const Row(
-                          children: [
-                            SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Loading device information...'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-            },
           ),
-
-          // Debug section removed - using simple native device ID now
-
-          // Add some bottom padding for better scrolling experience
-          const SizedBox(height: 24),
+          if (subtitle != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildNetworkStatusCard() {
+  Widget _buildUserCard(P2PUser user,
+      {bool isOnline = false, bool isNew = false, bool isSaved = false}) {
     final l10n = AppLocalizations.of(context)!;
-    final isDesktop = MediaQuery.of(context).size.width > 1200;
+    final brightness = Theme.of(context).brightness;
 
-    final toggleNetworkBtn = ElevatedButton.icon(
-      onPressed: _toggleNetworking,
-      icon: Icon(_controller.isEnabled ? Icons.wifi_off : Icons.wifi),
-      label: Text(_controller.isEnabled
-          ? (l10n.stopNetworking)
-          : (l10n.startNetworking)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: _controller.isEnabled ? Colors.red[700] : null,
-        foregroundColor: _controller.isEnabled ? Colors.white : null,
-      ),
-    );
-
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Icon(
-                  _getNetworkStatusIcon(),
-                  color: _getNetworkStatusColor(),
-                  size: 32,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _controller.getNetworkStatusDescription(),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _controller.getConnectionStatusDescription(),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-                if (isDesktop) toggleNetworkBtn
-              ],
-            ),
-            if (!isDesktop) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [toggleNetworkBtn],
-              )
-            ]
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.9)
-                  : Theme.of(context).colorScheme.primary,
-            ),
-      ),
-    );
-  }
-
-  Widget _buildUserCard(P2PUser user) {
-    final l10n = AppLocalizations.of(context)!;
+    // Determine card background color based on category and theme
+    Color? cardColor;
+    if (isOnline) {
+      cardColor = brightness == Brightness.dark
+          ? Colors.green.withOpacity(0.1)
+          : Colors.green.withOpacity(0.05);
+    } else if (isNew) {
+      cardColor = brightness == Brightness.dark
+          ? Colors.blue.withOpacity(0.1)
+          : Colors.blue.withOpacity(0.05);
+    } else if (isSaved) {
+      cardColor = brightness == Brightness.dark
+          ? Colors.grey.withOpacity(0.1)
+          : Colors.grey.withOpacity(0.03);
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
+      color: cardColor,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _controller.getUserStatusColor(user),
@@ -503,12 +381,12 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
             // Trust management
             if (user.isPaired && !user.isTrusted)
               const PopupMenuItem(
-                value: 'request_trust',
+                value: 'add_trust',
                 child: Row(
                   children: [
                     Icon(Icons.verified_user),
                     SizedBox(width: 8),
-                    Text('Request Trust'),
+                    Text('Trust'),
                   ],
                 ),
               ),
@@ -539,6 +417,248 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
           ],
         ),
         onTap: () => _selectUser(user),
+      ),
+    );
+  }
+
+  Widget _buildTransfersTab() {
+    if (_controller.activeTransfers.isEmpty) {
+      return _buildEmptyTransfersState();
+    }
+
+    return ListView.builder(
+      controller: _transfersScrollController,
+      padding: const EdgeInsets.all(16),
+      itemCount: _controller.activeTransfers.length,
+      itemBuilder: (context, index) {
+        final transfer = _controller.activeTransfers[index];
+        return DataTransferProgressWidget(
+          task: transfer,
+          onCancel: () => _cancelTransfer(transfer.id),
+          onClear: () => _clearTransfer(transfer.id),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusPanel() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Current device info (Moved to top)
+          FutureBuilder<Widget>(
+            future: _buildThisDeviceCard(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return snapshot.data!;
+              } else {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'This Device',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        const Row(
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            SizedBox(width: 8),
+                            Text('Loading device information...'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // Connection status
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.connectionStatus,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        _getConnectionStatusIcon(),
+                        color: _getConnectionStatusColor(),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child:
+                            Text(_controller.getConnectionStatusDescription()),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Statistics (Full-width like other cards)
+          if (_controller.currentUser != null)
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.statistics,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                          '${l10n.discoveredDevices}: ${_controller.discoveredUsers.length}'),
+                      Text(
+                          '${l10n.pairedDevices}: ${_controller.pairedUsers.length}'),
+                      Text(
+                          '${l10n.activeTransfers}: ${_controller.activeTransfers.length}'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
+
+          // Network info (Moved to bottom)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.networkInfo,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      TextButton(
+                        onPressed: _debugNetwork,
+                        child: const Text('Debug'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(_controller.getNetworkStatusDescription()),
+                ],
+              ),
+            ),
+          ),
+
+          // Add some bottom padding for better scrolling experience
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNetworkStatusCard() {
+    final l10n = AppLocalizations.of(context)!;
+    final isDesktop = MediaQuery.of(context).size.width > 1200;
+
+    final toggleNetworkBtn = ElevatedButton.icon(
+      onPressed: _toggleNetworking,
+      icon: Icon(_controller.isEnabled ? Icons.wifi_off : Icons.wifi),
+      label: Text(_controller.isEnabled
+          ? (l10n.stopNetworking)
+          : (l10n.startNetworking)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _controller.isEnabled ? Colors.red[700] : null,
+        foregroundColor: _controller.isEnabled ? Colors.white : null,
+      ),
+    );
+
+    final toggleBroadcastBtn = ElevatedButton.icon(
+      onPressed: _controller.isEnabled ? _toggleBroadcast : null,
+      icon: Icon(_controller.isBroadcasting
+          ? Icons.wifi_tethering_off
+          : Icons.wifi_tethering),
+      label: Text(
+          _controller.isBroadcasting ? 'Stop Broadcast' : 'Start Broadcast'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _controller.isBroadcasting ? Colors.orange[700] : null,
+        foregroundColor: _controller.isBroadcasting ? Colors.white : null,
+      ),
+    );
+
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(
+                  _getNetworkStatusIcon(),
+                  color: _getNetworkStatusColor(),
+                  size: 32,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _controller.getNetworkStatusDescription(),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _controller.getConnectionStatusDescription(),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+                if (isDesktop) ...[
+                  toggleBroadcastBtn,
+                  const SizedBox(width: 8),
+                  toggleNetworkBtn,
+                ]
+              ],
+            ),
+            if (!isDesktop) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  toggleBroadcastBtn,
+                  const SizedBox(width: 8),
+                  toggleNetworkBtn,
+                ],
+              )
+            ]
+          ],
+        ),
       ),
     );
   }
@@ -585,8 +705,8 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
             if (!_controller.isRefreshing)
               ElevatedButton.icon(
                 onPressed: _manualRefresh,
-                icon: const Icon(Icons.signal_cellular_alt),
-                label: const Text('Broadcast Signal'),
+                icon: const Icon(Icons.search),
+                label: const Text('Manual Discovery'),
               ),
             if (_controller.isRefreshing)
               const Row(
@@ -698,8 +818,8 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
       case 'pair':
         _showPairingDialog(user);
         break;
-      case 'request_trust':
-        _requestTrust(user);
+      case 'add_trust':
+        _addTrust(user);
         break;
       case 'remove_trust':
         _removeTrust(user);
@@ -774,6 +894,26 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
         onRespond: (requestId, accept, trustUser, saveConnection) async {
           final success = await _controller.respondToPairingRequest(
               requestId, accept, trustUser, saveConnection);
+          if (!success && _controller.errorMessage != null) {
+            _showErrorSnackBar(_controller.errorMessage!);
+          }
+        },
+      ),
+    );
+  }
+
+  /// Show dialog for file transfer request
+  void _showFileTransferRequestDialog(FileTransferRequest request,
+      {int? initialCountdown}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (context) => FileTransferRequestDialog(
+        request: request,
+        initialCountdown: initialCountdown,
+        onResponse: (accept, rejectMessage) async {
+          final success = await _controller.respondToFileTransferRequest(
+              request.requestId, accept, rejectMessage);
           if (!success && _controller.errorMessage != null) {
             _showErrorSnackBar(_controller.errorMessage!);
           }
@@ -882,6 +1022,13 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     }
   }
 
+  void _toggleBroadcast() async {
+    await _controller.toggleBroadcast();
+    if (mounted && _controller.errorMessage != null) {
+      _showErrorSnackBar(_controller.errorMessage!);
+    }
+  }
+
   String _formatDiscoveryTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
@@ -898,26 +1045,67 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
   }
 
   void _showTransferSettings() {
+    // Use a FutureBuilder to wait for initialization before showing the dialog
     showDialog(
       context: context,
-      builder: (context) => P2PDataTransferSettingsDialog(
-        currentSettings: _controller.transferSettings,
-        onSettingsChanged: (settings) async {
-          final success = await _controller.updateTransferSettings(settings);
-          if (success) {
-            _showErrorSnackBar('Transfer settings updated');
-          } else if (_controller.errorMessage != null) {
-            _showErrorSnackBar(_controller.errorMessage!);
-          }
-        },
-      ),
+      builder: (context) {
+        return FutureBuilder<void>(
+          future: _controller.initializationComplete,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const AlertDialog(
+                content: Row(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 16),
+                    Text('Loading settings...'),
+                  ],
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return AlertDialog(
+                title: const Text('Error'),
+                content: Text('Failed to load settings: ${snapshot.error}'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            }
+
+            // Once initialization is complete, settings are guaranteed to be non-null.
+            return P2PDataTransferSettingsDialog(
+              currentSettings: _controller.transferSettings,
+              onSettingsChanged: (settings) async {
+                final success =
+                    await _controller.updateTransferSettings(settings);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(success
+                          ? 'Transfer settings updated'
+                          : _controller.errorMessage ??
+                              'Failed to update settings'),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                }
+              },
+            );
+          },
+        );
+      },
     );
   }
 
-  void _requestTrust(P2PUser user) async {
-    final success = await _controller.sendTrustRequest(user);
+  void _addTrust(P2PUser user) async {
+    final success = await _controller.addTrust(user.id);
     if (success) {
-      _showErrorSnackBar('Trust request sent to ${user.displayName}');
+      _showErrorSnackBar('Trusted ${user.displayName}');
     } else if (_controller.errorMessage != null) {
       _showErrorSnackBar(_controller.errorMessage!);
     }
@@ -1058,10 +1246,31 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
           } else {
             _showErrorSnackBar(
                 'Started sending ${filePaths.length} files to ${user.displayName}');
+            // Auto-switch to Transfers tab and scroll to bottom
+            _switchToTransfersAndScroll();
           }
         },
       ),
     );
+  }
+
+  /// Switch to Transfers tab and scroll to bottom to show new transfers
+  void _switchToTransfersAndScroll() {
+    // Switch to Transfers tab (index 1)
+    setState(() {
+      _currentTabIndex = 1;
+    });
+
+    // Wait for the tab switch to complete, then scroll to bottom
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_transfersScrollController.hasClients) {
+        _transfersScrollController.animateTo(
+          _transfersScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   // Debug methods removed - using simple native device ID now

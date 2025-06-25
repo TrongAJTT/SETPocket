@@ -2,6 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/widgets/generic/radial_menu.dart';
+import 'package:setpocket/widgets/p2p/file_type_radial_menu.dart';
+import 'package:setpocket/services/file_directory_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class MultiFileSenderDialog extends StatefulWidget {
   final P2PUser targetUser;
@@ -17,20 +21,27 @@ class MultiFileSenderDialog extends StatefulWidget {
   State<MultiFileSenderDialog> createState() => _MultiFileSenderDialogState();
 }
 
-class _MultiFileSenderDialogState extends State<MultiFileSenderDialog> {
+class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
+    with SingleTickerProviderStateMixin {
   final List<FileInfo> _selectedFiles = [];
   bool _isLoading = false;
+
+  OverlayEntry? _radialMenuOverlay;
+
+  @override
+  void dispose() {
+    _hideRadialMenu();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Row(
+      title: const Row(
         children: [
-          const Icon(Icons.send),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text('Send Files to ${widget.targetUser.displayName}'),
-          ),
+          Icon(Icons.send),
+          SizedBox(width: 8),
+          Expanded(child: Text('Send Files')),
         ],
       ),
       content: SizedBox(
@@ -39,16 +50,11 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // File selection section
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _pickFiles,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Files'),
-                ),
-                const SizedBox(width: 8),
-                if (_selectedFiles.isNotEmpty)
+            if (_selectedFiles.isNotEmpty)
+              Row(
+                children: [
+                  _buildEnhancedAddFilesButton(),
+                  const SizedBox(width: 8),
                   TextButton.icon(
                     onPressed: _clearAllFiles,
                     icon: const Icon(Icons.clear_all),
@@ -57,20 +63,15 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog> {
                       foregroundColor: Colors.red,
                     ),
                   ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Files list section
+                ],
+              ),
+            if (_selectedFiles.isNotEmpty) const SizedBox(height: 16),
             Expanded(
               child: _selectedFiles.isEmpty
                   ? _buildEmptyState()
                   : _buildFilesList(),
             ),
-
             const SizedBox(height: 16),
-
-            // Summary section
             if (_selectedFiles.isNotEmpty) _buildSummarySection(),
           ],
         ),
@@ -95,32 +96,361 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog> {
     );
   }
 
+  Widget _buildEnhancedAddFilesButton() {
+    return GestureDetector(
+      onTap: _isLoading ? null : _pickFiles,
+      onLongPressStart: _isLoading
+          ? null
+          : (details) => _showRadialMenu(details.globalPosition),
+      onSecondaryTapDown: _isLoading
+          ? null
+          : (details) => _showRadialMenu(details.globalPosition),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: _isLoading
+              ? Theme.of(context).disabledColor
+              : Theme.of(context).colorScheme.primary,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.add,
+                color: _isLoading
+                    ? Theme.of(context).colorScheme.onSurface.withOpacity(0.38)
+                    : Theme.of(context).colorScheme.onPrimary,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Add Files',
+                style: TextStyle(
+                  color: _isLoading
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.38)
+                      : Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _isShowingRadialMenu() => _radialMenuOverlay != null;
+
+  void _showRadialMenu(Offset position) {
+    if (_isShowingRadialMenu()) return;
+
+    _radialMenuOverlay = OverlayEntry(
+      builder: (context) {
+        return FileTypeRadialMenu(
+          initialPosition: position,
+          onCancel: _hideRadialMenu,
+          onCategorySelected: (category) {
+            _hideRadialMenu();
+            if (category != null) {
+              _onCategorySelected(category);
+            }
+          },
+        );
+      },
+    );
+    Overlay.of(context).insert(_radialMenuOverlay!);
+  }
+
+  void _hideRadialMenu() {
+    if (_radialMenuOverlay != null) {
+      _radialMenuOverlay!.remove();
+      _radialMenuOverlay = null;
+    }
+  }
+
+  void _onCategorySelected(FileCategory? category) {
+    if (category == null) {
+      logInfo('Radial menu selection cancelled.');
+      return;
+    }
+    logInfo('Category selected: ${category.label}');
+    _pickFilesForCategory(category);
+  }
+
+  void _pickFilesForCategory(FileCategory category) async {
+    // Show loading state
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Use the file directory service to pick files for this category
+      final result = await FileDirectoryService.pickFilesByCategory(
+        category,
+        allowMultiple: true,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        await _addFilesFromResult(result);
+
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Added ${result.files.length} file(s) from ${FileDirectoryService.getCategoryDisplayName(category)}'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      logError('Error picking files for category ${category.label}: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting files from ${category.label}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  /// Pick files using the default file picker.
+  void _pickFiles() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.any,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        await _addFilesFromResult(result);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting files: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _addFilesFromResult(FilePickerResult result) async {
+    for (final file in result.files) {
+      if (file.path != null) {
+        final fileInfo = await _createFileInfo(file.path!);
+
+        // Check if file is already selected
+        final isAlreadySelected = _selectedFiles.any(
+          (existing) => existing.path == fileInfo.path,
+        );
+
+        if (!isAlreadySelected) {
+          setState(() {
+            _selectedFiles.add(fileInfo);
+          });
+        }
+      }
+    }
+  }
+
+  Future<FileInfo> _createFileInfo(String filePath) async {
+    final file = File(filePath);
+    final stat = await file.stat();
+    final name = file.path.split(Platform.pathSeparator).last;
+    final extension =
+        name.contains('.') ? name.split('.').last.toLowerCase() : '';
+
+    return FileInfo(
+      path: filePath,
+      name: name,
+      size: stat.size,
+      extension: extension,
+    );
+  }
+
+  void _removeFile(int index) {
+    setState(() {
+      _selectedFiles.removeAt(index);
+    });
+  }
+
+  void _clearAllFiles() {
+    setState(() {
+      _selectedFiles.clear();
+    });
+  }
+
+  void _sendFiles() async {
+    if (_selectedFiles.isEmpty) return;
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final filePaths = _selectedFiles.map((file) => file.path).toList();
+      widget.onSendFiles(filePaths);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sending files: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  IconData _getFileIcon(String extension) {
+    switch (extension.toLowerCase()) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+      case 'doc':
+      case 'docx':
+        return Icons.description;
+      case 'xls':
+      case 'xlsx':
+        return Icons.table_chart;
+      case 'ppt':
+      case 'pptx':
+        return Icons.slideshow;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'bmp':
+      case 'webp':
+        return Icons.image;
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+      case 'wmv':
+      case 'flv':
+        return Icons.video_file;
+      case 'mp3':
+      case 'wav':
+      case 'flac':
+      case 'aac':
+        return Icons.audio_file;
+      case 'zip':
+      case 'rar':
+      case '7z':
+      case 'tar':
+      case 'gz':
+        return Icons.archive;
+      case 'txt':
+        return Icons.text_snippet;
+      case 'json':
+      case 'xml':
+      case 'html':
+      case 'css':
+      case 'js':
+      case 'dart':
+      case 'java':
+      case 'cpp':
+      case 'py':
+        return Icons.code;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } else {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+    }
+  }
+
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.file_copy_outlined,
-            size: 64,
-            color: Theme.of(context).disabledColor,
+    return GestureDetector(
+      onTap: _isLoading ? null : _pickFiles,
+      onLongPressStart: _isLoading
+          ? null
+          : (details) => _showRadialMenu(details.globalPosition),
+      onSecondaryTapDown: _isLoading
+          ? null
+          : (details) => _showRadialMenu(details.globalPosition),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+            width: 1.5,
           ),
-          const SizedBox(height: 16),
-          Text(
-            'No files selected',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).disabledColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_photo_alternate_outlined,
+                size: 64,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No files selected',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
                 ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Click "Add Files" to select files to send',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).disabledColor,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tap or right-click for options',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
-            textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              _buildEnhancedAddFilesButton(),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -251,175 +581,6 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog> {
         ),
       ),
     );
-  }
-
-  void _pickFiles() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.any,
-      );
-
-      if (result != null && result.files.isNotEmpty) {
-        for (final file in result.files) {
-          if (file.path != null) {
-            final fileInfo = await _createFileInfo(file.path!);
-
-            // Check if file is already selected
-            final isAlreadySelected = _selectedFiles.any(
-              (existing) => existing.path == fileInfo.path,
-            );
-
-            if (!isAlreadySelected) {
-              setState(() {
-                _selectedFiles.add(fileInfo);
-              });
-            }
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error selecting files: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<FileInfo> _createFileInfo(String filePath) async {
-    final file = File(filePath);
-    final stat = await file.stat();
-    final name = file.path.split(Platform.pathSeparator).last;
-    final extension =
-        name.contains('.') ? name.split('.').last.toLowerCase() : '';
-
-    return FileInfo(
-      path: filePath,
-      name: name,
-      size: stat.size,
-      extension: extension,
-    );
-  }
-
-  void _removeFile(int index) {
-    setState(() {
-      _selectedFiles.removeAt(index);
-    });
-  }
-
-  void _clearAllFiles() {
-    setState(() {
-      _selectedFiles.clear();
-    });
-  }
-
-  void _sendFiles() async {
-    if (_selectedFiles.isEmpty) return;
-
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final filePaths = _selectedFiles.map((file) => file.path).toList();
-      widget.onSendFiles(filePaths);
-
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error sending files: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  IconData _getFileIcon(String extension) {
-    switch (extension.toLowerCase()) {
-      case 'pdf':
-        return Icons.picture_as_pdf;
-      case 'doc':
-      case 'docx':
-        return Icons.description;
-      case 'xls':
-      case 'xlsx':
-        return Icons.table_chart;
-      case 'ppt':
-      case 'pptx':
-        return Icons.slideshow;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'bmp':
-      case 'webp':
-        return Icons.image;
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-      case 'wmv':
-      case 'flv':
-        return Icons.video_file;
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-      case 'aac':
-        return Icons.audio_file;
-      case 'zip':
-      case 'rar':
-      case '7z':
-      case 'tar':
-      case 'gz':
-        return Icons.archive;
-      case 'txt':
-        return Icons.text_snippet;
-      case 'json':
-      case 'xml':
-      case 'html':
-      case 'css':
-      case 'js':
-      case 'dart':
-      case 'java':
-      case 'cpp':
-      case 'py':
-        return Icons.code;
-      default:
-        return Icons.insert_drive_file;
-    }
-  }
-
-  String _formatFileSize(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    } else if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    } else if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    } else {
-      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-    }
   }
 }
 

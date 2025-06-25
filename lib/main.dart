@@ -47,7 +47,8 @@ class BreadcrumbData {
   });
 }
 
-void main() async {
+Future<void> main() async {
+  // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
   // Setup window manager for desktop platforms
@@ -59,9 +60,6 @@ void main() async {
     // Don't prevent close - just trigger emergency save
     await windowManager.setPreventClose(false);
   }
-
-  // Temporarily disable force clear cache - let services handle migration
-  // await _forceClearHiveCache();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -80,7 +78,6 @@ void main() async {
   await HiveService.initialize();
 
   // Initialize App Installation Service immediately after Hive
-  // This ensures we have a stable app installation ID from the start
   _isFirstTimeSetup = await AppInstallationService.instance.initialize();
 
   // Initialize settings service
@@ -125,9 +122,7 @@ void _navigateToTool(String toolId) {
     // Navigate to the tool
     // Use navigatorKey.currentState instead of context to avoid using BuildContext across async gaps
     navigatorKey.currentState?.pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => _getToolScreen(tool),
-      ),
+      MaterialPageRoute(builder: (context) => _getToolScreen(tool)),
       (route) => false, // Clear all previous routes
     );
   });
@@ -237,7 +232,8 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
   Future<void> _handleAppTermination() async {
     logInfo(
-        '🚨 App termination detected - sending emergency disconnect signals');
+      '🚨 App termination detected - sending emergency disconnect signals',
+    );
     await _sendEmergencyDisconnectSignals();
   }
 
@@ -293,17 +289,21 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           logInfo('✅ Emergency disconnect sent to ${user.displayName}');
         } catch (e) {
           logWarning(
-              '❌ Failed to send emergency disconnect to ${user.displayName}: $e');
+            '❌ Failed to send emergency disconnect to ${user.displayName}: $e',
+          );
         }
       });
 
       // Wait for all disconnect messages with a maximum timeout
-      await Future.wait(disconnectFutures).timeout(const Duration(seconds: 5),
-          onTimeout: () {
-        logWarning(
-            'Emergency disconnect timeout - some messages may not have been sent');
-        return [];
-      });
+      await Future.wait(disconnectFutures).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          logWarning(
+            'Emergency disconnect timeout - some messages may not have been sent',
+          );
+          return [];
+        },
+      );
 
       logInfo('Emergency disconnect sequence completed');
     } catch (e) {
@@ -312,7 +312,10 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   }
 
   Future<bool> _sendEmergencyMessage(
-      P2PService p2pService, P2PUser user, P2PMessage message) async {
+    P2PService p2pService,
+    P2PUser user,
+    P2PMessage message,
+  ) async {
     try {
       // Try to send emergency disconnect with short timeout
       return await p2pService.sendEmergencyDisconnect(user, message);
@@ -340,10 +343,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
               brightness: Brightness.light,
             ),
             useMaterial3: true,
-            appBarTheme: const AppBarTheme(
-              centerTitle: false,
-              elevation: 0,
-            ),
+            appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
           ),
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
@@ -421,7 +421,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
     // Log for debugging
     AppLogger.instance.info(
-        'First time setup detected - showed installation progress snackbar');
+      'First time setup detected - showed installation progress snackbar',
+    );
   }
 
   @override
@@ -613,8 +614,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
             decoration: BoxDecoration(
               color: isDark
                   ? theme.colorScheme.surface.withValues(alpha: 0.3)
-                  : theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.4),
+                  : theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.4,
+                    ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDark
@@ -634,8 +636,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                       size: 12,
                       color: isDark
                           ? theme.colorScheme.onSurface.withValues(alpha: 0.8)
-                          : theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.9),
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.9,
+                            ),
                     ),
                     const SizedBox(width: 4),
                   ],
@@ -657,7 +660,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                       borderRadius: BorderRadius.circular(8),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 2),
+                          horizontal: 4,
+                          vertical: 2,
+                        ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -666,8 +671,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                                 breadcrumbs[i].icon,
                                 size: 10,
                                 color: isDark
-                                    ? theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.9)
+                                    ? theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.9,
+                                      )
                                     : theme.colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 2),
@@ -676,8 +682,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                               breadcrumbs[i].title,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: isDark
-                                    ? theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.9)
+                                    ? theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.9,
+                                      )
                                     : theme.colorScheme.onSurfaceVariant,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
@@ -768,8 +775,12 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                         onToolVisibilityChanged: _refreshToolSelection,
                         onRegisterUnsavedChangesCallback:
                             _registerUnsavedChangesCallback,
-                        onToolSelected: (Widget tool, String title,
-                            {String? parentCategory, IconData? icon}) {
+                        onToolSelected: (
+                          Widget tool,
+                          String title, {
+                          String? parentCategory,
+                          IconData? icon,
+                        }) {
                           setState(() {
                             currentTool = tool;
                             final newToolType = tool.runtimeType.toString();
@@ -784,23 +795,27 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                             if (isTopLevelTool) {
                               // Top-level tool from sidebar: Start fresh breadcrumb
                               breadcrumbs.clear();
-                              breadcrumbs.add(BreadcrumbData(
-                                title: title,
-                                toolType: newToolType,
-                                tool: tool,
-                                icon: icon,
-                              ));
+                              breadcrumbs.add(
+                                BreadcrumbData(
+                                  title: title,
+                                  toolType: newToolType,
+                                  tool: tool,
+                                  icon: icon,
+                                ),
+                              );
                             } else if (isSubTool) {
                               // Sub-tool navigation: Check if we're going deeper or switching
 
                               // If breadcrumbs is empty, this shouldn't happen but handle it
                               if (breadcrumbs.isEmpty) {
-                                breadcrumbs.add(BreadcrumbData(
-                                  title: title,
-                                  toolType: newToolType,
-                                  tool: tool,
-                                  icon: icon,
-                                ));
+                                breadcrumbs.add(
+                                  BreadcrumbData(
+                                    title: title,
+                                    toolType: newToolType,
+                                    tool: tool,
+                                    icon: icon,
+                                  ),
+                                );
                               } else {
                                 // Check if this is a direct child of the current breadcrumb
                                 final currentBreadcrumb = breadcrumbs.last;
@@ -810,37 +825,46 @@ class _DesktopLayoutState extends State<DesktopLayout> {
 
                                 if (isDirectChild) {
                                   // Going deeper: Add to breadcrumbs
-                                  breadcrumbs.add(BreadcrumbData(
-                                    title: title,
-                                    toolType: newToolType,
-                                    tool: tool,
-                                    icon: icon,
-                                  ));
+                                  breadcrumbs.add(
+                                    BreadcrumbData(
+                                      title: title,
+                                      toolType: newToolType,
+                                      tool: tool,
+                                      icon: icon,
+                                    ),
+                                  );
                                 } else {
                                   // Switching to different sub-tool:
                                   // Find the parent in breadcrumbs and truncate there
                                   int parentIndex = breadcrumbs.indexWhere(
-                                      (bc) => bc.toolType == parentCategory);
+                                    (bc) => bc.toolType == parentCategory,
+                                  );
 
                                   if (parentIndex >= 0) {
                                     // Keep breadcrumbs up to parent, add new child
-                                    breadcrumbs =
-                                        breadcrumbs.sublist(0, parentIndex + 1);
-                                    breadcrumbs.add(BreadcrumbData(
-                                      title: title,
-                                      toolType: newToolType,
-                                      tool: tool,
-                                      icon: icon,
-                                    ));
+                                    breadcrumbs = breadcrumbs.sublist(
+                                      0,
+                                      parentIndex + 1,
+                                    );
+                                    breadcrumbs.add(
+                                      BreadcrumbData(
+                                        title: title,
+                                        toolType: newToolType,
+                                        tool: tool,
+                                        icon: icon,
+                                      ),
+                                    );
                                   } else {
                                     // Parent not found, start fresh with this tool
                                     breadcrumbs.clear();
-                                    breadcrumbs.add(BreadcrumbData(
-                                      title: title,
-                                      toolType: newToolType,
-                                      tool: tool,
-                                      icon: icon,
-                                    ));
+                                    breadcrumbs.add(
+                                      BreadcrumbData(
+                                        title: title,
+                                        toolType: newToolType,
+                                        tool: tool,
+                                        icon: icon,
+                                      ),
+                                    );
                                   }
                                 }
                               }
@@ -852,9 +876,7 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                     // Main content area
                     Expanded(
                       child: currentTool != null
-                          ? ClipRect(
-                              child: currentTool!,
-                            )
+                          ? ClipRect(child: currentTool!)
                           : Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -874,7 +896,9 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                                         .textTheme
                                         .headlineSmall
                                         ?.copyWith(
-                                          color: Theme.of(context)
+                                          color: Theme.of(
+                                            context,
+                                          )
                                               .colorScheme
                                               .onSurface
                                               .withValues(alpha: 0.7),
@@ -882,13 +906,17 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    AppLocalizations.of(context)!
+                                    AppLocalizations.of(
+                                      context,
+                                    )!
                                         .selectToolDesc,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
                                         ?.copyWith(
-                                          color: Theme.of(context)
+                                          color: Theme.of(
+                                            context,
+                                          )
                                               .colorScheme
                                               .onSurface
                                               .withValues(alpha: 0.5),
@@ -965,9 +993,12 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return TemplateListScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: (tool, title, {parentCategory, icon}) =>
-              widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'TemplateListScreen',
-                  icon: icon),
+              widget.onToolSelected?.call(
+            tool,
+            title,
+            parentCategory: parentCategory ?? 'TemplateListScreen',
+            icon: icon,
+          ),
           onRegisterUnsavedChangesCallback:
               widget.onRegisterUnsavedChangesCallback,
         );
@@ -975,30 +1006,37 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
         return RandomToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: (tool, title, {parentCategory, icon}) =>
-              widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'RandomToolsScreen',
-                  icon: icon),
+              widget.onToolSelected?.call(
+            tool,
+            title,
+            parentCategory: parentCategory ?? 'RandomToolsScreen',
+            icon: icon,
+          ),
         );
       case 'converterTools':
         return ConverterToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: (tool, title, {parentCategory, icon}) =>
-              widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'ConverterToolsScreen',
-                  icon: icon),
+              widget.onToolSelected?.call(
+            tool,
+            title,
+            parentCategory: parentCategory ?? 'ConverterToolsScreen',
+            icon: icon,
+          ),
         );
       case 'calculatorTools':
         return CalculatorToolsScreen(
           isEmbedded: widget.isDesktop,
           onToolSelected: (tool, title, {parentCategory, icon}) =>
-              widget.onToolSelected?.call(tool, title,
-                  parentCategory: parentCategory ?? 'CalculatorToolsScreen',
-                  icon: icon),
+              widget.onToolSelected?.call(
+            tool,
+            title,
+            parentCategory: parentCategory ?? 'CalculatorToolsScreen',
+            icon: icon,
+          ),
         );
       case 'p2pDataTransfer':
-        return P2PDataTransferScreen(
-          isEmbedded: widget.isDesktop,
-        );
+        return P2PDataTransferScreen(isEmbedded: widget.isDesktop);
       default:
         return const SizedBox.shrink();
     }
@@ -1110,19 +1148,17 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               Icon(
                 Icons.visibility_off,
                 size: 64,
-                color: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
                 loc.allToolsHidden,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -1130,10 +1166,9 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               Text(
                 loc.allToolsHiddenDesc,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -1168,11 +1203,9 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
                   icon: _getIconData(config.icon),
                 );
               } else {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => tool,
-                  ),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => tool));
               }
             },
           );
@@ -1190,14 +1223,15 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
               onToolVisibilityChanged: widget.onToolVisibilityChanged,
             );
             if (widget.isDesktop) {
-              widget.onToolSelected
-                  ?.call(tool, loc.settings, icon: Icons.settings);
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => tool,
-                ),
+              widget.onToolSelected?.call(
+                tool,
+                loc.settings,
+                icon: Icons.settings,
               );
+            } else {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => tool));
             }
           },
           showActions: false,
@@ -1290,10 +1324,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -1408,8 +1439,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          Text(loc.language,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            loc.language,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           ListTile(
             title: Text(loc.english),
             leading: Radio<String>(
@@ -1459,74 +1492,3 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
-
-/// Force clear all Hive cache to resolve DateTime casting errors
-// Future<void> _forceClearHiveCache() async {
-//   try {
-//     // Get application documents directory for Hive data
-//     final Directory appDocDir = await getApplicationDocumentsDirectory();
-//     final String hivePath = '${appDocDir.path}/hive_data';
-
-//     // Initialize Hive with custom path
-//     Hive.init(hivePath);
-//     logInfo('Force clear: Using Hive path: $hivePath');
-
-//     // Clear all existing boxes
-//     final boxNames = [
-//       'mass_state',
-//       'length_states',
-//       'currency_state',
-//       'currency_cache',
-//       'currency_presets',
-//       'templates',
-//       'generation_history',
-//       'generic_presets',
-//       'unit_templates',
-//     ];
-
-//     for (final boxName in boxNames) {
-//       try {
-//         // First try to delete from disk without opening
-//         try {
-//           await Hive.deleteBoxFromDisk(boxName);
-//           logInfo('Deleted box from disk: $boxName');
-//           continue;
-//         } catch (deleteError) {
-//           logError(
-//               'Could not delete $boxName from disk, trying to open and clear: $deleteError');
-//         }
-
-//         // If deletion failed, try to open and clear
-//         if (Hive.isBoxOpen(boxName)) {
-//           final box = Hive.box(boxName);
-//           await box.clear();
-//           await box.close();
-//           logInfo('Cleared and closed open box: $boxName');
-//         } else {
-//           try {
-//             final box = await Hive.openBox(boxName);
-//             await box.clear();
-//             await box.close();
-//             logInfo('Opened, cleared and closed box: $boxName');
-//           } catch (openError) {
-//             logError('Could not open box $boxName: $openError');
-//             // Try to delete the corrupted file
-//             try {
-//               await Hive.deleteBoxFromDisk(boxName);
-//               logInfo('Deleted corrupted box from disk: $boxName');
-//             } catch (finalDeleteError) {
-//               logError(
-//                   'Final delete attempt failed for $boxName: $finalDeleteError');
-//             }
-//           }
-//         }
-//       } catch (e) {
-//         logError('Error processing box $boxName: $e');
-//       }
-//     }
-
-//     logInfo('Force cleared all Hive cache from: $hivePath');
-//   } catch (e) {
-//     logError('Error in force clear Hive cache: $e');
-//   }
-// }

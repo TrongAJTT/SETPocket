@@ -155,16 +155,117 @@ class _NumericStepperState extends State<NumericStepper> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).dividerColor,
-          width: 1,
+    return LayoutBuilder(builder: (context, constraints) {
+      // Switch to a column layout on narrow screens to prevent text wrapping issues
+      bool useColumnLayout = constraints.maxWidth < 250;
+
+      final stepperControl = Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: Theme.of(context).dividerColor,
+            width: 0.5,
+          ),
         ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MouseRegion(
+              cursor: isDecrementDisabled
+                  ? SystemMouseCursors.forbidden
+                  : SystemMouseCursors.click,
+              child: Listener(
+                onPointerDown:
+                    isDecrementDisabled ? null : (_) => _startDecrementing(),
+                onPointerUp:
+                    isDecrementDisabled ? null : (_) => _stopDecrementing(),
+                onPointerCancel:
+                    isDecrementDisabled ? null : (_) => _stopDecrementing(),
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(6),
+                      bottomLeft: Radius.circular(6),
+                    ),
+                    color: isDecrementDisabled
+                        ? Theme.of(context).disabledColor.withOpacity(0.1)
+                        : null,
+                  ),
+                  child: Icon(
+                    Icons.remove,
+                    size: 18,
+                    color: isDecrementDisabled
+                        ? Theme.of(context).disabledColor
+                        : Theme.of(context).iconTheme.color,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: 70,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                border: Border.symmetric(
+                  vertical: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  _formatValue(_currentValue),
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            MouseRegion(
+              cursor: isIncrementDisabled
+                  ? SystemMouseCursors.forbidden
+                  : SystemMouseCursors.click,
+              child: Listener(
+                onPointerDown:
+                    isIncrementDisabled ? null : (_) => _startIncrementing(),
+                onPointerUp:
+                    isIncrementDisabled ? null : (_) => _stopIncrementing(),
+                onPointerCancel:
+                    isIncrementDisabled ? null : (_) => _stopIncrementing(),
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(6),
+                      bottomRight: Radius.circular(6),
+                    ),
+                    color: isIncrementDisabled
+                        ? Theme.of(context).disabledColor.withOpacity(0.1)
+                        : null,
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    size: 18,
+                    color: isIncrementDisabled
+                        ? Theme.of(context).disabledColor
+                        : Theme.of(context).iconTheme.color,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      final labelContent = Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.icon != null) ...[
             Container(
@@ -172,17 +273,17 @@ class _NumericStepperState extends State<NumericStepper> {
                 color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(6),
               ),
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(8),
               child: Icon(
                 widget.icon!,
-                size: 20,
+                size: 22,
                 color: Theme.of(context).colorScheme.onPrimaryContainer,
               ),
             ),
             const SizedBox(width: 12),
           ],
-          if (widget.label != null) ...[
-            Expanded(
+          if (widget.label != null)
+            Flexible(
               child: Text(
                 widget.label!,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -190,120 +291,33 @@ class _NumericStepperState extends State<NumericStepper> {
                     ),
               ),
             ),
-          ],
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
-                color: Theme.of(context).dividerColor,
-                width: 0.5,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MouseRegion(
-                  cursor: isDecrementDisabled
-                      ? SystemMouseCursors.forbidden
-                      : SystemMouseCursors.click,
-                  child: Listener(
-                    onPointerDown: isDecrementDisabled
-                        ? null
-                        : (_) => _startDecrementing(),
-                    onPointerUp:
-                        isDecrementDisabled ? null : (_) => _stopDecrementing(),
-                    onPointerCancel:
-                        isDecrementDisabled ? null : (_) => _stopDecrementing(),
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(6),
-                          bottomLeft: Radius.circular(6),
-                        ),
-                        color: isDecrementDisabled
-                            ? Theme.of(context)
-                                .disabledColor
-                                .withValues(alpha: 0.1)
-                            : null,
-                      ),
-                      child: Icon(
-                        Icons.remove,
-                        size: 16,
-                        color: isDecrementDisabled
-                            ? Theme.of(context).disabledColor
-                            : Theme.of(context).iconTheme.color,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 60,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    border: Border.symmetric(
-                      vertical: BorderSide(
-                        color: Theme.of(context).dividerColor,
-                        width: 0.5,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    _formatValue(_currentValue),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-                MouseRegion(
-                  cursor: isIncrementDisabled
-                      ? SystemMouseCursors.forbidden
-                      : SystemMouseCursors.click,
-                  child: Listener(
-                    onPointerDown: isIncrementDisabled
-                        ? null
-                        : (_) => _startIncrementing(),
-                    onPointerUp:
-                        isIncrementDisabled ? null : (_) => _stopIncrementing(),
-                    onPointerCancel:
-                        isIncrementDisabled ? null : (_) => _stopIncrementing(),
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(6),
-                          bottomRight: Radius.circular(6),
-                        ),
-                        color: isIncrementDisabled
-                            ? Theme.of(context)
-                                .disabledColor
-                                .withValues(alpha: 0.1)
-                            : null,
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 16,
-                        color: isIncrementDisabled
-                            ? Theme.of(context).disabledColor
-                            : Theme.of(context).iconTheme.color,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
-      ),
-    );
+      );
+
+      if (useColumnLayout) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.label != null || widget.icon != null) ...[
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0, bottom: 12),
+                child: labelContent,
+              ),
+            ],
+            Center(child: stepperControl),
+          ],
+        );
+      } else {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(child: labelContent),
+            const SizedBox(width: 16),
+            stepperControl,
+          ],
+        );
+      }
+    });
   }
 }

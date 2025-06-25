@@ -51,6 +51,18 @@ class HiveService {
       Hive.init(hivePath);
       logInfo('HiveService: Initialized Hive with path: $hivePath');
 
+      // TEMPORARY FIX: Clear the file transfer requests box to resolve a data migration issue.
+      // This error (type 'bool' is not a subtype of type 'String?') occurs when the
+      // structure of a stored object changes in an incompatible way.
+      try {
+        await Hive.deleteBoxFromDisk('file_transfer_requests');
+        logInfo(
+            "HiveService: Cleared 'file_transfer_requests' box to fix migration error.");
+      } catch (e) {
+        logWarning(
+            "HiveService: Could not clear 'file_transfer_requests' box: $e");
+      }
+
       // Register type adapters
       if (!Hive.isAdapterRegistered(1)) {
         Hive.registerAdapter(CurrencyCacheModelAdapter());
@@ -143,21 +155,21 @@ class HiveService {
         Hive.registerAdapter(DataStateModelAdapter());
       }
 
-      // P2P adapters
-      if (!Hive.isAdapterRegistered(47)) {
+      // P2P adapters (with correct and consistent TypeIds)
+      if (!Hive.isAdapterRegistered(58)) {
+        Hive.registerAdapter(P2PDataTransferSettingsAdapter());
+      }
+      if (!Hive.isAdapterRegistered(50)) {
         Hive.registerAdapter(P2PUserAdapter());
       }
-      if (!Hive.isAdapterRegistered(48)) {
+      if (!Hive.isAdapterRegistered(51)) {
         Hive.registerAdapter(PairingRequestAdapter());
       }
       if (!Hive.isAdapterRegistered(49)) {
         Hive.registerAdapter(DataTransferTaskAdapter());
       }
-      if (!Hive.isAdapterRegistered(52)) {
-        Hive.registerAdapter(P2PFileStorageSettingsAdapter());
-      }
-      if (!Hive.isAdapterRegistered(53)) {
-        Hive.registerAdapter(P2PDataTransferSettingsAdapter());
+      if (!Hive.isAdapterRegistered(54)) {
+        Hive.registerAdapter(FileTransferRequestAdapter());
       }
 
       // Open boxes

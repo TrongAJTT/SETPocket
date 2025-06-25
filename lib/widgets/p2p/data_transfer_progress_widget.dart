@@ -174,6 +174,10 @@ class DataTransferProgressWidget extends StatelessWidget {
         return Icons.schedule;
       case DataTransferStatus.requesting:
         return Icons.help_outline;
+      case DataTransferStatus.waitingForApproval:
+        return Icons.hourglass_empty;
+      case DataTransferStatus.rejected:
+        return Icons.block;
       case DataTransferStatus.transferring:
         return Icons.sync;
       case DataTransferStatus.completed:
@@ -191,6 +195,10 @@ class DataTransferProgressWidget extends StatelessWidget {
         return Colors.orange;
       case DataTransferStatus.requesting:
         return Colors.blue;
+      case DataTransferStatus.waitingForApproval:
+        return Colors.amber;
+      case DataTransferStatus.rejected:
+        return Colors.red;
       case DataTransferStatus.transferring:
         return Colors.green;
       case DataTransferStatus.completed:
@@ -208,6 +216,10 @@ class DataTransferProgressWidget extends StatelessWidget {
         return 'Đang chờ';
       case DataTransferStatus.requesting:
         return 'Đang yêu cầu';
+      case DataTransferStatus.waitingForApproval:
+        return 'Chờ phê duyệt';
+      case DataTransferStatus.rejected:
+        return 'Bị từ chối';
       case DataTransferStatus.transferring:
         return task.isOutgoing ? 'Đang gửi...' : 'Đang nhận...';
       case DataTransferStatus.completed:

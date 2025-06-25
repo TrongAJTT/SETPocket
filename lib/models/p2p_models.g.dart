@@ -156,13 +156,14 @@ class DataTransferTaskAdapter extends TypeAdapter<DataTransferTask> {
       errorMessage: fields[11] as String?,
       isOutgoing: fields[12] as bool,
       savePath: fields[13] as String?,
+      batchId: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, DataTransferTask obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -190,7 +191,9 @@ class DataTransferTaskAdapter extends TypeAdapter<DataTransferTask> {
       ..writeByte(12)
       ..write(obj.isOutgoing)
       ..writeByte(13)
-      ..write(obj.savePath);
+      ..write(obj.savePath)
+      ..writeByte(14)
+      ..write(obj.batchId);
   }
 
   @override
@@ -200,6 +203,70 @@ class DataTransferTaskAdapter extends TypeAdapter<DataTransferTask> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DataTransferTaskAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class FileTransferRequestAdapter extends TypeAdapter<FileTransferRequest> {
+  @override
+  final int typeId = 53;
+
+  @override
+  FileTransferRequest read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return FileTransferRequest(
+      requestId: fields[0] as String?,
+      batchId: fields[1] as String?,
+      fromUserId: fields[2] as String,
+      fromUserName: fields[3] as String,
+      files: (fields[4] as List).cast<FileTransferInfo>(),
+      totalSize: fields[5] as int,
+      protocol: fields[6] as String,
+      requestTime: fields[7] as DateTime?,
+      isProcessed: fields[8] as bool,
+      maxChunkSize: fields[9] as int?,
+      receivedTime: fields[10] as DateTime?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, FileTransferRequest obj) {
+    writer
+      ..writeByte(11)
+      ..writeByte(0)
+      ..write(obj.requestId)
+      ..writeByte(1)
+      ..write(obj.batchId)
+      ..writeByte(2)
+      ..write(obj.fromUserId)
+      ..writeByte(3)
+      ..write(obj.fromUserName)
+      ..writeByte(4)
+      ..write(obj.files)
+      ..writeByte(5)
+      ..write(obj.totalSize)
+      ..writeByte(6)
+      ..write(obj.protocol)
+      ..writeByte(7)
+      ..write(obj.requestTime)
+      ..writeByte(8)
+      ..write(obj.isProcessed)
+      ..writeByte(9)
+      ..write(obj.maxChunkSize)
+      ..writeByte(10)
+      ..write(obj.receivedTime);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FileTransferRequestAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -220,13 +287,14 @@ class P2PFileStorageSettingsAdapter
       askBeforeDownload: fields[1] as bool,
       createDateFolders: fields[2] as bool,
       maxFileSize: fields[3] as int,
+      maxConcurrentTasks: fields[4] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, P2PFileStorageSettings obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.downloadPath)
       ..writeByte(1)
@@ -234,7 +302,9 @@ class P2PFileStorageSettingsAdapter
       ..writeByte(2)
       ..write(obj.createDateFolders)
       ..writeByte(3)
-      ..write(obj.maxFileSize);
+      ..write(obj.maxFileSize)
+      ..writeByte(4)
+      ..write(obj.maxConcurrentTasks);
   }
 
   @override
@@ -251,7 +321,7 @@ class P2PFileStorageSettingsAdapter
 class P2PDataTransferSettingsAdapter
     extends TypeAdapter<P2PDataTransferSettings> {
   @override
-  final int typeId = 53;
+  final int typeId = 58;
 
   @override
   P2PDataTransferSettings read(BinaryReader reader) {
@@ -263,15 +333,17 @@ class P2PDataTransferSettingsAdapter
       downloadPath: fields[0] as String,
       createDateFolders: fields[1] as bool,
       maxReceiveFileSize: fields[2] as int,
-      sendProtocol: fields[3] as String,
-      maxChunkSize: fields[4] as int,
+      maxTotalReceiveSize: fields[3] as int,
+      maxConcurrentTasks: fields[4] as int,
+      sendProtocol: fields[5] as String,
+      maxChunkSize: fields[6] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, P2PDataTransferSettings obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.downloadPath)
       ..writeByte(1)
@@ -279,8 +351,12 @@ class P2PDataTransferSettingsAdapter
       ..writeByte(2)
       ..write(obj.maxReceiveFileSize)
       ..writeByte(3)
-      ..write(obj.sendProtocol)
+      ..write(obj.maxTotalReceiveSize)
       ..writeByte(4)
+      ..write(obj.maxConcurrentTasks)
+      ..writeByte(5)
+      ..write(obj.sendProtocol)
+      ..writeByte(6)
       ..write(obj.maxChunkSize);
   }
 

@@ -23,8 +23,6 @@ class DeviceInfoCard extends StatefulWidget {
 }
 
 class _DeviceInfoCardState extends State<DeviceInfoCard> {
-  bool _isDeviceIdVisible = false;
-
   @override
   Widget build(BuildContext context) {
     if (widget.user == null) {
@@ -66,23 +64,6 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                if (widget.showDeviceIdToggle)
-                  IconButton(
-                    icon: Icon(
-                      _isDeviceIdVisible
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isDeviceIdVisible = !_isDeviceIdVisible;
-                      });
-                    },
-                    tooltip: _isDeviceIdVisible
-                        ? 'Hide App Installation ID (mask letters and numbers)'
-                        : 'Show App Installation ID (reveal letters and numbers)',
-                  ),
               ],
             ),
             const SizedBox(height: 12),
@@ -99,9 +80,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
               _buildInfoRow(
                 context,
                 'App Installation ID',
-                widget.showDeviceIdToggle && !_isDeviceIdVisible
-                    ? _maskInstallationId(widget.user!.id)
-                    : widget.user!.id,
+                widget.user!.id,
                 icon: Icons.fingerprint,
               ),
             ],
@@ -241,12 +220,6 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
         widget.user!.isTrusted ||
         widget.user!.isStored ||
         widget.user!.autoConnect;
-  }
-
-  String _maskInstallationId(String installationId) {
-    // Mask both digits and letters, preserving special characters like hyphens
-    // Example: "ABC-123-DEF" becomes "***-***-***"
-    return StringMaskUtils.maskAlphanumeric(installationId);
   }
 
   String _formatLastSeen(DateTime lastSeen) {

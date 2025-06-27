@@ -608,7 +608,7 @@ class P2PFileStorageSettings extends HiveObject {
       );
 }
 
-@HiveType(typeId: 58)
+@HiveType(typeId: 56)
 class P2PDataTransferSettings extends HiveObject {
   @HiveField(0)
   String downloadPath;
@@ -616,23 +616,43 @@ class P2PDataTransferSettings extends HiveObject {
   @HiveField(1)
   bool createDateFolders;
 
-  /// Maximum individual file size in BYTES.
+  @HiveField(10)
+
+  /// Create folders by sender name instead of date
+  bool createSenderFolders;
+
   @HiveField(2)
-  int maxReceiveFileSize;
+  int maxReceiveFileSize; // In bytes
 
-  /// Maximum total size for a batch transfer in BYTES.
   @HiveField(3)
-  int maxTotalReceiveSize;
-
-  @HiveField(4)
   int maxConcurrentTasks;
 
+  @HiveField(4)
+  String sendProtocol; // e.g., 'TCP', 'UDP'
+
   @HiveField(5)
-  String sendProtocol;
+  int maxTotalReceiveSize; // In bytes
+
+  @HiveField(6)
 
   /// Maximum chunk size for sending files in KILOBYTES.
-  @HiveField(6)
   int maxChunkSize;
+
+  @HiveField(7)
+
+  /// Custom display name for this device (optional)
+  String? customDisplayName;
+
+  @HiveField(8)
+
+  /// UI refresh rate in seconds for transfer progress updates
+  /// 0 = immediate, 1-5 = update every N seconds
+  int uiRefreshRateSeconds;
+
+  @HiveField(9)
+
+  /// Enable notifications for transfer events
+  bool enableNotifications;
 
   P2PDataTransferSettings({
     required this.downloadPath,
@@ -642,6 +662,10 @@ class P2PDataTransferSettings extends HiveObject {
     required this.maxConcurrentTasks,
     required this.sendProtocol,
     required this.maxChunkSize,
+    this.customDisplayName,
+    this.uiRefreshRateSeconds = 0, // Default value for backward compatibility
+    this.enableNotifications = true,
+    this.createSenderFolders = false,
   });
 
   // Helper getters for UI display
@@ -657,6 +681,10 @@ class P2PDataTransferSettings extends HiveObject {
     int? maxConcurrentTasks,
     String? sendProtocol,
     int? maxChunkSize,
+    String? customDisplayName,
+    int? uiRefreshRateSeconds,
+    bool? enableNotifications,
+    bool? createSenderFolders,
   }) {
     return P2PDataTransferSettings(
       downloadPath: downloadPath ?? this.downloadPath,
@@ -666,6 +694,10 @@ class P2PDataTransferSettings extends HiveObject {
       maxConcurrentTasks: maxConcurrentTasks ?? this.maxConcurrentTasks,
       sendProtocol: sendProtocol ?? this.sendProtocol,
       maxChunkSize: maxChunkSize ?? this.maxChunkSize,
+      customDisplayName: customDisplayName ?? this.customDisplayName,
+      uiRefreshRateSeconds: uiRefreshRateSeconds ?? this.uiRefreshRateSeconds,
+      enableNotifications: enableNotifications ?? this.enableNotifications,
+      createSenderFolders: createSenderFolders ?? this.createSenderFolders,
     );
   }
 
@@ -678,6 +710,10 @@ class P2PDataTransferSettings extends HiveObject {
       'maxConcurrentTasks': maxConcurrentTasks,
       'sendProtocol': sendProtocol,
       'maxChunkSize': maxChunkSize,
+      'customDisplayName': customDisplayName,
+      'uiRefreshRateSeconds': uiRefreshRateSeconds,
+      'enableNotifications': enableNotifications,
+      'createSenderFolders': createSenderFolders,
     };
   }
 
@@ -690,6 +726,10 @@ class P2PDataTransferSettings extends HiveObject {
       maxConcurrentTasks: json['maxConcurrentTasks'],
       sendProtocol: json['sendProtocol'],
       maxChunkSize: json['maxChunkSize'],
+      customDisplayName: json['customDisplayName'],
+      uiRefreshRateSeconds: json['uiRefreshRateSeconds'] ?? 0,
+      enableNotifications: json['enableNotifications'] ?? true,
+      createSenderFolders: json['createSenderFolders'] ?? false,
     );
   }
 }

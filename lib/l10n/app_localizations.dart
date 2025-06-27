@@ -10222,6 +10222,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send Data'**
   String get sendData;
+
+  /// No description provided for @savedDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Devices'**
+  String get savedDevices;
+
+  /// No description provided for @availableDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Devices'**
+  String get availableDevices;
+
+  /// Title for the P2Lan Transfer screen
+  ///
+  /// In en, this message translates to:
+  /// **'P2Lan Transfer'**
+  String get p2lanTransfer;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

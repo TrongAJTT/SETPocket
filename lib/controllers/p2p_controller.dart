@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_service.dart';
@@ -25,6 +26,13 @@ class P2PController with ChangeNotifier {
   bool _hasPerformedInitialDiscovery = false;
   DateTime? _lastDiscoveryTime;
   final Completer<void> _initCompleter = Completer<void>();
+
+  // Connectivity monitoring
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  bool _wasPreviouslyEnabled =
+      false; // Track if P2P was enabled before connection loss
+  bool _isTemporarilyDisabled =
+      false; // Track if P2P is temporarily disabled due to no internet
 
   // Callback for new pairing requests
   // ignore: unused_field
@@ -185,6 +193,7 @@ class P2PController with ChangeNotifier {
   bool get hasPerformedInitialDiscovery => _hasPerformedInitialDiscovery;
   DateTime? get lastDiscoveryTime => _lastDiscoveryTime;
   bool get isBroadcasting => _p2pService.isBroadcasting;
+  bool get isTemporarilyDisabled => _isTemporarilyDisabled;
 
   /// Initialize the controller
   Future<void> initialize() async {
@@ -193,6 +202,8 @@ class P2PController with ChangeNotifier {
       await _p2pService.initialize();
       // Automatically check network status on initialization
       await _checkInitialNetworkStatus();
+      // Start monitoring connectivity changes
+      _startConnectivityMonitoring();
       _isInitialized = true;
       if (!_initCompleter.isCompleted) {
         _initCompleter.complete();
@@ -289,10 +300,78 @@ class P2PController with ChangeNotifier {
       _showSecurityWarning = false;
       _errorMessage = null;
       _resetDiscoveryState();
+      // Reset temporary disabled state when manually stopping
+      _isTemporarilyDisabled = false;
+      _wasPreviouslyEnabled = false;
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
       notifyListeners();
+    }
+  }
+
+  /// Start monitoring connectivity changes
+  void _startConnectivityMonitoring() {
+    _connectivitySubscription?.cancel();
+    _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen((results) {
+      _handleConnectivityChange(results);
+    });
+    logInfo('P2P connectivity monitoring started');
+  }
+
+  /// Handle connectivity state changes
+  void _handleConnectivityChange(List<ConnectivityResult> results) async {
+    final hasConnection =
+        results.any((result) => result != ConnectivityResult.none);
+
+    logInfo('Connectivity changed: $results, hasConnection: $hasConnection');
+
+    if (!hasConnection) {
+      // Lost internet connection
+      if (_p2pService.isEnabled) {
+        logInfo(
+            'Lost internet connection. Temporarily disabling P2P networking.');
+        _wasPreviouslyEnabled = true;
+        _isTemporarilyDisabled = true;
+
+        try {
+          await _p2pService.stopNetworking();
+          _showSecurityWarning = false;
+          _errorMessage = 'P2P temporarily disabled - no internet connection';
+          _resetDiscoveryState();
+          notifyListeners();
+        } catch (e) {
+          logError('Error stopping P2P networking on connectivity loss: $e');
+        }
+      }
+    } else {
+      // Gained internet connection
+      if (_wasPreviouslyEnabled && _isTemporarilyDisabled) {
+        logInfo('Internet connection restored. Re-enabling P2P networking.');
+        _isTemporarilyDisabled = false;
+        _wasPreviouslyEnabled = false;
+
+        try {
+          // Small delay to ensure network is fully established
+          await Future.delayed(const Duration(seconds: 2));
+
+          final success = await _p2pService.startNetworking();
+          if (success) {
+            _errorMessage = null;
+            await _checkInitialNetworkStatus();
+            logInfo('P2P networking automatically restored');
+          } else {
+            _errorMessage = 'Failed to restore P2P networking automatically';
+            logError('Failed to automatically restore P2P networking');
+          }
+          notifyListeners();
+        } catch (e) {
+          _errorMessage = 'Error restoring P2P networking: $e';
+          logError('Error restoring P2P networking on connectivity gain: $e');
+          notifyListeners();
+        }
+      }
     }
   }
 
@@ -419,6 +498,10 @@ class P2PController with ChangeNotifier {
 
   /// Get network status description
   String getNetworkStatusDescription() {
+    if (_isTemporarilyDisabled) {
+      return 'P2P temporarily disabled - waiting for internet connection';
+    }
+
     if (_networkInfo == null) return 'Checking network...';
 
     if (_networkInfo!.isMobile) {
@@ -751,7 +834,18 @@ class P2PController with ChangeNotifier {
   /// Clear a transfer from the list
   void clearTransfer(String taskId) {
     _p2pService.clearTransfer(taskId);
-    notifyListeners();
+  }
+
+  /// Clear a transfer from the list and optionally delete the downloaded file
+  Future<bool> clearTransferWithFile(String taskId, bool deleteFile) async {
+    try {
+      return await _p2pService.clearTransferWithFile(taskId, deleteFile);
+    } catch (e) {
+      _errorMessage = 'Failed to clear transfer: $e';
+      logError(_errorMessage!);
+      notifyListeners();
+      return false;
+    }
   }
 
   /// Update transfer settings
@@ -842,8 +936,10 @@ class P2PController with ChangeNotifier {
   @override
   void dispose() {
     logInfo('P2PController disposed. Removing listener only.');
+    _connectivitySubscription?.cancel();
     _p2pService.removeListener(_onP2PServiceChanged);
     clearNewPairingRequestCallback(); // Clean up callback
+    clearNewFileTransferRequestCallback(); // Clean up file transfer callback
     // DO NOT call _p2pService.stopNetworking() here.
     // The service should persist in the background.
     super.dispose();

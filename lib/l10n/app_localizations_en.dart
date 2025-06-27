@@ -5261,4 +5261,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sendData => 'Send Data';
+
+  @override
+  String get savedDevices => 'Saved Devices';
+
+  @override
+  String get availableDevices => 'Available Devices';
+
+  @override
+  String get p2lanTransfer => 'P2Lan Transfer';
 }

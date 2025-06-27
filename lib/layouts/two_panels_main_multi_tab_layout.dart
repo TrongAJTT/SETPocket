@@ -559,6 +559,19 @@ class _TwoPanelsMainMultiTabLayoutState
     // Otherwise, show default app bar actions
     return widget.appBarActions;
   }
+
+  /// External API for tab navigation
+  void navigateToTab(int tabIndex) {
+    if (tabIndex >= 0 && tabIndex < widget.mainTabs.length) {
+      setState(() {
+        _currentMainTabIndex = tabIndex;
+      });
+      widget.onMainTabChanged?.call(tabIndex);
+    }
+  }
+
+  /// Get current tab index
+  int get currentTabIndex => _currentMainTabIndex;
 }
 
 class TabData {

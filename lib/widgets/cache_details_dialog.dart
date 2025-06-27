@@ -48,7 +48,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         calculatorToolsDesc: loc.cacheTypeCalculatorToolsDesc,
         converterToolsName: loc.cacheTypeConverterTools,
         converterToolsDesc: loc.cacheTypeConverterToolsDesc,
-        p2pDataTransferName: loc.p2pDataTransfer,
+        p2pDataTransferName: loc.p2lanTransfer,
         p2pDataTransferDesc: 'P2P users, pairing data, and transfer settings',
       );
       setState(() {
@@ -501,7 +501,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Debug button for P2P cache
-                    if (cacheType == 'p2p_data_transfer')
+                    if (cacheType == 'p2lan_transfer')
                       IconButton(
                         onPressed: () => _debugP2PCache(),
                         icon: Icon(Icons.bug_report, size: 16),
@@ -514,8 +514,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                           ),
                         ),
                       ),
-                    if (cacheType == 'p2p_data_transfer')
-                      const SizedBox(width: 8),
+                    if (cacheType == 'p2lan_transfer') const SizedBox(width: 8),
 
                     // Clear cache button
                     if (cacheType !=
@@ -642,7 +641,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Icons.casino;
       case 'converter_tools':
         return Icons.swap_horiz;
-      case 'p2p_data_transfer':
+      case 'p2lan_transfer':
         return Icons.wifi;
       default:
         return Icons.storage;
@@ -659,7 +658,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         return Colors.purple;
       case 'converter_tools':
         return Colors.green;
-      case 'p2p_data_transfer':
+      case 'p2lan_transfer':
         return Colors.indigo;
       default:
         return Colors.grey;

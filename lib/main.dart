@@ -16,6 +16,7 @@ import 'package:setpocket/services/draft_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/services/p2p_service.dart';
 import 'package:setpocket/services/app_installation_service.dart';
+import 'package:setpocket/services/p2p_navigation_service.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -24,7 +25,7 @@ import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
 import 'screens/converter_tools_screen.dart';
 import 'screens/calculator_tools_screen.dart';
-import 'screens/p2p_data_transfer_screen.dart';
+import 'screens/p2lan_transfer_screen.dart';
 import 'package:flutter/services.dart';
 
 // Global navigation key for deep linking
@@ -139,7 +140,7 @@ Widget _getToolScreen(ToolConfig tool) {
     case 'calculatorTools':
       return const CalculatorToolsScreen();
     case 'p2pDataTransfer':
-      return const P2PDataTransferScreen();
+      return const P2LanTransferScreen();
     default:
       return const HomePage(); // Fallback to home
   }
@@ -362,6 +363,17 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
             GlobalCupertinoLocalizations.delegate,
           ],
           home: const HomePage(),
+          routes: {
+            '/p2lan_transfer': (context) => const P2LanTransferScreen(),
+          },
+          navigatorObservers: [
+            NavigatorObserver(),
+          ],
+          builder: (context, child) {
+            // Set navigation context for P2P services
+            P2PNavigationService.instance.setContext(context);
+            return child!;
+          },
         );
       },
     );
@@ -1036,7 +1048,7 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
           ),
         );
       case 'p2pDataTransfer':
-        return P2PDataTransferScreen(isEmbedded: widget.isDesktop);
+        return P2LanTransferScreen(isEmbedded: widget.isDesktop);
       default:
         return const SizedBox.shrink();
     }
@@ -1088,7 +1100,7 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       case 'calculatorTools':
         return l10n.calculatorTools;
       case 'p2pDataTransfer':
-        return l10n.p2pDataTransfer;
+        return l10n.p2lanTransfer;
       default:
         return nameKey;
     }
@@ -1123,7 +1135,7 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       case 'calculatorTools':
         return 'CalculatorToolsScreen';
       case 'p2pDataTransfer':
-        return 'P2PDataTransferScreen';
+        return 'P2LanTransferScreen';
       default:
         return '';
     }

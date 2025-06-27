@@ -5,165 +5,325 @@ class DataTransferProgressWidget extends StatelessWidget {
   final DataTransferTask task;
   final VoidCallback? onCancel;
   final VoidCallback? onClear;
+  final void Function(bool deleteFile)? onClearWithFile;
+  final bool isInBatch;
 
   const DataTransferProgressWidget({
     super.key,
     required this.task,
     this.onCancel,
     this.onClear,
+    this.onClearWithFile,
+    this.isInBatch = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (isInBatch) {
+      return _buildCompactView(context);
+    } else {
+      return _buildFullView(context);
+    }
+  }
+
+  Widget _buildFullView(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: _buildContent(context),
+      ),
+    );
+  }
+
+  Widget _buildCompactView(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: _buildContent(context, isCompact: true),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, {bool isCompact = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with file info
+        Row(
           children: [
-            // Header with file info
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: _getStatusColor(),
-                  child: Icon(
-                    _getStatusIcon(),
-                    color: Colors.white,
-                    size: 20,
-                  ),
+            if (!isCompact)
+              CircleAvatar(
+                backgroundColor: _getStatusColor(),
+                child: Icon(
+                  _getStatusIcon(),
+                  color: Colors.white,
+                  size: 20,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.fileName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${task.isOutgoing ? "Gửi đến" : "Nhận từ"} ${task.targetUserName}',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (task.status == DataTransferStatus.transferring &&
-                    onCancel != null)
-                  IconButton(
-                    onPressed: onCancel,
-                    icon: const Icon(Icons.cancel),
-                    tooltip: 'Hủy truyền tải',
-                  ),
-                if (task.status == DataTransferStatus.cancelled ||
-                    task.status == DataTransferStatus.failed)
-                  IconButton(
-                    onPressed: onClear,
-                    icon: Icon(Icons.clear, color: Colors.grey[700]),
-                    tooltip: 'Xóa tác vụ',
-                  ),
-                if (task.status == DataTransferStatus.completed)
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'clear') {
-                        onClear?.call();
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'clear',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_forever),
-                            SizedBox(width: 8),
-                            Text('Xóa'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Progress bar (only for transferring status)
-            if (task.status == DataTransferStatus.transferring) ...[
-              LinearProgressIndicator(
-                value: task.progress,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(_getStatusColor()),
               ),
-              const SizedBox(height: 8),
-            ],
-
-            // Status and details
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getStatusText(),
-                        style: TextStyle(
-                          color: _getStatusColor(),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      if (task.status == DataTransferStatus.transferring)
-                        Text(
-                          _getProgressText(),
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      if (task.errorMessage != null)
-                        Text(
-                          'Lỗi: ${task.errorMessage}',
-                          style: TextStyle(
-                            color: Colors.red[700],
-                            fontSize: 12,
-                          ),
-                        ),
-                    ],
+            if (!isCompact) const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.fileName,
+                    style: TextStyle(
+                      fontWeight:
+                          isCompact ? FontWeight.normal : FontWeight.bold,
+                      fontSize: isCompact ? 14 : 16,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
+                  if (!isCompact)
                     Text(
-                      _formatFileSize(task.fileSize),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    if (task.status == DataTransferStatus.transferring)
-                      Text(
-                        _getTransferSpeed(),
-                        style: Theme.of(context).textTheme.bodySmall,
+                      '${task.isOutgoing ? "Gửi đến" : "Nhận từ"} ${task.targetUserName}',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
                       ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Time information
-            if (task.startedAt != null || task.completedAt != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _getTimeInfo(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
                     ),
+                ],
               ),
-            ],
+            ),
+            _buildActionButtons(context, isCompact),
           ],
         ),
+
+        if (!isCompact) const SizedBox(height: 12),
+
+        // Progress bar (only for transferring status)
+        if (task.status == DataTransferStatus.transferring) ...[
+          LinearProgressIndicator(
+            value: task.progress,
+            backgroundColor: Colors.grey[300],
+            valueColor: AlwaysStoppedAnimation<Color>(_getStatusColor()),
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        // Status and details
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _getStatusText(),
+                    style: TextStyle(
+                      color: _getStatusColor(),
+                      fontWeight: FontWeight.w500,
+                      fontSize: isCompact ? 12 : 14,
+                    ),
+                  ),
+                  if (task.status == DataTransferStatus.transferring)
+                    Text(
+                      _getProgressText(),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontSize: isCompact ? 11 : null,
+                          ),
+                    ),
+                  if (task.errorMessage != null)
+                    Text(
+                      'Lỗi: ${task.errorMessage}',
+                      style: TextStyle(
+                        color: Colors.red[700],
+                        fontSize: isCompact ? 11 : 12,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  _formatFileSize(task.fileSize),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: isCompact ? 11 : null,
+                      ),
+                ),
+                if (task.status == DataTransferStatus.transferring)
+                  Text(
+                    _getTransferSpeed(),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: isCompact ? 11 : null,
+                        ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+
+        // Time information
+        if (!isCompact &&
+            (task.startedAt != null || task.completedAt != null)) ...[
+          const SizedBox(height: 8),
+          Text(
+            _getTimeInfo(),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, bool isCompact) {
+    if (task.status == DataTransferStatus.transferring && onCancel != null) {
+      return IconButton(
+        onPressed: onCancel,
+        icon: const Icon(Icons.cancel),
+        tooltip: 'Hủy truyền tải',
+        iconSize: isCompact ? 20 : 24,
+      );
+    }
+
+    if (task.status == DataTransferStatus.cancelled ||
+        task.status == DataTransferStatus.failed) {
+      return IconButton(
+        onPressed: onClear,
+        icon: Icon(Icons.clear, color: Colors.grey[700]),
+        tooltip: 'Xóa tác vụ',
+        iconSize: isCompact ? 20 : 24,
+      );
+    }
+
+    if (task.status == DataTransferStatus.completed) {
+      // For completed incoming files, show delete with file option
+      if (!task.isOutgoing && task.savePath != null) {
+        return PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'clear') {
+              onClear?.call();
+            } else if (value == 'delete_with_file') {
+              _showDeleteWithFileDialog(context);
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'clear',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_forever),
+                  SizedBox(width: 8),
+                  Text('Xóa task'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete_with_file',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_sweep, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Delete with file', style: TextStyle(color: Colors.red)),
+                ],
+              ),
+            ),
+          ],
+          iconSize: isCompact ? 20 : 24,
+        );
+      } else {
+        // For outgoing files or files without savePath, show regular clear option
+        return PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'clear') {
+              onClear?.call();
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'clear',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_forever),
+                  SizedBox(width: 8),
+                  Text('Xóa'),
+                ],
+              ),
+            ),
+          ],
+          iconSize: isCompact ? 20 : 24,
+        );
+      }
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  void _showDeleteWithFileDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Task and File'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Bạn có muốn xóa task và file đã tải về không?'),
+            const SizedBox(height: 8),
+            Text(
+              'File: ${task.fileName}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            if (task.savePath != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Path: ${task.savePath}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.warning, color: Colors.red, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Hành động này không thể hoàn tác. File sẽ bị xóa vĩnh viễn.',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onClearWithFile?.call(false); // Clear task only
+            },
+            child: const Text('Chỉ xóa task'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onClearWithFile?.call(true); // Delete task and file
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Xóa cả file'),
+          ),
+        ],
       ),
     );
   }
@@ -240,10 +400,14 @@ class DataTransferProgressWidget extends StatelessWidget {
 
   String _getTransferSpeed() {
     if (task.startedAt == null ||
-        task.status != DataTransferStatus.transferring) return '';
+        task.status != DataTransferStatus.transferring) {
+      return '';
+    }
 
     final elapsed = DateTime.now().difference(task.startedAt!);
-    if (elapsed.inSeconds == 0) return '';
+    if (elapsed.inSeconds == 0) {
+      return '';
+    }
 
     final bytesPerSecond = task.transferredBytes / elapsed.inSeconds;
     return '${_formatFileSize(bytesPerSecond.round())}/s';

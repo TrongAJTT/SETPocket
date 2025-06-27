@@ -2324,7 +2324,11 @@
       "dataTransferRequest": "Yêu cầu truyền dữ liệu",
   "dataTransferResponse": "Phản hồi truyền dữ liệu",
   "dataTransferCancel": "Hủy truyền dữ liệu",
-  "sendData": "Gửi Dữ Liệu",
-  "savedDevices": "Thiết bị đã lưu",
-  "availableDevices": "Thiết bị có sẵn"
-}
+      "sendData": "Gửi Dữ Liệu",
+    "savedDevices": "Thiết bị đã lưu",
+    "availableDevices": "Thiết bị có sẵn",
+    "p2lanTransfer": "Truyền tệp P2Lan",
+    "@p2lanTransfer": {
+        "description": "Tiêu đề cho màn hình Truyền tệp P2Lan"
+    }
+  }

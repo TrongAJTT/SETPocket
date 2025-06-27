@@ -72,7 +72,7 @@ class CacheService {
       'generation_history_rock_paper_scissors',
     ],
     'converter_tools': [],
-    'p2p_data_transfer': [],
+    'p2lan_transfer': [],
   };
   static Future<Map<String, CacheInfo>> getAllCacheInfo({
     String? textTemplatesName,
@@ -709,23 +709,23 @@ class CacheService {
       logInfo(
           'CacheService: P2P cache total - Count: $p2pCount, Size: $p2pSize bytes');
 
-      cacheInfoMap['p2p_data_transfer'] = CacheInfo(
-        name: p2pDataTransferName ?? 'P2P Data Transfer',
+      cacheInfoMap['p2lan_transfer'] = CacheInfo(
+        name: p2pDataTransferName ?? 'P2Lan Transfer',
         description: p2pDataTransferDesc ??
             'P2P users, pairing data, and transfer settings',
         itemCount: p2pCount,
         sizeBytes: p2pSize,
-        keys: _cacheKeys['p2p_data_transfer'] ?? [],
+        keys: _cacheKeys['p2lan_transfer'] ?? [],
       );
     } catch (e) {
       logError('CacheService: Error getting P2P cache info: $e');
-      cacheInfoMap['p2p_data_transfer'] = CacheInfo(
-        name: p2pDataTransferName ?? 'P2P Data Transfer',
+      cacheInfoMap['p2lan_transfer'] = CacheInfo(
+        name: p2pDataTransferName ?? 'P2Lan Transfer',
         description: p2pDataTransferDesc ??
             'P2P users, pairing data, and transfer settings',
         itemCount: 0,
         sizeBytes: 0,
-        keys: _cacheKeys['p2p_data_transfer'] ?? [],
+        keys: _cacheKeys['p2lan_transfer'] ?? [],
       );
     }
 
@@ -812,7 +812,7 @@ class CacheService {
       await GenericPresetService.clearAllPresets('speed');
       await GenericPresetService.clearAllPresets('temperature');
       await GenericPresetService.clearAllPresets('data_storage');
-    } else if (cacheType == 'p2p_data_transfer') {
+    } else if (cacheType == 'p2lan_transfer') {
       // Clear P2P data transfer cache
       await clearP2PCache();
     } else {
@@ -988,7 +988,7 @@ class CacheService {
   /// Check if a cache type can be cleared (conditional clearing)
   static Future<bool> canClearCache(String cacheType) async {
     switch (cacheType) {
-      case 'p2p_data_transfer':
+      case 'p2lan_transfer':
         // Can't clear P2P cache if service is currently enabled
         return !(await isP2PEnabled());
       default:
@@ -999,9 +999,9 @@ class CacheService {
   /// Get the reason why a cache type cannot be cleared
   static Future<String?> getClearCacheBlockReason(String cacheType) async {
     switch (cacheType) {
-      case 'p2p_data_transfer':
+      case 'p2lan_transfer':
         if (await isP2PEnabled()) {
-          return 'P2P Data Transfer is currently active. Stop the service to clear cache.';
+          return 'P2Lan Transfer is currently active. Stop the service to clear cache.';
         }
         return null;
       default:
@@ -1170,7 +1170,7 @@ class CacheService {
 
       // Get cache info
       final cacheInfo = await getAllCacheInfo();
-      final p2pCache = cacheInfo['p2p_data_transfer'];
+      final p2pCache = cacheInfo['p2lan_transfer'];
       result['cache_info'] = {
         'item_count': p2pCache?.itemCount ?? 0,
         'size_bytes': p2pCache?.sizeBytes ?? 0,

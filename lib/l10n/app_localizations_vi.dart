@@ -5261,4 +5261,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get sendData => 'Gửi Dữ Liệu';
+
+  @override
+  String get savedDevices => 'Thiết bị đã lưu';
+
+  @override
+  String get availableDevices => 'Thiết bị có sẵn';
+
+  @override
+  String get p2lanTransfer => 'Truyền tệp P2Lan';
 }

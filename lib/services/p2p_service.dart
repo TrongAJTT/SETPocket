@@ -9,10 +9,12 @@ import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' hide Key;
 import 'package:hive/hive.dart';
 import 'package:multicast_dns/multicast_dns.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/hive_service.dart';
+import 'package:setpocket/services/p2p_notification_service.dart';
 
 /// Validation result for file transfer request
 class _FileTransferValidationResult {
@@ -185,8 +187,14 @@ class P2PService extends ChangeNotifier {
       // Initialize encryption
       _initializeEncryption();
 
+      // Initialize notifications
+      await P2PNotificationService.instance.initialize();
+
       // Load saved data - simple approach like the old version
       await _loadSavedData();
+
+      // Initialize Android-specific paths if needed
+      await _initializeAndroidPath();
 
       _isServiceInitialized = true;
       logInfo('P2P Service initialized');
@@ -258,49 +266,54 @@ class P2PService extends ChangeNotifier {
 
   /// Stop P2P networking
   Future<void> stopNetworking() async {
-    try {
-      _isEnabled = false;
-      _isDiscovering = false;
-      _connectionStatus = ConnectionStatus.disconnected;
+    if (!_isEnabled) return;
 
-      // Send disconnect notifications to all paired users before stopping
-      await _sendDisconnectNotifications();
+    await _stopServer();
+    await _stopDiscovery();
 
-      // Stop timers
-      _stopTimers();
+    // Cancel timers
+    _heartbeatTimer?.cancel();
+    _cleanupTimer?.cancel();
+    _broadcastTimer?.cancel();
+    _isBroadcasting = false; // Reset broadcast state when stopping all timers
 
-      // Cancel active transfers
-      await _cancelAllTransfers();
+    // Send disconnect notifications to all paired users before stopping
+    await _sendDisconnectNotifications();
 
-      // Close connections
-      await _closeAllConnections();
+    // Cancel active transfers
+    await _cancelAllTransfers();
 
-      // Stop server
-      await _stopServer();
+    // Close connections
+    await _closeAllConnections();
 
-      // Stop discovery
-      await _stopDiscovery();
+    // Stop server
+    await _stopServer();
 
-      // Only clear non-stored users, keep stored users but mark them offline
-      _cleanupUsersOnNetworkStop();
+    // Stop discovery
+    await _stopDiscovery();
 
-      // Clean up receiving data
-      _incomingFileChunks.clear();
+    // Only clear non-stored users, keep stored users but mark them offline
+    _cleanupUsersOnNetworkStop();
 
-      // Clean up task creation locks
-      _taskCreationLocks.clear();
+    // Clean up receiving data
+    _incomingFileChunks.clear();
 
-      // Clean up pending chunks buffer
-      _pendingChunks.clear();
+    // Clean up task creation locks
+    _taskCreationLocks.clear();
 
-      // Reset the initialization flag to allow for a clean restart
-      _isServiceInitialized = false;
+    // Clean up pending chunks buffer
+    _pendingChunks.clear();
 
-      notifyListeners();
-      logInfo('P2P networking stopped and service lifecycle ended.');
-    } catch (e) {
-      logError('Error stopping P2P networking: $e');
-    }
+    // Reset state flags to reflect that networking is stopped
+    _isEnabled = false;
+    _connectionStatus = ConnectionStatus.disconnected;
+    _currentUser = null; // Clear current user profile
+
+    // Do NOT reset _isServiceInitialized here, allow for restart
+    // _isServiceInitialized = false;
+
+    notifyListeners();
+    logInfo('P2P networking stopped and service lifecycle ended.');
   }
 
   /// Send pairing request to user
@@ -649,13 +662,54 @@ class P2PService extends ChangeNotifier {
             'Cleaned up ${processedRequestIds.length} processed pairing requests from storage on startup');
       }
 
-      // Load transfer settings
+      // Load transfer settings with migration support
       final settingsBox =
           await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
+
+      // TEMPORARY: Clear old settings to force migration to new format
+      // This ensures all new fields are properly initialized
       if (settingsBox.containsKey('settings')) {
-        _transferSettings = settingsBox.get('settings');
-        logInfo(
-            'Loaded transfer settings: downloadPath=${_transferSettings?.downloadPath}');
+        try {
+          final existingSettings = settingsBox.get('settings');
+          if (existingSettings != null) {
+            // Check if this is an old version without new fields
+            // This is a simple way to detect if we need migration
+            logInfo('Checking existing settings for compatibility...');
+
+            // For now, always recreate to ensure new fields are present
+            logWarning(
+                'Migrating to new settings format with additional fields...');
+            await settingsBox.clear();
+
+            // Preserve important user settings if possible
+            _transferSettings = P2PDataTransferSettings(
+              downloadPath: existingSettings.downloadPath,
+              createDateFolders: existingSettings.createDateFolders,
+              maxReceiveFileSize: existingSettings.maxReceiveFileSize,
+              maxTotalReceiveSize: existingSettings.maxTotalReceiveSize,
+              maxConcurrentTasks: existingSettings.maxConcurrentTasks,
+              sendProtocol: existingSettings.sendProtocol,
+              maxChunkSize: existingSettings.maxChunkSize,
+              customDisplayName: existingSettings.customDisplayName,
+              uiRefreshRateSeconds: 0, // New field with default
+              enableNotifications: true, // New field with default
+              createSenderFolders: false, // New field with default
+            );
+
+            await settingsBox.put('settings', _transferSettings!);
+            logInfo('Successfully migrated settings with new fields');
+          }
+        } catch (e) {
+          logError('Failed to migrate existing transfer settings: $e');
+          logWarning('Creating completely new default settings...');
+
+          // Clear corrupted settings and create new ones
+          await settingsBox.clear();
+          _transferSettings = _createDefaultTransferSettings();
+          await settingsBox.put('settings', _transferSettings!);
+          logInfo(
+              'Created new default transfer settings after migration error');
+        }
       } else {
         // Create default settings if none exist
         _transferSettings = _createDefaultTransferSettings();
@@ -663,6 +717,13 @@ class P2PService extends ChangeNotifier {
         await settingsBox.put('settings', _transferSettings!);
         logInfo(
             'Created and saved default transfer settings: ${_transferSettings!.downloadPath}');
+      }
+
+      // Double-check that settings are not null
+      if (_transferSettings == null) {
+        logError(
+            'Transfer settings are still null after loading! Creating emergency defaults...');
+        _transferSettings = _createDefaultTransferSettings();
       }
 
       logInfo(
@@ -677,9 +738,12 @@ class P2PService extends ChangeNotifier {
         await NetworkSecurityService.getAppInstallationId();
     final deviceName = await NetworkSecurityService.getDeviceName();
 
+    // Use custom display name from settings if available, otherwise use device name
+    final customDisplayName = _transferSettings?.customDisplayName;
+
     _currentUser = P2PUser(
       id: appInstallationId,
-      displayName: deviceName,
+      displayName: customDisplayName ?? deviceName,
       appInstallationId: appInstallationId,
       ipAddress: networkInfo.ipAddress ?? '127.0.0.1',
       port: _basePort,
@@ -1479,7 +1543,7 @@ class P2PService extends ChangeNotifier {
         return;
       }
 
-      // If user is trusted, auto-accept
+      // If user is trusted, auto-accept without notification
       if (fromUser.isTrusted) {
         logInfo(
             'Auto-accepting file transfer from trusted user: ${fromUser.displayName}');
@@ -1488,6 +1552,14 @@ class P2PService extends ChangeNotifier {
         _fileTransferRequestTimers.remove(request.requestId);
         await _acceptFileTransferRequest(request);
         return;
+      }
+
+      // Show notification for file transfer request (only for non-trusted users)
+      if (_transferSettings?.enableNotifications == true) {
+        await P2PNotificationService.instance.showFileTransferRequest(
+          request: request,
+          enableActions: true,
+        );
       }
 
       // Add to pending requests and show dialog
@@ -1564,8 +1636,9 @@ class P2PService extends ChangeNotifier {
     logInfo(
         '  - Settings max total size: ${settings.maxTotalReceiveSize} bytes');
 
-    // Check total size limit
-    if (request.totalSize > settings.maxTotalReceiveSize) {
+    // Check total size limit, skipping if set to unlimited (-1)
+    if (settings.maxTotalReceiveSize != -1 &&
+        request.totalSize > settings.maxTotalReceiveSize) {
       final maxSizeMB = settings.maxTotalReceiveSize ~/ (1024 * 1024);
       final requestSizeMB = request.totalSize / (1024 * 1024);
       return _FileTransferValidationResult.invalid(
@@ -1573,9 +1646,10 @@ class P2PService extends ChangeNotifier {
           'Total size ${requestSizeMB.toStringAsFixed(1)}MB exceeds limit ${maxSizeMB}MB');
     }
 
-    // Check individual file size limits
+    // Check individual file size limits, skipping if set to unlimited (-1)
     for (final file in request.files) {
-      if (file.fileSize > settings.maxReceiveFileSize) {
+      if (settings.maxReceiveFileSize != -1 &&
+          file.fileSize > settings.maxReceiveFileSize) {
         final maxSizeMB = settings.maxReceiveFileSize ~/ (1024 * 1024);
         final fileSizeMB = file.fileSize / (1024 * 1024);
         return _FileTransferValidationResult.invalid(
@@ -1846,6 +1920,10 @@ class P2PService extends ChangeNotifier {
 
   void _handleClientConnection(Socket socket) {
     logInfo('New client connected: ${socket.remoteAddress}');
+
+    // Optimize socket for high throughput
+    socket.setOption(SocketOption.tcpNoDelay, true);
+
     // Use a buffer for each connection to handle message framing
     final buffer = BytesBuilder();
 
@@ -2023,6 +2101,14 @@ class P2PService extends ChangeNotifier {
     await _savePairingRequest(request);
     notifyListeners();
 
+    // Show notification for pairing request
+    if (_transferSettings?.enableNotifications == true) {
+      await P2PNotificationService.instance.showPairingRequest(
+        request: request,
+        enableActions: true,
+      );
+    }
+
     // Trigger callback for new pairing request (for auto-showing dialogs)
     if (_onNewPairingRequest != null) {
       _onNewPairingRequest!(request);
@@ -2095,7 +2181,11 @@ class P2PService extends ChangeNotifier {
       if (task.status != DataTransferStatus.transferring) {
         task.status = DataTransferStatus.transferring;
       }
-      notifyListeners();
+
+      // Only notify UI every 10 chunks to reduce overhead
+      if (_incomingFileChunks[taskId]!.length % 10 == 0 || isLast) {
+        notifyListeners();
+      }
 
       // If this is the last chunk, assemble the file
       if (isLast) {
@@ -2381,6 +2471,14 @@ class P2PService extends ChangeNotifier {
       task.transferredBytes = fileData.length; // Finalize byte count
       logInfo('✅ ASSEMBLE: Updated task $taskId to completed state.');
 
+      // Show completion notification for received file
+      if (_transferSettings?.enableNotifications == true) {
+        await P2PNotificationService.instance.showFileTransferCompleted(
+          task: task,
+          success: true,
+        );
+      }
+
       // Clean up
       _incomingFileChunks.remove(taskId);
 
@@ -2619,6 +2717,14 @@ class P2PService extends ChangeNotifier {
       logInfo(
           'Starting transfer for ${task.fileName} with chunk size: ${chunkSizeKB}KB (${chunkSizeBytes} bytes) - Settings value: ${_transferSettings?.maxChunkSize}');
 
+      // Show initial progress notification
+      if (_transferSettings?.enableNotifications == true) {
+        await P2PNotificationService.instance.showFileTransferProgress(
+          task: task,
+          progress: 0,
+        );
+      }
+
       // Create isolate for data transfer
       final receivePort = ReceivePort();
       _transferPorts[task.id] = receivePort;
@@ -2650,15 +2756,48 @@ class P2PService extends ChangeNotifier {
 
           if (progress != null) {
             task.transferredBytes = (task.fileSize * progress).round();
+
+            // Show progress notification - more frequent updates
+            if (_transferSettings?.enableNotifications == true) {
+              final progressPercent = (progress * 100).round();
+              // Show at start, every 5%, and for final stages
+              if (progressPercent == 0 ||
+                  progressPercent % 5 == 0 ||
+                  progressPercent > 90) {
+                P2PNotificationService.instance.showFileTransferProgress(
+                  task: task,
+                  progress: progressPercent,
+                );
+              }
+            }
           }
 
           if (completed) {
             task.status = DataTransferStatus.completed;
             task.completedAt = DateTime.now();
+
+            // Show completion notification
+            if (_transferSettings?.enableNotifications == true) {
+              P2PNotificationService.instance.showFileTransferCompleted(
+                task: task,
+                success: true,
+              );
+            }
+
             _cleanupTransfer(task.id);
           } else if (error != null) {
             task.status = DataTransferStatus.failed;
             task.errorMessage = error;
+
+            // Show failure notification
+            if (_transferSettings?.enableNotifications == true) {
+              P2PNotificationService.instance.showFileTransferCompleted(
+                task: task,
+                success: false,
+                errorMessage: error,
+              );
+            }
+
             _cleanupTransfer(task.id);
           }
 
@@ -2704,13 +2843,17 @@ class P2PService extends ChangeNotifier {
         udpSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
         sendPort.send({'info': 'UDP socket bound to port ${udpSocket!.port}'});
       } else {
-        // Default to TCP
+        // Default to TCP with optimized settings
         tcpSocket = await Socket.connect(
           targetUser.ipAddress,
           targetUser.port,
           timeout: const Duration(seconds: 10),
         );
-        sendPort.send({'info': 'TCP connection established'});
+
+        // Optimize TCP socket for high throughput
+        tcpSocket!.setOption(SocketOption.tcpNoDelay, true);
+        sendPort
+            .send({'info': 'TCP connection established with optimizations'});
       }
 
       // Read file
@@ -2723,12 +2866,13 @@ class P2PService extends ChangeNotifier {
       final fileBytes = await file.readAsBytes();
       int totalSent = 0;
 
-      // Dynamic chunking parameters
-      int chunkSize = min(32 * 1024,
-          maxChunkSizeFromSettings); // Start with 32KB or setting max, whichever is smaller
+      // Dynamic chunking parameters - Start with larger chunk size for better speed
+      int chunkSize = min(128 * 1024,
+          maxChunkSizeFromSettings); // Start with 128KB or setting max, whichever is smaller
       final int maxChunkSize = maxChunkSizeFromSettings; // Use setting value
       int successfulChunksInRow = 0;
-      Duration delay = const Duration(milliseconds: 50);
+      Duration delay =
+          const Duration(milliseconds: 5); // Reduce initial delay significantly
 
       sendPort.send({
         'info':
@@ -2777,23 +2921,26 @@ class P2PService extends ChangeNotifier {
             final targetAddress = InternetAddress(targetUser.ipAddress);
             udpSocket!.send(messageBytes, targetAddress, targetUser.port);
           } else {
-            // TCP: Send with length header
+            // TCP: Send with length header and immediate flush
             final lengthHeader = ByteData(4)
               ..setUint32(0, messageBytes.length, Endian.big);
             tcpSocket!.add(lengthHeader.buffer.asUint8List());
-            tcpSocket.add(messageBytes);
-            await tcpSocket.flush();
+            tcpSocket!.add(messageBytes);
+            await tcpSocket!.flush(); // Force immediate send
           }
 
           totalSent += currentChunkSize;
           successfulChunksInRow++;
 
-          // Adjust chunk size and delay dynamically
-          if (successfulChunksInRow > 10 && chunkSize < maxChunkSize) {
-            chunkSize *= 2; // Double chunk size
+          // Adjust chunk size and delay dynamically - More aggressive scaling
+          if (successfulChunksInRow > 3 && chunkSize < maxChunkSize) {
+            chunkSize = min(chunkSize * 2,
+                maxChunkSize); // Double chunk size but cap at max
             delay = Duration(
-                milliseconds:
-                    max(10, delay.inMilliseconds - 10)); // Decrease delay
+                milliseconds: max(
+                    1,
+                    delay.inMilliseconds -
+                        2)); // Decrease delay more aggressively
             successfulChunksInRow = 0; // Reset counter
             sendPort.send({
               'info':
@@ -2812,22 +2959,24 @@ class P2PService extends ChangeNotifier {
         } catch (e) {
           sendPort.send({'error': 'Chunk failed: $e. Retrying...'});
 
-          // Slow down on error
-          chunkSize = max(32 * 1024, chunkSize ~/ 2); // Halve chunk size
+          // Slow down on error but not too much
+          chunkSize = max(64 * 1024,
+              chunkSize ~/ 2); // Halve chunk size but keep reasonable minimum
           delay = Duration(
-              milliseconds:
-                  min(100, delay.inMilliseconds + 20)); // Increase delay
+              milliseconds: min(50,
+                  delay.inMilliseconds + 10)); // Increase delay more moderately
 
           // Re-establish connection based on protocol
           if (protocol.toLowerCase() == 'udp') {
             // UDP doesn't need reconnection, just continue
             sendPort.send({'info': 'UDP error recovery, continuing...'});
           } else {
-            // TCP: Re-establish connection
+            // TCP: Re-establish connection with optimizations
             await tcpSocket?.close();
             tcpSocket = await Socket.connect(
                 targetUser.ipAddress, targetUser.port,
                 timeout: const Duration(seconds: 10));
+            tcpSocket?.setOption(SocketOption.tcpNoDelay, true);
           }
 
           // IMPORTANT: If this was the first chunk that failed, we need to resend with metadata
@@ -3088,34 +3237,98 @@ class P2PService extends ChangeNotifier {
 
   /// Create default transfer settings
   P2PDataTransferSettings _createDefaultTransferSettings() {
-    // Get default download path based on platform
-    String defaultDownloadPath;
-    if (Platform.isWindows) {
-      defaultDownloadPath = '${Platform.environment['USERPROFILE']}\\Downloads';
-    } else if (Platform.isAndroid) {
-      defaultDownloadPath = '/storage/emulated/0/Download';
-    } else {
-      defaultDownloadPath = '${Platform.environment['HOME']}/Downloads';
-    }
-
     return P2PDataTransferSettings(
-      downloadPath: defaultDownloadPath,
+      downloadPath: _getDefaultDownloadPath(),
       createDateFolders: true,
       maxReceiveFileSize: 100 * 1024 * 1024, // 100MB
       maxTotalReceiveSize: 1 * 1024 * 1024 * 1024, // 1GB
       maxConcurrentTasks: 3,
       sendProtocol: 'TCP',
-      maxChunkSize: 512, // 512KB
+      maxChunkSize: 1024, // 1MB - Increase default chunk size for better speed
+      uiRefreshRateSeconds: 0, // Default to immediate updates
+      enableNotifications: false, // Default to disable notifications
+      createSenderFolders: false, // Default to date folders
     );
+  }
+
+  /// Get default download path based on platform
+  String _getDefaultDownloadPath() {
+    if (Platform.isWindows) {
+      return '${Platform.environment['USERPROFILE']}\\Downloads';
+    } else if (Platform.isAndroid) {
+      // This will be replaced with actual path during initialization
+      return '/data/data/com.setpocket.app/files/p2lan_transfer';
+    } else {
+      return '${Platform.environment['HOME']}/Downloads';
+    }
+  }
+
+  /// Initialize default Android path using path_provider
+  Future<void> _initializeAndroidPath() async {
+    if (Platform.isAndroid && _transferSettings != null) {
+      try {
+        final appDocDir = await getApplicationDocumentsDirectory();
+        final androidPath = '${appDocDir.parent.path}/files/p2lan_transfer';
+
+        // Create directory if it doesn't exist
+        final directory = Directory(androidPath);
+        if (!await directory.exists()) {
+          await directory.create(recursive: true);
+        }
+
+        // Update settings if still using default path
+        if (_transferSettings!.downloadPath
+            .contains('/data/data/com.setpocket.app/files/p2lan_transfer')) {
+          _transferSettings =
+              _transferSettings!.copyWith(downloadPath: androidPath);
+
+          // Save updated settings
+          final box = await Hive.openBox<P2PDataTransferSettings>(
+              'p2p_transfer_settings');
+          await box.put('settings', _transferSettings!);
+
+          logInfo('Updated Android download path to: $androidPath');
+        }
+      } catch (e) {
+        logError('Failed to initialize Android path: $e');
+      }
+    }
   }
 
   /// Update transfer settings
   Future<bool> updateTransferSettings(P2PDataTransferSettings settings) async {
     try {
+      // Check if notifications are being enabled for the first time
+      final wasNotificationsEnabled =
+          _transferSettings?.enableNotifications ?? false;
+      final isNotificationsNowEnabled = settings.enableNotifications;
+
       final box =
           await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
       await box.put('settings', settings); // Use fixed key instead of add
       _transferSettings = settings;
+
+      // 🔥 Update current user's display name if it has changed
+      if (_currentUser != null && settings.customDisplayName != null) {
+        if (_currentUser!.displayName != settings.customDisplayName) {
+          _currentUser!.displayName = settings.customDisplayName!;
+          logInfo(
+              'Updated current user display name to: ${settings.customDisplayName}');
+          notifyListeners(); // Notify UI of the change
+        }
+      }
+
+      // 🔥 Request notification permissions if notifications were just enabled
+      if (!wasNotificationsEnabled && isNotificationsNowEnabled) {
+        logInfo('Notifications enabled - requesting permissions...');
+        final permissionGranted =
+            await P2PNotificationService.instance.requestPermissions();
+        if (!permissionGranted) {
+          logWarning('Notification permissions not granted');
+        } else {
+          logInfo('Notification permissions granted successfully');
+        }
+      }
 
       logInfo('Updated transfer settings: ${settings.toJson()}');
       return true;
@@ -3165,6 +3378,9 @@ class P2PService extends ChangeNotifier {
       maxConcurrentTasks: 3,
       sendProtocol: 'TCP', // Default
       maxChunkSize: 512, // Default 512KB
+      uiRefreshRateSeconds: 0, // Default
+      enableNotifications: true, // Default
+      createSenderFolders: false, // Default
     );
     return await updateTransferSettings(newSettings);
   }
@@ -3343,6 +3559,43 @@ class P2PService extends ChangeNotifier {
       logInfo('Cleared transfer from UI: ${task.fileName}');
       notifyListeners();
     }
+  }
+
+  /// Clear a transfer from the list and optionally delete the downloaded file
+  Future<bool> clearTransferWithFile(String taskId, bool deleteFile) async {
+    final task = _activeTransfers.remove(taskId);
+    if (task == null) {
+      logWarning('Task $taskId not found for clear operation');
+      return false;
+    }
+
+    bool fileDeleted = false;
+    String? errorMessage;
+
+    if (deleteFile && !task.isOutgoing && task.savePath != null) {
+      try {
+        final file = File(task.savePath!);
+        if (await file.exists()) {
+          await file.delete();
+          fileDeleted = true;
+          logInfo('Successfully deleted file: ${task.savePath}');
+        } else {
+          logWarning('File not found for deletion: ${task.savePath}');
+          errorMessage = 'File not found at ${task.savePath}';
+        }
+      } catch (e) {
+        logError('Failed to delete file ${task.savePath}: $e');
+        errorMessage = 'Failed to delete file: $e';
+      }
+    }
+
+    logInfo(
+        'Cleared transfer from UI: ${task.fileName}${deleteFile ? (fileDeleted ? ' (file deleted)' : ' (file deletion failed)') : ''}');
+    notifyListeners();
+
+    // Return true if task was cleared successfully, regardless of file deletion result
+    // Error message will be handled by the caller if needed
+    return errorMessage == null || !deleteFile;
   }
 
   /// Send multiple files to user with approval request

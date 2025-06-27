@@ -321,7 +321,7 @@ class P2PFileStorageSettingsAdapter
 class P2PDataTransferSettingsAdapter
     extends TypeAdapter<P2PDataTransferSettings> {
   @override
-  final int typeId = 58;
+  final int typeId = 56;
 
   @override
   P2PDataTransferSettings read(BinaryReader reader) {
@@ -333,31 +333,43 @@ class P2PDataTransferSettingsAdapter
       downloadPath: fields[0] as String,
       createDateFolders: fields[1] as bool,
       maxReceiveFileSize: fields[2] as int,
-      maxTotalReceiveSize: fields[3] as int,
-      maxConcurrentTasks: fields[4] as int,
-      sendProtocol: fields[5] as String,
+      maxTotalReceiveSize: fields[5] as int,
+      maxConcurrentTasks: fields[3] as int,
+      sendProtocol: fields[4] as String,
       maxChunkSize: fields[6] as int,
+      customDisplayName: fields[7] as String?,
+      uiRefreshRateSeconds: fields[8] as int,
+      enableNotifications: fields[9] as bool,
+      createSenderFolders: fields[10] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, P2PDataTransferSettings obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.downloadPath)
       ..writeByte(1)
       ..write(obj.createDateFolders)
+      ..writeByte(10)
+      ..write(obj.createSenderFolders)
       ..writeByte(2)
       ..write(obj.maxReceiveFileSize)
       ..writeByte(3)
-      ..write(obj.maxTotalReceiveSize)
-      ..writeByte(4)
       ..write(obj.maxConcurrentTasks)
-      ..writeByte(5)
+      ..writeByte(4)
       ..write(obj.sendProtocol)
+      ..writeByte(5)
+      ..write(obj.maxTotalReceiveSize)
       ..writeByte(6)
-      ..write(obj.maxChunkSize);
+      ..write(obj.maxChunkSize)
+      ..writeByte(7)
+      ..write(obj.customDisplayName)
+      ..writeByte(8)
+      ..write(obj.uiRefreshRateSeconds)
+      ..writeByte(9)
+      ..write(obj.enableNotifications);
   }
 
   @override

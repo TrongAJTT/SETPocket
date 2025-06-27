@@ -17,17 +17,16 @@ class OptionSlider<T> extends StatelessWidget {
   final T currentValue;
   final List<SliderOption<T>> options;
   final ValueChanged<T> onChanged;
-  final SliderAlignment mobileValueDisplayAlignment;
-  const OptionSlider({
-    super.key,
-    required this.label,
-    this.subtitle,
-    required this.icon,
-    required this.currentValue,
-    required this.options,
-    required this.onChanged,
-    this.mobileValueDisplayAlignment = SliderAlignment.center,
-  });
+  final double fixedWidth;
+  const OptionSlider(
+      {super.key,
+      required this.label,
+      this.subtitle,
+      required this.icon,
+      required this.currentValue,
+      required this.options,
+      required this.onChanged,
+      this.fixedWidth = 100});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +40,23 @@ class OptionSlider<T> extends StatelessWidget {
     final int displayIndex = selectedIndex != -1 ? selectedIndex : 0;
     final SliderOption<T> selectedOption = options[displayIndex];
 
+    final valueSlider = Slider(
+      value: displayIndex.toDouble(),
+      min: 0,
+      max: (options.length - 1).toDouble(),
+      divisions: options.length > 1 ? options.length - 1 : 1,
+      label: selectedOption.label,
+      onChanged: (double value) {
+        final newIndex = value.round();
+        if (newIndex >= 0 && newIndex < options.length) {
+          final newValue = options[newIndex].value;
+          onChanged(newValue);
+        }
+      },
+    );
+
     final displayValueWidget = Container(
+      width: fixedWidth > 0 ? fixedWidth : null,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer,
@@ -93,33 +108,16 @@ class OptionSlider<T> extends StatelessWidget {
                 ],
               ],
             ),
-            const SizedBox(height: 8),
-            Slider(
-              value: displayIndex.toDouble(),
-              min: 0,
-              max: (options.length - 1).toDouble(),
-              divisions: options.length > 1 ? options.length - 1 : 1,
-              label: selectedOption.label,
-              onChanged: (double value) {
-                final newIndex = value.round();
-                if (newIndex >= 0 && newIndex < options.length) {
-                  final newValue = options[newIndex].value;
-                  onChanged(newValue);
-                }
-              },
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Expanded(child: valueSlider),
+                if (!isLargeScreen) ...[
+                  const SizedBox(width: 4),
+                  displayValueWidget
+                ],
+              ],
             ),
-            // Mobile value display
-            if (!isLargeScreen) ...[
-              const SizedBox(height: 8),
-              Align(
-                alignment: mobileValueDisplayAlignment == SliderAlignment.start
-                    ? Alignment.centerLeft
-                    : mobileValueDisplayAlignment == SliderAlignment.center
-                        ? Alignment.center
-                        : Alignment.centerRight,
-                child: displayValueWidget,
-              )
-            ],
           ],
         ),
       ),
@@ -127,8 +125,8 @@ class OptionSlider<T> extends StatelessWidget {
   }
 }
 
-enum SliderAlignment {
-  start,
-  center,
-  end,
+class MobileRatio {
+  int sliderWidth;
+  int valueWidth;
+  MobileRatio({required this.sliderWidth, required this.valueWidth});
 }

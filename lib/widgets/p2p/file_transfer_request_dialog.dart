@@ -127,8 +127,9 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
   String _formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024)
+    if (bytes < 1024 * 1024 * 1024) {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
@@ -159,7 +160,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -204,7 +205,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                     CircleAvatar(
                       backgroundColor: theme.brightness == Brightness.dark
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.primary.withOpacity(0.8),
+                          : theme.colorScheme.primary.withValues(alpha: 0.8),
                       child: Text(
                         deviceName.isNotEmpty
                             ? deviceName[0].toUpperCase()
@@ -274,7 +275,8 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -304,11 +306,12 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: theme.brightness == Brightness.dark
                               ? theme.colorScheme.error
-                              : theme.colorScheme.error.withOpacity(0.8),
+                              : theme.colorScheme.error.withValues(alpha: 0.8),
                           side: BorderSide(
                               color: theme.brightness == Brightness.dark
                                   ? theme.colorScheme.error
-                                  : theme.colorScheme.error.withOpacity(0.8)),
+                                  : theme.colorScheme.error
+                                      .withValues(alpha: 0.8)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         child: const Text('Reject',
@@ -322,7 +325,8 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.brightness == Brightness.dark
                               ? theme.colorScheme.primary
-                              : theme.colorScheme.primary.withOpacity(0.9),
+                              : theme.colorScheme.primary
+                                  .withValues(alpha: 0.9),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           elevation:

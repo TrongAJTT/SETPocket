@@ -37,11 +37,12 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.send),
-          SizedBox(width: 8),
-          Expanded(child: Text('Send Files')),
+          const Icon(Icons.send),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text('Send Files to ${widget.targetUser.displayName}')),
         ],
       ),
       content: SizedBox(
@@ -71,8 +72,6 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
                   ? _buildEmptyState()
                   : _buildFilesList(),
             ),
-            const SizedBox(height: 16),
-            if (_selectedFiles.isNotEmpty) _buildSummarySection(),
           ],
         ),
       ),
@@ -456,131 +455,128 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
   }
 
   Widget _buildFilesList() {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with total size
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
               'Selected Files (${_selectedFiles.length})',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _selectedFiles.length,
-              itemBuilder: (context, index) {
-                final fileInfo = _selectedFiles[index];
-                return ListTile(
-                  leading: Icon(
-                    _getFileIcon(fileInfo.extension),
+            Text(
+              _formatTotalSize(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
                   ),
-                  title: Text(
-                    fileInfo.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    '${_formatFileSize(fileInfo.size)} • ${fileInfo.extension.toUpperCase()}',
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle_outline),
-                    onPressed: () => _removeFile(index),
-                    color: Colors.red,
-                  ),
-                  dense: true,
-                );
-              },
             ),
+          ],
+        ),
+        const Divider(height: 24),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _selectedFiles.length,
+            itemBuilder: (context, index) {
+              final fileInfo = _selectedFiles[index];
+              return ListTile(
+                leading: Icon(
+                  _getFileIcon(fileInfo.extension),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(
+                  fileInfo.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  '${_formatFileSize(fileInfo.size)} • ${fileInfo.extension.toUpperCase()}',
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: () => _removeFile(index),
+                  color: Colors.red,
+                ),
+                dense: true,
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildSummarySection() {
-    final totalSize = _selectedFiles.fold<int>(
-      0,
-      (sum, file) => sum + file.size,
-    );
-
     return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
+      color: Theme.of(context).colorScheme.secondaryContainer,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Transfer Summary',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Files:',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                ),
-                Text(
-                  '${_selectedFiles.length}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Size:',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                ),
-                Text(
-                  _formatFileSize(totalSize),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recipient:',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                ),
-                Text(
-                  widget.targetUser.displayName,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
+            const SizedBox(height: 12),
+            _buildSummaryRow('Files:', '${_selectedFiles.length}',
+                context: context),
+            _buildSummaryRow('Total Size:', _formatTotalSize(),
+                context: context),
+            _buildSummaryRow('Recipient:', widget.targetUser.displayName,
+                context: context),
           ],
         ),
       ),
     );
+  }
+
+  String _formatTotalSize() {
+    if (_selectedFiles.isEmpty) return '0 B';
+    final totalSize =
+        _selectedFiles.fold<int>(0, (sum, file) => sum + file.size);
+    return _formatBytes(totalSize);
+  }
+
+  Widget _buildSummaryRow(String label, String value,
+      {required BuildContext context}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } else {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+    }
   }
 }
 

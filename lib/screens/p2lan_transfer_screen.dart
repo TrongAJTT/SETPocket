@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:setpocket/controllers/p2p_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
@@ -9,27 +9,31 @@ import 'package:setpocket/widgets/p2p/network_security_warning_dialog.dart';
 import 'package:setpocket/widgets/p2p/pairing_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/file_transfer_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/user_pairing_dialog.dart';
-import 'package:setpocket/widgets/p2p/data_transfer_progress_widget.dart';
+
 import 'package:setpocket/widgets/p2p/permission_request_dialog.dart';
 import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:setpocket/widgets/p2p/p2p_data_transfer_settings_dialog.dart';
+import 'package:setpocket/widgets/p2p/p2lan_transfer_settings_helper.dart';
 import 'package:setpocket/widgets/p2p/user_info_dialog.dart';
 import 'package:setpocket/widgets/p2p/multi_file_sender_dialog.dart';
 import 'package:setpocket/widgets/p2p/device_info_card.dart';
+import 'package:setpocket/widgets/p2p/transfer_batch_widget.dart';
+import 'package:setpocket/screens/p2lan_local_files_screen.dart';
 import 'package:setpocket/services/network_security_service.dart';
+import 'package:setpocket/services/p2p_navigation_service.dart';
+import 'package:setpocket/services/p2p_notification_service.dart';
 
-class P2PDataTransferScreen extends StatefulWidget {
+class P2LanTransferScreen extends StatefulWidget {
   final bool isEmbedded;
 
-  const P2PDataTransferScreen({super.key, this.isEmbedded = false});
+  const P2LanTransferScreen({super.key, this.isEmbedded = false});
 
   @override
-  State<P2PDataTransferScreen> createState() => _P2PDataTransferScreenState();
+  State<P2LanTransferScreen> createState() => _P2LanTransferScreenState();
 }
 
-class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
+class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   late P2PController _controller;
   int _currentTabIndex = 0;
   bool _isControllerInitialized = false;
@@ -46,6 +50,19 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
 
     // Set up callback for auto-showing file transfer request dialogs
     _controller.setNewFileTransferRequestCallback(_onNewFileTransferRequest);
+
+    // Set up navigation callbacks for P2P
+    P2PNavigationService.instance.setP2LanCallbacks(
+      switchTabCallback: _switchToTab,
+      showDialogCallback: _showDialogFromNotification,
+      getCurrentTabCallback: () => _currentTabIndex,
+    );
+
+    // Set up notification callbacks
+    P2PNotificationService.instance.setCallbacks(
+      onNotificationTapped: _handleNotificationTapped,
+      onActionPressed: _handleNotificationAction,
+    );
   }
 
   @override
@@ -58,7 +75,7 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
   }
 
   @override
-  void didUpdateWidget(P2PDataTransferScreen oldWidget) {
+  void didUpdateWidget(P2LanTransferScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Process pending file transfer requests when user returns to this screen
     if (_isControllerInitialized) {
@@ -74,6 +91,10 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     _controller.clearNewPairingRequestCallback(); // Clear callback
     _controller
         .clearNewFileTransferRequestCallback(); // Clear file transfer callback
+
+    // Clear navigation callbacks
+    P2PNavigationService.instance.clearP2LanCallbacks();
+
     _controller.dispose();
     _transfersScrollController.dispose();
     super.dispose();
@@ -130,15 +151,15 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
 
     if (!_controller.isInitialized) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.p2pDataTransfer)),
+        appBar: AppBar(title: Text(l10n.p2lanTransfer)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return TwoPanelsMainMultiTabLayout(
       isEmbedded: widget.isEmbedded,
-      title: l10n.p2pDataTransfer,
-      mainPanelTitle: l10n.p2pDataTransfer,
+      title: l10n.p2lanTransfer,
+      mainPanelTitle: l10n.p2lanTransfer,
       mainTabIndex: _currentTabIndex,
       onMainTabChanged: (index) {
         setState(() {
@@ -146,6 +167,13 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
         });
       },
       mainPanelActions: [
+        // Local files folder button
+        if (Platform.isAndroid)
+          IconButton(
+            icon: const Icon(Icons.folder),
+            onPressed: _openLocalFiles,
+            tooltip: 'Local Files',
+          ),
         // Manual discovery button - show only when networking is enabled and not currently refreshing
         if (_controller.isEnabled && !_controller.isRefreshing)
           IconButton(
@@ -299,16 +327,16 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     Color? cardColor;
     if (isOnline) {
       cardColor = brightness == Brightness.dark
-          ? Colors.green.withOpacity(0.1)
-          : Colors.green.withOpacity(0.05);
+          ? Colors.green.withValues(alpha: 0.1)
+          : Colors.green.withValues(alpha: 0.05);
     } else if (isNew) {
       cardColor = brightness == Brightness.dark
-          ? Colors.blue.withOpacity(0.1)
-          : Colors.blue.withOpacity(0.05);
+          ? Colors.blue.withValues(alpha: 0.1)
+          : Colors.blue.withValues(alpha: 0.05);
     } else if (isSaved) {
       cardColor = brightness == Brightness.dark
-          ? Colors.grey.withOpacity(0.1)
-          : Colors.grey.withOpacity(0.03);
+          ? Colors.grey.withValues(alpha: 0.1)
+          : Colors.grey.withValues(alpha: 0.03);
     }
 
     return Card(
@@ -426,18 +454,32 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
       return _buildEmptyTransfersState();
     }
 
-    return ListView.builder(
+    // Group transfers by batch ID
+    final groupedTransfers = <String?, List<DataTransferTask>>{};
+    for (final transfer in _controller.activeTransfers) {
+      final batchId = transfer.batchId;
+      groupedTransfers.putIfAbsent(batchId, () => []);
+      groupedTransfers[batchId]!.add(transfer);
+    }
+
+    // Convert to list of batch widgets
+    final batchWidgets = <Widget>[];
+    for (final entry in groupedTransfers.entries) {
+      batchWidgets.add(
+        TransferBatchWidget(
+          batchId: entry.key,
+          tasks: entry.value,
+          onCancel: _cancelTransfer,
+          onClear: _clearTransfer,
+          onClearWithFile: _clearTransferWithFile,
+        ),
+      );
+    }
+
+    return ListView(
       controller: _transfersScrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: _controller.activeTransfers.length,
-      itemBuilder: (context, index) {
-        final transfer = _controller.activeTransfers[index];
-        return DataTransferProgressWidget(
-          task: transfer,
-          onCancel: () => _cancelTransfer(transfer.id),
-          onClear: () => _clearTransfer(transfer.id),
-        );
-      },
+      children: batchWidgets,
     );
   }
 
@@ -582,30 +624,26 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
 
   Widget _buildNetworkStatusCard() {
     final l10n = AppLocalizations.of(context)!;
-    final isDesktop = MediaQuery.of(context).size.width > 1200;
+    final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final toggleNetworkBtn = ElevatedButton.icon(
-      onPressed: _toggleNetworking,
-      icon: Icon(_controller.isEnabled ? Icons.wifi_off : Icons.wifi),
-      label: Text(_controller.isEnabled
-          ? (l10n.stopNetworking)
-          : (l10n.startNetworking)),
+      onPressed: _controller.isTemporarilyDisabled ? null : _toggleNetworking,
+      icon: Icon(_controller.isTemporarilyDisabled
+          ? Icons.pause_circle_outline
+          : (_controller.isEnabled ? Icons.wifi_off : Icons.wifi)),
+      label: Text(_controller.isTemporarilyDisabled
+          ? 'Paused (No Internet)'
+          : (_controller.isEnabled
+              ? (l10n.stopNetworking)
+              : (l10n.startNetworking))),
       style: ElevatedButton.styleFrom(
-        backgroundColor: _controller.isEnabled ? Colors.red[700] : null,
-        foregroundColor: _controller.isEnabled ? Colors.white : null,
-      ),
-    );
-
-    final toggleBroadcastBtn = ElevatedButton.icon(
-      onPressed: _controller.isEnabled ? _toggleBroadcast : null,
-      icon: Icon(_controller.isBroadcasting
-          ? Icons.wifi_tethering_off
-          : Icons.wifi_tethering),
-      label: Text(
-          _controller.isBroadcasting ? 'Stop Broadcast' : 'Start Broadcast'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: _controller.isBroadcasting ? Colors.orange[700] : null,
-        foregroundColor: _controller.isBroadcasting ? Colors.white : null,
+        backgroundColor: _controller.isTemporarilyDisabled
+            ? Colors.orange[700]
+            : (_controller.isEnabled ? Colors.red[700] : null),
+        foregroundColor:
+            (_controller.isTemporarilyDisabled || _controller.isEnabled)
+                ? Colors.white
+                : null,
       ),
     );
 
@@ -640,7 +678,6 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
                   ),
                 ),
                 if (isDesktop) ...[
-                  toggleBroadcastBtn,
                   const SizedBox(width: 8),
                   toggleNetworkBtn,
                 ]
@@ -651,8 +688,6 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  toggleBroadcastBtn,
-                  const SizedBox(width: 8),
                   toggleNetworkBtn,
                 ],
               )
@@ -682,20 +717,23 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _controller.isRefreshing
-                ? 'Searching for devices...'
-                : (_controller.isEnabled
-                    ? (_controller.hasPerformedInitialDiscovery
-                        ? 'No devices in range. Try refreshing.'
-                        : 'Initial discovery in progress...')
-                    : l10n.startNetworkingToDiscover),
+            _controller.isTemporarilyDisabled
+                ? 'P2P networking is paused due to internet connection loss. It will automatically resume when connection is restored.'
+                : (_controller.isRefreshing
+                    ? 'Searching for devices...'
+                    : (_controller.isEnabled
+                        ? (_controller.hasPerformedInitialDiscovery
+                            ? 'No devices in range. Try refreshing.'
+                            : 'Initial discovery in progress...')
+                        : l10n.startNetworkingToDiscover)),
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           // Show last discovery time and refresh button when appropriate
           if (_controller.isEnabled &&
-              _controller.hasPerformedInitialDiscovery) ...[
+              _controller.hasPerformedInitialDiscovery &&
+              !_controller.isTemporarilyDisabled) ...[
             if (_controller.lastDiscoveryTime != null)
               Text(
                 'Last refresh: ${_formatDiscoveryTime(_controller.lastDiscoveryTime!)}',
@@ -982,6 +1020,10 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
   }
 
   IconData _getNetworkStatusIcon() {
+    if (_controller.isTemporarilyDisabled) {
+      return Icons.pause_circle_outline;
+    }
+
     final networkInfo = _controller.networkInfo;
     if (networkInfo == null) return Icons.help_outline;
 
@@ -997,6 +1039,10 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
   }
 
   Color _getNetworkStatusColor() {
+    if (_controller.isTemporarilyDisabled) {
+      return Colors.orange;
+    }
+
     final networkInfo = _controller.networkInfo;
     if (networkInfo == null) return Colors.grey;
 
@@ -1022,13 +1068,6 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     }
   }
 
-  void _toggleBroadcast() async {
-    await _controller.toggleBroadcast();
-    if (mounted && _controller.errorMessage != null) {
-      _showErrorSnackBar(_controller.errorMessage!);
-    }
-  }
-
   String _formatDiscoveryTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
@@ -1044,62 +1083,42 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     }
   }
 
-  void _showTransferSettings() {
-    // Use a FutureBuilder to wait for initialization before showing the dialog
-    showDialog(
-      context: context,
-      builder: (context) {
-        return FutureBuilder<void>(
-          future: _controller.initializationComplete,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const AlertDialog(
-                content: Row(
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(width: 16),
-                    Text('Loading settings...'),
-                  ],
+  void _showTransferSettings() async {
+    // Wait for initialization to complete
+    try {
+      await _controller.initializationComplete;
+
+      if (mounted) {
+        P2LanTransferSettingsHelper.showSettings(
+          context,
+          currentSettings: _controller.transferSettings,
+          onSettingsChanged: (settings) async {
+            final success = await _controller.updateTransferSettings(settings);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(success
+                      ? 'Transfer settings updated successfully'
+                      : _controller.errorMessage ??
+                          'Failed to update settings'),
+                  backgroundColor: success ? Colors.green : Colors.red,
+                  duration: const Duration(seconds: 2),
                 ),
               );
             }
-
-            if (snapshot.hasError) {
-              return AlertDialog(
-                title: const Text('Error'),
-                content: Text('Failed to load settings: ${snapshot.error}'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            }
-
-            // Once initialization is complete, settings are guaranteed to be non-null.
-            return P2PDataTransferSettingsDialog(
-              currentSettings: _controller.transferSettings,
-              onSettingsChanged: (settings) async {
-                final success =
-                    await _controller.updateTransferSettings(settings);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(success
-                          ? 'Transfer settings updated'
-                          : _controller.errorMessage ??
-                              'Failed to update settings'),
-                      backgroundColor: success ? Colors.green : Colors.red,
-                    ),
-                  );
-                }
-              },
-            );
           },
         );
-      },
-    );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load settings: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _addTrust(P2PUser user) async {
@@ -1171,6 +1190,17 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
 
   void _clearTransfer(String taskId) {
     _controller.clearTransfer(taskId);
+  }
+
+  void _clearTransferWithFile(String taskId, bool deleteFile) async {
+    final success = await _controller.clearTransferWithFile(taskId, deleteFile);
+    if (!success && _controller.errorMessage != null) {
+      _showErrorSnackBar(_controller.errorMessage!);
+    } else if (success && deleteFile) {
+      _showErrorSnackBar('Task và file đã được xóa thành công');
+    } else if (success) {
+      _showErrorSnackBar('Task đã được xóa');
+    }
   }
 
   Future<Widget> _buildThisDeviceCard() async {
@@ -1254,6 +1284,15 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
     );
   }
 
+  void _openLocalFiles() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const P2LanLocalFilesScreen(),
+      ),
+    );
+  }
+
   /// Switch to Transfers tab and scroll to bottom to show new transfers
   void _switchToTransfersAndScroll() {
     // Switch to Transfers tab (index 1)
@@ -1271,6 +1310,137 @@ class _P2PDataTransferScreenState extends State<P2PDataTransferScreen> {
         );
       }
     });
+  }
+
+  // Navigation and notification handler methods
+
+  /// Switch to specific tab (called from navigation service)
+  void _switchToTab(int tabIndex) {
+    if (mounted && tabIndex >= 0 && tabIndex < 2) {
+      setState(() {
+        _currentTabIndex = tabIndex;
+      });
+    }
+  }
+
+  /// Show dialog from notification (called from navigation service)
+  void _showDialogFromNotification(
+      String dialogType, Map<String, dynamic> dialogData) {
+    if (!mounted) return;
+
+    switch (dialogType) {
+      case 'pairing_request':
+        final requestId = dialogData['requestId'] as String?;
+        if (requestId != null) {
+          final request = _controller.pendingRequests.firstWhere(
+            (r) => r.id == requestId,
+            orElse: () => throw StateError('Request not found'),
+          );
+          _showSinglePairingRequestDialog(request);
+        }
+        break;
+      case 'file_transfer_request':
+        final requestId = dialogData['requestId'] as String?;
+        if (requestId != null) {
+          final request = _controller.pendingFileTransferRequests.firstWhere(
+            (r) => r.requestId == requestId,
+            orElse: () => throw StateError('Request not found'),
+          );
+          _showFileTransferRequestDialog(request);
+        }
+        break;
+    }
+  }
+
+  /// Handle notification tap
+  void _handleNotificationTapped(P2PNotificationPayload payload) {
+    if (!mounted) return;
+
+    switch (payload.type) {
+      case P2PNotificationType.fileTransferRequest:
+        // Navigate to main tab and show dialog
+        setState(() {
+          _currentTabIndex = 0; // Devices tab
+        });
+        if (payload.requestId != null) {
+          _showDialogFromNotification('file_transfer_request', {
+            'requestId': payload.requestId,
+          });
+        }
+        break;
+      case P2PNotificationType.fileTransferProgress:
+      case P2PNotificationType.fileTransferCompleted:
+        // Navigate to transfers tab
+        setState(() {
+          _currentTabIndex = 1; // Transfers tab
+        });
+        break;
+      case P2PNotificationType.pairingRequest:
+        // Navigate to main tab and show dialog
+        setState(() {
+          _currentTabIndex = 0; // Devices tab
+        });
+        if (payload.requestId != null) {
+          _showDialogFromNotification('pairing_request', {
+            'requestId': payload.requestId,
+          });
+        }
+        break;
+      default:
+        // Navigate to main tab for other notifications
+        setState(() {
+          _currentTabIndex = 0; // Devices tab
+        });
+        break;
+    }
+  }
+
+  /// Handle notification action button press
+  void _handleNotificationAction(
+      P2PNotificationAction action, P2PNotificationPayload payload) {
+    if (!mounted) return;
+
+    switch (action) {
+      case P2PNotificationAction.approveTransfer:
+        if (payload.requestId != null) {
+          _controller.respondToFileTransferRequest(
+              payload.requestId!, true, null);
+        }
+        break;
+      case P2PNotificationAction.rejectTransfer:
+        if (payload.requestId != null) {
+          _controller.respondToFileTransferRequest(
+              payload.requestId!, false, 'Rejected from notification');
+        }
+        break;
+      case P2PNotificationAction.acceptPairing:
+        if (payload.requestId != null) {
+          _controller.respondToPairingRequest(
+              payload.requestId!, true, false, true);
+        }
+        break;
+      case P2PNotificationAction.rejectPairing:
+        if (payload.requestId != null) {
+          _controller.respondToPairingRequest(
+              payload.requestId!, false, false, false);
+        }
+        break;
+      case P2PNotificationAction.openP2Lan:
+        // Already on P2LAN screen, just switch to appropriate tab
+        _handleNotificationTapped(payload);
+        break;
+      case P2PNotificationAction.openTransfers:
+        setState(() {
+          _currentTabIndex = 1; // Transfers tab
+        });
+        break;
+      case P2PNotificationAction.cancelTransfer:
+        if (payload.taskId != null) {
+          _controller.cancelDataTransfer(payload.taskId!);
+          _showErrorSnackBar('Transfer cancelled');
+        }
+        break;
+    }
   }
 
   // Debug methods removed - using simple native device ID now

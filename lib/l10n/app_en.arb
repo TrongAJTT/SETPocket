@@ -2398,7 +2398,11 @@
     },
       "dataTransferRequest": "Data Transfer Request",
   "dataTransferResponse": "Data Transfer Response",
-  "sendData": "Send Data",
-  "savedDevices": "Saved Devices",
-  "availableDevices": "Available Devices"
-}
+      "sendData": "Send Data",
+    "savedDevices": "Saved Devices",
+    "availableDevices": "Available Devices",
+    "p2lanTransfer": "P2Lan Transfer",
+    "@p2lanTransfer": {
+        "description": "Title for the P2Lan Transfer screen"
+    }
+  }

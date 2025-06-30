@@ -246,7 +246,7 @@ class _DateCalculatorScreenState extends State<DateCalculatorScreen> {
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .primary
-                                    .withOpacity(0.12),
+                                    .withValues(alpha: 0.12),
                               )
                             : null,
                         color: _controller.isDataConstraintEnabled

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 class FileTransferRequestDialog extends StatefulWidget {
   final FileTransferRequest request;
@@ -38,7 +39,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
   /// Calculate remaining time using receivedTime (local time) for accuracy
   int _calculateRemainingTime() {
     if (widget.initialCountdown != null) {
-      print(
+      logInfo(
           'FileTransferDialog: Using provided countdown: ${widget.initialCountdown}s');
       return widget.initialCountdown!;
     }
@@ -50,28 +51,29 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
       final receivedTime = widget.request.receivedTime!;
       final elapsedSinceReceived = now.difference(receivedTime);
 
-      print('FileTransferDialog: Request received time (local): $receivedTime');
-      print('FileTransferDialog: Current time: $now');
-      print(
+      logInfo(
+          'FileTransferDialog: Request received time (local): $receivedTime');
+      logInfo('FileTransferDialog: Current time: $now');
+      logInfo(
           'FileTransferDialog: Elapsed since received: ${elapsedSinceReceived.inSeconds}s');
 
       final remainingSeconds = 60 - elapsedSinceReceived.inSeconds;
 
       if (remainingSeconds <= 0) {
-        print('FileTransferDialog: Request expired, using minimum 5s');
+        logInfo('FileTransferDialog: Request expired, using minimum 5s');
         return 5;
       }
 
-      print(
+      logInfo(
           'FileTransferDialog: Using received time - remaining: ${remainingSeconds}s');
       return remainingSeconds.clamp(1, 60);
     } else {
       // Fallback: use dialog open time if receivedTime is not available
-      print(
+      logInfo(
           'FileTransferDialog: No receivedTime available, using dialog open time');
       final elapsedSinceDialog = now.difference(_dialogOpenTime);
       final remainingFromDialog = 60 - elapsedSinceDialog.inSeconds;
-      print(
+      logInfo(
           'FileTransferDialog: Elapsed since dialog: ${elapsedSinceDialog.inSeconds}s, remaining: ${remainingFromDialog}s');
 
       return remainingFromDialog.clamp(1, 60);
@@ -317,7 +319,8 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         child: Text(l10n.reject,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -335,7 +338,8 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                               theme.brightness == Brightness.dark ? 2 : 3,
                         ),
                         child: Text(l10n.accept,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],

@@ -88,7 +88,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Row(
+          title: const Row(
             children: [
               Icon(Icons.warning, color: Colors.orange),
               SizedBox(width: 8),
@@ -100,7 +100,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
           actions: [
             FilledButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -363,7 +363,7 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                     if (cacheType == 'p2lan_transfer')
                       IconButton(
                         onPressed: () => _debugP2PCache(),
-                        icon: Icon(Icons.bug_report, size: 16),
+                        icon: const Icon(Icons.bug_report, size: 16),
                         tooltip: 'Debug P2P Cache',
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.orange.shade600,

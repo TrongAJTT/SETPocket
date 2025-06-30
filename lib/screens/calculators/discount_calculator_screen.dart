@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/utils/percentage_input_utils.dart';
 import 'package:setpocket/controllers/discount_calculator_controller.dart';
@@ -250,10 +251,18 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
 
   void _clearAllFormData() {
     // Clear all form controllers
-    _discountControllers.values.forEach((controller) => controller.clear());
-    _tipControllers.values.forEach((controller) => controller.clear());
-    _taxControllers.values.forEach((controller) => controller.clear());
-    _markupControllers.values.forEach((controller) => controller.clear());
+    for (var controller in _discountControllers.values) {
+      controller.clear();
+    }
+    for (var controller in _tipControllers.values) {
+      controller.clear();
+    }
+    for (var controller in _taxControllers.values) {
+      controller.clear();
+    }
+    for (var controller in _markupControllers.values) {
+      controller.clear();
+    }
 
     // Reset tip and people defaults
     _tipControllers['tipPercent']?.text = '15';
@@ -522,7 +531,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
       keyboardType: keyboardType,
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-        if (isPercentage) PercentageInputFormatter(),
+        if (isPercentage) const PercentageInputFormatter(),
       ],
       decoration: InputDecoration(
         labelText: label,
@@ -873,11 +882,9 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             ),
             onTap: () {
               _loadFromHistory(item);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Đã tải dữ liệu từ lịch sử'),
-                  duration: const Duration(seconds: 2),
-                ),
+              SnackbarUtils.showCustom(
+                context,
+                'Đã tải dữ liệu từ lịch sử',
               );
             },
             trailing: PopupMenuButton<String>(
@@ -885,29 +892,28 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
                 if (value == 'delete') {
                   await _controller.removeFromHistory(item.id);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.historyItemDeleted)),
+                    SnackbarUtils.showCustom(
+                      context,
+                      l10n.historyItemDeleted,
                     );
                   }
                 } else if (value == 'load') {
                   _loadFromHistory(item);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã tải dữ liệu từ lịch sử'),
-                        duration: const Duration(seconds: 2),
-                      ),
+                    SnackbarUtils.showCustom(
+                      context,
+                      'Đã tải dữ liệu từ lịch sử',
                     );
                   }
                 }
               },
               itemBuilder: (context) => [
-                PopupMenuItem(
+                const PopupMenuItem(
                   value: 'load',
                   child: Row(
                     children: [
-                      const Icon(Icons.restore),
-                      const SizedBox(width: 8),
+                      Icon(Icons.restore),
+                      SizedBox(width: 8),
                       Text('Tải từ lịch sử'),
                     ],
                   ),

@@ -13,7 +13,6 @@ class P2LanTransferSettingsHelper {
   }) {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = screenSize.width > 800;
-    final isMobile = screenSize.width < 600;
 
     if (isDesktop) {
       // Desktop: Use dialog

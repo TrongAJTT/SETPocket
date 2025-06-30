@@ -135,10 +135,6 @@ class DateCalculatorService {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  String _formatDateTime(DateTime dateTime) {
-    return '${_formatDate(dateTime)} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-  }
-
   Future<void> _cleanupHistory() async {
     try {
       final history = await getHistory();

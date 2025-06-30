@@ -467,7 +467,7 @@ class P2PNotificationService {
       request.requestId.hashCode,
       'File Transfer Request',
       '${request.fromUserName} wants to send you $filesText',
-      NotificationDetails(
+      const NotificationDetails(
         android: AndroidNotificationDetails(
           _fileTransferChannelId,
           'File Transfers',
@@ -476,11 +476,11 @@ class P2PNotificationService {
           priority: Priority.high,
           category: AndroidNotificationCategory.message,
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
           categoryIdentifier: 'file_transfer_request',
         ),
-        linux: const LinuxNotificationDetails(),
-        macOS: const DarwinNotificationDetails(),
+        linux: LinuxNotificationDetails(),
+        macOS: DarwinNotificationDetails(),
       ),
       payload: _encodePayload(payload),
     );
@@ -650,7 +650,7 @@ class P2PNotificationService {
       title,
       body,
       NotificationDetails(
-        android: AndroidNotificationDetails(
+        android: const AndroidNotificationDetails(
           _fileTransferChannelId,
           'File Transfers',
           channelDescription: 'File transfer completion status',
@@ -691,7 +691,7 @@ class P2PNotificationService {
       request.id.hashCode,
       'Pairing Request',
       '${request.fromUserName} wants to pair with your device',
-      NotificationDetails(
+      const NotificationDetails(
         android: AndroidNotificationDetails(
           _pairingChannelId,
           'Device Pairing',
@@ -700,11 +700,11 @@ class P2PNotificationService {
           priority: Priority.high,
           category: AndroidNotificationCategory.social,
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
           categoryIdentifier: 'pairing_request',
         ),
-        linux: const LinuxNotificationDetails(),
-        macOS: const DarwinNotificationDetails(),
+        linux: LinuxNotificationDetails(),
+        macOS: DarwinNotificationDetails(),
       ),
       payload: _encodePayload(payload),
     );
@@ -728,7 +728,7 @@ class P2PNotificationService {
       '${user.id}_online'.hashCode,
       'Device Online',
       '${user.displayName} is now available',
-      NotificationDetails(
+      const NotificationDetails(
         android: AndroidNotificationDetails(
           _deviceChannelId,
           'Device Status',
@@ -737,7 +737,7 @@ class P2PNotificationService {
           priority: Priority.low,
           icon: 'ic_device_online',
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
           categoryIdentifier: 'device_status',
         ),
       ),
@@ -780,7 +780,7 @@ class P2PNotificationService {
       _p2lanStatusNotificationId,
       'P2LAN Active',
       '$deviceName ($ipAddress) • $statusText',
-      NotificationDetails(
+      const NotificationDetails(
         android: AndroidNotificationDetails(
           _p2lanStatusChannelId,
           'P2LAN Status',
@@ -791,15 +791,15 @@ class P2PNotificationService {
           autoCancel: false,
           icon: 'ic_p2lan_active',
         ),
-        linux: const LinuxNotificationDetails(
+        linux: LinuxNotificationDetails(
           category: LinuxNotificationCategory.network,
           defaultActionName: 'Open P2LAN',
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
           presentAlert: false, // Don't show a banner
           categoryIdentifier: 'p2lan_status',
         ),
-        macOS: const DarwinNotificationDetails(
+        macOS: DarwinNotificationDetails(
           presentAlert: false,
           presentBadge: false,
           presentSound: false,

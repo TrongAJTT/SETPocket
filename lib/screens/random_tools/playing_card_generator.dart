@@ -5,7 +5,7 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/models/random_generator.dart';
-import 'package:setpocket/widgets/random_generator_layout.dart';
+import 'package:setpocket/layouts/random_generator_layout.dart';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;

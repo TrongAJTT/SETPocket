@@ -19,7 +19,7 @@ class NetworkSecurityWarningDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
-      icon: Icon(
+      icon: const Icon(
         Icons.warning,
         color: Colors.orange,
         size: 48,
@@ -50,16 +50,16 @@ class NetworkSecurityWarningDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
+              color: Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.info, color: Colors.orange, size: 20),
+                    const Icon(Icons.info, color: Colors.orange, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       l10n.securityRisks ?? 'Security Risks',

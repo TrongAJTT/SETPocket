@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_history_service.dart';
-import 'package:setpocket/services/graphing_calculator_service.dart';
-import 'package:setpocket/widgets/three_panel_layout.dart';
+import 'package:setpocket/layouts/three_panels_layout.dart';
 
 /// New calculator layout using ThreePanelLayout for consistency
-class NewCalculatorLayout extends StatefulWidget {
+class TwoPanelsLayout extends StatefulWidget {
   final Widget calculatorContent;
   final Widget? historyWidget;
   final bool historyEnabled;
@@ -20,7 +19,7 @@ class NewCalculatorLayout extends StatefulWidget {
       clearHistoryMessage; // Custom clear history confirmation message
   final String? historyClearedMessage; // Custom history cleared success message
 
-  const NewCalculatorLayout({
+  const TwoPanelsLayout({
     super.key,
     required this.calculatorContent,
     this.historyWidget,
@@ -37,10 +36,10 @@ class NewCalculatorLayout extends StatefulWidget {
   });
 
   @override
-  State<NewCalculatorLayout> createState() => _NewCalculatorLayoutState();
+  State<TwoPanelsLayout> createState() => _TwoPanelsLayoutState();
 }
 
-class _NewCalculatorLayoutState extends State<NewCalculatorLayout> {
+class _TwoPanelsLayoutState extends State<TwoPanelsLayout> {
   List<Widget> _buildCalculatorActions(BuildContext context) {
     final actions = <Widget>[];
 
@@ -140,69 +139,6 @@ class _NewCalculatorLayoutState extends State<NewCalculatorLayout> {
           widget.historyEnabled && widget.historyWidget != null
               ? _buildHistoryActions(context)
               : null,
-    );
-  }
-}
-
-/// Generic calculator widget base class for common functionality
-abstract class CalculatorWidget extends StatefulWidget {
-  final bool isEmbedded;
-
-  const CalculatorWidget({super.key, this.isEmbedded = false});
-
-  // Abstract methods that subclasses must implement
-  String get title;
-  IconData get icon => Icons.calculate;
-  Widget buildCalculatorContent(BuildContext context);
-  Widget? buildHistoryWidget(BuildContext context) => null;
-  VoidCallback? getInfoCallback(BuildContext context) => null;
-  bool get hasHistory => false; // Default to false, override if has history
-
-  @override
-  CalculatorWidgetState createState();
-}
-
-/// Generic state class for calculator widgets
-abstract class CalculatorWidgetState<T extends CalculatorWidget>
-    extends State<T> {
-  bool _historyEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadHistorySettings();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadHistorySettings();
-  }
-
-  Future<void> _loadHistorySettings() async {
-    final enabled = await GraphingCalculatorService.getRememberHistory();
-    if (mounted) {
-      setState(() {
-        _historyEnabled = enabled;
-      });
-    }
-  }
-
-  // Override this to provide localized title
-  String getLocalizedTitle(BuildContext context) {
-    return widget.title;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CalculatorLayout(
-      calculatorContent: widget.buildCalculatorContent(context),
-      historyWidget: widget.buildHistoryWidget(context),
-      historyEnabled: _historyEnabled,
-      hasHistory: widget.hasHistory,
-      isEmbedded: widget.isEmbedded,
-      title: getLocalizedTitle(context),
-      onShowInfo: widget.getInfoCallback(context),
     );
   }
 }
@@ -479,7 +415,7 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
               showTabBar: false,
               onSwitchToCalculator: _switchToCalculatorTab,
             )
-          : SingleCalculatorLayout(
+          : SinglePanelLayout(
               calculatorContent:
                   widget.mobileContent ?? widget.calculatorContent,
               title: widget.title,
@@ -510,7 +446,7 @@ class _CalculatorLayoutState extends State<CalculatorLayout>
                     showTabBar: false, // Hide tab bar, will be in AppBar
                     onSwitchToCalculator: _switchToCalculatorTab,
                   )
-                : SingleCalculatorLayout(
+                : SinglePanelLayout(
                     calculatorContent:
                         widget.mobileContent ?? widget.calculatorContent,
                     title: widget.title,
@@ -605,7 +541,7 @@ class TabbedCalculatorLayout extends StatelessWidget {
             controller: tabController,
             children: [
               // Calculator tab
-              SingleCalculatorLayout(
+              SinglePanelLayout(
                 calculatorContent: calculatorContent,
                 title: title,
                 onShowInfo: onShowInfo,
@@ -613,7 +549,7 @@ class TabbedCalculatorLayout extends StatelessWidget {
                     showTabBar, // Show header only if no separate tab bar
               ),
               // History tab
-              _HistoryWidgetWrapper(
+              _SubPanelWrapper(
                 onSwitchToCalculator: onSwitchToCalculator,
                 child: historyWidget,
               ),
@@ -626,13 +562,13 @@ class TabbedCalculatorLayout extends StatelessWidget {
 }
 
 /// Single calculator layout without tabs
-class SingleCalculatorLayout extends StatelessWidget {
+class SinglePanelLayout extends StatelessWidget {
   final Widget calculatorContent;
   final String title;
   final VoidCallback? onShowInfo;
   final bool showHeader;
 
-  const SingleCalculatorLayout({
+  const SinglePanelLayout({
     super.key,
     required this.calculatorContent,
     required this.title,
@@ -700,7 +636,7 @@ class SingleCalculatorLayout extends StatelessWidget {
 }
 
 /// Generic calculator history widget builder for consistency
-class CalculatorHistoryWidget extends StatefulWidget {
+class SubPanelWidget extends StatefulWidget {
   final String historyType;
   final List<CalculatorHistoryItem> history;
   final String title;
@@ -709,7 +645,7 @@ class CalculatorHistoryWidget extends StatefulWidget {
   final Function(String)? onCopyResult;
   final Widget Function(CalculatorHistoryItem, BuildContext)? customItemBuilder;
 
-  const CalculatorHistoryWidget({
+  const SubPanelWidget({
     super.key,
     required this.historyType,
     required this.history,
@@ -721,11 +657,10 @@ class CalculatorHistoryWidget extends StatefulWidget {
   });
 
   @override
-  State<CalculatorHistoryWidget> createState() =>
-      _CalculatorHistoryWidgetState();
+  State<SubPanelWidget> createState() => _SubPanelWidgetState();
 }
 
-class _CalculatorHistoryWidgetState extends State<CalculatorHistoryWidget> {
+class _SubPanelWidgetState extends State<SubPanelWidget> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -917,11 +852,11 @@ class _CalculatorHistoryWidgetState extends State<CalculatorHistoryWidget> {
 }
 
 /// Wrapper to inject callback into history widgets
-class _HistoryWidgetWrapper extends StatelessWidget {
+class _SubPanelWrapper extends StatelessWidget {
   final Widget child;
   final VoidCallback? onSwitchToCalculator;
 
-  const _HistoryWidgetWrapper({
+  const _SubPanelWrapper({
     required this.child,
     this.onSwitchToCalculator,
   });

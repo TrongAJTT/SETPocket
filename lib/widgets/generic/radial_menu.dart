@@ -214,7 +214,7 @@ class RadialMenuState<T> extends State<RadialMenu<T>>
       onPanEnd: _handleGlobalPanEnd,
       onTapUp: _handleGlobalTapUp,
       child: Container(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         child: Stack(
           children: [
             Positioned(
@@ -292,7 +292,7 @@ class _RadialMenuPainter<T> extends CustomPainter {
     canvas.drawCircle(center, radius - 10, paint);
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 1.5;
-    paint.color = colorScheme.outline.withOpacity(0.5);
+    paint.color = colorScheme.outline.withValues(alpha: 0.5);
     canvas.drawCircle(center, radius - 10, paint);
 
     // 2. Draw sectors, highlights, and items
@@ -332,8 +332,8 @@ class _RadialMenuPainter<T> extends CustomPainter {
     // 3. Draw the central hub on top of everything
     paint.style = PaintingStyle.fill;
     paint.color = isDragging && dragFromCenter
-        ? colorScheme.primary.withOpacity(0.3)
-        : colorScheme.surfaceVariant;
+        ? colorScheme.primary.withValues(alpha: 0.3)
+        : colorScheme.surfaceContainerHighest;
     final dynamicCenterRadius =
         isDragging ? (centerRadius * pulseScale) : centerRadius;
     canvas.drawCircle(center, dynamicCenterRadius, paint);
@@ -367,7 +367,7 @@ class _RadialMenuPainter<T> extends CustomPainter {
       double sectorAngle, Color color) {
     final paint = Paint()
       ..style = PaintingStyle.fill
-      ..color = color.withOpacity(0.25);
+      ..color = color.withValues(alpha: 0.25);
     final path = Path();
     path.moveTo(center.dx, center.dy);
     path.arcTo(
@@ -447,7 +447,7 @@ class _RadialMenuPainter<T> extends CustomPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1
-      ..color = colorScheme.outline.withOpacity(0.5);
+      ..color = colorScheme.outline.withValues(alpha: 0.5);
     for (int i = 0; i < items.length; i++) {
       final angle = i * sectorAngle - math.pi / 2;
       final p1 = center + Offset.fromDirection(angle, centerRadius);

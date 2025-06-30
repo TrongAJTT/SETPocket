@@ -10925,12 +10925,6 @@ abstract class AppLocalizations {
   /// **'Enable Notifications'**
   String get enableNotifications;
 
-  /// Description for notification setting
-  ///
-  /// In en, this message translates to:
-  /// **'Get notified about transfer events'**
-  String get getNotifiedAboutTransferEvents;
-
   /// Section header for UI performance settings
   ///
   /// In en, this message translates to:

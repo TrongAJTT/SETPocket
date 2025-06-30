@@ -78,7 +78,7 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
       _tabController.addListener(() {
         setState(() {});
       });
-// Reset to first tab
+      // Reset to first tab
     }
   }
 
@@ -93,14 +93,16 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
+    final layoutContent = _buildLayoutContent(isDesktop);
+
     // Wrap with Scaffold to provide Material ancestor and handle back button
     if (widget.isEmbedded) {
       // If embedded, don't wrap with Scaffold (parent should provide it)
-      return _buildLayoutContent(isDesktop);
+      return layoutContent;
     } else {
-      // Standalone layout - wrap with Scaffold
+      // Standalone layout - wrap with Scaffold and SafeArea
       return Scaffold(
-        body: _buildLayoutContent(isDesktop),
+        body: SafeArea(child: layoutContent),
       );
     }
   }

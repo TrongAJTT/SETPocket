@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/p2p_models.dart';
-import 'package:setpocket/widgets/generic/radial_menu.dart';
 import 'package:setpocket/widgets/p2p/file_type_radial_menu.dart';
 import 'package:setpocket/services/file_directory_service.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -153,7 +152,10 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
               Icon(
                 Icons.add,
                 color: _isLoading
-                    ? Theme.of(context).colorScheme.onSurface.withOpacity(0.38)
+                    ? Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.38)
                     : Theme.of(context).colorScheme.onPrimary,
                 size: 18,
               ),
@@ -165,7 +167,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
                       ? Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.38)
+                          .withValues(alpha: 0.38)
                       : Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.w500,
                 ),
@@ -556,64 +558,11 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
     );
   }
 
-  Widget _buildSummarySection() {
-    final l10n = AppLocalizations.of(context)!;
-    return Card(
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.transferSummary,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            _buildSummaryRow('Files:', '${_selectedFiles.length}',
-                context: context),
-            _buildSummaryRow('Total Size:', _formatTotalSize(),
-                context: context),
-            _buildSummaryRow('Recipient:', widget.targetUser.displayName,
-                context: context),
-          ],
-        ),
-      ),
-    );
-  }
-
   String _formatTotalSize() {
     if (_selectedFiles.isEmpty) return '0 B';
     final totalSize =
         _selectedFiles.fold<int>(0, (sum, file) => sum + file.size);
     return _formatBytes(totalSize);
-  }
-
-  Widget _buildSummaryRow(String label, String value,
-      {required BuildContext context}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                ),
-          ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ],
-      ),
-    );
   }
 
   String _formatBytes(int bytes) {

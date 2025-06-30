@@ -106,9 +106,7 @@ class AppInstallationService {
     } catch (e) {
       logError('Failed to get app installation ID: $e');
       // Fallback: tạo installation ID tạm thời không lưu vào storage
-      if (_cachedInstallationId == null) {
-        _cachedInstallationId = _generateStableInstallationId();
-      }
+      _cachedInstallationId ??= _generateStableInstallationId();
       return _cachedInstallationId!;
     }
   }
@@ -138,9 +136,7 @@ class AppInstallationService {
     } catch (e) {
       logError('Failed to get app installation word ID: $e');
       // Fallback: tạo installation word ID tạm thời không lưu vào storage
-      if (_cachedInstallationWordId == null) {
-        _cachedInstallationWordId = _generateReadableInstallationId();
-      }
+      _cachedInstallationWordId ??= _generateReadableInstallationId();
       return _cachedInstallationWordId!;
     }
   }
@@ -176,7 +172,7 @@ class AppInstallationService {
     final hashString = digest.toString();
 
     // Tạo ID với mix của chữ hoa, chữ thường, và số
-    final characters =
+    const characters =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     String result = '';
 
@@ -192,15 +188,15 @@ class AppInstallationService {
       // Ensure we have a good mix by forcing certain positions
       if (i < 3) {
         // First 3: at least one uppercase
-        final upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         result += upperChars[seededRandom.nextInt(upperChars.length)];
       } else if (i < 6) {
         // Next 3: at least one lowercase
-        final lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+        const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
         result += lowerChars[seededRandom.nextInt(lowerChars.length)];
       } else if (i < 8) {
         // Next 2: at least one number
-        final numbers = '0123456789';
+        const numbers = '0123456789';
         result += numbers[seededRandom.nextInt(numbers.length)];
       } else {
         // Last 2: random from all characters

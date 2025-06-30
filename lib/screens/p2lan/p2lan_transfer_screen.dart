@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:setpocket/controllers/p2p_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
@@ -18,7 +19,7 @@ import 'package:setpocket/widgets/p2p/user_info_dialog.dart';
 import 'package:setpocket/widgets/p2p/multi_file_sender_dialog.dart';
 import 'package:setpocket/widgets/p2p/device_info_card.dart';
 import 'package:setpocket/widgets/p2p/transfer_batch_widget.dart';
-import 'package:setpocket/screens/p2lan_local_files_screen.dart';
+import 'package:setpocket/screens/p2lan/p2lan_local_files_screen.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_navigation_service.dart';
 import 'package:setpocket/services/p2p_notification_service.dart';
@@ -330,7 +331,6 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   Widget _buildSectionHeader(String title, {String? subtitle}) {
-    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
@@ -1081,10 +1081,12 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
                   l10n.connectionStatus,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                TextButton(
-                  onPressed: _debugNetwork,
-                  child: Text(l10n.debug),
-                ),
+                if (kDebugMode) ...[
+                  TextButton(
+                    onPressed: _debugNetwork,
+                    child: Text(l10n.debug),
+                  ),
+                ]
               ],
             ),
             const SizedBox(height: 8),
@@ -1211,7 +1213,9 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
 
   /// Clear file cache
   void _clearFileCache() async {
+    // final l10n = AppLocalizations.of(context)!;
     try {
+      final l10n = AppLocalizations.of(context)!;
       // Show confirmation dialog
       final confirmed = await showDialog<bool>(
         context: context,
@@ -1223,14 +1227,14 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Clear'),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.orange[700],
               ),
+              child: Text(l10n.clear),
             ),
           ],
         ),
@@ -1426,14 +1430,12 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await _controller.removeTrust(user.id);
-              if (success) {
-                if (mounted) {
-                  SnackbarUtils.showTyped(
-                    context,
-                    'Trust removed from ${user.displayName}',
-                    SnackBarType.info,
-                  );
-                }
+              if (success && mounted) {
+                SnackbarUtils.showTyped(
+                  context,
+                  l10n.removeTrustFrom(user.displayName),
+                  SnackBarType.info,
+                );
               } else if (_controller.errorMessage != null) {
                 _showErrorSnackBar(_controller.errorMessage!);
               }
@@ -1464,14 +1466,12 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           Navigator.of(context).pop();
 
           final success = await _controller.unpairUser(user.id);
-          if (success) {
-            if (mounted) {
-              SnackbarUtils.showTyped(
-                context,
-                l10n.unpairFrom(user.displayName),
-                SnackBarType.info,
-              );
-            }
+          if (success && mounted) {
+            SnackbarUtils.showTyped(
+              context,
+              l10n.unpairFrom(user.displayName),
+              SnackBarType.info,
+            );
           } else if (_controller.errorMessage != null) {
             _showErrorSnackBar(_controller.errorMessage!);
           }

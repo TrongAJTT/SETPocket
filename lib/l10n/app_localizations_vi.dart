@@ -813,7 +813,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get ageCalculatorResultsTitle => 'Chi tiết sinh nhật';
 
   @override
-  String get age => 'Tuổi hiện tại';
+  String get age => 'Tuổi';
 
   @override
   String get daysLived => 'Tổng số ngày đã sống';
@@ -5640,9 +5640,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get enableNotifications => 'Bật thông báo';
-
-  @override
-  String get getNotifiedAboutTransferEvents => 'Nhận thông báo về sự kiện truyền file';
 
   @override
   String get userInterfacePerformance => 'Hiệu suất giao diện';

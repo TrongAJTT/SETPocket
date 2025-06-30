@@ -193,7 +193,7 @@ class _NumericStepperState extends State<NumericStepper> {
                       bottomLeft: Radius.circular(6),
                     ),
                     color: isDecrementDisabled
-                        ? Theme.of(context).disabledColor.withOpacity(0.1)
+                        ? Theme.of(context).disabledColor.withValues(alpha: 0.1)
                         : null,
                   ),
                   child: Icon(
@@ -247,7 +247,7 @@ class _NumericStepperState extends State<NumericStepper> {
                       bottomRight: Radius.circular(6),
                     ),
                     color: isIncrementDisabled
-                        ? Theme.of(context).disabledColor.withOpacity(0.1)
+                        ? Theme.of(context).disabledColor.withValues(alpha: 0.1)
                         : null,
                   ),
                   child: Icon(

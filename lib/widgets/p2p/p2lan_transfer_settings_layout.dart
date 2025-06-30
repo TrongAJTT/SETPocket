@@ -12,7 +12,6 @@ import 'package:setpocket/services/p2p_notification_service.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_list_picker.dart';
 import 'package:setpocket/widgets/generic/permission_info_dialog.dart';
-import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 
 class P2LanTransferSettingsLayout extends StatefulWidget {
@@ -45,46 +44,6 @@ class _P2LanTransferSettingsLayoutState
   String _customDisplayName = '';
   String _currentDeviceName = '';
   late TextEditingController _displayNameController;
-
-  // Configuration options
-  static final List<SliderOption<int>> _fileSizeOptions = [
-    const SliderOption(value: 10 * 1024 * 1024, label: '10 MB'),
-    const SliderOption(value: 50 * 1024 * 1024, label: '50 MB'),
-    const SliderOption(value: 100 * 1024 * 1024, label: '100 MB'),
-    const SliderOption(value: 200 * 1024 * 1024, label: '200 MB'),
-    const SliderOption(value: 500 * 1024 * 1024, label: '500 MB'),
-    const SliderOption(value: 1 * 1024 * 1024 * 1024, label: '1 GB'),
-    const SliderOption(value: 2 * 1024 * 1024 * 1024, label: '2 GB'),
-    const SliderOption(value: 5 * 1024 * 1024 * 1024, label: '5 GB'),
-    const SliderOption(value: 10 * 1024 * 1024 * 1024, label: '10 GB'),
-    const SliderOption(value: 50 * 1024 * 1024 * 1024, label: '50 GB'),
-    const SliderOption(value: -1, label: 'Unlimited'),
-  ];
-
-  static final List<SliderOption<int>> _totalSizeOptions = [
-    const SliderOption(value: 100 * 1024 * 1024, label: '100 MB'),
-    const SliderOption(value: 500 * 1024 * 1024, label: '500 MB'),
-    const SliderOption(value: 1 * 1024 * 1024 * 1024, label: '1 GB'),
-    const SliderOption(value: 2 * 1024 * 1024 * 1024, label: '2 GB'),
-    const SliderOption(value: 5 * 1024 * 1024 * 1024, label: '5 GB'),
-    const SliderOption(value: 10 * 1024 * 1024 * 1024, label: '10 GB'),
-    const SliderOption(value: 20 * 1024 * 1024 * 1024, label: '20 GB'),
-    const SliderOption(value: 50 * 1024 * 1024 * 1024, label: '50 GB'),
-    const SliderOption(value: 100 * 1024 * 1024 * 1024, label: '100 GB'),
-    const SliderOption(value: -1, label: 'Unlimited'),
-  ];
-
-  static final List<SliderOption<int>> _concurrentTasksOptions = [
-    const SliderOption(value: 1, label: '1'),
-    const SliderOption(value: 2, label: '2'),
-    const SliderOption(value: 3, label: '3 (Default)'),
-    const SliderOption(value: 4, label: '4'),
-    const SliderOption(value: 5, label: '5'),
-    const SliderOption(value: 6, label: '6'),
-    const SliderOption(value: 8, label: '8'),
-    const SliderOption(value: 10, label: '10'),
-    const SliderOption(value: 99, label: 'Unlimited'),
-  ];
 
   static final List<SliderOption<int>> _chunkSizeOptions = [
     const SliderOption(value: 64, label: '64 KB'),
@@ -264,15 +223,16 @@ class _P2LanTransferSettingsLayoutState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isDesktop = MediaQuery.of(context).size.width > 800;
 
     return Column(
       children: [
         // Header with tabs
         Container(
           decoration: BoxDecoration(
-            color:
-                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           ),
           child: TabBar(
@@ -613,7 +573,7 @@ class _P2LanTransferSettingsLayoutState
                         color: Theme.of(context)
                             .colorScheme
                             .primary
-                            .withOpacity(0.5),
+                            .withValues(alpha: 0.5),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -892,7 +852,7 @@ class _P2LanTransferSettingsLayoutState
     try {
       final directory = Directory(_currentSettings.downloadPath);
       if (await directory.exists()) {
-        final stat = await directory.stat();
+        // final stat = await directory.stat();
         // Note: Getting actual disk space requires platform-specific implementation
         return {
           'path': _currentSettings.downloadPath,

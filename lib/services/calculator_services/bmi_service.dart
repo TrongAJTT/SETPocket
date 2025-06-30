@@ -331,42 +331,6 @@ class BmiService {
     }
   }
 
-  static String _getAgeBasedInterpretation(
-      BmiCategory category, int age, AppLocalizations l10n) {
-    if (age < 18) {
-      switch (category) {
-        case BmiCategory.underweight:
-          return l10n.bmiPercentileUnderweight.toLowerCase();
-        case BmiCategory.normalWeight:
-          return l10n.bmiPercentileNormal.toLowerCase();
-        case BmiCategory.overweightI:
-        case BmiCategory.overweightII:
-          return l10n.bmiPercentileOverweightI.toLowerCase();
-        case BmiCategory.obeseI:
-        case BmiCategory.obeseII:
-        case BmiCategory.obeseIII:
-          return l10n.bmiPercentileObeseI.toLowerCase();
-      }
-    } else {
-      switch (category) {
-        case BmiCategory.underweight:
-          return l10n.underweight.toLowerCase();
-        case BmiCategory.normalWeight:
-          return l10n.normalWeight.toLowerCase();
-        case BmiCategory.overweightI:
-          return l10n.overweightI.toLowerCase();
-        case BmiCategory.overweightII:
-          return l10n.overweightII.toLowerCase();
-        case BmiCategory.obeseI:
-          return l10n.obeseI.toLowerCase();
-        case BmiCategory.obeseII:
-          return l10n.obeseII.toLowerCase();
-        case BmiCategory.obeseIII:
-          return l10n.obeseIII.toLowerCase();
-      }
-    }
-  }
-
   static List<String> _getRecommendations(
       BmiCategory category, int age, AppLocalizations l10n) {
     List<String> recommendations = [];

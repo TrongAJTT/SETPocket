@@ -23,7 +23,7 @@ class SnackbarUtils {
     String text, {
     Color? textColor,
     Color? backgroundColor,
-    Duration duration = const Duration(seconds: 3),
+    int durationSeconds = 2,
   }) {
     final snackbar = SnackBar(
       content: Text(
@@ -31,7 +31,7 @@ class SnackbarUtils {
         style: TextStyle(color: textColor),
       ),
       backgroundColor: backgroundColor,
-      duration: duration,
+      duration: Duration(seconds: durationSeconds),
     );
     show(context, snackbar);
   }

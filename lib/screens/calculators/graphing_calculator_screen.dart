@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/widgets/three_panel_layout.dart';
+import 'package:setpocket/layouts/three_panels_layout.dart';
 import 'package:setpocket/widgets/graph_calculator/graph_panel.dart';
 import 'package:setpocket/widgets/graph_calculator/functions_panel.dart';
 import 'package:setpocket/widgets/graph_calculator/history_panel.dart';

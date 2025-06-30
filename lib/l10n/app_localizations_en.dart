@@ -5642,9 +5642,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableNotifications => 'Enable Notifications';
 
   @override
-  String get getNotifiedAboutTransferEvents => 'Get notified about transfer events';
-
-  @override
   String get userInterfacePerformance => 'User Interface Performance';
 
   @override

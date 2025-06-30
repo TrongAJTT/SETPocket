@@ -48,11 +48,16 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color:
-                  Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Theme.of(context)
+                    .colorScheme
+                    .outline
+                    .withValues(alpha: 0.2),
               ),
             ),
             child: Column(
@@ -65,7 +70,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
                           Theme.of(context).brightness == Brightness.dark
                               ? Theme.of(context).colorScheme.primary
                               : Theme.of(context).primaryColor,
-                      child: Icon(
+                      child: const Icon(
                         Icons.devices,
                         color: Colors.white,
                       ),
@@ -137,13 +142,13 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.withOpacity(0.3)),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
-                Icon(Icons.info, color: Colors.blue, size: 20),
+                const Icon(Icons.info, color: Colors.blue, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

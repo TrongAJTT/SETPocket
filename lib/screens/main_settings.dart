@@ -5,7 +5,6 @@ import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/widgets/cache_details_dialog.dart';
 import 'package:setpocket/widgets/tool_visibility_dialog.dart';
 import 'package:setpocket/widgets/quick_actions_dialog.dart';
-import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/services/settings_service.dart';
@@ -40,7 +39,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   late ThemeMode _themeMode = settingsController.themeMode;
   late String _language = settingsController.locale.languageCode;
   String _cacheInfo = '';
-  bool _clearing = false;
+  final bool _clearing = false;
   bool _loading = true;
   bool _historyEnabled = false;
   bool _rememberCalculationHistory = true;
@@ -141,49 +140,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     // Refresh info after dialog closes
     await _loadCacheInfo();
     await _loadSettings();
-  }
-
-  Future<void> _performClearCache() async {
-    setState(() {
-      _clearing = true;
-    });
-
-    try {
-      await CacheService.clearAllCache();
-
-      // Reset "Hỏi trước khi tải lịch sử" khi clear Calculator Tools cache
-      await GraphingCalculatorService.setAskBeforeLoading(true);
-      await GraphingCalculatorService.setSaveDialogPreference(null);
-
-      await _loadCacheInfo(); // Refresh cache info
-      await _loadSettings(); // Refresh settings để cập nhật UI
-
-      setState(() {
-        _clearing = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.clearCache),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _clearing = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
   }
 
   Future<void> _showCacheDetails() async {

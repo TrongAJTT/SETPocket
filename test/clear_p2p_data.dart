@@ -1,16 +1,17 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 void main() async {
-  print('Clearing P2P Hive data...');
+  logInfo('Clearing P2P Hive data...');
 
   try {
     // Initialize Hive
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final String hivePath = '${appDocDir.path}/hive_data';
 
-    print('Hive path: $hivePath');
+    logInfo('Hive path: $hivePath');
 
     Hive.init(hivePath);
 
@@ -25,9 +26,9 @@ void main() async {
     for (final boxName in boxesToDelete) {
       try {
         await Hive.deleteBoxFromDisk(boxName);
-        print('Deleted box: $boxName');
+        logInfo('Deleted box: $boxName');
       } catch (e) {
-        print('Failed to delete box $boxName: $e');
+        logError('Failed to delete box $boxName: $e');
       }
     }
 
@@ -42,17 +43,17 @@ void main() async {
             fileName.contains('file_transfer_')) {
           try {
             await file.delete();
-            print('Deleted file: $fileName');
+            logInfo('Deleted file: $fileName');
           } catch (e) {
-            print('Failed to delete file $fileName: $e');
+            logError('Failed to delete file $fileName: $e');
           }
         }
       }
     }
 
-    print('P2P Hive data cleared successfully!');
+    logInfo('P2P Hive data cleared successfully!');
   } catch (e) {
-    print('Error clearing P2P data: $e');
+    logError('Error clearing P2P data: $e');
   }
 
   exit(0);

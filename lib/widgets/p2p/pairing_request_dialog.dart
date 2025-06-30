@@ -75,11 +75,14 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
               decoration: BoxDecoration(
                 color: Theme.of(context)
                     .colorScheme
-                    .surfaceVariant
-                    .withOpacity(0.3),
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -92,7 +95,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                             Theme.of(context).brightness == Brightness.dark
                                 ? Theme.of(context).colorScheme.primary
                                 : Theme.of(context).primaryColor,
-                        child: Icon(
+                        child: const Icon(
                           Icons.person,
                           color: Colors.white,
                         ),
@@ -139,7 +142,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.save, size: 16, color: Colors.blue),
+                        const Icon(Icons.save, size: 16, color: Colors.blue),
                         const SizedBox(width: 8),
                         Text(
                           l10n.wantsSaveConnection,
@@ -198,13 +201,13 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.warning, color: Colors.orange, size: 20),
+                  const Icon(Icons.warning, color: Colors.orange, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(

@@ -4,7 +4,7 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_history_service.dart';
 import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/services/scientific_calculator_service.dart';
-import 'package:setpocket/widgets/calculator_layout.dart';
+import 'package:setpocket/layouts/two_panels_layout.dart';
 import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'dart:math' as math;
 
@@ -808,8 +808,8 @@ class _ScientificCalculatorScreenState
       },
     );
 
-    // Return the calculator layout directly - NewCalculatorLayout handles Scaffold internally
-    return NewCalculatorLayout(
+    // Return the calculator layout directly - TwoPanelsLayout handles Scaffold internally
+    return TwoPanelsLayout(
       calculatorContent: calculatorContent,
       historyWidget: _historyEnabled ? _buildHistoryWidget(l10n) : null,
       historyEnabled: _historyEnabled,

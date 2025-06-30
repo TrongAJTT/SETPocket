@@ -1,8 +1,8 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:setpocket/services/app_installation_service.dart';
+import 'package:setpocket/services/app_logger.dart';
 
 void main() {
   group('App Installation ID Stability Tests', () {
@@ -24,9 +24,9 @@ void main() {
       final id1 = await service.getAppInstallationId();
       final wordId1 = await service.getAppInstallationWordId();
 
-      print('First call:');
-      print('  Installation ID: $id1');
-      print('  Installation Word ID: $wordId1');
+      logInfo('First call:');
+      logInfo('  Installation ID: $id1');
+      logInfo('  Installation Word ID: $wordId1');
 
       // Multiple subsequent calls should return same ID
       for (int i = 0; i < 5; i++) {
@@ -39,7 +39,7 @@ void main() {
             reason: 'App Installation Word ID should remain stable on call $i');
       }
 
-      print('All calls returned same IDs - stability confirmed!');
+      logInfo('All calls returned same IDs - stability confirmed!');
     });
 
     test('App Installation ID should be exactly 10 letters', () async {
@@ -52,7 +52,7 @@ void main() {
       expect(RegExp(r'^[A-Z]{10}$').hasMatch(id), isTrue,
           reason: 'Installation ID should be 10 uppercase letters');
 
-      print('Generated Installation ID: $id (length: ${id.length})');
+      logInfo('Generated Installation ID: $id (length: ${id.length})');
     });
 
     test('App Installation Word ID should have correct format', () async {
@@ -63,7 +63,7 @@ void main() {
       expect(RegExp(r'^[a-z]+-[a-z]+-\d{4}$').hasMatch(wordId), isTrue,
           reason: 'Installation Word ID should match format: word-word-1234');
 
-      print('Generated Installation Word ID: $wordId');
+      logInfo('Generated Installation Word ID: $wordId');
     });
 
     test('Service should handle storage correctly', () async {
@@ -87,9 +87,9 @@ void main() {
       expect(wordId.isNotEmpty, isTrue,
           reason: 'Installation Word ID should not be empty');
 
-      print('Service correctly initialized with IDs:');
-      print('  Installation ID: $id');
-      print('  Installation Word ID: $wordId');
+      logInfo('Service correctly initialized with IDs:');
+      logInfo('  Installation ID: $id');
+      logInfo('  Installation Word ID: $wordId');
     });
 
     test('Reset functionality should work correctly', () async {
@@ -99,9 +99,9 @@ void main() {
       final originalId = await service.getAppInstallationId();
       final originalWordId = await service.getAppInstallationWordId();
 
-      print('Original IDs:');
-      print('  Installation ID: $originalId');
-      print('  Installation Word ID: $originalWordId');
+      logInfo('Original IDs:');
+      logInfo('  Installation ID: $originalId');
+      logInfo('  Installation Word ID: $originalWordId');
 
       // Reset and reinitialize
       await service.resetAppInstallation();
@@ -115,9 +115,9 @@ void main() {
       final newId = await service.getAppInstallationId();
       final newWordId = await service.getAppInstallationWordId();
 
-      print('After reset:');
-      print('  Installation ID: $newId');
-      print('  Installation Word ID: $newWordId');
+      logInfo('After reset:');
+      logInfo('  Installation ID: $newId');
+      logInfo('  Installation Word ID: $newWordId');
 
       expect(newId, isNot(equals(originalId)),
           reason: 'New ID should be different after reset');

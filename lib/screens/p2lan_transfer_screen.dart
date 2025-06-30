@@ -10,10 +10,9 @@ import 'package:setpocket/widgets/p2p/pairing_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/file_transfer_request_dialog.dart';
 import 'package:setpocket/widgets/p2p/user_pairing_dialog.dart';
 
-import 'package:setpocket/widgets/p2p/permission_request_dialog.dart';
 import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/app_logger.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:setpocket/utils/permission_utils.dart';
 import 'package:setpocket/widgets/p2p/p2lan_transfer_settings_helper.dart';
 import 'package:setpocket/widgets/p2p/user_info_dialog.dart';
 import 'package:setpocket/widgets/p2p/multi_file_sender_dialog.dart';
@@ -23,6 +22,8 @@ import 'package:setpocket/screens/p2lan_local_files_screen.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_navigation_service.dart';
 import 'package:setpocket/services/p2p_notification_service.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
+import 'package:path_provider/path_provider.dart';
 
 class P2LanTransferScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -38,6 +39,10 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   int _currentTabIndex = 0;
   bool _isControllerInitialized = false;
   final ScrollController _transfersScrollController = ScrollController();
+
+  // Cache management state
+  bool _isCalculatingCacheSize = false;
+  String _cachedFileCacheSize = 'Unknown';
 
   @override
   void initState() {
@@ -58,11 +63,19 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       getCurrentTabCallback: () => _currentTabIndex,
     );
 
-    // Set up notification callbacks
-    P2PNotificationService.instance.setCallbacks(
-      onNotificationTapped: _handleNotificationTapped,
-      onActionPressed: _handleNotificationAction,
-    );
+    // Set up notification callbacks (only if service is available)
+    final notificationService = P2PNotificationService.instanceOrNull;
+    if (notificationService != null) {
+      notificationService.setCallbacks(
+        onNotificationTapped: _handleNotificationTapped,
+        onActionPressed: _handleNotificationAction,
+      );
+    }
+
+    // Initialize cache size
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _reloadCacheSize();
+    });
   }
 
   @override
@@ -95,9 +108,37 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
     // Clear navigation callbacks
     P2PNavigationService.instance.clearP2LanCallbacks();
 
+    // Clear notification callbacks (only if service is available)
+    final notificationService = P2PNotificationService.instanceOrNull;
+    if (notificationService != null) {
+      notificationService.clearCallbacks();
+    }
+
+    // 🔥 CLEANUP: Trigger memory cleanup when leaving P2Lan screen
+    _performMemoryCleanup();
+
     _controller.dispose();
     _transfersScrollController.dispose();
     super.dispose();
+  }
+
+  /// 🔥 NEW: Perform memory cleanup when leaving screen
+  void _performMemoryCleanup() {
+    try {
+      // Use Future.microtask to avoid blocking dispose
+      Future.microtask(() async {
+        try {
+          // 🔥 SAFE: Let periodic cleanup handle it safely
+          // The P2P service will handle cleanup automatically via its periodic timer
+          logInfo(
+              'P2LanTransferScreen: Screen disposed - periodic cleanup will handle file picker cache');
+        } catch (e) {
+          logWarning('P2LanTransferScreen: Error in cleanup logging: $e');
+        }
+      });
+    } catch (e) {
+      logWarning('P2LanTransferScreen: Error scheduling memory cleanup: $e');
+    }
   }
 
   void _initializeController() async {
@@ -250,14 +291,16 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       return _buildEmptyDevicesState();
     }
 
+    final l10n = AppLocalizations.of(context)!;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         // Online devices section (green - saved devices that are online)
         if (_controller.hasOnlineDevices) ...[
           _buildSectionHeader(
-              '🟢 Online Devices (${_controller.onlineDevices.length})',
-              subtitle: 'Saved devices currently available'),
+              '🟢 ${l10n.onlineDevices} (${_controller.onlineDevices.length})',
+              subtitle: l10n.savedDevicesCurrentlyAvailable),
           ..._controller.onlineDevices
               .map((user) => _buildUserCard(user, isOnline: true)),
           const SizedBox(height: 24),
@@ -266,8 +309,8 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         // New devices section (blue - newly discovered devices)
         if (_controller.hasNewDevices) ...[
           _buildSectionHeader(
-              '🔵 New Devices (${_controller.newDevices.length})',
-              subtitle: 'Recently discovered devices'),
+              '🔵 ${l10n.newDevices} (${_controller.newDevices.length})',
+              subtitle: l10n.recentlyDiscoveredDevices),
           ..._controller.newDevices
               .map((user) => _buildUserCard(user, isNew: true)),
           const SizedBox(height: 24),
@@ -276,8 +319,8 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         // Saved devices section (gray - saved but offline devices)
         if (_controller.hasSavedDevices) ...[
           _buildSectionHeader(
-              '⚫ Saved Devices (${_controller.savedDevices.length})',
-              subtitle: 'Previously paired devices (offline)'),
+              '⚫ ${l10n.savedDevices} (${_controller.savedDevices.length})',
+              subtitle: l10n.previouslyPairedOffline),
           ..._controller.savedDevices
               .map((user) => _buildUserCard(user, isSaved: true)),
           const SizedBox(height: 24),
@@ -287,6 +330,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   Widget _buildSectionHeader(String title, {String? subtitle}) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
@@ -388,7 +432,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
                 children: [
                   const Icon(Icons.info),
                   const SizedBox(width: 8),
-                  const Text('View Info'),
+                  Text(l10n.viewInfo),
                 ],
               ),
             ),
@@ -408,37 +452,37 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
 
             // Trust management
             if (user.isPaired && !user.isTrusted)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'add_trust',
                 child: Row(
                   children: [
-                    Icon(Icons.verified_user),
-                    SizedBox(width: 8),
-                    Text('Trust'),
+                    const Icon(Icons.verified_user),
+                    const SizedBox(width: 8),
+                    Text(l10n.addTrust),
                   ],
                 ),
               ),
             if (user.isTrusted)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'remove_trust',
                 child: Row(
                   children: [
-                    Icon(Icons.security),
-                    SizedBox(width: 8),
-                    Text('Remove Trust'),
+                    const Icon(Icons.security),
+                    const SizedBox(width: 8),
+                    Text(l10n.removeTrust),
                   ],
                 ),
               ),
 
             // Connection management
             if (user.isStored)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'unpair',
                 child: Row(
                   children: [
-                    Icon(Icons.link_off),
-                    SizedBox(width: 8),
-                    Text('Unpair'),
+                    const Icon(Icons.link_off),
+                    const SizedBox(width: 8),
+                    Text(l10n.unpair),
                   ],
                 ),
               ),
@@ -491,7 +535,13 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Current device info (Moved to top)
+          // File Cache card (Show only on Android)
+          if (Platform.isAndroid) ...[
+            _buildFileCacheCard(),
+            const SizedBox(height: 16),
+          ],
+
+          // Current device info
           FutureBuilder<Widget>(
             future: _buildThisDeviceCard(),
             builder: (context, snapshot) {
@@ -505,19 +555,19 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'This Device',
+                          l10n.thisDevice,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 12),
-                        const Row(
+                        Row(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 16,
                               height: 16,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            SizedBox(width: 8),
-                            Text('Loading device information...'),
+                            const SizedBox(width: 8),
+                            Text(l10n.loadingDeviceInfo),
                           ],
                         ),
                       ],
@@ -529,35 +579,8 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Connection status
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.connectionStatus,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        _getConnectionStatusIcon(),
-                        color: _getConnectionStatusColor(),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child:
-                            Text(_controller.getConnectionStatusDescription()),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Connection status with Network Info merged
+          _buildConnectionStatusCard(),
           const SizedBox(height: 16),
 
           // Statistics (Full-width like other cards)
@@ -586,34 +609,6 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
                 ),
               ),
             ),
-          const SizedBox(height: 16),
-
-          // Network info (Moved to bottom)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.networkInfo,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      TextButton(
-                        onPressed: _debugNetwork,
-                        child: const Text('Debug'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(_controller.getNetworkStatusDescription()),
-                ],
-              ),
-            ),
-          ),
 
           // Add some bottom padding for better scrolling experience
           const SizedBox(height: 24),
@@ -666,12 +661,12 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _controller.getNetworkStatusDescription(),
+                        _controller.getNetworkStatusDescription(l10n),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _controller.getConnectionStatusDescription(),
+                        _controller.getConnectionStatusDescription(l10n),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
@@ -718,13 +713,13 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           const SizedBox(height: 8),
           Text(
             _controller.isTemporarilyDisabled
-                ? 'P2P networking is paused due to internet connection loss. It will automatically resume when connection is restored.'
+                ? l10n.p2pNetworkingPaused
                 : (_controller.isRefreshing
-                    ? 'Searching for devices...'
+                    ? l10n.searchingForDevices
                     : (_controller.isEnabled
                         ? (_controller.hasPerformedInitialDiscovery
-                            ? 'No devices in range. Try refreshing.'
-                            : 'Initial discovery in progress...')
+                            ? l10n.noDevicesInRange
+                            : l10n.initialDiscoveryInProgress)
                         : l10n.startNetworkingToDiscover)),
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
@@ -736,7 +731,8 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
               !_controller.isTemporarilyDisabled) ...[
             if (_controller.lastDiscoveryTime != null)
               Text(
-                'Last refresh: ${_formatDiscoveryTime(_controller.lastDiscoveryTime!)}',
+                l10n.lastRefresh(
+                    _formatDiscoveryTime(_controller.lastDiscoveryTime!)),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             const SizedBox(height: 8),
@@ -744,19 +740,19 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
               ElevatedButton.icon(
                 onPressed: _manualRefresh,
                 icon: const Icon(Icons.search),
-                label: const Text('Manual Discovery'),
+                label: Text(l10n.manualDiscovery),
               ),
             if (_controller.isRefreshing)
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  SizedBox(width: 8),
-                  Text('Refreshing...'),
+                  const SizedBox(width: 8),
+                  Text(l10n.refreshing),
                 ],
               ),
           ],
@@ -804,32 +800,31 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   void _startNetworking() async {
-    // Check for location permission before starting
-    final status = await Permission.locationWhenInUse.status;
-    if (status.isDenied || status.isPermanentlyDenied) {
-      if (mounted) {
-        await showDialog(
-          context: context,
-          builder: (context) => PermissionRequestDialog(
-            onContinue: () async {
-              Navigator.of(context).pop();
-              // Now, attempt to start networking, which will trigger the actual permission request
-              final success = await _controller.checkAndStartNetworking();
-              if (!success && _controller.errorMessage != null && mounted) {
-                _showErrorSnackBar(_controller.errorMessage!);
-              }
-            },
-            onCancel: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        );
+    try {
+      // Use the utility to request all P2P permissions with proper UI flow
+      final permissionsGranted =
+          await PermissionUtils.requestAllP2PPermissions(context);
+
+      if (!permissionsGranted) {
+        // User cancelled or denied permissions
+        if (mounted) {
+          _showErrorSnackBar(
+              'Permissions are required to start P2P networking');
+        }
+        return;
       }
-    } else {
-      // Permission is already granted, proceed
+
+      // All permissions granted, proceed with starting networking
       final success = await _controller.checkAndStartNetworking();
       if (!success && _controller.errorMessage != null && mounted) {
         _showErrorSnackBar(_controller.errorMessage!);
+      }
+    } catch (e) {
+      logError('Error in _startNetworking: $e');
+      if (mounted) {
+        // Show more specific error message
+        final errorMessage = e.toString().replaceFirst('Exception: ', '');
+        _showErrorSnackBar(errorMessage);
       }
     }
   }
@@ -979,15 +974,289 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+    if (mounted) {
+      SnackbarUtils.showTyped(context, message, SnackBarType.error);
+    }
+  }
+
+  /// Build file cache card showing cache size and clear button
+  Widget _buildFileCacheCard() {
+    final l10n = AppLocalizations.of(context)!;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.fileCache,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _reloadCacheSize,
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: Text(l10n.reload),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton.icon(
+                      onPressed: _clearFileCache,
+                      icon: const Icon(Icons.clear_all, size: 18),
+                      label: Text(l10n.clear),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.orange[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  '${l10n.cacheSize}: ',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (_isCalculatingCacheSize)
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(l10n.calculating),
+                    ],
+                  )
+                else
+                  Text(
+                    _cachedFileCacheSize,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              l10n.tempFilesDescription,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // Helper methods
+  /// Build connection status card with network info merged
+  Widget _buildConnectionStatusCard() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.connectionStatus,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                TextButton(
+                  onPressed: _debugNetwork,
+                  child: Text(l10n.debug),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  _getConnectionStatusIcon(),
+                  color: _getConnectionStatusColor(),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(_controller.getConnectionStatusDescription(l10n)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Network Info section merged here
+            Row(
+              children: [
+                Icon(
+                  _getNetworkStatusIcon(),
+                  color: _getNetworkStatusColor(),
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _controller.getNetworkStatusDescription(l10n),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Reload cache size manually
+  void _reloadCacheSize() async {
+    if (_isCalculatingCacheSize) return; // Prevent multiple calls
+
+    setState(() {
+      _isCalculatingCacheSize = true;
+    });
+
+    try {
+      final cacheSize = await _getP2LanFileCacheSize();
+      if (mounted) {
+        setState(() {
+          _cachedFileCacheSize = cacheSize;
+          _isCalculatingCacheSize = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _cachedFileCacheSize = 'Error: $e';
+          _isCalculatingCacheSize = false;
+        });
+      }
+    }
+  }
+
+  /// Get P2Lan specific file cache size
+  Future<String> _getP2LanFileCacheSize() async {
+    // This feature is only relevant on Android where file_picker creates temp files.
+    if (!Platform.isAndroid) {
+      return '0 B';
+    }
+
+    try {
+      final tempDir = await getTemporaryDirectory();
+      // The directory used by file_picker for temporary files.
+      final filePickerCacheDir = Directory('${tempDir.path}/file_picker');
+
+      int totalSize = 0;
+      if (await filePickerCacheDir.exists()) {
+        totalSize = await _calculateDirectorySize(filePickerCacheDir);
+        logInfo(
+            'P2Lan file_picker cache found in ${filePickerCacheDir.path}: ${_formatBytes(totalSize)}');
+      } else {
+        logInfo(
+            'P2Lan file_picker cache directory not found at ${filePickerCacheDir.path}');
+      }
+
+      return _formatBytes(totalSize);
+    } catch (e) {
+      logError('Error calculating P2Lan cache size: $e');
+      return 'Unknown';
+    }
+  }
+
+  /// Calculate directory size recursively
+  Future<int> _calculateDirectorySize(Directory directory) async {
+    int totalSize = 0;
+    try {
+      await for (final entity in directory.list(recursive: true)) {
+        if (entity is File) {
+          try {
+            final stat = await entity.stat();
+            totalSize += stat.size;
+          } catch (e) {
+            // Skip files we can't read
+          }
+        }
+      }
+    } catch (e) {
+      // Skip directories we can't access
+    }
+    return totalSize;
+  }
+
+  /// Format bytes to human readable string
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  /// Clear file cache
+  void _clearFileCache() async {
+    try {
+      // Show confirmation dialog
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Clear File Cache'),
+          content: const Text(
+            'This will clear temporary files from P2Lan transfers. This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Clear'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.orange[700],
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed == true) {
+        // Call the P2P service to clean up file picker cache
+        await _controller.p2pService.cleanupFilePickerCacheIfSafe();
+
+        if (mounted) {
+          SnackbarUtils.showTyped(
+              context, 'File cache cleared successfully', SnackBarType.success);
+
+          // Reload cache size to show updated value
+          _reloadCacheSize();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackbarUtils.showTyped(
+            context, 'Failed to clear cache: $e', SnackBarType.error);
+      }
+    }
+  }
+
+  // Helper methods - keep existing ones
 
   IconData _getConnectionStatusIcon() {
     switch (_controller.connectionStatus) {
@@ -1057,8 +1326,15 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   void _debugNetwork() async {
+    final l10n = AppLocalizations.of(context)!;
     await NetworkDebugUtils.debugNetworkConnectivity();
-    _showErrorSnackBar('Network debug completed. Check logs for details.');
+    if (mounted) {
+      SnackbarUtils.showTyped(
+        context,
+        l10n.networkDebugCompleted,
+        SnackBarType.info,
+      );
+    }
   }
 
   void _manualRefresh() async {
@@ -1069,17 +1345,18 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   String _formatDiscoveryTime(DateTime time) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final difference = now.difference(time);
 
     if (difference.inMinutes < 1) {
-      return 'Just now';
+      return l10n.justNow;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} min ago';
+      return l10n.minutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours} hr ago';
+      return l10n.hoursAgo(difference.inHours);
     } else {
-      return '${difference.inDays} days ago';
+      return l10n.daysAgo(difference.inDays);
     }
   }
 
@@ -1093,17 +1370,15 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           context,
           currentSettings: _controller.transferSettings,
           onSettingsChanged: (settings) async {
+            final l10n = AppLocalizations.of(context)!;
             final success = await _controller.updateTransferSettings(settings);
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(success
-                      ? 'Transfer settings updated successfully'
-                      : _controller.errorMessage ??
-                          'Failed to update settings'),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                  duration: const Duration(seconds: 2),
-                ),
+              SnackbarUtils.showTyped(
+                context,
+                success
+                    ? l10n.transferSettingsUpdated
+                    : _controller.errorMessage ?? l10n.failedToUpdateSettings,
+                success ? SnackBarType.success : SnackBarType.error,
               );
             }
           },
@@ -1111,11 +1386,10 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load settings: $e'),
-            backgroundColor: Colors.red,
-          ),
+        SnackbarUtils.showTyped(
+          context,
+          'Failed to load settings: $e',
+          SnackBarType.error,
         );
       }
     }
@@ -1124,34 +1398,47 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   void _addTrust(P2PUser user) async {
     final success = await _controller.addTrust(user.id);
     if (success) {
-      _showErrorSnackBar('Trusted ${user.displayName}');
+      if (mounted) {
+        SnackbarUtils.showTyped(
+          context,
+          'Trusted ${user.displayName}',
+          SnackBarType.success,
+        );
+      }
     } else if (_controller.errorMessage != null) {
       _showErrorSnackBar(_controller.errorMessage!);
     }
   }
 
   void _removeTrust(P2PUser user) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove Trust'),
-        content: Text('Remove trust from ${user.displayName}?'),
+        title: Text(l10n.removeTrust),
+        content: Text(l10n.removeTrustFrom(user.displayName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await _controller.removeTrust(user.id);
               if (success) {
-                _showErrorSnackBar('Trust removed from ${user.displayName}');
+                if (mounted) {
+                  SnackbarUtils.showTyped(
+                    context,
+                    'Trust removed from ${user.displayName}',
+                    SnackBarType.info,
+                  );
+                }
               } else if (_controller.errorMessage != null) {
                 _showErrorSnackBar(_controller.errorMessage!);
               }
             },
-            child: const Text('Remove'),
+            child: Text(l10n.remove),
           ),
         ],
       ),
@@ -1164,13 +1451,12 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
     showDialog(
       context: context,
       builder: (context) => HoldToConfirmDialog(
-        title: 'Unpair from ${user.displayName}',
-        content:
-            'This will remove the pairing completely from both devices. You will need to pair again in the future.\n\nThe other device will also be notified and their connection will be removed.',
-        actionText: 'Hold to Unpair',
-        holdText: 'Hold to Unpair',
-        processingText: 'Unpairing...',
-        instructionText: 'Hold the button for 1 second to confirm unpair',
+        title: l10n.unpairFrom(user.displayName),
+        content: l10n.unpairDescription,
+        actionText: l10n.holdToUnpair,
+        holdText: l10n.holdToUnpair,
+        processingText: l10n.unpairing,
+        instructionText: l10n.holdButtonToConfirmUnpair,
         actionIcon: Icons.link_off,
         holdDuration: const Duration(seconds: 1),
         l10n: l10n,
@@ -1179,7 +1465,13 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
 
           final success = await _controller.unpairUser(user.id);
           if (success) {
-            _showErrorSnackBar('Unpaired from ${user.displayName}');
+            if (mounted) {
+              SnackbarUtils.showTyped(
+                context,
+                l10n.unpairFrom(user.displayName),
+                SnackBarType.info,
+              );
+            }
           } else if (_controller.errorMessage != null) {
             _showErrorSnackBar(_controller.errorMessage!);
           }
@@ -1197,13 +1489,20 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
     if (!success && _controller.errorMessage != null) {
       _showErrorSnackBar(_controller.errorMessage!);
     } else if (success && deleteFile) {
-      _showErrorSnackBar('Task và file đã được xóa thành công');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        SnackbarUtils.showTyped(
+            context, l10n.taskAndFileDeletedSuccessfully, SnackBarType.success);
+      }
     } else if (success) {
-      _showErrorSnackBar('Task đã được xóa');
+      if (mounted) {
+        SnackbarUtils.showTyped(context, 'Task cleared', SnackBarType.info);
+      }
     }
   }
 
   Future<Widget> _buildThisDeviceCard() async {
+    final l10n = AppLocalizations.of(context)!;
     // Luôn hiển thị device info, ngay cả khi networking chưa được khởi động
     try {
       // Lấy thông tin device
@@ -1225,7 +1524,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
 
       return DeviceInfoCard(
         user: deviceUser,
-        title: 'This Device',
+        title: l10n.thisDevice,
         showStatusChips: false,
         isCompact: false,
         showDeviceIdToggle: true,
@@ -1239,12 +1538,12 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'This Device',
+                l10n.thisDevice,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
               Text(
-                'Loading device information...',
+                '-----',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).disabledColor,
                     ),
@@ -1264,18 +1563,29 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   }
 
   void _showMultiFileSenderDialog(P2PUser user) {
+    // Capture the context before the async gap.
+    final scaffoldContext = context;
+
     showDialog(
       context: context,
       builder: (context) => MultiFileSenderDialog(
         targetUser: user,
         onSendFiles: (filePaths) async {
+          // The dialog's context is no longer valid here, so we use the captured scaffoldContext.
           final success =
               await _controller.sendMultipleFilesToUser(filePaths, user);
+          if (!scaffoldContext.mounted) return;
+
           if (!success && _controller.errorMessage != null) {
-            _showErrorSnackBar(_controller.errorMessage!);
+            SnackbarUtils.showTyped(
+                scaffoldContext, _controller.errorMessage!, SnackBarType.error);
           } else {
-            _showErrorSnackBar(
-                'Started sending ${filePaths.length} files to ${user.displayName}');
+            final l10n = AppLocalizations.of(scaffoldContext)!;
+            SnackbarUtils.showTyped(
+              scaffoldContext,
+              l10n.startedSending(filePaths.length, user.displayName),
+              SnackBarType.info,
+            );
             // Auto-switch to Transfers tab and scroll to bottom
             _switchToTransfersAndScroll();
           }
@@ -1370,6 +1680,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         break;
       case P2PNotificationType.fileTransferProgress:
       case P2PNotificationType.fileTransferCompleted:
+      case P2PNotificationType.fileTransferStatus:
         // Navigate to transfers tab
         setState(() {
           _currentTabIndex = 1; // Transfers tab
@@ -1385,6 +1696,11 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
             'requestId': payload.requestId,
           });
         }
+        break;
+      case P2PNotificationType.p2lanStatus:
+        // P2LAN status notification tapped - ensure we're on P2LAN screen
+        // If already on P2LAN screen, no action needed
+        // If not, this will be handled by the navigation service
         break;
       default:
         // Navigate to main tab for other notifications
@@ -1428,17 +1744,6 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       case P2PNotificationAction.openP2Lan:
         // Already on P2LAN screen, just switch to appropriate tab
         _handleNotificationTapped(payload);
-        break;
-      case P2PNotificationAction.openTransfers:
-        setState(() {
-          _currentTabIndex = 1; // Transfers tab
-        });
-        break;
-      case P2PNotificationAction.cancelTransfer:
-        if (payload.taskId != null) {
-          _controller.cancelDataTransfer(payload.taskId!);
-          _showErrorSnackBar('Transfer cancelled');
-        }
         break;
     }
   }

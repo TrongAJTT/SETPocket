@@ -57,9 +57,13 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
   @override
   void dispose() {
     _searchController.dispose();
-    // Clear caches to free memory
+    // 🔥 CLEANUP: Clear caches to free memory and prevent memory leaks
     _fileStatCache.clear();
     _fileTypeCache.clear();
+    // 🔥 CLEANUP: Clear file lists to free memory
+    _allFiles.clear();
+    _filteredFiles.clear();
+    _selectedFiles.clear();
     super.dispose();
   }
 

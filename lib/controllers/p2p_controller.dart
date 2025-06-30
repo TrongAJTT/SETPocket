@@ -5,6 +5,7 @@ import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_service.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class P2PController with ChangeNotifier {
   final P2PService _p2pService = P2PService.instance;
@@ -37,6 +38,9 @@ class P2PController with ChangeNotifier {
   // Callback for new pairing requests
   // ignore: unused_field
   Function(PairingRequest)? _onNewPairingRequest;
+
+  // Callback for new file transfer requests
+  Function(FileTransferRequest)? _onNewFileTransferRequest;
 
   P2PController() {
     _p2pService.addListener(_onP2PServiceChanged);
@@ -187,6 +191,8 @@ class P2PController with ChangeNotifier {
 
   List<PairingRequest> get pendingRequests => _p2pService.pendingRequests;
   List<DataTransferTask> get activeTransfers => _p2pService.activeTransfers;
+  List<FileTransferRequest> get pendingFileTransferRequests =>
+      _p2pService.pendingFileTransferRequests;
   P2PUser? get selectedUser => _selectedUser;
   String? get selectedFile => _selectedFile;
   bool get isRefreshing => _isRefreshing;
@@ -195,11 +201,16 @@ class P2PController with ChangeNotifier {
   bool get isBroadcasting => _p2pService.isBroadcasting;
   bool get isTemporarilyDisabled => _isTemporarilyDisabled;
 
+  /// Access to P2P service for advanced operations
+  P2PService get p2pService => _p2pService;
+
   /// Initialize the controller
   Future<void> initialize() async {
     if (_isInitialized) return;
     try {
-      await _p2pService.initialize();
+      // Initialize P2P services with proper initialization order
+      await P2PService.init();
+
       // Automatically check network status on initialization
       await _checkInitialNetworkStatus();
       // Start monitoring connectivity changes
@@ -219,10 +230,12 @@ class P2PController with ChangeNotifier {
     }
   }
 
-  /// Check the initial network status without starting networking
+  /// Check the initial network status without starting networking or requesting permissions
   Future<void> _checkInitialNetworkStatus() async {
     try {
       _networkInfo = await NetworkSecurityService.checkNetworkSecurity();
+      logInfo(
+          'Initial network status checked - no permission requests made yet');
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to check network status: $e';
@@ -496,40 +509,40 @@ class P2PController with ChangeNotifier {
     }
   }
 
-  /// Get network status description
-  String getNetworkStatusDescription() {
+  /// Get network status description (requires context for localization)
+  String getNetworkStatusDescription(AppLocalizations l10n) {
     if (_isTemporarilyDisabled) {
-      return 'P2P temporarily disabled - waiting for internet connection';
+      return l10n.p2pTemporarilyDisabled;
     }
 
-    if (_networkInfo == null) return 'Checking network...';
+    if (_networkInfo == null) return l10n.checkingNetwork;
 
     if (_networkInfo!.isMobile) {
-      return 'Connected via mobile data (secure)';
+      return l10n.connectedViaMobileData;
     } else if (_networkInfo!.isWiFi) {
-      final securityText = _networkInfo!.isSecure ? 'secure' : 'unsecure';
-      final wifiName = _networkInfo!.wifiName ?? 'Unknown WiFi';
-      return 'Connected to $wifiName ($securityText)';
+      final securityText = _networkInfo!.isSecure ? l10n.secure : l10n.unsecure;
+      final wifiName = _networkInfo!.wifiName ?? l10n.unknownWifi;
+      return l10n.connectedToWifi(wifiName, securityText);
     } else if (_networkInfo!.securityType == 'ETHERNET') {
-      return 'Connected via Ethernet (secure)';
+      return l10n.connectedViaEthernet;
     } else {
-      return 'No network connection';
+      return l10n.noNetworkConnection;
     }
   }
 
-  /// Get connection status description
-  String getConnectionStatusDescription() {
+  /// Get connection status description (requires context for localization)
+  String getConnectionStatusDescription(AppLocalizations l10n) {
     switch (connectionStatus) {
       case ConnectionStatus.disconnected:
-        return 'Disconnected';
+        return l10n.disconnected;
       case ConnectionStatus.discovering:
-        return 'Discovering devices...';
+        return l10n.discoveringDevices;
       case ConnectionStatus.connected:
-        return 'Connected';
+        return l10n.connected;
       case ConnectionStatus.pairing:
-        return 'Pairing...';
+        return l10n.pairing;
       case ConnectionStatus.paired:
-        return 'Paired';
+        return l10n.paired;
     }
   }
 
@@ -864,26 +877,6 @@ class P2PController with ChangeNotifier {
   /// Get current transfer settings
   P2PDataTransferSettings? get transferSettings => _p2pService.transferSettings;
 
-  /// Get pending file transfer requests
-  List<FileTransferRequest> get pendingFileTransferRequests =>
-      _p2pService.pendingFileTransferRequests;
-
-  /// Callback for new file transfer requests
-  Function(FileTransferRequest)? _onNewFileTransferRequest;
-
-  /// Set callback for new file transfer requests
-  void setNewFileTransferRequestCallback(
-      Function(FileTransferRequest)? callback) {
-    _onNewFileTransferRequest = callback;
-    _p2pService.setNewFileTransferRequestCallback(callback);
-  }
-
-  /// Clear new file transfer request callback
-  void clearNewFileTransferRequestCallback() {
-    _onNewFileTransferRequest = null;
-    _p2pService.setNewFileTransferRequestCallback(null);
-  }
-
   /// Respond to file transfer request
   Future<bool> respondToFileTransferRequest(
       String requestId, bool accept, String? rejectMessage) async {
@@ -923,12 +916,11 @@ class P2PController with ChangeNotifier {
   }
 
   void _onP2PServiceChanged() {
-    // This method is called whenever P2PService notifies its listeners.
-    // We can update controller-specific state here.
-    _networkInfo = _p2pService.currentNetworkInfo;
-
-    // Simply notify listeners to rebuild UI with latest data from the service.
-    notifyListeners();
+    // This method now simply notifies listeners.
+    // Specific event handling is done via direct callbacks for reliability.
+    if (hasListeners) {
+      notifyListeners();
+    }
   }
 
   /// Override the dispose method to only remove the listener,
@@ -943,5 +935,18 @@ class P2PController with ChangeNotifier {
     // DO NOT call _p2pService.stopNetworking() here.
     // The service should persist in the background.
     super.dispose();
+  }
+
+  /// Set callback for new file transfer requests
+  void setNewFileTransferRequestCallback(
+      Function(FileTransferRequest)? callback) {
+    _onNewFileTransferRequest = callback;
+    _p2pService.setNewFileTransferRequestCallback(callback);
+  }
+
+  /// Clear callback for new file transfer requests
+  void clearNewFileTransferRequestCallback() {
+    _onNewFileTransferRequest = null;
+    _p2pService.setNewFileTransferRequestCallback(null);
   }
 }

@@ -48,8 +48,8 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
         calculatorToolsDesc: loc.cacheTypeCalculatorToolsDesc,
         converterToolsName: loc.cacheTypeConverterTools,
         converterToolsDesc: loc.cacheTypeConverterToolsDesc,
-        p2pDataTransferName: loc.p2lanTransfer,
-        p2pDataTransferDesc: 'P2P users, pairing data, and transfer settings',
+        p2pDataTransferName: loc.p2pDataTransfer,
+        p2pDataTransferDesc: loc.p2pDataTransferCacheDesc,
       );
       setState(() {
         _cacheInfo = cacheInfo;
@@ -153,150 +153,9 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
 
   Future<void> _clearAllCache() async {
     final loc = AppLocalizations.of(context)!;
-    final confirmed = await _showConfirmDialog();
-
-    if (confirmed == true) {
-      try {
-        await CacheService.clearAllCache();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(loc.allCacheCleared),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-        await _loadCacheInfo(); // Refresh the cache info
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(loc.errorClearingCache(e.toString())),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  Future<bool?> _showConfirmDialog() async {
-    final loc = AppLocalizations.of(context)!;
-    final textController = TextEditingController();
-
-    // Check for blocked caches
-    final blockedCaches = <String, String>{};
-    for (final entry in _cacheInfo.entries) {
-      final canClear = await CacheService.canClearCache(entry.key);
-      if (!canClear) {
-        final reason = await CacheService.getClearCacheBlockReason(entry.key);
-        if (reason != null) {
-          blockedCaches[entry.value.name] = reason;
-        }
-      }
-    }
-
-    return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text(loc.clearAllCache),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(loc.confirmClearAllCache),
-
-              // Show blocked caches if any
-              if (blockedCaches.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.shade200),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.warning, color: Colors.orange, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'These caches will NOT be cleared:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade800,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      ...blockedCaches.entries.map((entry) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '• ${entry.key}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.orange.shade700,
-                                  ),
-                                ),
-                                Text(
-                                  '  ${entry.value}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.orange.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                    ],
-                  ),
-                ),
-              ],
-
-              const SizedBox(height: 16),
-              Text(
-                loc.typeConfirmToProceed,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: textController,
-                decoration: const InputDecoration(
-                  hintText: 'confirm',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) => setState(() {}),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(loc.cancel),
-            ),
-            FilledButton(
-              onPressed: textController.text.toLowerCase() == 'confirm'
-                  ? () => Navigator.of(context).pop(true)
-                  : null,
-              style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(loc.clearAllCache),
-            ),
-          ],
-        ),
-      ),
-    );
+    await CacheService.confirmAndClearAllCache(context, l10n: loc);
+    // Refresh cache info after dialog closes, regardless of outcome
+    await _loadCacheInfo();
   }
 
   Future<void> _clearLogs() async {

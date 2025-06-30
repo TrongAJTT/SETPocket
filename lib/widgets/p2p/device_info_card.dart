@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/utils/string_mask_utils.dart';
 
@@ -25,6 +26,7 @@ class DeviceInfoCard extends StatefulWidget {
 class _DeviceInfoCardState extends State<DeviceInfoCard> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.user == null) {
       return Card(
         child: Padding(
@@ -71,7 +73,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
             // Device info rows
             _buildInfoRow(
               context,
-              'Device Name',
+              l10n.deviceName,
               widget.user!.displayName,
               icon: Icons.devices,
             ),
@@ -79,7 +81,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
               const SizedBox(height: 8),
               _buildInfoRow(
                 context,
-                'App Installation ID',
+                l10n.appInstallationId,
                 widget.user!.id,
                 icon: Icons.fingerprint,
               ),
@@ -87,22 +89,22 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
             const SizedBox(height: 8),
             _buildInfoRow(
               context,
-              'IP Address',
+              l10n.ipAddress,
               widget.user!.ipAddress,
               icon: Icons.location_on,
             ),
             const SizedBox(height: 8),
             _buildInfoRow(
               context,
-              'Port',
+              l10n.port,
               widget.user!.port.toString(),
               icon: Icons.router,
             ),
             const SizedBox(height: 8),
             _buildInfoRow(
               context,
-              'Status',
-              widget.user!.isOnline ? 'Online' : 'Offline',
+              l10n.status,
+              widget.user!.isOnline ? l10n.online : l10n.offline,
               icon:
                   widget.user!.isOnline ? Icons.circle : Icons.circle_outlined,
               statusColor: widget.user!.isOnline ? Colors.green : Colors.red,
@@ -111,7 +113,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
               const SizedBox(height: 8),
               _buildInfoRow(
                 context,
-                'Last Seen',
+                l10n.lastSeen,
                 _formatLastSeen(widget.user!.lastSeen),
                 icon: Icons.access_time,
               ),
@@ -175,13 +177,14 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
   }
 
   Widget _buildStatusChips(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: 6.0,
       runSpacing: 4.0,
       children: [
         if (widget.user!.isPaired)
           Chip(
-            label: const Text('Paired'),
+            label: Text(l10n.paired),
             avatar: const Icon(Icons.link, size: 14),
             backgroundColor: Colors.blue,
             labelStyle: const TextStyle(color: Colors.white, fontSize: 12),
@@ -189,7 +192,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
           ),
         if (widget.user!.isTrusted)
           Chip(
-            label: const Text('Trusted'),
+            label: Text(l10n.trust),
             avatar: const Icon(Icons.verified_user, size: 14),
             backgroundColor: Colors.green,
             labelStyle: const TextStyle(color: Colors.white, fontSize: 12),
@@ -197,7 +200,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
           ),
         if (widget.user!.isStored)
           Chip(
-            label: const Text('Saved'),
+            label: Text(l10n.saved),
             avatar: const Icon(Icons.save, size: 14),
             backgroundColor: Colors.purple,
             labelStyle: const TextStyle(color: Colors.white, fontSize: 12),
@@ -205,7 +208,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
           ),
         if (widget.user!.autoConnect)
           Chip(
-            label: const Text('Auto Connect'),
+            label: Text(l10n.autoConnect),
             avatar: const Icon(Icons.autorenew, size: 14),
             backgroundColor: Colors.orange,
             labelStyle: const TextStyle(color: Colors.white, fontSize: 12),

@@ -182,7 +182,7 @@ abstract class AppLocalizations {
   /// No description provided for @cacheSize.
   ///
   /// In en, this message translates to:
-  /// **'Cache Size'**
+  /// **'Cache size'**
   String get cacheSize;
 
   /// No description provided for @cacheItems.
@@ -293,6 +293,12 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to clear ALL cache data? This will remove all saved templates but preserve your settings.'**
   String get confirmClearAllCache;
 
+  /// Warning text for caches that cannot be cleared
+  ///
+  /// In en, this message translates to:
+  /// **'The following caches cannot be cleared because they are currently in use:'**
+  String get cannotClearFollowingCaches;
+
   /// No description provided for @cacheCleared.
   ///
   /// In en, this message translates to:
@@ -316,6 +322,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @online.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get online;
+
+  /// No description provided for @offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offline;
 
   /// No description provided for @options.
   ///
@@ -341,7 +359,7 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
-  /// No description provided for @saved.
+  /// Label for saved devices
   ///
   /// In en, this message translates to:
   /// **'Saved'**
@@ -3077,7 +3095,7 @@ abstract class AppLocalizations {
   /// **'Maximum 4 quick actions reached'**
   String get maxQuickActionsReached;
 
-  /// No description provided for @clearAll.
+  /// Button to clear all selected files
   ///
   /// In en, this message translates to:
   /// **'Clear All'**
@@ -4889,7 +4907,7 @@ abstract class AppLocalizations {
   /// **'Calculating...'**
   String get calculating;
 
-  /// No description provided for @unknown.
+  /// Unknown status or value
   ///
   /// In en, this message translates to:
   /// **'Unknown'**
@@ -7727,7 +7745,7 @@ abstract class AppLocalizations {
   /// **'Function {number}'**
   String functionLabel(int number);
 
-  /// No description provided for @reset.
+  /// Button to confirm reset
   ///
   /// In en, this message translates to:
   /// **'Reset'**
@@ -9953,16 +9971,16 @@ abstract class AppLocalizations {
   /// **'Start calculating to see history'**
   String get startCalculatingToSeeHistory;
 
-  /// No description provided for @p2pDataTransfer.
+  /// Title for the P2P File Transfer tool
   ///
   /// In en, this message translates to:
-  /// **'P2P Data Transfer'**
+  /// **'P2P File Transfer'**
   String get p2pDataTransfer;
 
-  /// No description provided for @p2pDataTransferDesc.
+  /// Description for the P2P File Transfer tool
   ///
   /// In en, this message translates to:
-  /// **'Transfer data directly between devices on the same network'**
+  /// **'Transfer files between devices on the same local network.'**
   String get p2pDataTransferDesc;
 
   /// No description provided for @networkSecurityWarning.
@@ -10067,6 +10085,12 @@ abstract class AppLocalizations {
   /// **'Connection Status'**
   String get connectionStatus;
 
+  /// No description provided for @autoConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Connect'**
+  String get autoConnect;
+
   /// No description provided for @networkInfo.
   ///
   /// In en, this message translates to:
@@ -10133,11 +10157,23 @@ abstract class AppLocalizations {
   /// **'Paired'**
   String get paired;
 
+  /// No description provided for @lastSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Seen'**
+  String get lastSeen;
+
+  /// No description provided for @pairedSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired Since'**
+  String get pairedSince;
+
   /// No description provided for @trusted.
   ///
   /// In en, this message translates to:
-  /// **'Trusted'**
-  String get trusted;
+  /// **'Trusted {name}'**
+  String trusted(String name);
 
   /// No description provided for @pair.
   ///
@@ -10205,6 +10241,18 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get p2pPermissionCancel;
 
+  /// Title for the nearby devices permission request dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby Devices Permission Required'**
+  String get p2pNearbyDevicesPermissionTitle;
+
+  /// Explanation for why nearby WiFi devices permission is needed for P2P
+  ///
+  /// In en, this message translates to:
+  /// **'To discover nearby devices on modern Android versions, this app needs access to nearby WiFi devices. This permission allows the app to scan for WiFi networks without accessing your location. Your data is not stored or shared. The app is client-side and we do not collect any user data.'**
+  String get p2pNearbyDevicesPermissionExplanation;
+
   /// No description provided for @dataTransferRequest.
   ///
   /// In en, this message translates to:
@@ -10240,6 +10288,1506 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'P2Lan Transfer'**
   String get p2lanTransfer;
+
+  /// Notification type for P2LAN active status
+  ///
+  /// In en, this message translates to:
+  /// **'P2LAN Status'**
+  String get p2lanStatus;
+
+  /// Notification type for detailed file transfer status
+  ///
+  /// In en, this message translates to:
+  /// **'File Transfer Status'**
+  String get fileTransferStatus;
+
+  /// Notification title when P2LAN is running
+  ///
+  /// In en, this message translates to:
+  /// **'P2LAN Active'**
+  String get p2lanActive;
+
+  /// Status when P2LAN is ready to accept connections
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for connections'**
+  String get readyForConnections;
+
+  /// Number of devices connected to P2LAN
+  ///
+  /// In en, this message translates to:
+  /// **'{count} devices connected'**
+  String devicesConnected(int count);
+
+  /// One device connected to P2LAN
+  ///
+  /// In en, this message translates to:
+  /// **'{count} device connected'**
+  String deviceConnected(int count);
+
+  /// Action button to stop P2LAN from notification
+  ///
+  /// In en, this message translates to:
+  /// **'Stop P2LAN'**
+  String get stopP2lan;
+
+  /// Message when P2LAN has been stopped
+  ///
+  /// In en, this message translates to:
+  /// **'P2LAN stopped'**
+  String get p2lanStopped;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
+  /// No description provided for @quickActionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Select up to 4 tools for quick access.'**
+  String get quickActionsDesc;
+
+  /// No description provided for @quickActionsManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Quick Actions'**
+  String get quickActionsManage;
+
+  /// No description provided for @cacheDetailsDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Details'**
+  String get cacheDetailsDialogTitle;
+
+  /// No description provided for @randomGeneratorsCacheDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation history and settings'**
+  String get randomGeneratorsCacheDesc;
+
+  /// No description provided for @calculatorToolsCacheDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation history, graphing calculator data, BMI data, and settings'**
+  String get calculatorToolsCacheDesc;
+
+  /// No description provided for @converterToolsCacheDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency/length states, presets and exchange rates cache'**
+  String get converterToolsCacheDesc;
+
+  /// Description for the P2P cache entry in the cache details dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Settings, saved device profiles, and temporary file transfer cache.'**
+  String get p2pDataTransferCacheDesc;
+
+  /// No description provided for @totalCacheSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {count} items, {size}'**
+  String totalCacheSize(Object count, Object size);
+
+  /// No description provided for @clearSelectedCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Selected Cache'**
+  String get clearSelectedCache;
+
+  /// Question in user pairing dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to pair with this device?'**
+  String get pairWithDevice;
+
+  /// Label for device ID field
+  ///
+  /// In en, this message translates to:
+  /// **'Device ID'**
+  String get deviceId;
+
+  /// Label for when device was discovered
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery Time'**
+  String get discoveryTime;
+
+  /// Checkbox label to save connection
+  ///
+  /// In en, this message translates to:
+  /// **'Save Connection'**
+  String get saveConnection;
+
+  /// Description for save connection option
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically reconnect when both devices are online'**
+  String get autoReconnectDescription;
+
+  /// Information about pairing process
+  ///
+  /// In en, this message translates to:
+  /// **'The other user will receive a pairing request and needs to accept to complete the pairing.'**
+  String get pairingNotificationInfo;
+
+  /// Button to send pairing request
+  ///
+  /// In en, this message translates to:
+  /// **'Send Request'**
+  String get sendRequest;
+
+  /// Time indication for very recent actions
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String minutesAgo(int minutes);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hr ago'**
+  String hoursAgo(int hours);
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String daysAgo(int days);
+
+  /// Text when there are no pairing requests
+  ///
+  /// In en, this message translates to:
+  /// **'No pairing requests'**
+  String get noPairingRequests;
+
+  /// Text indicating source of pairing request
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing request from:'**
+  String get pairingRequestFrom;
+
+  /// Label for when request was sent
+  ///
+  /// In en, this message translates to:
+  /// **'Sent Time'**
+  String get sentTime;
+
+  /// Message when sender wants to save connection
+  ///
+  /// In en, this message translates to:
+  /// **'This person wants to save the connection'**
+  String get wantsSaveConnection;
+
+  /// Checkbox to trust user
+  ///
+  /// In en, this message translates to:
+  /// **'Trust this user'**
+  String get trustThisUser;
+
+  /// Description for trust user option
+  ///
+  /// In en, this message translates to:
+  /// **'Allow file transfers without confirmation'**
+  String get allowFileTransfersWithoutConfirmation;
+
+  /// Security warning about pairing
+  ///
+  /// In en, this message translates to:
+  /// **'Only accept pairing from devices you trust.'**
+  String get onlyAcceptFromTrustedDevices;
+
+  /// Tooltip for previous request button
+  ///
+  /// In en, this message translates to:
+  /// **'Previous request'**
+  String get previousRequest;
+
+  /// Tooltip for next request button
+  ///
+  /// In en, this message translates to:
+  /// **'Next request'**
+  String get nextRequest;
+
+  /// Button to reject pairing/transfer request
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get reject;
+
+  /// Button to accept pairing/transfer request
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// Title for incoming file transfer dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming Files'**
+  String get incomingFiles;
+
+  /// Text showing sender wants to send files
+  ///
+  /// In en, this message translates to:
+  /// **'wants to send you {count} file(s)'**
+  String wantsToSendYouFiles(int count);
+
+  /// Header for list of files to receive
+  ///
+  /// In en, this message translates to:
+  /// **'Files to receive:'**
+  String get filesToReceive;
+
+  /// Label for total file size
+  ///
+  /// In en, this message translates to:
+  /// **'Total size:'**
+  String get totalSize;
+
+  /// Tooltip for local files button
+  ///
+  /// In en, this message translates to:
+  /// **'Local Files'**
+  String get localFiles;
+
+  /// Tooltip and label for manual discovery
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Discovery'**
+  String get manualDiscovery;
+
+  /// Tooltip for transfer settings button
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Settings'**
+  String get transferSettings;
+
+  /// Subtitle for saved devices section
+  ///
+  /// In en, this message translates to:
+  /// **'Saved devices currently available'**
+  String get savedDevicesCurrentlyAvailable;
+
+  /// Subtitle for discovered devices section
+  ///
+  /// In en, this message translates to:
+  /// **'Recently discovered devices'**
+  String get recentlyDiscoveredDevices;
+
+  /// Menu option to view device info
+  ///
+  /// In en, this message translates to:
+  /// **'View Info'**
+  String get viewInfo;
+
+  /// Menu option to trust device
+  ///
+  /// In en, this message translates to:
+  /// **'Trust'**
+  String get trust;
+
+  /// Menu option to remove trust
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Trust'**
+  String get removeTrust;
+
+  /// Menu option to unpair device
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair'**
+  String get unpair;
+
+  /// Label for current device
+  ///
+  /// In en, this message translates to:
+  /// **'This Device'**
+  String get thisDevice;
+
+  /// Label for file cache section
+  ///
+  /// In en, this message translates to:
+  /// **'File Cache'**
+  String get fileCache;
+
+  /// Button to reload cache size
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get reload;
+
+  /// Button to clear cache
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// Description of file cache content
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary files from P2Lan file transfers'**
+  String get temporaryFilesFromTransfers;
+
+  /// Debug button label
+  ///
+  /// In en, this message translates to:
+  /// **'Debug'**
+  String get debug;
+
+  /// Title for clear file cache dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Clear File Cache'**
+  String get clearFileCache;
+
+  /// Success message for cache clear
+  ///
+  /// In en, this message translates to:
+  /// **'File cache cleared successfully'**
+  String get fileCacheClearedSuccessfully;
+
+  /// No description provided for @failedToClearCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clear cache: {error}'**
+  String failedToClearCache(String error);
+
+  /// Error message for settings update failure
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update settings'**
+  String get failedToUpdateSettings;
+
+  /// Error message for settings load failure
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load settings: {error}'**
+  String failedToLoadSettings(String error);
+
+  /// Confirmation to remove trust from device
+  ///
+  /// In en, this message translates to:
+  /// **'Remove trust from {deviceName}?'**
+  String removeTrustFrom(String deviceName);
+
+  /// Button to remove/delete
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// Title for unpair dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair from {deviceName}'**
+  String unpairFrom(String deviceName);
+
+  /// Description of unpair action
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove the pairing completely from both devices. You will need to pair again in the future.\n\nThe other device will also be notified and their connection will be removed.'**
+  String get unpairDescription;
+
+  /// Button text for unpair confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to Unpair'**
+  String get holdToUnpair;
+
+  /// Text shown during unpair process
+  ///
+  /// In en, this message translates to:
+  /// **'Unpairing...'**
+  String get unpairing;
+
+  /// Instruction for unpair confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the button for 1 second to confirm unpair'**
+  String get holdButtonToConfirmUnpair;
+
+  /// Success message when task and file are deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Task and file deleted successfully'**
+  String get taskAndFileDeletedSuccessfully;
+
+  /// Message when task is cleared
+  ///
+  /// In en, this message translates to:
+  /// **'Task cleared'**
+  String get taskCleared;
+
+  /// Status when not connected
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get notConnected;
+
+  /// Status text during file sending
+  ///
+  /// In en, this message translates to:
+  /// **'Sending...'**
+  String get sending;
+
+  /// Button to send selected files
+  ///
+  /// In en, this message translates to:
+  /// **'Send files'**
+  String get sendFiles;
+
+  /// Button to add files
+  ///
+  /// In en, this message translates to:
+  /// **'Add Files'**
+  String get addFiles;
+
+  /// Error message for file selection
+  ///
+  /// In en, this message translates to:
+  /// **'Error selecting files: {error}'**
+  String errorSelectingFiles(String error);
+
+  /// Error message for file sending
+  ///
+  /// In en, this message translates to:
+  /// **'Error sending files: {error}'**
+  String errorSendingFiles(String error);
+
+  /// Message when no files are selected
+  ///
+  /// In en, this message translates to:
+  /// **'No files selected'**
+  String get noFilesSelected;
+
+  /// Instructions for file options
+  ///
+  /// In en, this message translates to:
+  /// **'Tap or right-click for options'**
+  String get tapRightClickForOptions;
+
+  /// Title for transfer summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Summary'**
+  String get transferSummary;
+
+  /// Option for unlimited size/count
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited'**
+  String get unlimited;
+
+  /// TCP protocol option
+  ///
+  /// In en, this message translates to:
+  /// **'TCP'**
+  String get tcpProtocol;
+
+  /// Description of TCP protocol
+  ///
+  /// In en, this message translates to:
+  /// **'More reliable, better for important files'**
+  String get tcpDescription;
+
+  /// UDP protocol option
+  ///
+  /// In en, this message translates to:
+  /// **'UDP'**
+  String get udpProtocol;
+
+  /// Description of UDP protocol
+  ///
+  /// In en, this message translates to:
+  /// **'Faster but less reliable, good for large files'**
+  String get udpDescription;
+
+  /// No file organization option
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get noFileOrganization;
+
+  /// Option to create folders by date
+  ///
+  /// In en, this message translates to:
+  /// **'Create date folders'**
+  String get createDateFolders;
+
+  /// Description of date organization
+  ///
+  /// In en, this message translates to:
+  /// **'Organize files by date received'**
+  String get organizeFoldersByDate;
+
+  /// Option to create folders by sender
+  ///
+  /// In en, this message translates to:
+  /// **'Create sender folders'**
+  String get createSenderFolders;
+
+  /// Option for immediate UI updates
+  ///
+  /// In en, this message translates to:
+  /// **'Immediate'**
+  String get immediate;
+
+  /// Default device name
+  ///
+  /// In en, this message translates to:
+  /// **'My Device'**
+  String get myDevice;
+
+  /// File organization by sender name
+  ///
+  /// In en, this message translates to:
+  /// **'By Sender Name'**
+  String get bySenderName;
+
+  /// File organization by date
+  ///
+  /// In en, this message translates to:
+  /// **'By Date'**
+  String get byDate;
+
+  /// No organization option
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// Button and dialog title to reset settings
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Defaults'**
+  String get resetToDefaults;
+
+  /// Confirmation message for reset
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reset all settings to their default values?'**
+  String get resetConfirmation;
+
+  /// Tab label for general settings
+  ///
+  /// In en, this message translates to:
+  /// **'Generic'**
+  String get generic;
+
+  /// Tab label for storage settings
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get storage;
+
+  /// Tab label for network settings
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get network;
+
+  /// Button to save settings
+  ///
+  /// In en, this message translates to:
+  /// **'Save Settings'**
+  String get saveSettings;
+
+  /// Section header for device profile
+  ///
+  /// In en, this message translates to:
+  /// **'Device Profile'**
+  String get deviceProfile;
+
+  /// Label for device name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Device Display Name'**
+  String get deviceDisplayName;
+
+  /// Section header for user preferences
+  ///
+  /// In en, this message translates to:
+  /// **'User Preferences'**
+  String get userPreferences;
+
+  /// Setting to enable notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get enableNotifications;
+
+  /// Description for notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified about transfer events'**
+  String get getNotifiedAboutTransferEvents;
+
+  /// Section header for UI performance settings
+  ///
+  /// In en, this message translates to:
+  /// **'User Interface Performance'**
+  String get userInterfacePerformance;
+
+  /// Label for UI refresh rate setting
+  ///
+  /// In en, this message translates to:
+  /// **'UI Refresh Rate'**
+  String get uiRefreshRate;
+
+  /// Section header for current config display
+  ///
+  /// In en, this message translates to:
+  /// **'Current Configuration'**
+  String get currentConfiguration;
+
+  /// Label for protocol setting
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol'**
+  String get protocol;
+
+  /// Label for maximum file size setting
+  ///
+  /// In en, this message translates to:
+  /// **'Max File Size'**
+  String get maxFileSize;
+
+  /// Label for maximum total size setting
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum total size (per transfer batch)'**
+  String get maxTotalSize;
+
+  /// Label for concurrent tasks setting
+  ///
+  /// In en, this message translates to:
+  /// **'Concurrent Tasks'**
+  String get concurrentTasks;
+
+  /// Label for chunk size setting
+  ///
+  /// In en, this message translates to:
+  /// **'Chunk Size'**
+  String get chunkSize;
+
+  /// Label for file organization setting
+  ///
+  /// In en, this message translates to:
+  /// **'File Organization'**
+  String get fileOrganization;
+
+  /// Section header for storage info
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Information'**
+  String get storageInformation;
+
+  /// Label for download path
+  ///
+  /// In en, this message translates to:
+  /// **'Download Path'**
+  String get downloadPath;
+
+  /// Label for total disk space
+  ///
+  /// In en, this message translates to:
+  /// **'Total Space'**
+  String get totalSpace;
+
+  /// Label for free disk space
+  ///
+  /// In en, this message translates to:
+  /// **'Free Space'**
+  String get freeSpace;
+
+  /// Label for used disk space
+  ///
+  /// In en, this message translates to:
+  /// **'Used Space'**
+  String get usedSpace;
+
+  /// Message when no download path is configured
+  ///
+  /// In en, this message translates to:
+  /// **'No Download Path Set'**
+  String get noDownloadPathSet;
+
+  /// Section header for download location settings
+  ///
+  /// In en, this message translates to:
+  /// **'Download Location'**
+  String get downloadLocation;
+
+  /// Label for download folder setting
+  ///
+  /// In en, this message translates to:
+  /// **'Download Folder'**
+  String get downloadFolder;
+
+  /// Section header for Android storage permissions
+  ///
+  /// In en, this message translates to:
+  /// **'Android Storage Access'**
+  String get androidStorageAccess;
+
+  /// Button to use app-specific folder
+  ///
+  /// In en, this message translates to:
+  /// **'Use App Folder'**
+  String get useAppFolder;
+
+  /// Section header for size limit settings
+  ///
+  /// In en, this message translates to:
+  /// **'Size Limits'**
+  String get sizeLimits;
+
+  /// Description for total size limit
+  ///
+  /// In en, this message translates to:
+  /// **'Total size limit for all files in a single transfer request'**
+  String get totalSizeLimitDescription;
+
+  /// Section header for protocol settings
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Protocol'**
+  String get transferProtocolSection;
+
+  /// Section header for performance settings
+  ///
+  /// In en, this message translates to:
+  /// **'Performance Tuning'**
+  String get performanceTuning;
+
+  /// Description for concurrent transfers setting
+  ///
+  /// In en, this message translates to:
+  /// **' = faster overall but higher CPU usage'**
+  String get concurrentTransfersDescription;
+
+  /// Description for chunk size setting
+  ///
+  /// In en, this message translates to:
+  /// **'Higher sizes = faster transfers but more memory usage'**
+  String get transferChunkSizeDescription;
+
+  /// Error message when permissions are missing
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions are required to start P2P networking'**
+  String get permissionsRequiredForP2P;
+
+  /// Error message for networking start failure
+  ///
+  /// In en, this message translates to:
+  /// **'Error in starting networking: {error}'**
+  String errorInStartNetworking(String error);
+
+  /// Error message for file selection from category
+  ///
+  /// In en, this message translates to:
+  /// **'Error selecting files from {category}: {error}'**
+  String errorSelectingFilesFromCategory(String category, String error);
+
+  /// No description provided for @loadingDeviceInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading device information...'**
+  String get loadingDeviceInfo;
+
+  /// No description provided for @tempFilesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary files from P2Lan file transfers'**
+  String get tempFilesDescription;
+
+  /// No description provided for @networkDebugCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Network debug completed. Check logs for details.'**
+  String get networkDebugCompleted;
+
+  /// No description provided for @lastRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Last refresh: {time}'**
+  String lastRefresh(String time);
+
+  /// No description provided for @p2pNetworkingPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'P2P networking is paused due to internet connection loss. It will automatically resume when connection is restored.'**
+  String get p2pNetworkingPaused;
+
+  /// No description provided for @noDevicesInRange.
+  ///
+  /// In en, this message translates to:
+  /// **'No devices in range. Try refreshing.'**
+  String get noDevicesInRange;
+
+  /// No description provided for @initialDiscoveryInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial discovery in progress...'**
+  String get initialDiscoveryInProgress;
+
+  /// No description provided for @refreshing.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshing...'**
+  String get refreshing;
+
+  /// No description provided for @pausedNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused (No Internet)'**
+  String get pausedNoInternet;
+
+  /// No description provided for @trustRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust removed from {name}'**
+  String trustRemoved(String name);
+
+  /// No description provided for @removeTrustConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove trust from {name}?'**
+  String removeTrustConfirm(String name);
+
+  /// No description provided for @unpairFromDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair from {name}'**
+  String unpairFromDevice(String name);
+
+  /// No description provided for @holdUnpairInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the button for 1 second to confirm unpair'**
+  String get holdUnpairInstruction;
+
+  /// No description provided for @unpaired.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpaired from {name}'**
+  String unpaired(String name);
+
+  /// No description provided for @taskAndFileDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Task and file deleted successfully'**
+  String get taskAndFileDeleted;
+
+  /// No description provided for @clearFileCacheConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This will clear temporary files from P2Lan transfers. This action cannot be undone.'**
+  String get clearFileCacheConfirm;
+
+  /// No description provided for @fileCacheClearedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'File cache cleared successfully'**
+  String get fileCacheClearedSuccess;
+
+  /// No description provided for @permissionsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions are required to start P2P networking'**
+  String get permissionsRequired;
+
+  /// No description provided for @startedSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Started sending {count} files to {name}'**
+  String startedSending(int count, String name);
+
+  /// No description provided for @transferSettingsUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer settings updated successfully'**
+  String get transferSettingsUpdated;
+
+  /// No description provided for @disconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get disconnected;
+
+  /// No description provided for @discoveringDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovering devices...'**
+  String get discoveringDevices;
+
+  /// No description provided for @connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get connected;
+
+  /// No description provided for @pairing.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing...'**
+  String get pairing;
+
+  /// No description provided for @checkingNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking network...'**
+  String get checkingNetwork;
+
+  /// No description provided for @connectedViaMobileData.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected via mobile data (secure)'**
+  String get connectedViaMobileData;
+
+  /// No description provided for @connectedToWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected to {name} ({security})'**
+  String connectedToWifi(String name, String security);
+
+  /// No description provided for @secure.
+  ///
+  /// In en, this message translates to:
+  /// **'secure'**
+  String get secure;
+
+  /// No description provided for @unsecure.
+  ///
+  /// In en, this message translates to:
+  /// **'unsecure'**
+  String get unsecure;
+
+  /// No description provided for @connectedViaEthernet.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected via Ethernet (secure)'**
+  String get connectedViaEthernet;
+
+  /// No description provided for @noNetworkConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No network connection'**
+  String get noNetworkConnection;
+
+  /// No description provided for @unknownWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown WiFi'**
+  String get unknownWifi;
+
+  /// No description provided for @tcpReliable.
+  ///
+  /// In en, this message translates to:
+  /// **'TCP (Reliable)'**
+  String get tcpReliable;
+
+  /// No description provided for @udpFast.
+  ///
+  /// In en, this message translates to:
+  /// **'UDP (Fast)'**
+  String get udpFast;
+
+  /// No description provided for @createDateFoldersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize by date (YYYY-MM-DD)'**
+  String get createDateFoldersDescription;
+
+  /// No description provided for @createSenderFoldersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize by sender display name'**
+  String get createSenderFoldersDescription;
+
+  /// No description provided for @maxConcurrentTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Concurrent Tasks'**
+  String get maxConcurrentTasks;
+
+  /// No description provided for @defaultLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultLabel;
+
+  /// No description provided for @customDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Display Name'**
+  String get customDisplayName;
+
+  /// No description provided for @deviceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Name'**
+  String get deviceName;
+
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
+  /// No description provided for @performance.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance'**
+  String get performance;
+
+  /// No description provided for @advanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get advanced;
+
+  /// No description provided for @discard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
+  /// No description provided for @hasUnsavedChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. Do you want to discard them?'**
+  String get hasUnsavedChanges;
+
+  /// No description provided for @selectFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Folder'**
+  String get selectFolder;
+
+  /// No description provided for @permissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Required'**
+  String get permissionRequired;
+
+  /// No description provided for @grantStoragePermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant storage permission to select download folder'**
+  String get grantStoragePermission;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// No description provided for @notificationPermissionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission allows you to receive updates about file transfers and connection status.'**
+  String get notificationPermissionInfo;
+
+  /// No description provided for @secondsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'second'**
+  String get secondsLabel;
+
+  /// No description provided for @secondsPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'seconds'**
+  String get secondsPlural;
+
+  /// No description provided for @networkInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Information'**
+  String get networkInfoTitle;
+
+  /// No description provided for @deviceSections.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Sections'**
+  String get deviceSections;
+
+  /// No description provided for @onlineDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Devices'**
+  String get onlineDevices;
+
+  /// No description provided for @newDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'New Devices'**
+  String get newDevices;
+
+  /// No description provided for @addTrust.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Trust'**
+  String get addTrust;
+
+  /// No description provided for @emptyDevicesStateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Devices Found'**
+  String get emptyDevicesStateTitle;
+
+  /// No description provided for @viewDeviceInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'View device information'**
+  String get viewDeviceInfo;
+
+  /// No description provided for @trustUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust user'**
+  String get trustUser;
+
+  /// No description provided for @menuSendFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Files'**
+  String get menuSendFiles;
+
+  /// No description provided for @menuViewInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'View Info'**
+  String get menuViewInfo;
+
+  /// No description provided for @menuPair.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair'**
+  String get menuPair;
+
+  /// No description provided for @menuTrust.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust'**
+  String get menuTrust;
+
+  /// No description provided for @menuUntrust.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Trust'**
+  String get menuUntrust;
+
+  /// No description provided for @menuUnpair.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair'**
+  String get menuUnpair;
+
+  /// No description provided for @deviceActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Actions'**
+  String get deviceActions;
+
+  /// No description provided for @p2pTemporarilyDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'P2P temporarily disabled - waiting for internet connection'**
+  String get p2pTemporarilyDisabled;
+
+  /// No description provided for @fileOrgNoneDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Files go directly to download folder'**
+  String get fileOrgNoneDescription;
+
+  /// No description provided for @fileOrgDateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize by date (YYYY-MM-DD)'**
+  String get fileOrgDateDescription;
+
+  /// No description provided for @fileOrgSenderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize by sender display name'**
+  String get fileOrgSenderDescription;
+
+  /// No description provided for @basic.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic'**
+  String get basic;
+
+  /// No description provided for @summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get summary;
+
+  /// No description provided for @p2lanTransferSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'P2Lan Transfer Settings'**
+  String get p2lanTransferSettingsTitle;
+
+  /// No description provided for @settingsTabGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Generic'**
+  String get settingsTabGeneric;
+
+  /// No description provided for @settingsTabStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get settingsTabStorage;
+
+  /// No description provided for @settingsTabNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get settingsTabNetwork;
+
+  /// No description provided for @displayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// No description provided for @displayNameDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize how your device appears to other users'**
+  String get displayNameDescription;
+
+  /// No description provided for @deviceDisplayNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Display Name'**
+  String get deviceDisplayNameLabel;
+
+  /// No description provided for @deviceDisplayNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter custom display name...'**
+  String get deviceDisplayNameHint;
+
+  /// No description provided for @defaultDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {name}'**
+  String defaultDisplayName(String name);
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @notSupportedOnWindows.
+  ///
+  /// In en, this message translates to:
+  /// **'Not supported on Windows'**
+  String get notSupportedOnWindows;
+
+  /// No description provided for @uiPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'User Interface Performance'**
+  String get uiPerformance;
+
+  /// No description provided for @uiRefreshRateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how often transfer progress updates in the UI. Higher frequencies work better on powerful devices.'**
+  String get uiRefreshRateDescription;
+
+  /// No description provided for @savedDevicesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Devices ({count})'**
+  String savedDevicesCount(int count);
+
+  /// No description provided for @previouslyPairedOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Previously paired devices (offline)'**
+  String get previouslyPairedOffline;
+
+  /// No description provided for @statusSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get statusSaved;
+
+  /// No description provided for @statusTrusted.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted'**
+  String get statusTrusted;
+
+  /// No description provided for @thisDeviceCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This Device'**
+  String get thisDeviceCardTitle;
+
+  /// No description provided for @appInstallationId.
+  ///
+  /// In en, this message translates to:
+  /// **'App Installation ID'**
+  String get appInstallationId;
+
+  /// No description provided for @ipAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'IP Address'**
+  String get ipAddress;
+
+  /// No description provided for @port.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get port;
+
+  /// No description provided for @statusOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get statusOffline;
+
+  /// No description provided for @selectDownloadFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select download folder...'**
+  String get selectDownloadFolder;
+
+  /// No description provided for @maxFileSizePerFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum file size (per file)'**
+  String get maxFileSizePerFile;
+
+  /// No description provided for @transferProtocol.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Protocol'**
+  String get transferProtocol;
+
+  /// No description provided for @concurrentTransfers.
+  ///
+  /// In en, this message translates to:
+  /// **'Concurrent transfers'**
+  String get concurrentTransfers;
+
+  /// No description provided for @transferChunkSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer chunk size'**
+  String get transferChunkSize;
+
+  /// No description provided for @defaultValue.
+  ///
+  /// In en, this message translates to:
+  /// **'(Default)'**
+  String get defaultValue;
+
+  /// No description provided for @androidStorageAccessDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'For security, it\'s recommended to use the app-specific folder. You can select other folders, but this may require additional permissions.'**
+  String get androidStorageAccessDescription;
+
+  /// No description provided for @storageInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Information'**
+  String get storageInfo;
+
+  /// No description provided for @noDownloadPathSetDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a download folder in the Storage tab to see storage information.'**
+  String get noDownloadPathSetDescription;
+
+  /// No description provided for @enableNotificationsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified about transfer events'**
+  String get enableNotificationsDescription;
+
+  /// No description provided for @maxFileSizePerFileDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger files will be automatically rejected'**
+  String get maxFileSizePerFileDescription;
+
+  /// No description provided for @maxTotalSizeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Total size limit for all files in a single transfer request'**
+  String get maxTotalSizeDescription;
+
+  /// No description provided for @concurrentTransfersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'More transfers = faster overall but higher CPU usage'**
+  String get concurrentTransfersSubtitle;
+
+  /// No description provided for @transferChunkSizeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Higher sizes = faster transfers but more memory usage'**
+  String get transferChunkSizeSubtitle;
+
+  /// No description provided for @protocolTcpReliable.
+  ///
+  /// In en, this message translates to:
+  /// **'TCP (Reliable)'**
+  String get protocolTcpReliable;
+
+  /// No description provided for @protocolTcpDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'More reliable, better for important files'**
+  String get protocolTcpDescription;
+
+  /// No description provided for @protocolUdpFast.
+  ///
+  /// In en, this message translates to:
+  /// **'UDP (Fast)'**
+  String get protocolUdpFast;
+
+  /// No description provided for @fileOrgNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get fileOrgNone;
+
+  /// No description provided for @fileOrgDate.
+  ///
+  /// In en, this message translates to:
+  /// **'By Date'**
+  String get fileOrgDate;
+
+  /// No description provided for @fileOrgSender.
+  ///
+  /// In en, this message translates to:
+  /// **'By Sender Name'**
+  String get fileOrgSender;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

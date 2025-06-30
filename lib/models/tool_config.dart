@@ -65,6 +65,8 @@ class ToolConfig {
         return Icons.swap_horiz;
       case 'calculate':
         return Icons.calculate;
+      case 'share':
+        return Icons.share;
       default:
         return Icons.extension; // Fallback icon
     }
@@ -80,6 +82,10 @@ class ToolConfig {
         return Colors.green;
       case 'orange':
         return Colors.orange;
+      case 'grey':
+        return Colors.grey[700]!;
+      case 'teal':
+        return Colors.teal;
       default:
         return Colors.grey; // Fallback color
     }
@@ -96,6 +102,8 @@ class ToolConfig {
         return l10n.converterTools;
       case 'calculatorTools':
         return l10n.calculatorTools;
+      case 'p2pDataTransfer':
+        return l10n.p2pDataTransfer;
       default:
         return nameKey;
     }
@@ -111,6 +119,8 @@ class ToolConfig {
         return 'ic_converter_tools';
       case 'calculatorTools':
         return 'ic_calculator_tools';
+      case 'p2pDataTransfer':
+        return 'ic_p2lan_active';
       default:
         return 'ic_default_tool';
     }
@@ -127,6 +137,8 @@ class ToolConfig {
         return l10n.converterToolsDesc;
       case 'calculatorToolsDesc':
         return l10n.calculatorToolsDesc;
+      case 'p2pDataTransferDesc':
+        return l10n.p2pDataTransferDesc;
       default:
         return descKey;
     }

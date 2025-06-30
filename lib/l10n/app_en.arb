@@ -39,10 +39,16 @@
     "dataAndStorage": "Data & Storage",
     "confirmClearCache": "Are you sure you want to clear \"{cacheName}\" cache?",
     "confirmClearAllCache": "Are you sure you want to clear ALL cache data? This will remove all saved templates but preserve your settings.",
+    "cannotClearFollowingCaches": "The following caches cannot be cleared because they are currently in use:",
+    "@cannotClearFollowingCaches": {
+        "description": "Warning text for caches that cannot be cleared"
+    },
     "cacheCleared": "{cacheName} cache cleared successfully",
     "allCacheCleared": "All cache cleared successfully",
     "errorClearingCache": "Error clearing cache: {error}",
     "close": "Close",
+    "online": "Online",
+    "offline": "Offline",
     "options": "Options",
     "about": "About",
     "add": "Add",
@@ -2342,8 +2348,8 @@
     "startCalculatingToSeeHistory": "Start calculating to see history",
     "noHistoryAvailable": "No history available",
 
-      "p2pDataTransfer": "P2P Data Transfer",
-  "p2pDataTransferDesc": "Transfer data directly between devices on the same network",
+      "p2pDataTransfer": "P2P File Transfer",
+  "p2pDataTransferDesc": "Transfer files between devices on the same local network.",
     "networkSecurityWarning": "Network Security Warning",
     "unsecureNetworkDetected": "Unsecure network detected",
     "currentNetwork": "Current Network",
@@ -2361,6 +2367,7 @@
     "transfers": "Transfers",
     "status": "Status",
     "connectionStatus": "Connection Status",
+    "autoConnect": "Auto Connect",
     "networkInfo": "Network Info",
     "statistics": "Statistics",
     "discoveredDevices": "Discovered devices",
@@ -2372,6 +2379,8 @@
     "noActiveTransfers": "No active transfers",
     "transfersWillAppearHere": "Data transfers will appear here",
     "paired": "Paired",
+    "lastSeen": "Last Seen",
+    "pairedSince": "Paired Since",
     "trusted": "Trusted",
     "pair": "Pair",
     "sendFile": "Send File",
@@ -2396,6 +2405,14 @@
     "@p2pPermissionCancel": {
         "description": "Button text to cancel the permission request"
     },
+    "p2pNearbyDevicesPermissionTitle": "Nearby Devices Permission Required",
+    "@p2pNearbyDevicesPermissionTitle": {
+        "description": "Title for the nearby devices permission request dialog"
+    },
+    "p2pNearbyDevicesPermissionExplanation": "To discover nearby devices on modern Android versions, this app needs access to nearby WiFi devices. This permission allows the app to scan for WiFi networks without accessing your location. Your data is not stored or shared. The app is client-side and we do not collect any user data.",
+    "@p2pNearbyDevicesPermissionExplanation": {
+        "description": "Explanation for why nearby WiFi devices permission is needed for P2P"
+    },
       "dataTransferRequest": "Data Transfer Request",
   "dataTransferResponse": "Data Transfer Response",
       "sendData": "Send Data",
@@ -2404,5 +2421,1086 @@
     "p2lanTransfer": "P2Lan Transfer",
     "@p2lanTransfer": {
         "description": "Title for the P2Lan Transfer screen"
-    }
+    },
+    "p2lanStatus": "P2LAN Status",
+    "@p2lanStatus": {
+        "description": "Notification type for P2LAN active status"
+    },
+    "fileTransferStatus": "File Transfer Status",
+    "@fileTransferStatus": {
+        "description": "Notification type for detailed file transfer status"
+    },
+    "p2lanActive": "P2LAN Active",
+    "@p2lanActive": {
+        "description": "Notification title when P2LAN is running"
+    },
+    "readyForConnections": "Ready for connections",
+    "@readyForConnections": {
+        "description": "Status when P2LAN is ready to accept connections"
+    },
+    "devicesConnected": "{count} devices connected",
+    "@devicesConnected": {
+        "description": "Number of devices connected to P2LAN",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "deviceConnected": "{count} device connected",
+    "@deviceConnected": {
+        "description": "One device connected to P2LAN",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "stopP2lan": "Stop P2LAN",
+    "@stopP2lan": {
+        "description": "Action button to stop P2LAN from notification"
+    },
+    "p2lanStopped": "P2LAN stopped",
+    "@p2lanStopped": {
+        "description": "Message when P2LAN has been stopped"
+    },
+    "calculatorToolsDesc": "Specialized calculators for health, finance, and more",
+    
+    "p2pDataTransfer": "P2P File Transfer",
+    "@p2pDataTransfer": {
+        "description": "Title for the P2P File Transfer tool"
+    },
+    "p2pDataTransferDesc": "Transfer files between devices on the same local network.",
+    "@p2pDataTransferDesc": {
+        "description": "Description for the P2P File Transfer tool"
+    },
+
+    "quickActions": "Quick Actions",
+    "quickActionsDesc": "Select up to 4 tools for quick access.",
+    "quickActionsManage": "Manage Quick Actions",
+    "cacheDetailsDialogTitle": "Cache Details",
+    "randomGeneratorsCacheDesc": "Generation history and settings",
+    "calculatorToolsCacheDesc": "Calculation history, graphing calculator data, BMI data, and settings",
+    "converterToolsCacheDesc": "Currency/length states, presets and exchange rates cache",
+    "p2pDataTransferCacheDesc": "Settings, saved device profiles, and temporary file transfer cache.",
+    "@p2pDataTransferCacheDesc": {
+        "description": "Description for the P2P cache entry in the cache details dialog"
+    },
+
+    "totalCacheSize": "Total: {count} items, {size}",
+    "clearSelectedCache": "Clear Selected Cache",
+    "noHistoryAvailable": "No history available",
+    "converterTools": "Converter Tools",
+    "converterToolsDesc": "Convert between different units and systems",
+    "calculatorTools": "Calculator Tools",
+    "calculatorToolsDesc": "Specialized calculators for health, finance, and more",
+
+    "p2pDataTransfer": "P2P File Transfer",
+    "p2pDataTransferDesc": "Transfer files between devices on the same local network.",
+
+    "quickActions": "Quick Actions",
+    "quickActionsDesc": "Select up to 4 tools for quick access.",
+    "quickActionsManage": "Manage Quick Actions",
+    "cacheDetailsDialogTitle": "Cache Details",
+    "randomGeneratorsCacheDesc": "Generation history and settings",
+    "calculatorToolsCacheDesc": "Calculation history, graphing calculator data, BMI data, and settings",
+    "converterToolsCacheDesc": "Currency/length states, presets and exchange rates cache",
+    "p2pDataTransferCacheDesc": "Settings, saved device profiles, and temporary file transfer cache.",
+
+    "totalCacheSize": "Total: {count} items, {size}",
+    "clearSelectedCache": "Clear Selected Cache",
+
+    "pairWithDevice": "Do you want to pair with this device?",
+    "@pairWithDevice": {
+        "description": "Question in user pairing dialog"
+    },
+    "deviceId": "Device ID",
+    "@deviceId": {
+        "description": "Label for device ID field"
+    },
+    "discoveryTime": "Discovery Time",
+    "@discoveryTime": {
+        "description": "Label for when device was discovered"
+    },
+    "saveConnection": "Save Connection",
+    "@saveConnection": {
+        "description": "Checkbox label to save connection"
+    },
+    "autoReconnectDescription": "Automatically reconnect when both devices are online",
+    "@autoReconnectDescription": {
+        "description": "Description for save connection option"
+    },
+    "pairingNotificationInfo": "The other user will receive a pairing request and needs to accept to complete the pairing.",
+    "@pairingNotificationInfo": {
+        "description": "Information about pairing process"
+    },
+    "sendRequest": "Send Request",
+    "@sendRequest": {
+        "description": "Button to send pairing request"
+    },
+    "justNow": "Just now",
+    "@justNow": {
+        "description": "Time indication for very recent actions"
+    },
+    "minutesAgo": "{minutes} minutes ago",
+    "@minutesAgo": {
+        "description": "Time indication for minutes ago",
+        "placeholders": {
+            "minutes": {
+                "type": "int"
+            }
+        }
+    },
+    "hoursAgo": "{hours} hours ago",
+    "@hoursAgo": {
+        "description": "Time indication for hours ago",
+        "placeholders": {
+            "hours": {
+                "type": "int"
+            }
+        }
+    },
+    "daysAgo": "{days} days ago",
+    "@daysAgo": {
+        "description": "Time indication for days ago",
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+
+    "noPairingRequests": "No pairing requests",
+    "@noPairingRequests": {
+        "description": "Text when there are no pairing requests"
+    },
+    "pairingRequestFrom": "Pairing request from:",
+    "@pairingRequestFrom": {
+        "description": "Text indicating source of pairing request"
+    },
+    "sentTime": "Sent Time",
+    "@sentTime": {
+        "description": "Label for when request was sent"
+    },
+    "wantsSaveConnection": "This person wants to save the connection",
+    "@wantsSaveConnection": {
+        "description": "Message when sender wants to save connection"
+    },
+    "trustThisUser": "Trust this user",
+    "@trustThisUser": {
+        "description": "Checkbox to trust user"
+    },
+    "allowFileTransfersWithoutConfirmation": "Allow file transfers without confirmation",
+    "@allowFileTransfersWithoutConfirmation": {
+        "description": "Description for trust user option"
+    },
+    "onlyAcceptFromTrustedDevices": "Only accept pairing from devices you trust.",
+    "@onlyAcceptFromTrustedDevices": {
+        "description": "Security warning about pairing"
+    },
+    "previousRequest": "Previous request",
+    "@previousRequest": {
+        "description": "Tooltip for previous request button"
+    },
+    "nextRequest": "Next request",
+    "@nextRequest": {
+        "description": "Tooltip for next request button"
+    },
+    "reject": "Reject",
+    "@reject": {
+        "description": "Button to reject pairing/transfer request"
+    },
+    "accept": "Accept",
+    "@accept": {
+        "description": "Button to accept pairing/transfer request"
+    },
+
+    "incomingFiles": "Incoming Files",
+    "@incomingFiles": {
+        "description": "Title for incoming file transfer dialog"
+    },
+    "wantsToSendYouFiles": "wants to send you {count} file(s)",
+    "@wantsToSendYouFiles": {
+        "description": "Text showing sender wants to send files",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "filesToReceive": "Files to receive:",
+    "@filesToReceive": {
+        "description": "Header for list of files to receive"
+    },
+    "totalSize": "Total size:",
+    "@totalSize": {
+        "description": "Label for total file size"
+    },
+
+    "localFiles": "Local Files",
+    "@localFiles": {
+        "description": "Tooltip for local files button"
+    },
+    "manualDiscovery": "Manual Discovery",
+    "@manualDiscovery": {
+        "description": "Tooltip and label for manual discovery"
+    },
+    "transferSettings": "Transfer Settings",
+    "@transferSettings": {
+        "description": "Tooltip for transfer settings button"
+    },
+    "savedDevicesCurrentlyAvailable": "Saved devices currently available",
+    "@savedDevicesCurrentlyAvailable": {
+        "description": "Subtitle for saved devices section"
+    },
+    "recentlyDiscoveredDevices": "Recently discovered devices",
+    "@recentlyDiscoveredDevices": {
+        "description": "Subtitle for discovered devices section"
+    },
+    "saved": "Saved",
+    "@saved": {
+        "description": "Label for saved devices"
+    },
+    "viewInfo": "View Info",
+    "@viewInfo": {
+        "description": "Menu option to view device info"
+    },
+    "trust": "Trust",
+    "@trust": {
+        "description": "Menu option to trust device"
+    },
+    "removeTrust": "Remove Trust",
+    "@removeTrust": {
+        "description": "Menu option to remove trust"
+    },
+    "unpair": "Unpair",
+    "@unpair": {
+        "description": "Menu option to unpair device"
+    },
+    "thisDevice": "This Device",
+    "@thisDevice": {
+        "description": "Label for current device"
+    },
+    "fileCache": "File Cache",
+    "@fileCache": {
+        "description": "Label for file cache section"
+    },
+    "reload": "Reload",
+    "@reload": {
+        "description": "Button to reload cache size"
+    },
+    "clear": "Clear",
+    "@clear": {
+        "description": "Button to clear cache"
+    },
+    "temporaryFilesFromTransfers": "Temporary files from P2Lan file transfers",
+    "@temporaryFilesFromTransfers": {
+        "description": "Description of file cache content"
+    },
+    "debug": "Debug",
+    "@debug": {
+        "description": "Debug button label"
+    },
+    "clearFileCache": "Clear File Cache",
+    "@clearFileCache": {
+        "description": "Title for clear file cache dialog"
+    },
+    "fileCacheClearedSuccessfully": "File cache cleared successfully",
+    "@fileCacheClearedSuccessfully": {
+        "description": "Success message for cache clear"
+    },
+    "failedToClearCache": "Failed to clear cache: {error}",
+    "@failedToClearCache": {
+        "description": "Error message for cache clear failure",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "failedToUpdateSettings": "Failed to update settings",
+    "@failedToUpdateSettings": {
+        "description": "Error message for settings update failure"
+    },
+    "failedToLoadSettings": "Failed to load settings: {error}",
+    "@failedToLoadSettings": {
+        "description": "Error message for settings load failure",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "removeTrustFrom": "Remove trust from {deviceName}?",
+    "@removeTrustFrom": {
+        "description": "Confirmation to remove trust from device",
+        "placeholders": {
+            "deviceName": {
+                "type": "String"
+            }
+        }
+    },
+    "remove": "Remove",
+    "@remove": {
+        "description": "Button to remove/delete"
+    },
+    "unpairFrom": "Unpair from {deviceName}",
+    "@unpairFrom": {
+        "description": "Title for unpair dialog",
+        "placeholders": {
+            "deviceName": {
+                "type": "String"
+            }
+        }
+    },
+    "unpairDescription": "This will remove the pairing completely from both devices. You will need to pair again in the future.\\n\\nThe other device will also be notified and their connection will be removed.",
+    "@unpairDescription": {
+        "description": "Description of unpair action"
+    },
+    "holdToUnpair": "Hold to Unpair",
+    "@holdToUnpair": {
+        "description": "Button text for unpair confirmation"
+    },
+    "unpairing": "Unpairing...",
+    "@unpairing": {
+        "description": "Text shown during unpair process"
+    },
+    "holdButtonToConfirmUnpair": "Hold the button for 1 second to confirm unpair",
+    "@holdButtonToConfirmUnpair": {
+        "description": "Instruction for unpair confirmation"
+    },
+    "taskAndFileDeletedSuccessfully": "Task and file deleted successfully",
+    "@taskAndFileDeletedSuccessfully": {
+        "description": "Success message when task and file are deleted"
+    },
+    "taskCleared": "Task cleared",
+    "@taskCleared": {
+        "description": "Message when task is cleared"
+    },
+    "notConnected": "Not connected",
+    "@notConnected": {
+        "description": "Status when not connected"
+    },
+
+    "clearAll": "Clear All",
+    "@clearAll": {
+        "description": "Button to clear all selected files"
+    },
+    "sending": "Sending...",
+    "@sending": {
+        "description": "Status text during file sending"
+    },
+    "sendFiles": "Send Files",
+    "@sendFiles": {
+        "description": "Button to send selected files"
+    },
+    "addFiles": "Add Files",
+    "@addFiles": {
+        "description": "Button to add files"
+    },
+    "errorSelectingFiles": "Error selecting files: {error}",
+    "@errorSelectingFiles": {
+        "description": "Error message for file selection",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorSendingFiles": "Error sending files: {error}",
+    "@errorSendingFiles": {
+        "description": "Error message for file sending",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "noFilesSelected": "No files selected",
+    "@noFilesSelected": {
+        "description": "Message when no files are selected"
+    },
+    "tapRightClickForOptions": "Tap or right-click for options",
+    "@tapRightClickForOptions": {
+        "description": "Instructions for file options"
+    },
+    "transferSummary": "Transfer Summary",
+    "@transferSummary": {
+        "description": "Title for transfer summary section"
+    },
+
+    "unlimited": "Unlimited",
+    "@unlimited": {
+        "description": "Option for unlimited size/count"
+    },
+    "tcpProtocol": "TCP",
+    "@tcpProtocol": {
+        "description": "TCP protocol option"
+    },
+    "tcpDescription": "More reliable, better for important files",
+    "@tcpDescription": {
+        "description": "Description of TCP protocol"
+    },
+    "udpProtocol": "UDP",
+    "@udpProtocol": {
+        "description": "UDP protocol option"
+    },
+    "udpDescription": "Faster but less reliable, good for large files",
+    "@udpDescription": {
+        "description": "Description of UDP protocol"
+    },
+    "noFileOrganization": "None",
+    "@noFileOrganization": {
+        "description": "No file organization option"
+    },
+    "createDateFolders": "Create date folders",
+    "@createDateFolders": {
+        "description": "Option to create folders by date"
+    },
+    "organizeFoldersByDate": "Organize files by date received",
+    "@organizeFoldersByDate": {
+        "description": "Description of date organization"
+    },
+    "createSenderFolders": "Create sender folders",
+    "@createSenderFolders": {
+        "description": "Option to create folders by sender"
+    },
+    "immediate": "Immediate",
+    "@immediate": {
+        "description": "Option for immediate UI updates"
+    },
+    "myDevice": "My Device",
+    "@myDevice": {
+        "description": "Default device name"
+    },
+    "bySenderName": "By Sender Name",
+    "@bySenderName": {
+        "description": "File organization by sender name"
+    },
+    "byDate": "By Date",
+    "@byDate": {
+        "description": "File organization by date"
+    },
+    "none": "None",
+    "@none": {
+        "description": "No organization option"
+    },
+    "resetToDefaults": "Reset to Defaults",
+    "@resetToDefaults": {
+        "description": "Button and dialog title to reset settings"
+    },
+    "resetConfirmation": "Are you sure you want to reset all settings to their default values?",
+    "@resetConfirmation": {
+        "description": "Confirmation message for reset"
+    },
+    "reset": "Reset",
+    "@reset": {
+        "description": "Button to confirm reset"
+    },
+    "generic": "Generic",
+    "@generic": {
+        "description": "Tab label for general settings"
+    },
+    "storage": "Storage",
+    "@storage": {
+        "description": "Tab label for storage settings"
+    },
+    "network": "Network",
+    "@network": {
+        "description": "Tab label for network settings"
+    },
+    "saveSettings": "Save Settings",
+    "@saveSettings": {
+        "description": "Button to save settings"
+    },
+    "deviceProfile": "Device Profile",
+    "@deviceProfile": {
+        "description": "Section header for device profile"
+    },
+    "deviceDisplayName": "Device Display Name",
+    "@deviceDisplayName": {
+        "description": "Label for device name input field"
+    },
+    "userPreferences": "User Preferences",
+    "@userPreferences": {
+        "description": "Section header for user preferences"
+    },
+    "enableNotifications": "Enable notifications",
+    "@enableNotifications": {
+        "description": "Setting to enable notifications"
+    },
+    "userInterfacePerformance": "User Interface Performance",
+    "@userInterfacePerformance": {
+        "description": "Section header for UI performance settings"
+    },
+    "uiRefreshRate": "UI Refresh Rate",
+    "@uiRefreshRate": {
+        "description": "Label for UI refresh rate setting"
+    },
+    "currentConfiguration": "Current Configuration",
+    "@currentConfiguration": {
+        "description": "Section header for current config display"
+    },
+    "protocol": "Protocol",
+    "@protocol": {
+        "description": "Label for protocol setting"
+    },
+    "maxFileSize": "Max File Size",
+    "@maxFileSize": {
+        "description": "Label for maximum file size setting"
+    },
+    "maxTotalSize": "Max Total Size",
+    "@maxTotalSize": {
+        "description": "Label for maximum total size setting"
+    },
+    "concurrentTasks": "Concurrent Tasks",
+    "@concurrentTasks": {
+        "description": "Label for concurrent tasks setting"
+    },
+    "chunkSize": "Chunk Size",
+    "@chunkSize": {
+        "description": "Label for chunk size setting"
+    },
+    "fileOrganization": "File Organization",
+    "@fileOrganization": {
+        "description": "Label for file organization setting"
+    },
+    "storageInformation": "Storage Information",
+    "@storageInformation": {
+        "description": "Section header for storage info"
+    },
+    "downloadPath": "Download Path",
+    "@downloadPath": {
+        "description": "Label for download path"
+    },
+    "totalSpace": "Total Space",
+    "@totalSpace": {
+        "description": "Label for total disk space"
+    },
+    "freeSpace": "Free Space",
+    "@freeSpace": {
+        "description": "Label for free disk space"
+    },
+    "usedSpace": "Used Space",
+    "@usedSpace": {
+        "description": "Label for used disk space"
+    },
+    "noDownloadPathSet": "No Download Path Set",
+    "@noDownloadPathSet": {
+        "description": "Message when no download path is configured"
+    },
+    "downloadLocation": "Download Location",
+    "@downloadLocation": {
+        "description": "Section header for download location settings"
+    },
+    "downloadFolder": "Download Folder",
+    "@downloadFolder": {
+        "description": "Label for download folder setting"
+    },
+    "androidStorageAccess": "Android Storage Access",
+    "@androidStorageAccess": {
+        "description": "Section header for Android storage permissions"
+    },
+    "useAppFolder": "Use App Folder",
+    "@useAppFolder": {
+        "description": "Button to use app-specific folder"
+    },
+    "sizeLimits": "Size Limits",
+    "@sizeLimits": {
+        "description": "Section header for size limit settings"
+    },
+    "totalSizeLimitDescription": "Total size limit for all files in a single transfer request",
+    "@totalSizeLimitDescription": {
+        "description": "Description for total size limit"
+    },
+    "transferProtocolSection": "Transfer Protocol",
+    "@transferProtocolSection": {
+        "description": "Section header for protocol settings"
+    },
+    "performanceTuning": "Performance Tuning",
+    "@performanceTuning": {
+        "description": "Section header for performance settings"
+    },
+    "concurrentTransfersDescription": "More transfers = faster overall but higher CPU usage",
+    "@concurrentTransfersDescription": {
+        "description": "Description for concurrent transfers setting"
+    },
+    "transferChunkSizeDescription": "Higher sizes = faster transfers but more memory usage",
+    "@transferChunkSizeDescription": {
+        "description": "Description for chunk size setting"
+    },
+
+    "unknown": "Unknown",
+    "@unknown": {
+        "description": "Unknown status or value"
+    },
+    "permissionsRequiredForP2P": "Permissions are required to start P2P networking",
+    "@permissionsRequiredForP2P": {
+        "description": "Error message when permissions are missing"
+    },
+    "errorInStartNetworking": "Error in starting networking: {error}",
+    "@errorInStartNetworking": {
+        "description": "Error message for networking start failure",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "clearAll": "Clear All",
+    "@clearAll": {
+        "description": "Button to clear all selected files"
+    },
+    "sending": "Sending...",
+    "@sending": {
+        "description": "Status text during file sending"
+    },
+    "sendFiles": "Send Files",
+    "@sendFiles": {
+        "description": "Button to send selected files"
+    },
+    "addFiles": "Add Files",
+    "@addFiles": {
+        "description": "Button to add files"
+    },
+    "errorSelectingFilesFromCategory": "Error selecting files from {category}: {error}",
+    "@errorSelectingFilesFromCategory": {
+        "description": "Error message for file selection from category",
+        "placeholders": {
+            "category": {
+                "type": "String"
+            },
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorSelectingFiles": "Error selecting files: {error}",
+    "@errorSelectingFiles": {
+        "description": "Error message for file selection",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorSendingFiles": "Error sending files: {error}",
+    "@errorSendingFiles": {
+        "description": "Error message for file sending",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "noFilesSelected": "No files selected",
+    "@noFilesSelected": {
+        "description": "Message when no files are selected"
+    },
+    "tapRightClickForOptions": "Tap or right-click for options",
+    "@tapRightClickForOptions": {
+        "description": "Instructions for file options"
+    },
+    "transferSummary": "Transfer Summary",
+    "@transferSummary": {
+        "description": "Title for transfer summary section"
+    },
+    "unlimited": "Unlimited",
+    "@unlimited": {
+        "description": "Option for unlimited size/count"
+    },
+    "tcpProtocol": "TCP",
+    "@tcpProtocol": {
+        "description": "TCP protocol option"
+    },
+    "tcpDescription": "More reliable, better for important files",
+    "@tcpDescription": {
+        "description": "Description of TCP protocol"
+    },
+    "udpProtocol": "UDP",
+    "@udpProtocol": {
+        "description": "UDP protocol option"
+    },
+    "udpDescription": "Faster but less reliable, good for large files",
+    "@udpDescription": {
+        "description": "Description of UDP protocol"
+    },
+    "noFileOrganization": "None",
+    "@noFileOrganization": {
+        "description": "No file organization option"
+    },
+    "createDateFolders": "Create date folders",
+    "@createDateFolders": {
+        "description": "Option to create folders by date"
+    },
+    "organizeFoldersByDate": "Organize files by date received",
+    "@organizeFoldersByDate": {
+        "description": "Description of date organization"
+    },
+    "createSenderFolders": "Create sender folders",
+    "@createSenderFolders": {
+        "description": "Option to create folders by sender"
+    },
+    "immediate": "Immediate",
+    "@immediate": {
+        "description": "Option for immediate UI updates"
+    },
+    "myDevice": "My Device",
+    "@myDevice": {
+        "description": "Default device name"
+    },
+    "bySenderName": "By Sender Name",
+    "@bySenderName": {
+        "description": "File organization by sender name"
+    },
+    "byDate": "By Date",
+    "@byDate": {
+        "description": "File organization by date"
+    },
+    "removeTrustFrom": "Remove trust from {deviceName}?",
+    "@removeTrustFrom": {
+        "description": "Confirmation to remove trust from device",
+        "placeholders": {
+            "deviceName": {
+                "type": "String"
+            }
+        }
+    },
+    "remove": "Remove",
+    "@remove": {
+        "description": "Button to remove/delete"
+    },
+    "unpairFrom": "Unpair from {deviceName}",
+    "@unpairFrom": {
+        "description": "Title for unpair dialog",
+        "placeholders": {
+            "deviceName": {
+                "type": "String"
+            }
+        }
+    },
+    "unpairDescription": "This will remove the pairing completely from both devices. You will need to pair again in the future.\\n\\nThe other device will also be notified and their connection will be removed.",
+    "@unpairDescription": {
+        "description": "Description of unpair action"
+    },
+    "holdToUnpair": "Hold to Unpair",
+    "@holdToUnpair": {
+        "description": "Button text for unpair confirmation"
+    },
+    "unpairing": "Unpairing...",
+    "@unpairing": {
+        "description": "Text shown during unpair process"
+    },
+    "holdButtonToConfirmUnpair": "Hold the button for 1 second to confirm unpair",
+    "@holdButtonToConfirmUnpair": {
+        "description": "Instruction for unpair confirmation"
+    },
+    "taskAndFileDeletedSuccessfully": "Task and file deleted successfully",
+    "@taskAndFileDeletedSuccessfully": {
+        "description": "Success message when task and file are deleted"
+    },
+    "taskCleared": "Task cleared",
+    "@taskCleared": {
+        "description": "Message when task is cleared"
+    },
+    "notConnected": "Not connected",
+    "@notConnected": {
+        "description": "Status when not connected"
+    },
+    "connectionStatus": "Connection Status",
+    "thisDevice": "This Device",
+    "loadingDeviceInfo": "Loading device information...",
+    "fileCache": "File Cache",
+    "reload": "Reload",
+    "clear": "Clear",
+    "cacheSize": "Cache size",
+    "calculating": "Calculating...",
+    "tempFilesDescription": "Temporary files from P2Lan file transfers",
+    "debug": "Debug",
+    "networkDebugCompleted": "Network debug completed. Check logs for details.",
+    "lastRefresh": "Last refresh: {time}",
+    "@lastRefresh": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "justNow": "Just now",
+    "minutesAgo": "{minutes} min ago",
+    "@minutesAgo": {
+        "placeholders": {
+            "minutes": {
+                "type": "int"
+            }
+        }
+    },
+    "hoursAgo": "{hours} hr ago",
+    "@hoursAgo": {
+        "placeholders": {
+            "hours": {
+                "type": "int"
+            }
+        }
+    },
+    "daysAgo": "{days} days ago",
+    "@daysAgo": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "p2pNetworkingPaused": "P2P networking is paused due to internet connection loss. It will automatically resume when connection is restored.",
+    "searchingForDevices": "Searching for devices...",
+    "noDevicesInRange": "No devices in range. Try refreshing.",
+    "initialDiscoveryInProgress": "Initial discovery in progress...",
+    "manualDiscovery": "Manual Discovery",
+    "refreshing": "Refreshing...",
+    "pausedNoInternet": "Paused (No Internet)",
+    "localFiles": "Local Files",
+    "transferSettings": "Transfer Settings",
+    "trusted": "Trusted {name}",
+    "@trusted": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "trustRemoved": "Trust removed from {name}",
+    "@trustRemoved": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "removeTrust": "Remove Trust",
+    "removeTrustConfirm": "Remove trust from {name}?",
+    "@removeTrustConfirm": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "unpairFromDevice": "Unpair from {name}",
+    "@unpairFromDevice": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "unpairDescription": "This will remove the pairing completely from both devices. You will need to pair again in the future.\n\nThe other device will also be notified and their connection will be removed.",
+    "holdToUnpair": "Hold to Unpair",
+    "unpairing": "Unpairing...",
+    "holdUnpairInstruction": "Hold the button for 1 second to confirm unpair",
+    "unpaired": "Unpaired from {name}",
+    "@unpaired": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "taskAndFileDeleted": "Task and file deleted successfully",
+    "taskCleared": "Task cleared",
+    "clearFileCache": "Clear File Cache",
+    "clearFileCacheConfirm": "This will clear temporary files from P2Lan transfers. This action cannot be undone.",
+    "fileCacheClearedSuccess": "File cache cleared successfully",
+    "failedToClearCache": "Failed to clear cache: {error}",
+    "@failedToClearCache": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "permissionsRequired": "Permissions are required to start P2P networking",
+    "startedSending": "Started sending {count} files to {name}",
+    "@startedSending": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "transferSettingsUpdated": "Transfer settings updated successfully",
+    "disconnected": "Disconnected",
+    "discoveringDevices": "Discovering devices...",
+    "connected": "Connected",
+    "pairing": "Pairing...",
+    "paired": "Paired",
+    "checkingNetwork": "Checking network...",
+    "connectedViaMobileData": "Connected via mobile data (secure)",
+    "connectedToWifi": "Connected to {name} ({security})",
+    "@connectedToWifi": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            },
+            "security": {
+                "type": "String"
+            }
+        }
+    },
+    "secure": "secure",
+    "unsecure": "unsecure",
+    "connectedViaEthernet": "Connected via Ethernet (secure)",
+    "noNetworkConnection": "No network connection",
+    "unknownWifi": "Unknown WiFi",
+    "protocol": "Protocol",
+    "tcpReliable": "TCP (Reliable)",
+    "tcpDescription": "More reliable, better for important files",
+    "udpFast": "UDP (Fast)",
+    "udpDescription": "Faster but less reliable, good for large files",
+    "fileOrganization": "File Organization",
+    "createDateFolders": "Create date folders",
+    "createDateFoldersDescription": "Organize by date (YYYY-MM-DD)",
+    "createSenderFolders": "Create sender folders",
+    "createSenderFoldersDescription": "Organize by sender display name",
+    "maxFileSize": "Max File Size",
+    "maxTotalSize": "Max Total Size",
+    "maxConcurrentTasks": "Max Concurrent Tasks",
+    "chunkSize": "Chunk Size",
+    "uiRefreshRate": "UI Refresh Rate",
+    "immediate": "Immediate",
+    "unlimited": "Unlimited",
+    "defaultLabel": "Default",
+    "downloadPath": "Download Path",
+    "customDisplayName": "Custom Display Name",
+    "deviceName": "Device Name",
+    "enableNotifications": "Enable Notifications",
+    "general": "General",
+    "performance": "Performance",
+    "advanced": "Advanced",
+    "save": "Save",
+    "discard": "Discard",
+    "hasUnsavedChanges": "You have unsaved changes. Do you want to discard them?",
+    "selectFolder": "Select Folder",
+    "permissionRequired": "Permission Required",
+    "grantStoragePermission": "Grant storage permission to select download folder",
+    "openSettings": "Open Settings",
+    "notificationPermissionInfo": "Notification permission allows you to receive updates about file transfers and connection status.",
+    "secondsLabel": "second",
+    "secondsPlural": "seconds",
+    "networkInfoTitle": "Network Information",
+    "deviceSections": "Device Sections",
+    "onlineDevices": "Online Devices",
+    "newDevices": "New Devices", 
+    "savedDevices": "Saved Devices",
+    "viewInfo": "View Info",
+    "addTrust": "Add Trust",
+    "removeTrust": "Remove Trust",
+    "unpair": "Unpair",
+    "emptyDevicesStateTitle": "No Devices Found",
+    "viewDeviceInfo": "View device information",
+    "pair": "Pair",
+    "trustUser": "Trust user",
+    "sendFiles": "Send files",
+    "menuSendFiles": "Send Files",
+    "menuViewInfo": "View Info",
+    "menuPair": "Pair",
+    "menuTrust": "Trust",
+    "menuUntrust": "Remove Trust",
+    "menuUnpair": "Unpair",
+    "deviceActions": "Device Actions",
+    "p2pTemporarilyDisabled": "P2P temporarily disabled - waiting for internet connection",
+    "udpDescription": "Faster but less reliable, good for large files",
+    "none": "None",
+    "createDateFolders": "Create date folders",
+    "createSenderFolders": "Create sender folders",
+    "fileOrgNoneDescription": "Files go directly to download folder",
+    "fileOrgDateDescription": "Organize by date (YYYY-MM-DD)",
+    "fileOrgSenderDescription": "Organize by sender display name",
+    "basic": "Basic",
+    "advanced": "Advanced",
+    "summary": "Summary",
+    "reset": "Reset",
+    "save": "Save",
+    "p2lanTransferSettingsTitle": "P2Lan Transfer Settings",
+    "settingsTabGeneric": "Generic",
+    "settingsTabStorage": "Storage",
+    "settingsTabNetwork": "Network",
+    "deviceProfile": "Device Profile",
+    "displayName": "Display Name",
+    "displayNameDescription": "Customize how your device appears to other users",
+    "deviceDisplayNameLabel": "Device Display Name",
+    "deviceDisplayNameHint": "Enter custom display name...",
+    "defaultDisplayName": "Default: {name}",
+    "@defaultDisplayName": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "userPreferences": "User Preferences",
+    "notifications": "Notifications",
+    "notSupportedOnWindows": "Not supported on Windows",
+    "uiPerformance": "User Interface Performance",
+    "uiRefreshRate": "UI Refresh Rate",
+    "uiRefreshRateDescription": "Choose how often transfer progress updates in the UI. Higher frequencies work better on powerful devices.",
+    "immediate": "Immediate",
+    "saveSettings": "Save Settings",
+    "resetToDefaults": "Reset to Defaults",
+    "savedDevicesCount": "Saved Devices ({count})",
+    "@savedDevicesCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "previouslyPairedOffline": "Previously paired devices (offline)",
+    "statusSaved": "Saved",
+    "statusTrusted": "Trusted",
+    "thisDeviceCardTitle": "This Device",
+    "deviceName": "Device Name",
+    "appInstallationId": "App Installation ID",
+    "ipAddress": "IP Address",
+    "port": "Port",
+    "status": "Status",
+    "statusOffline": "Offline",
+    "lastSeen": "Last Seen",
+    "notConnected": "Not connected",
+    "downloadLocation": "Download Location",
+    "downloadFolder": "Download Folder",
+    "selectDownloadFolder": "Select download folder...",
+    "sizeLimits": "Size Limits",
+    "maxFileSizePerFile": "Maximum file size (per file)",
+    "transferProtocol": "Transfer Protocol",
+    "performanceTuning": "Performance Tuning",
+    "concurrentTransfers": "Concurrent transfers",
+    "concurrentTransfersDescription": " = faster overall but higher CPU usage",
+    "transferChunkSize": "Transfer chunk size",
+    "transferChunkSizeDescription": "Higher sizes = faster transfers but more memory usage",
+    "defaultValue": "(Default)",
+    "useAppFolder": "Use App Folder",
+    "androidStorageAccess": "Android Storage Access",
+    "androidStorageAccessDescription": "For security, it's recommended to use the app-specific folder. You can select other folders, but this may require additional permissions.",
+    "totalSpace": "Total Space",
+    "freeSpace": "Free Space",
+    "usedSpace": "Used Space",
+    "storageInfo": "Storage Information",
+    "noDownloadPathSet": "No Download Path Set",
+    "noDownloadPathSetDescription": "Please select a download folder in the Storage tab to see storage information.",
+    "enableNotificationsDescription": "Get notified about transfer events",
+    "currentConfiguration": "Current Configuration",
+    "maxFileSizePerFileDescription": "Larger files will be automatically rejected",
+    "maxTotalSize": "Maximum total size (per transfer batch)",
+    "maxTotalSizeDescription": "Total size limit for all files in a single transfer request",
+    "concurrentTransfersSubtitle": "More transfers = faster overall but higher CPU usage",
+    "transferChunkSizeSubtitle": "Higher sizes = faster transfers but more memory usage",
+    "protocolTcpReliable": "TCP (Reliable)",
+    "protocolTcpDescription": "More reliable, better for important files",
+    "protocolUdpFast": "UDP (Fast)",
+    "fileOrgNone": "None",
+    "fileOrgDate": "By Date",
+    "fileOrgSender": "By Sender Name"
   }

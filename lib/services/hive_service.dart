@@ -238,35 +238,29 @@ class HiveService {
     }
   }
 
-  /// Get the size of a box in bytes (estimated)
-  static int getBoxSize(String boxName) {
+  /// Get the size of a box in bytes by reading its file size from disk.
+  static Future<int> getBoxSize(String boxName) async {
     try {
-      Box box;
-      switch (boxName) {
-        case templatesBoxName:
-          box = templatesBox;
-          break;
-        case historyBoxName:
-          box = historyBox;
-          break;
-        default:
-          return 0;
-      }
+      final dir = await getApplicationDocumentsDirectory();
+      // Construct the path for both .hive and .lock files
+      final hivePath = '${dir.path}/hive_data/$boxName.hive';
+      final lockPath = '${dir.path}/hive_data/$boxName.lock';
 
       int totalSize = 0;
-      for (var key in box.keys) {
-        final value = box.get(key);
-        if (value is String) {
-          totalSize += value.length * 2; // UTF-16 encoding estimate
-        } else if (value is Map || value is List) {
-          // Rough estimate for complex objects
-          totalSize += value.toString().length * 2;
-        }
+
+      final hiveFile = File(hivePath);
+      if (await hiveFile.exists()) {
+        totalSize += await hiveFile.length();
+      }
+
+      final lockFile = File(lockPath);
+      if (await lockFile.exists()) {
+        totalSize += await lockFile.length();
       }
 
       return totalSize;
     } catch (e) {
-      logError('Error calculating box size for $boxName: $e');
+      logError('Error getting box size for $boxName: $e');
       return 0;
     }
   }

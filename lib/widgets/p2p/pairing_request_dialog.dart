@@ -30,7 +30,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
     if (widget.requests.isEmpty) {
       return AlertDialog(
         title: Text(l10n.pairingRequests),
-        content: const Text('Không có yêu cầu ghép nối nào'),
+        content: Text(l10n.noPairingRequests),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -64,7 +64,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Yêu cầu ghép nối từ:',
+              l10n.pairingRequestFrom,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 16),
@@ -124,7 +124,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                   const SizedBox(height: 12),
                   _buildInfoRow(
                     icon: Icons.fingerprint,
-                    label: 'Device ID',
+                    label: l10n.deviceId,
                     value: request.fromDeviceId.length > 20
                         ? '${request.fromDeviceId.substring(0, 20)}...'
                         : request.fromDeviceId,
@@ -132,7 +132,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                   const SizedBox(height: 8),
                   _buildInfoRow(
                     icon: Icons.access_time,
-                    label: 'Thời gian gửi',
+                    label: l10n.sentTime,
                     value: _formatTime(request.requestTime),
                   ),
                   if (request.wantsSaveConnection) ...[
@@ -142,7 +142,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                         Icon(Icons.save, size: 16, color: Colors.blue),
                         const SizedBox(width: 8),
                         Text(
-                          'Người này muốn lưu ghép nối',
+                          l10n.wantsSaveConnection,
                           style: TextStyle(
                             color: Colors.blue[700],
                             fontWeight: FontWeight.w500,
@@ -166,9 +166,9 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                   _trustUser = value ?? false;
                 });
               },
-              title: Text('Tin cậy người dùng này'),
+              title: Text(l10n.trustThisUser),
               subtitle: Text(
-                'Cho phép truyền file mà không cần xác nhận',
+                l10n.allowFileTransfersWithoutConfirmation,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               contentPadding: EdgeInsets.zero,
@@ -183,9 +183,9 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                   _saveConnection = value ?? false;
                 });
               },
-              title: Text('Lưu ghép nối'),
+              title: Text(l10n.saveConnection),
               subtitle: Text(
-                'Tự động kết nối lại khi cả hai thiết bị online',
+                l10n.autoReconnectDescription,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               contentPadding: EdgeInsets.zero,
@@ -208,7 +208,7 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Chỉ chấp nhận ghép nối từ những thiết bị bạn tin tưởng.',
+                      l10n.onlyAcceptFromTrustedDevices,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.orange[700],
                           ),
@@ -226,14 +226,14 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
           IconButton(
             onPressed: _currentIndex > 0 ? _previousRequest : null,
             icon: const Icon(Icons.arrow_back),
-            tooltip: 'Yêu cầu trước',
+            tooltip: l10n.previousRequest,
           ),
           IconButton(
             onPressed: _currentIndex < widget.requests.length - 1
                 ? _nextRequest
                 : null,
             icon: const Icon(Icons.arrow_forward),
-            tooltip: 'Yêu cầu tiếp theo',
+            tooltip: l10n.nextRequest,
           ),
           const Spacer(),
         ],
@@ -241,11 +241,11 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
         // Action buttons
         TextButton(
           onPressed: () => _respondToRequest(false),
-          child: Text('Từ chối'),
+          child: Text(l10n.reject),
         ),
         ElevatedButton(
           onPressed: () => _respondToRequest(true),
-          child: Text('Chấp nhận'),
+          child: Text(l10n.accept),
         ),
       ],
     );
@@ -280,17 +280,18 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
   }
 
   String _formatTime(DateTime time) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final difference = now.difference(time);
 
     if (difference.inMinutes < 1) {
-      return 'Vừa xong';
+      return l10n.justNow;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} phút trước';
+      return l10n.minutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours} giờ trước';
+      return l10n.hoursAgo(difference.inHours);
     } else {
-      return '${difference.inDays} ngày trước';
+      return l10n.daysAgo(difference.inDays);
     }
   }
 

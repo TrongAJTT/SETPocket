@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/screens/p2lan_transfer_screen.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 /// P2P Navigation destination

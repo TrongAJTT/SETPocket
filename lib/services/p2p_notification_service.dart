@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:setpocket/services/p2p_navigation_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/models/p2p_models.dart';
 
@@ -12,7 +15,9 @@ enum P2PNotificationType {
   fileTransferCompleted('file_transfer_completed', 'File Transfer Completed'),
   pairingRequest('pairing_request', 'Pairing Request'),
   deviceOnline('device_online', 'Device Online'),
-  deviceOffline('device_offline', 'Device Offline');
+  deviceOffline('device_offline', 'Device Offline'),
+  p2lanStatus('p2lan_status', 'P2LAN Status'),
+  fileTransferStatus('file_transfer_status', 'File Transfer Status');
 
   const P2PNotificationType(this.id, this.displayName);
   final String id;
@@ -21,17 +26,15 @@ enum P2PNotificationType {
 
 /// P2P notification action that can be performed
 enum P2PNotificationAction {
-  openP2Lan('open_p2lan', 'Open P2LAN'),
-  openTransfers('open_transfers', 'View Transfers'),
   approveTransfer('approve_transfer', 'Approve'),
   rejectTransfer('reject_transfer', 'Reject'),
   acceptPairing('accept_pairing', 'Accept'),
   rejectPairing('reject_pairing', 'Reject'),
-  cancelTransfer('cancel_transfer', 'Cancel');
+  openP2Lan('open_p2lan', 'Open P2LAN');
 
-  const P2PNotificationAction(this.id, this.displayName);
+  const P2PNotificationAction(this.id, this.label);
   final String id;
-  final String displayName;
+  final String label;
 }
 
 /// P2P notification data payload
@@ -85,10 +88,29 @@ class P2PNotificationPayload {
 /// P2P Notification Service for cross-platform notifications
 class P2PNotificationService {
   static P2PNotificationService? _instance;
-  static P2PNotificationService get instance =>
-      _instance ??= P2PNotificationService._();
 
+  // Private constructor
   P2PNotificationService._();
+
+  // Public getter for the instance
+  static P2PNotificationService get instance {
+    if (_instance == null) {
+      throw Exception(
+          'P2PNotificationService not initialized. Call P2PNotificationService.init() first.');
+    }
+    return _instance!;
+  }
+
+  // Safe getter that returns null if not initialized
+  static P2PNotificationService? get instanceOrNull => _instance;
+
+  // Initialization method
+  static Future<void> init() async {
+    if (_instance == null) {
+      _instance = P2PNotificationService._();
+      await _instance!.initialize();
+    }
+  }
 
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
@@ -99,6 +121,11 @@ class P2PNotificationService {
   static const String _fileTransferChannelId = 'p2p_file_transfer';
   static const String _pairingChannelId = 'p2p_pairing';
   static const String _deviceChannelId = 'p2p_device';
+  static const String _p2lanStatusChannelId = 'p2p_status';
+  static const String _fileTransferStatusChannelId = 'p2p_file_status';
+
+  // Notification IDs
+  static const int _p2lanStatusNotificationId = 12345;
 
   // Notification callbacks
   Function(P2PNotificationPayload)? _onNotificationTapped;
@@ -187,6 +214,26 @@ class P2PNotificationService {
       playSound: false,
     );
 
+    // P2LAN Status Channel (persistent notification)
+    const p2lanStatusChannel = AndroidNotificationChannel(
+      _p2lanStatusChannelId,
+      'P2LAN Status',
+      description: 'Persistent notification when P2LAN is running',
+      importance: Importance.low,
+      enableVibration: false,
+      playSound: false,
+    );
+
+    // File Transfer Status Channel (detailed progress)
+    const fileTransferStatusChannel = AndroidNotificationChannel(
+      _fileTransferStatusChannelId,
+      'File Transfer Status',
+      description: 'Detailed file transfer progress notifications',
+      importance: Importance.low,
+      enableVibration: false,
+      playSound: false,
+    );
+
     await _notifications
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
@@ -201,6 +248,34 @@ class P2PNotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(deviceChannel);
+
+    await _notifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(p2lanStatusChannel);
+
+    await _notifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(fileTransferStatusChannel);
+  }
+
+  /// Check if notifications are ready to use (initialized + permissions granted)
+  bool get isReady => _isInitialized && _permissionsGranted;
+
+  /// Check if service is initialized
+  bool get isInitialized => _isInitialized;
+
+  /// Check if permissions are granted
+  bool get hasPermissions => _permissionsGranted;
+
+  /// Update permissions status (called when user enables/disables notifications)
+  Future<bool> updatePermissions() async {
+    if (!_isInitialized) {
+      return false;
+    }
+
+    return await requestPermissions();
   }
 
   /// Request notification permissions (called when user enables notifications)
@@ -218,17 +293,37 @@ class P2PNotificationService {
     }
 
     if (Platform.isAndroid) {
-      final androidPlugin =
-          _notifications.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
-      final granted = await androidPlugin?.requestNotificationsPermission();
-      _permissionsGranted = granted ?? false;
-      return _permissionsGranted;
+      final deviceInfo = await DeviceInfoPlugin().androidInfo;
+      final sdkInt = deviceInfo.version.sdkInt;
+
+      // For Android 13 (Tiramisu, SDK 33) and above
+      if (sdkInt >= 33) {
+        final androidPlugin =
+            _notifications.resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>();
+        final granted = await androidPlugin?.requestNotificationsPermission();
+        _permissionsGranted = granted ?? false;
+        return _permissionsGranted;
+      } else {
+        // For older Android versions, permission is controlled via system settings.
+        // We just check if they are enabled. The UI will guide the user to settings.
+        final androidPlugin =
+            _notifications.resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>();
+        final granted = await androidPlugin?.areNotificationsEnabled();
+        _permissionsGranted = granted ?? false;
+        return _permissionsGranted;
+      }
     }
 
     // Desktop platforms typically don't require explicit permission
     _permissionsGranted = true;
     return true;
+  }
+
+  /// Opens the application's notification settings page.
+  Future<void> openNotificationSettings() async {
+    await openAppSettings();
   }
 
   /// Check if permissions are already granted (without requesting)
@@ -254,6 +349,14 @@ class P2PNotificationService {
   }) {
     _onNotificationTapped = onNotificationTapped;
     _onActionPressed = onActionPressed;
+    logInfo('P2P notification callbacks set');
+  }
+
+  /// Clear notification callbacks
+  void clearCallbacks() {
+    _onNotificationTapped = null;
+    _onActionPressed = null;
+    logInfo('P2P notification callbacks cleared');
   }
 
   /// Handle notification tap
@@ -273,11 +376,54 @@ class P2PNotificationService {
           _onActionPressed?.call(action, data);
         } else {
           // Handle notification tap
-          _onNotificationTapped?.call(data);
+          _handleNotificationTap(data);
         }
       }
     } catch (e, s) {
       logError('Error handling notification response: $e\n$s');
+    }
+  }
+
+  /// Handle notification tap with special logic for P2LAN Status
+  void _handleNotificationTap(P2PNotificationPayload data) {
+    if (data.type == P2PNotificationType.p2lanStatus) {
+      // For P2LAN Status notification, navigate to P2LAN screen
+      _navigateToP2Lan();
+    } else {
+      // For other notifications, use the registered callback
+      _onNotificationTapped?.call(data);
+    }
+  }
+
+  /// Navigate to P2LAN screen using the global navigator key
+  void _navigateToP2Lan() {
+    try {
+      // Use the global navigator key from main.dart for reliable navigation
+      final navigator = _getGlobalNavigator();
+      if (navigator != null) {
+        navigator.pushNamed('/p2lan_transfer');
+        logInfo(
+            'Navigated to P2LAN from notification tap using global navigator');
+      } else {
+        // Fallback to navigation service
+        final navService = P2PNavigationService.instance;
+        navService.navigateToP2Lan();
+        logInfo(
+            'Navigated to P2LAN from notification tap using navigation service');
+      }
+    } catch (e) {
+      logError('Failed to navigate to P2LAN from notification: $e');
+    }
+  }
+
+  /// Get global navigator state from main.dart
+  NavigatorState? _getGlobalNavigator() {
+    try {
+      // Import the global navigator key from main.dart
+      // We'll need to make this accessible via a service or direct import
+      return null; // Will be implemented after making navigatorKey accessible
+    } catch (e) {
+      return null;
     }
   }
 
@@ -599,9 +745,192 @@ class P2PNotificationService {
     );
   }
 
-  /// Cancel notification by ID
-  Future<void> cancelNotification(String id) async {
-    await _notifications.cancel(id.hashCode);
+  /// Show P2LAN status notification (persistent when P2LAN is running)
+  Future<void> showP2LanStatus({
+    required String deviceName,
+    required String ipAddress,
+    int connectedDevices = 0,
+  }) async {
+    if (!_isInitialized) return;
+
+    // Auto-check permissions if not already granted
+    if (!_permissionsGranted) {
+      final hasPermission = await checkPermissions();
+      if (!hasPermission) {
+        logWarning(
+            'Notification permissions not granted, P2LAN status notification skipped');
+        return;
+      }
+    }
+
+    final payload = P2PNotificationPayload(
+      type: P2PNotificationType.p2lanStatus,
+      extra: {
+        'deviceName': deviceName,
+        'ipAddress': ipAddress,
+        'connectedDevices': connectedDevices,
+      },
+    );
+
+    final statusText = connectedDevices > 0
+        ? '$connectedDevices device${connectedDevices > 1 ? 's' : ''} connected'
+        : 'Ready for connections';
+
+    await _notifications.show(
+      _p2lanStatusNotificationId,
+      'P2LAN Active',
+      '$deviceName ($ipAddress) • $statusText',
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _p2lanStatusChannelId,
+          'P2LAN Status',
+          channelDescription: 'Persistent notification when P2LAN is running',
+          importance: Importance.low,
+          priority: Priority.low,
+          ongoing: true,
+          autoCancel: false,
+          icon: 'ic_p2lan_active',
+        ),
+        linux: const LinuxNotificationDetails(
+          category: LinuxNotificationCategory.network,
+          defaultActionName: 'Open P2LAN',
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: false, // Don't show a banner
+          categoryIdentifier: 'p2lan_status',
+        ),
+        macOS: const DarwinNotificationDetails(
+          presentAlert: false,
+          presentBadge: false,
+          presentSound: false,
+        ),
+      ),
+      payload: _encodePayload(payload),
+    );
+
+    logInfo('Showed P2LAN status notification: $deviceName ($ipAddress)');
+  }
+
+  /// Hide P2LAN status notification
+  Future<void> hideP2LanStatus() async {
+    await _notifications.cancel(_p2lanStatusNotificationId);
+    logInfo('Hidden P2LAN status notification');
+  }
+
+  /// Show file transfer status notification (enhanced progress with detailed info)
+  Future<void> showFileTransferStatus({
+    required DataTransferTask task,
+    required int progress, // 0-100
+    String? speed,
+    String? eta,
+    String? remainingFiles,
+  }) async {
+    if (!_isInitialized) return;
+
+    // Auto-check permissions if not already granted
+    if (!_permissionsGranted) {
+      final hasPermission = await checkPermissions();
+      if (!hasPermission) {
+        logWarning(
+            'Notification permissions not granted, file transfer status notification skipped');
+        return;
+      }
+    }
+
+    final payload = P2PNotificationPayload(
+      type: P2PNotificationType.fileTransferStatus,
+      userId: task.targetUserId,
+      userName: task.targetUserName,
+      taskId: task.id,
+      batchId: task.batchId,
+      extra: {
+        'progress': progress,
+        'speed': speed,
+        'eta': eta,
+        'remainingFiles': remainingFiles,
+      },
+    );
+
+    final statusText = task.isOutgoing
+        ? 'Sending to ${task.targetUserName}'
+        : 'Receiving from ${task.targetUserName}';
+
+    // Build detailed progress text
+    final progressParts = <String>['$progress%'];
+    if (speed != null && speed.isNotEmpty) {
+      progressParts.add(speed);
+    }
+    if (eta != null && eta.isNotEmpty) {
+      progressParts.add(eta);
+    }
+    if (remainingFiles != null && remainingFiles.isNotEmpty) {
+      progressParts.add(remainingFiles);
+    }
+
+    final progressText = progressParts.join(' • ');
+
+    final fileName = task.fileName.length > 30
+        ? '${task.fileName.substring(0, 27)}...'
+        : task.fileName;
+
+    await _notifications.show(
+      '${task.id}_status'.hashCode,
+      '$statusText: $fileName',
+      progressText,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _fileTransferStatusChannelId,
+          'File Transfer Status',
+          channelDescription: 'Detailed file transfer progress notifications',
+          importance: Importance.low,
+          priority: Priority.low,
+          ongoing: true,
+          autoCancel: false,
+          showProgress: true,
+          maxProgress: 100,
+          progress: progress,
+          icon: task.isOutgoing ? 'ic_p2lan_active' : 'ic_p2lan_active',
+        ),
+        linux: LinuxNotificationDetails(
+          category: LinuxNotificationCategory.transfer,
+          resident: true,
+          urgency: LinuxNotificationUrgency.low,
+          actions: task.isOutgoing
+              ? [
+                  const LinuxNotificationAction(
+                    key: 'cancel_transfer',
+                    label: 'Cancel',
+                  ),
+                  const LinuxNotificationAction(
+                    key: 'open_p2lan',
+                    label: 'Open P2LAN',
+                  ),
+                ]
+              : [
+                  const LinuxNotificationAction(
+                    key: 'open_p2lan',
+                    label: 'Open P2LAN',
+                  ),
+                ],
+        ),
+        macOS: DarwinNotificationDetails(
+          subtitle: progressText,
+          presentAlert: false,
+          presentBadge: false,
+          presentSound: false,
+        ),
+      ),
+      payload: _encodePayload(payload),
+    );
+
+    logInfo(
+        'Showed file transfer status notification: $progress% for ${task.fileName}');
+  }
+
+  /// Cancel a generic notification by its ID
+  Future<void> cancelNotification(int notificationId) async {
+    if (!_isInitialized) return;
+    await _notifications.cancel(notificationId);
   }
 
   /// Show test notification (for debugging)
@@ -661,5 +990,12 @@ class P2PNotificationService {
   /// Get pending notifications (platform dependent)
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
     return await _notifications.pendingNotificationRequests();
+  }
+
+  /// Cancel a file transfer status notification by task ID
+  Future<void> cancelFileTransferStatus(String taskId) async {
+    if (!_isInitialized) return;
+    await _notifications.cancel('${taskId}_status'.hashCode);
+    logInfo('Cancelled file transfer status notification for task: $taskId');
   }
 }

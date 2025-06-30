@@ -27,6 +27,13 @@ import 'scientific_calculator_service.dart';
 import 'date_calculator_service.dart';
 import 'p2p_service.dart';
 import 'package:hive/hive.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 
 class CacheInfo {
   final String name;
@@ -34,6 +41,7 @@ class CacheInfo {
   final int itemCount;
   final int sizeBytes;
   final List<String> keys;
+  final bool isDeletable;
 
   CacheInfo({
     required this.name,
@@ -41,6 +49,7 @@ class CacheInfo {
     required this.itemCount,
     required this.sizeBytes,
     required this.keys,
+    this.isDeletable = true,
   });
   String get formattedSize {
     if (sizeBytes < 1024) {
@@ -92,7 +101,8 @@ class CacheService {
     final Map<String, CacheInfo> cacheInfoMap =
         {}; // Text Templates Cache - Now using Hive
     final templates = await TemplateService.getTemplates();
-    final templatesSize = HiveService.getBoxSize(HiveService.templatesBoxName);
+    final templatesSize =
+        await HiveService.getBoxSize(HiveService.templatesBoxName);
 
     cacheInfoMap['text_templates'] = CacheInfo(
       name: textTemplatesName ?? 'Text Templates',
@@ -598,134 +608,79 @@ class CacheService {
 
     // P2P Data Transfer Cache
     try {
-      int p2pSize = 0;
-      int p2pCount = 0;
+      final p2pService = P2PService.instance;
+      final isP2PEnabled = p2pService.isEnabled;
+      logInfo('P2P Service running for cache check: $isP2PEnabled');
 
-      // Check if P2P service has cached data
-      final p2pBoxNames = [
-        'p2p_users',
-        'pairing_requests',
-        'p2p_storage_settings'
-      ];
+      // Get size of Hive boxes related to P2P
+      final settingsBoxSize =
+          await HiveService.getBoxSize('p2p_transfer_settings');
+      final usersBoxSize = await HiveService.getBoxSize('p2p_users');
+      final requestsBoxSize =
+          await HiveService.getBoxSize('file_transfer_requests');
+      final pairingRequestsBoxSize =
+          await HiveService.getBoxSize('pairing_requests');
 
-      logInfo('CacheService: Checking P2P cache...');
+      // Get item counts
+      final settingsBox =
+          await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
+      final usersBox = await Hive.openBox<P2PUser>('p2p_users');
+      final requestsBox =
+          await Hive.openBox<FileTransferRequest>('file_transfer_requests');
+      final pairingRequestsBox =
+          await Hive.openBox<PairingRequest>('pairing_requests');
 
-      for (final boxName in p2pBoxNames) {
+      final p2pItemCount = settingsBox.length +
+          usersBox.length +
+          requestsBox.length +
+          pairingRequestsBox.length;
+
+      // Get file picker cache size (Android only)
+      int filePickerCacheSize = 0;
+      if (Platform.isAndroid) {
         try {
-          logInfo('CacheService: Checking box $boxName...');
-
-          final boxExists = await Hive.boxExists(boxName);
-          logInfo('CacheService: Box $boxName exists: $boxExists');
-
-          if (boxExists) {
-            // Try to open box and read data - check if already open first
-            Box box;
-            bool wasAlreadyOpen = false;
-
-            try {
-              if (Hive.isBoxOpen(boxName)) {
-                box = Hive.box(boxName);
-                wasAlreadyOpen = true;
-                logInfo('CacheService: Box $boxName was already open');
-              } else {
-                box = await Hive.openBox(boxName);
-                logInfo('CacheService: Opened box $boxName');
-              }
-
-              final boxLength = box.length;
-
-              // Calculate size manually since HiveService.getBoxSize doesn't support P2P boxes
-              int boxSize = 0;
-              try {
-                for (var key in box.keys) {
-                  final value = box.get(key);
-                  if (value != null) {
-                    // Estimate size based on JSON representation
-                    final jsonString = value.toString();
-                    boxSize += jsonString.length * 2; // UTF-16 estimate
-                  }
-                }
-              } catch (e) {
-                logError(
-                    'CacheService: Error calculating size for $boxName: $e');
-                boxSize = boxLength * 100; // Fallback estimate
-              }
-
-              logInfo(
-                  'CacheService: Box $boxName has $boxLength items, size: $boxSize bytes');
-
-              p2pSize += boxSize;
-              p2pCount += boxLength;
-
-              // Log some details about the content
-              if (boxLength > 0) {
-                logInfo(
-                    'CacheService: Box $boxName keys: ${box.keys.take(5).toList()}');
-
-                // Log first item details for debugging
-                final firstKey = box.keys.first;
-                final firstValue = box.get(firstKey);
-                logInfo(
-                    'CacheService: First item in $boxName: $firstKey -> ${firstValue.runtimeType}');
-              }
-
-              // Only close if we opened it ourselves
-              if (!wasAlreadyOpen) {
-                await box.close();
-              }
-            } catch (e) {
-              logError('CacheService: Error accessing box $boxName: $e');
-            }
-          } else {
-            logInfo(
-                'CacheService: Box $boxName does not exist, checking if P2P service has data...');
-
-            // Also check if P2P service has users that might not be saved yet
-            if (boxName == 'p2p_users') {
-              try {
-                final p2pService = P2PService.instance;
-                final pairedUsers = p2pService.pairedUsers;
-                logInfo(
-                    'CacheService: P2P service has ${pairedUsers.length} paired users');
-
-                if (pairedUsers.isNotEmpty) {
-                  // Estimate size for users that exist in memory but not in cache
-                  p2pCount += pairedUsers.length;
-                  p2pSize +=
-                      pairedUsers.length * 200; // Approximate size per user
-                  logInfo(
-                      'CacheService: Added ${pairedUsers.length} in-memory users to cache count');
-                }
-              } catch (e) {
-                logWarning('CacheService: Could not access P2P service: $e');
-              }
-            }
+          final tempDir = await getTemporaryDirectory();
+          final filePickerCacheDir =
+              Directory(p.join(tempDir.path, 'file_picker'));
+          if (await filePickerCacheDir.exists()) {
+            filePickerCacheSize = await _getDirectorySize(filePickerCacheDir);
           }
         } catch (e) {
-          logError('CacheService: Error checking P2P box $boxName: $e');
+          logError(
+              'CacheService: Could not calculate file_picker cache size: $e');
         }
       }
 
-      logInfo(
-          'CacheService: P2P cache total - Count: $p2pCount, Size: $p2pSize bytes');
+      final p2pTotalSize = settingsBoxSize +
+          usersBoxSize +
+          requestsBoxSize +
+          pairingRequestsBoxSize +
+          filePickerCacheSize;
 
-      cacheInfoMap['p2lan_transfer'] = CacheInfo(
-        name: p2pDataTransferName ?? 'P2Lan Transfer',
+      cacheInfoMap['p2p_data_transfer'] = CacheInfo(
+        name: p2pDataTransferName ?? 'P2P File Transfer',
         description: p2pDataTransferDesc ??
-            'P2P users, pairing data, and transfer settings',
-        itemCount: p2pCount,
-        sizeBytes: p2pSize,
-        keys: _cacheKeys['p2lan_transfer'] ?? [],
+            'Settings, saved device profiles, and temporary file transfer cache.',
+        itemCount: p2pItemCount,
+        sizeBytes: p2pTotalSize,
+        keys: [
+          'p2p_transfer_settings',
+          'p2p_users',
+          'file_transfer_requests',
+          'pairing_requests'
+        ],
+        isDeletable: !isP2PEnabled,
       );
     } catch (e) {
       logError('CacheService: Error getting P2P cache info: $e');
-      cacheInfoMap['p2lan_transfer'] = CacheInfo(
-        name: p2pDataTransferName ?? 'P2Lan Transfer',
-        description: p2pDataTransferDesc ??
-            'P2P users, pairing data, and transfer settings',
+      // On error, show an entry that indicates a problem but is not deletable
+      cacheInfoMap['p2p_data_transfer'] = CacheInfo(
+        name: p2pDataTransferName ?? 'P2P File Transfer',
+        description: p2pDataTransferDesc ?? 'Error loading cache details.',
         itemCount: 0,
         sizeBytes: 0,
-        keys: _cacheKeys['p2lan_transfer'] ?? [],
+        keys: [],
+        isDeletable: false,
       );
     }
 
@@ -812,9 +767,19 @@ class CacheService {
       await GenericPresetService.clearAllPresets('speed');
       await GenericPresetService.clearAllPresets('temperature');
       await GenericPresetService.clearAllPresets('data_storage');
-    } else if (cacheType == 'p2lan_transfer') {
+    } else if (cacheType == 'p2p_data_transfer') {
       // Clear P2P data transfer cache
-      await clearP2PCache();
+      await Hive.deleteBoxFromDisk('p2p_transfer_settings');
+      await Hive.deleteBoxFromDisk('p2p_users');
+      await Hive.deleteBoxFromDisk('file_transfer_requests');
+      await Hive.deleteBoxFromDisk('pairing_requests');
+      if (Platform.isAndroid) {
+        try {
+          await FilePicker.platform.clearTemporaryFiles();
+        } catch (e) {
+          logError('CacheService: Failed to clear file_picker cache: $e');
+        }
+      }
     } else {
       final keys = _cacheKeys[cacheType] ?? [];
       for (final key in keys) {
@@ -962,7 +927,8 @@ class CacheService {
     final p2pBoxNames = [
       'p2p_users',
       'pairing_requests',
-      'p2p_storage_settings'
+      'p2p_storage_settings',
+      'file_transfer_requests',
     ];
 
     for (final boxName in p2pBoxNames) {
@@ -972,6 +938,21 @@ class CacheService {
       } catch (e) {
         logError('CacheService: Error clearing P2P box $boxName: $e');
       }
+    }
+
+    // 🔥 SAFE: Only clear file picker cache if P2P is not active
+    try {
+      final p2pService = P2PService.instance;
+      if (!p2pService.isEnabled) {
+        await FilePicker.platform.clearTemporaryFiles();
+        logInfo(
+            'CacheService: Cleared file picker temporary files (P2P disabled)');
+      } else {
+        logInfo(
+            'CacheService: Skipped file picker cleanup - P2P service is active');
+      }
+    } catch (e) {
+      logWarning('CacheService: Failed to clear file picker temp files: $e');
     }
   }
 
@@ -1170,7 +1151,7 @@ class CacheService {
 
       // Get cache info
       final cacheInfo = await getAllCacheInfo();
-      final p2pCache = cacheInfo['p2lan_transfer'];
+      final p2pCache = cacheInfo['p2p_data_transfer'];
       result['cache_info'] = {
         'item_count': p2pCache?.itemCount ?? 0,
         'size_bytes': p2pCache?.sizeBytes ?? 0,
@@ -1180,5 +1161,123 @@ class CacheService {
     }
 
     return result;
+  }
+
+  static Future<Map<String, dynamic>> getP2PCacheInfo() async {
+    final p2pBoxNames = [
+      'p2p_users',
+      'pairing_requests',
+      'p2p_storage_settings',
+      'file_transfer_requests',
+    ];
+    int itemCount = 0;
+    int sizeBytes = 0;
+
+    for (final boxName in p2pBoxNames) {
+      try {
+        final box = await Hive.openBox(boxName);
+        itemCount += box.length;
+        // This is a very rough estimation of size
+        for (var key in box.keys) {
+          final value = box.get(key);
+          if (value != null) {
+            sizeBytes += value.toString().length * 2;
+          }
+        }
+        await box.close();
+      } catch (e) {
+        logError('CacheService: Error getting size for box $boxName: $e');
+      }
+    }
+
+    // 🔥 FIX: Add file picker cache size for Android
+    int filePickerCacheSizeBytes = 0;
+    if (Platform.isAndroid) {
+      try {
+        final tempDir = await getTemporaryDirectory();
+        final filePickerCacheDir =
+            Directory(p.join(tempDir.path, '..', 'cache', 'file_picker'));
+        if (await filePickerCacheDir.exists()) {
+          filePickerCacheSizeBytes =
+              await _getDirectorySize(filePickerCacheDir);
+        }
+      } catch (e) {
+        logError(
+            'CacheService: Could not calculate file_picker cache size: $e');
+      }
+    }
+
+    return {
+      'itemCount': itemCount,
+      'sizeBytes': sizeBytes + filePickerCacheSizeBytes
+    };
+  }
+
+  /// 🔥 NEW: Helper to calculate directory size recursively
+  static Future<int> _getDirectorySize(Directory dir) async {
+    int size = 0;
+    if (await dir.exists()) {
+      try {
+        await for (final entity in dir.list(recursive: true)) {
+          if (entity is File) {
+            try {
+              size += await entity.length();
+            } catch (e) {
+              // Ignore errors for files that might be deleted during iteration
+            }
+          }
+        }
+      } catch (e) {
+        logError('CacheService: Error listing directory ${dir.path}: $e');
+      }
+    }
+    return size;
+  }
+
+  /// Shows a confirmation dialog and clears all deletable cache if confirmed.
+  static Future<void> confirmAndClearAllCache(
+    BuildContext context, {
+    required AppLocalizations l10n,
+  }) async {
+    // First, determine which caches cannot be cleared.
+    final allCacheInfo = await getAllCacheInfo();
+    final nonDeletableCaches = allCacheInfo.values
+        .where((info) => !info.isDeletable)
+        .map((info) => info.name)
+        .toList();
+
+    String dialogContent = l10n.confirmClearAllCache;
+    if (nonDeletableCaches.isNotEmpty) {
+      dialogContent +=
+          '\n\n${l10n.cannotClearFollowingCaches}\n• ${nonDeletableCaches.join('\n• ')}';
+    }
+
+    // Show the hold-to-confirm dialog.
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => HoldToConfirmDialog(
+        l10n: l10n,
+        title: l10n.clearAllCache,
+        content: dialogContent,
+        holdDuration: const Duration(seconds: 5),
+        onConfirmed: () => Navigator.of(context).pop(true),
+        actionText: l10n.clearAll,
+        holdText: l10n.holdToClearCache,
+        processingText: l10n.clearingCache,
+        actionIcon: Icons.delete_sweep,
+      ),
+    );
+
+    if (confirmed == true) {
+      await clearAllCache();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.allCacheCleared),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
   }
 }

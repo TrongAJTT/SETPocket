@@ -51,7 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewCacheDetails => 'View Details';
 
   @override
-  String get cacheSize => 'Cache Size';
+  String get cacheSize => 'Cache size';
 
   @override
   String get cacheItems => 'Items';
@@ -112,6 +112,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmClearAllCache => 'Are you sure you want to clear ALL cache data? This will remove all saved templates but preserve your settings.';
 
   @override
+  String get cannotClearFollowingCaches => 'The following caches cannot be cleared because they are currently in use:';
+
+  @override
   String cacheCleared(Object cacheName) {
     return '$cacheName cache cleared successfully';
   }
@@ -126,6 +129,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get online => 'Online';
+
+  @override
+  String get offline => 'Offline';
 
   @override
   String get options => 'Options';
@@ -5128,10 +5137,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startCalculatingToSeeHistory => 'Start calculating to see history';
 
   @override
-  String get p2pDataTransfer => 'P2P Data Transfer';
+  String get p2pDataTransfer => 'P2P File Transfer';
 
   @override
-  String get p2pDataTransferDesc => 'Transfer data directly between devices on the same network';
+  String get p2pDataTransferDesc => 'Transfer files between devices on the same local network.';
 
   @override
   String get networkSecurityWarning => 'Network Security Warning';
@@ -5185,6 +5194,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectionStatus => 'Connection Status';
 
   @override
+  String get autoConnect => 'Auto Connect';
+
+  @override
   String get networkInfo => 'Network Info';
 
   @override
@@ -5218,7 +5230,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paired => 'Paired';
 
   @override
-  String get trusted => 'Trusted';
+  String get lastSeen => 'Last Seen';
+
+  @override
+  String get pairedSince => 'Paired Since';
+
+  @override
+  String trusted(String name) {
+    return 'Trusted $name';
+  }
 
   @override
   String get pair => 'Pair';
@@ -5254,6 +5274,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get p2pPermissionCancel => 'Cancel';
 
   @override
+  String get p2pNearbyDevicesPermissionTitle => 'Nearby Devices Permission Required';
+
+  @override
+  String get p2pNearbyDevicesPermissionExplanation => 'To discover nearby devices on modern Android versions, this app needs access to nearby WiFi devices. This permission allows the app to scan for WiFi networks without accessing your location. Your data is not stored or shared. The app is client-side and we do not collect any user data.';
+
+  @override
   String get dataTransferRequest => 'Data Transfer Request';
 
   @override
@@ -5270,4 +5296,802 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get p2lanTransfer => 'P2Lan Transfer';
+
+  @override
+  String get p2lanStatus => 'P2LAN Status';
+
+  @override
+  String get fileTransferStatus => 'File Transfer Status';
+
+  @override
+  String get p2lanActive => 'P2LAN Active';
+
+  @override
+  String get readyForConnections => 'Ready for connections';
+
+  @override
+  String devicesConnected(int count) {
+    return '$count devices connected';
+  }
+
+  @override
+  String deviceConnected(int count) {
+    return '$count device connected';
+  }
+
+  @override
+  String get stopP2lan => 'Stop P2LAN';
+
+  @override
+  String get p2lanStopped => 'P2LAN stopped';
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get quickActionsDesc => 'Select up to 4 tools for quick access.';
+
+  @override
+  String get quickActionsManage => 'Manage Quick Actions';
+
+  @override
+  String get cacheDetailsDialogTitle => 'Cache Details';
+
+  @override
+  String get randomGeneratorsCacheDesc => 'Generation history and settings';
+
+  @override
+  String get calculatorToolsCacheDesc => 'Calculation history, graphing calculator data, BMI data, and settings';
+
+  @override
+  String get converterToolsCacheDesc => 'Currency/length states, presets and exchange rates cache';
+
+  @override
+  String get p2pDataTransferCacheDesc => 'Settings, saved device profiles, and temporary file transfer cache.';
+
+  @override
+  String totalCacheSize(Object count, Object size) {
+    return 'Total: $count items, $size';
+  }
+
+  @override
+  String get clearSelectedCache => 'Clear Selected Cache';
+
+  @override
+  String get pairWithDevice => 'Do you want to pair with this device?';
+
+  @override
+  String get deviceId => 'Device ID';
+
+  @override
+  String get discoveryTime => 'Discovery Time';
+
+  @override
+  String get saveConnection => 'Save Connection';
+
+  @override
+  String get autoReconnectDescription => 'Automatically reconnect when both devices are online';
+
+  @override
+  String get pairingNotificationInfo => 'The other user will receive a pairing request and needs to accept to complete the pairing.';
+
+  @override
+  String get sendRequest => 'Send Request';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours hr ago';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String get noPairingRequests => 'No pairing requests';
+
+  @override
+  String get pairingRequestFrom => 'Pairing request from:';
+
+  @override
+  String get sentTime => 'Sent Time';
+
+  @override
+  String get wantsSaveConnection => 'This person wants to save the connection';
+
+  @override
+  String get trustThisUser => 'Trust this user';
+
+  @override
+  String get allowFileTransfersWithoutConfirmation => 'Allow file transfers without confirmation';
+
+  @override
+  String get onlyAcceptFromTrustedDevices => 'Only accept pairing from devices you trust.';
+
+  @override
+  String get previousRequest => 'Previous request';
+
+  @override
+  String get nextRequest => 'Next request';
+
+  @override
+  String get reject => 'Reject';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get incomingFiles => 'Incoming Files';
+
+  @override
+  String wantsToSendYouFiles(int count) {
+    return 'wants to send you $count file(s)';
+  }
+
+  @override
+  String get filesToReceive => 'Files to receive:';
+
+  @override
+  String get totalSize => 'Total size:';
+
+  @override
+  String get localFiles => 'Local Files';
+
+  @override
+  String get manualDiscovery => 'Manual Discovery';
+
+  @override
+  String get transferSettings => 'Transfer Settings';
+
+  @override
+  String get savedDevicesCurrentlyAvailable => 'Saved devices currently available';
+
+  @override
+  String get recentlyDiscoveredDevices => 'Recently discovered devices';
+
+  @override
+  String get viewInfo => 'View Info';
+
+  @override
+  String get trust => 'Trust';
+
+  @override
+  String get removeTrust => 'Remove Trust';
+
+  @override
+  String get unpair => 'Unpair';
+
+  @override
+  String get thisDevice => 'This Device';
+
+  @override
+  String get fileCache => 'File Cache';
+
+  @override
+  String get reload => 'Reload';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get temporaryFilesFromTransfers => 'Temporary files from P2Lan file transfers';
+
+  @override
+  String get debug => 'Debug';
+
+  @override
+  String get clearFileCache => 'Clear File Cache';
+
+  @override
+  String get fileCacheClearedSuccessfully => 'File cache cleared successfully';
+
+  @override
+  String failedToClearCache(String error) {
+    return 'Failed to clear cache: $error';
+  }
+
+  @override
+  String get failedToUpdateSettings => 'Failed to update settings';
+
+  @override
+  String failedToLoadSettings(String error) {
+    return 'Failed to load settings: $error';
+  }
+
+  @override
+  String removeTrustFrom(String deviceName) {
+    return 'Remove trust from $deviceName?';
+  }
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String unpairFrom(String deviceName) {
+    return 'Unpair from $deviceName';
+  }
+
+  @override
+  String get unpairDescription => 'This will remove the pairing completely from both devices. You will need to pair again in the future.\n\nThe other device will also be notified and their connection will be removed.';
+
+  @override
+  String get holdToUnpair => 'Hold to Unpair';
+
+  @override
+  String get unpairing => 'Unpairing...';
+
+  @override
+  String get holdButtonToConfirmUnpair => 'Hold the button for 1 second to confirm unpair';
+
+  @override
+  String get taskAndFileDeletedSuccessfully => 'Task and file deleted successfully';
+
+  @override
+  String get taskCleared => 'Task cleared';
+
+  @override
+  String get notConnected => 'Not connected';
+
+  @override
+  String get sending => 'Sending...';
+
+  @override
+  String get sendFiles => 'Send files';
+
+  @override
+  String get addFiles => 'Add Files';
+
+  @override
+  String errorSelectingFiles(String error) {
+    return 'Error selecting files: $error';
+  }
+
+  @override
+  String errorSendingFiles(String error) {
+    return 'Error sending files: $error';
+  }
+
+  @override
+  String get noFilesSelected => 'No files selected';
+
+  @override
+  String get tapRightClickForOptions => 'Tap or right-click for options';
+
+  @override
+  String get transferSummary => 'Transfer Summary';
+
+  @override
+  String get unlimited => 'Unlimited';
+
+  @override
+  String get tcpProtocol => 'TCP';
+
+  @override
+  String get tcpDescription => 'More reliable, better for important files';
+
+  @override
+  String get udpProtocol => 'UDP';
+
+  @override
+  String get udpDescription => 'Faster but less reliable, good for large files';
+
+  @override
+  String get noFileOrganization => 'None';
+
+  @override
+  String get createDateFolders => 'Create date folders';
+
+  @override
+  String get organizeFoldersByDate => 'Organize files by date received';
+
+  @override
+  String get createSenderFolders => 'Create sender folders';
+
+  @override
+  String get immediate => 'Immediate';
+
+  @override
+  String get myDevice => 'My Device';
+
+  @override
+  String get bySenderName => 'By Sender Name';
+
+  @override
+  String get byDate => 'By Date';
+
+  @override
+  String get none => 'None';
+
+  @override
+  String get resetToDefaults => 'Reset to Defaults';
+
+  @override
+  String get resetConfirmation => 'Are you sure you want to reset all settings to their default values?';
+
+  @override
+  String get generic => 'Generic';
+
+  @override
+  String get storage => 'Storage';
+
+  @override
+  String get network => 'Network';
+
+  @override
+  String get saveSettings => 'Save Settings';
+
+  @override
+  String get deviceProfile => 'Device Profile';
+
+  @override
+  String get deviceDisplayName => 'Device Display Name';
+
+  @override
+  String get userPreferences => 'User Preferences';
+
+  @override
+  String get enableNotifications => 'Enable Notifications';
+
+  @override
+  String get getNotifiedAboutTransferEvents => 'Get notified about transfer events';
+
+  @override
+  String get userInterfacePerformance => 'User Interface Performance';
+
+  @override
+  String get uiRefreshRate => 'UI Refresh Rate';
+
+  @override
+  String get currentConfiguration => 'Current Configuration';
+
+  @override
+  String get protocol => 'Protocol';
+
+  @override
+  String get maxFileSize => 'Max File Size';
+
+  @override
+  String get maxTotalSize => 'Maximum total size (per transfer batch)';
+
+  @override
+  String get concurrentTasks => 'Concurrent Tasks';
+
+  @override
+  String get chunkSize => 'Chunk Size';
+
+  @override
+  String get fileOrganization => 'File Organization';
+
+  @override
+  String get storageInformation => 'Storage Information';
+
+  @override
+  String get downloadPath => 'Download Path';
+
+  @override
+  String get totalSpace => 'Total Space';
+
+  @override
+  String get freeSpace => 'Free Space';
+
+  @override
+  String get usedSpace => 'Used Space';
+
+  @override
+  String get noDownloadPathSet => 'No Download Path Set';
+
+  @override
+  String get downloadLocation => 'Download Location';
+
+  @override
+  String get downloadFolder => 'Download Folder';
+
+  @override
+  String get androidStorageAccess => 'Android Storage Access';
+
+  @override
+  String get useAppFolder => 'Use App Folder';
+
+  @override
+  String get sizeLimits => 'Size Limits';
+
+  @override
+  String get totalSizeLimitDescription => 'Total size limit for all files in a single transfer request';
+
+  @override
+  String get transferProtocolSection => 'Transfer Protocol';
+
+  @override
+  String get performanceTuning => 'Performance Tuning';
+
+  @override
+  String get concurrentTransfersDescription => ' = faster overall but higher CPU usage';
+
+  @override
+  String get transferChunkSizeDescription => 'Higher sizes = faster transfers but more memory usage';
+
+  @override
+  String get permissionsRequiredForP2P => 'Permissions are required to start P2P networking';
+
+  @override
+  String errorInStartNetworking(String error) {
+    return 'Error in starting networking: $error';
+  }
+
+  @override
+  String errorSelectingFilesFromCategory(String category, String error) {
+    return 'Error selecting files from $category: $error';
+  }
+
+  @override
+  String get loadingDeviceInfo => 'Loading device information...';
+
+  @override
+  String get tempFilesDescription => 'Temporary files from P2Lan file transfers';
+
+  @override
+  String get networkDebugCompleted => 'Network debug completed. Check logs for details.';
+
+  @override
+  String lastRefresh(String time) {
+    return 'Last refresh: $time';
+  }
+
+  @override
+  String get p2pNetworkingPaused => 'P2P networking is paused due to internet connection loss. It will automatically resume when connection is restored.';
+
+  @override
+  String get noDevicesInRange => 'No devices in range. Try refreshing.';
+
+  @override
+  String get initialDiscoveryInProgress => 'Initial discovery in progress...';
+
+  @override
+  String get refreshing => 'Refreshing...';
+
+  @override
+  String get pausedNoInternet => 'Paused (No Internet)';
+
+  @override
+  String trustRemoved(String name) {
+    return 'Trust removed from $name';
+  }
+
+  @override
+  String removeTrustConfirm(String name) {
+    return 'Remove trust from $name?';
+  }
+
+  @override
+  String unpairFromDevice(String name) {
+    return 'Unpair from $name';
+  }
+
+  @override
+  String get holdUnpairInstruction => 'Hold the button for 1 second to confirm unpair';
+
+  @override
+  String unpaired(String name) {
+    return 'Unpaired from $name';
+  }
+
+  @override
+  String get taskAndFileDeleted => 'Task and file deleted successfully';
+
+  @override
+  String get clearFileCacheConfirm => 'This will clear temporary files from P2Lan transfers. This action cannot be undone.';
+
+  @override
+  String get fileCacheClearedSuccess => 'File cache cleared successfully';
+
+  @override
+  String get permissionsRequired => 'Permissions are required to start P2P networking';
+
+  @override
+  String startedSending(int count, String name) {
+    return 'Started sending $count files to $name';
+  }
+
+  @override
+  String get transferSettingsUpdated => 'Transfer settings updated successfully';
+
+  @override
+  String get disconnected => 'Disconnected';
+
+  @override
+  String get discoveringDevices => 'Discovering devices...';
+
+  @override
+  String get connected => 'Connected';
+
+  @override
+  String get pairing => 'Pairing...';
+
+  @override
+  String get checkingNetwork => 'Checking network...';
+
+  @override
+  String get connectedViaMobileData => 'Connected via mobile data (secure)';
+
+  @override
+  String connectedToWifi(String name, String security) {
+    return 'Connected to $name ($security)';
+  }
+
+  @override
+  String get secure => 'secure';
+
+  @override
+  String get unsecure => 'unsecure';
+
+  @override
+  String get connectedViaEthernet => 'Connected via Ethernet (secure)';
+
+  @override
+  String get noNetworkConnection => 'No network connection';
+
+  @override
+  String get unknownWifi => 'Unknown WiFi';
+
+  @override
+  String get tcpReliable => 'TCP (Reliable)';
+
+  @override
+  String get udpFast => 'UDP (Fast)';
+
+  @override
+  String get createDateFoldersDescription => 'Organize by date (YYYY-MM-DD)';
+
+  @override
+  String get createSenderFoldersDescription => 'Organize by sender display name';
+
+  @override
+  String get maxConcurrentTasks => 'Max Concurrent Tasks';
+
+  @override
+  String get defaultLabel => 'Default';
+
+  @override
+  String get customDisplayName => 'Custom Display Name';
+
+  @override
+  String get deviceName => 'Device Name';
+
+  @override
+  String get general => 'General';
+
+  @override
+  String get performance => 'Performance';
+
+  @override
+  String get advanced => 'Advanced';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get hasUnsavedChanges => 'You have unsaved changes. Do you want to discard them?';
+
+  @override
+  String get selectFolder => 'Select Folder';
+
+  @override
+  String get permissionRequired => 'Permission Required';
+
+  @override
+  String get grantStoragePermission => 'Grant storage permission to select download folder';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get notificationPermissionInfo => 'Notification permission allows you to receive updates about file transfers and connection status.';
+
+  @override
+  String get secondsLabel => 'second';
+
+  @override
+  String get secondsPlural => 'seconds';
+
+  @override
+  String get networkInfoTitle => 'Network Information';
+
+  @override
+  String get deviceSections => 'Device Sections';
+
+  @override
+  String get onlineDevices => 'Online Devices';
+
+  @override
+  String get newDevices => 'New Devices';
+
+  @override
+  String get addTrust => 'Add Trust';
+
+  @override
+  String get emptyDevicesStateTitle => 'No Devices Found';
+
+  @override
+  String get viewDeviceInfo => 'View device information';
+
+  @override
+  String get trustUser => 'Trust user';
+
+  @override
+  String get menuSendFiles => 'Send Files';
+
+  @override
+  String get menuViewInfo => 'View Info';
+
+  @override
+  String get menuPair => 'Pair';
+
+  @override
+  String get menuTrust => 'Trust';
+
+  @override
+  String get menuUntrust => 'Remove Trust';
+
+  @override
+  String get menuUnpair => 'Unpair';
+
+  @override
+  String get deviceActions => 'Device Actions';
+
+  @override
+  String get p2pTemporarilyDisabled => 'P2P temporarily disabled - waiting for internet connection';
+
+  @override
+  String get fileOrgNoneDescription => 'Files go directly to download folder';
+
+  @override
+  String get fileOrgDateDescription => 'Organize by date (YYYY-MM-DD)';
+
+  @override
+  String get fileOrgSenderDescription => 'Organize by sender display name';
+
+  @override
+  String get basic => 'Basic';
+
+  @override
+  String get summary => 'Summary';
+
+  @override
+  String get p2lanTransferSettingsTitle => 'P2Lan Transfer Settings';
+
+  @override
+  String get settingsTabGeneric => 'Generic';
+
+  @override
+  String get settingsTabStorage => 'Storage';
+
+  @override
+  String get settingsTabNetwork => 'Network';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get displayNameDescription => 'Customize how your device appears to other users';
+
+  @override
+  String get deviceDisplayNameLabel => 'Device Display Name';
+
+  @override
+  String get deviceDisplayNameHint => 'Enter custom display name...';
+
+  @override
+  String defaultDisplayName(String name) {
+    return 'Default: $name';
+  }
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get notSupportedOnWindows => 'Not supported on Windows';
+
+  @override
+  String get uiPerformance => 'User Interface Performance';
+
+  @override
+  String get uiRefreshRateDescription => 'Choose how often transfer progress updates in the UI. Higher frequencies work better on powerful devices.';
+
+  @override
+  String savedDevicesCount(int count) {
+    return 'Saved Devices ($count)';
+  }
+
+  @override
+  String get previouslyPairedOffline => 'Previously paired devices (offline)';
+
+  @override
+  String get statusSaved => 'Saved';
+
+  @override
+  String get statusTrusted => 'Trusted';
+
+  @override
+  String get thisDeviceCardTitle => 'This Device';
+
+  @override
+  String get appInstallationId => 'App Installation ID';
+
+  @override
+  String get ipAddress => 'IP Address';
+
+  @override
+  String get port => 'Port';
+
+  @override
+  String get statusOffline => 'Offline';
+
+  @override
+  String get selectDownloadFolder => 'Select download folder...';
+
+  @override
+  String get maxFileSizePerFile => 'Maximum file size (per file)';
+
+  @override
+  String get transferProtocol => 'Transfer Protocol';
+
+  @override
+  String get concurrentTransfers => 'Concurrent transfers';
+
+  @override
+  String get transferChunkSize => 'Transfer chunk size';
+
+  @override
+  String get defaultValue => '(Default)';
+
+  @override
+  String get androidStorageAccessDescription => 'For security, it\'s recommended to use the app-specific folder. You can select other folders, but this may require additional permissions.';
+
+  @override
+  String get storageInfo => 'Storage Information';
+
+  @override
+  String get noDownloadPathSetDescription => 'Please select a download folder in the Storage tab to see storage information.';
+
+  @override
+  String get enableNotificationsDescription => 'Get notified about transfer events';
+
+  @override
+  String get maxFileSizePerFileDescription => 'Larger files will be automatically rejected';
+
+  @override
+  String get maxTotalSizeDescription => 'Total size limit for all files in a single transfer request';
+
+  @override
+  String get concurrentTransfersSubtitle => 'More transfers = faster overall but higher CPU usage';
+
+  @override
+  String get transferChunkSizeSubtitle => 'Higher sizes = faster transfers but more memory usage';
+
+  @override
+  String get protocolTcpReliable => 'TCP (Reliable)';
+
+  @override
+  String get protocolTcpDescription => 'More reliable, better for important files';
+
+  @override
+  String get protocolUdpFast => 'UDP (Fast)';
+
+  @override
+  String get fileOrgNone => 'None';
+
+  @override
+  String get fileOrgDate => 'By Date';
+
+  @override
+  String get fileOrgSender => 'By Sender Name';
 }

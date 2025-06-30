@@ -567,6 +567,9 @@ class P2PMessageTypes {
   static const String fileTransferResponse = 'file_transfer_response';
 }
 
+// Workmanager task constants
+const String p2pKeepAliveTask = "p2pKeepAliveTask";
+
 @HiveType(typeId: 52)
 class P2PFileStorageSettings extends HiveObject {
   @HiveField(0)

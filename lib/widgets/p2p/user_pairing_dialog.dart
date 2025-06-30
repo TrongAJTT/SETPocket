@@ -39,7 +39,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Bạn muốn ghép nối với thiết bị này?',
+            l10n.pairWithDevice,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
@@ -97,7 +97,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
                 const SizedBox(height: 12),
                 _buildInfoRow(
                   icon: Icons.fingerprint,
-                  label: 'Device ID',
+                  label: l10n.deviceId,
                   value: widget.user.deviceId.length > 20
                       ? '${widget.user.deviceId.substring(0, 20)}...'
                       : widget.user.deviceId,
@@ -105,7 +105,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
                 const SizedBox(height: 8),
                 _buildInfoRow(
                   icon: Icons.access_time,
-                  label: 'Thời gian phát hiện',
+                  label: l10n.discoveryTime,
                   value: _formatTime(widget.user.lastSeen),
                 ),
               ],
@@ -122,9 +122,9 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
                 _saveConnection = value ?? false;
               });
             },
-            title: Text('Lưu ghép nối'),
+            title: Text(l10n.saveConnection),
             subtitle: Text(
-              'Tự động kết nối lại khi cả hai thiết bị online',
+              l10n.autoReconnectDescription,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             contentPadding: EdgeInsets.zero,
@@ -147,7 +147,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Người dùng kia sẽ nhận được yêu cầu ghép nối và cần chấp nhận để hoàn tất.',
+                    l10n.pairingNotificationInfo,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.blue[700],
                         ),
@@ -168,7 +168,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
             Navigator.of(context).pop();
             widget.onPair(_saveConnection);
           },
-          child: Text('Gửi yêu cầu'),
+          child: Text(l10n.sendRequest),
         ),
       ],
     );
@@ -203,17 +203,18 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
   }
 
   String _formatTime(DateTime time) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final difference = now.difference(time);
 
     if (difference.inMinutes < 1) {
-      return 'Vừa xong';
+      return l10n.justNow;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} phút trước';
+      return l10n.minutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours} giờ trước';
+      return l10n.hoursAgo(difference.inHours);
     } else {
-      return '${difference.inDays} ngày trước';
+      return l10n.daysAgo(difference.inDays);
     }
   }
 }

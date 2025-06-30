@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/p2p_models.dart';
 
 class UserInfoDialog extends StatelessWidget {
@@ -11,6 +12,7 @@ class UserInfoDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Row(
         children: [
@@ -38,36 +40,36 @@ class UserInfoDialog extends StatelessWidget {
           children: [
             _buildInfoRow(
               context,
-              'App Installation ID',
+              l10n.appInstallationId,
               user.id,
               icon: Icons.fingerprint,
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               context,
-              'IP Address',
+              l10n.ipAddress,
               user.ipAddress,
               icon: Icons.location_on,
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               context,
-              'Port',
+              l10n.port,
               user.port.toString(),
               icon: Icons.router,
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               context,
-              'Status',
-              user.isOnline ? 'Online' : 'Offline',
+              l10n.status,
+              user.isOnline ? l10n.online : l10n.offline,
               icon: user.isOnline ? Icons.circle : Icons.circle_outlined,
               statusColor: user.isOnline ? Colors.green : Colors.red,
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               context,
-              'Last Seen',
+              l10n.lastSeen,
               _formatLastSeen(user.lastSeen),
               icon: Icons.access_time,
             ),
@@ -75,20 +77,20 @@ class UserInfoDialog extends StatelessWidget {
               const SizedBox(height: 12),
               _buildInfoRow(
                 context,
-                'Paired Since',
+                l10n.pairedSince,
                 _formatPairedAt(user.pairedAt!),
                 icon: Icons.link,
               ),
             ],
             const SizedBox(height: 16),
-            _buildStatusChips(),
+            _buildStatusChips(l10n),
           ],
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(l10n.close),
         ),
       ],
     );
@@ -136,38 +138,38 @@ class UserInfoDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChips() {
+  Widget _buildStatusChips(AppLocalizations l10n) {
     return Wrap(
       spacing: 8.0,
       runSpacing: 4.0,
       children: [
         if (user.isPaired)
-          const Chip(
-            label: Text('Paired'),
-            avatar: Icon(Icons.link, size: 16),
+          Chip(
+            label: Text(l10n.paired),
+            avatar: const Icon(Icons.link, size: 16),
             backgroundColor: Colors.blue,
-            labelStyle: TextStyle(color: Colors.white),
+            labelStyle: const TextStyle(color: Colors.white),
           ),
         if (user.isTrusted)
-          const Chip(
-            label: Text('Trusted'),
-            avatar: Icon(Icons.verified_user, size: 16),
+          Chip(
+            label: Text(l10n.trust),
+            avatar: const Icon(Icons.verified_user, size: 16),
             backgroundColor: Colors.green,
-            labelStyle: TextStyle(color: Colors.white),
+            labelStyle: const TextStyle(color: Colors.white),
           ),
         if (user.isStored)
-          const Chip(
-            label: Text('Saved'),
-            avatar: Icon(Icons.save, size: 16),
+          Chip(
+            label: Text(l10n.saved),
+            avatar: const Icon(Icons.save, size: 16),
             backgroundColor: Colors.purple,
-            labelStyle: TextStyle(color: Colors.white),
+            labelStyle: const TextStyle(color: Colors.white),
           ),
         if (user.autoConnect)
-          const Chip(
-            label: Text('Auto Connect'),
-            avatar: Icon(Icons.autorenew, size: 16),
+          Chip(
+            label: Text(l10n.autoConnect),
+            avatar: const Icon(Icons.autorenew, size: 16),
             backgroundColor: Colors.orange,
-            labelStyle: TextStyle(color: Colors.white),
+            labelStyle: const TextStyle(color: Colors.white),
           ),
       ],
     );

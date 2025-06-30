@@ -47,7 +47,7 @@ class ToolVisibilityService {
     ),
     'p2pDataTransfer': ToolConfig(
       id: 'p2pDataTransfer',
-      fixName: 'P2P Data Transfer',
+      fixName: 'P2P File Transfer',
       nameKey: 'p2pDataTransfer',
       descKey: 'p2pDataTransferDesc',
       icon: 'share',

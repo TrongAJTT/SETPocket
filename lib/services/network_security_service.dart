@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:network_info_plus/network_info_plus.dart' as network_info_plus;
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -116,72 +115,14 @@ class NetworkSecurityService {
 
   static Future<NetworkInfo> _getWiFiInfo() async {
     try {
-      // Try to get detailed WiFi info from native platform first
-      if (Platform.isAndroid || Platform.isWindows) {
-        try {
-          final result = await _channel.invokeMethod('checkWifiSecurity');
-          if (result is Map) {
-            final hasPermission = result['hasPermission'] as bool? ?? false;
-            if (hasPermission) {
-              final isConnected = result['isConnected'] as bool? ?? false;
-              final isWiFi = result['isWiFi'] as bool? ?? false;
-
-              if (isConnected && isWiFi) {
-                final ssid = result['ssid'] as String?;
-                final securityType = result['securityType'] as String?;
-                final isSecure = result['isSecure'] as bool? ?? false;
-                final ipAddress = result['ipAddress'] as String?;
-                final signalLevel = result['signalLevel'] as int? ?? 0;
-
-                return NetworkInfo(
-                  wifiName: ssid,
-                  wifiSSID: ssid,
-                  ipAddress: ipAddress,
-                  isWiFi: true,
-                  isMobile: false,
-                  isSecure: isSecure,
-                  securityLevel: isSecure
-                      ? NetworkSecurityLevel.secure
-                      : NetworkSecurityLevel.unsecure,
-                  signalStrength: signalLevel,
-                  securityType: securityType,
-                );
-              }
-            }
-          }
-        } catch (e) {
-          AppLogger.instance.warning('Failed to get native WiFi info: $e');
-        }
-      }
-
-      // Fallback to standard method
-      // Request location permission for WiFi info on Android
-      if (Platform.isAndroid) {
-        final status = await Permission.locationWhenInUse.request();
-        if (!status.isGranted) {
-          AppLogger.instance.warning(
-              'Location permission denied, cannot get WiFi security info');
-          return NetworkInfo(
-            isWiFi: true,
-            isMobile: false,
-            isSecure: false,
-            securityLevel: NetworkSecurityLevel.unknown,
-          );
-        }
-      }
-
+      // Fallback to standard method, DO NOT request permission here
       final wifiName = await _networkInfo.getWifiName();
       final wifiSSID = await _networkInfo.getWifiBSSID();
       final ipAddress = await _networkInfo.getWifiIP();
       final gatewayAddress = await _networkInfo.getWifiGatewayIP();
 
-      // Check WiFi security using platform-specific methods
-      bool isSecure = false;
-      if (Platform.isAndroid) {
-        isSecure = await _checkAndroidWiFiSecurity();
-      } else if (Platform.isWindows) {
-        isSecure = await _checkWindowsWiFiSecurity();
-      }
+      // Assume secure and let user decide if warning is shown
+      bool isSecure = true;
 
       return NetworkInfo(
         wifiName: wifiName,
@@ -206,80 +147,6 @@ class NetworkSecurityService {
     }
   }
 
-  static Future<bool> _checkAndroidWiFiSecurity() async {
-    try {
-      // Use native Android method to check WiFi security
-      final result = await _channel.invokeMethod('checkWifiSecurity');
-      if (result is Map) {
-        final hasPermission = result['hasPermission'] as bool? ?? false;
-        if (!hasPermission) {
-          AppLogger.instance.warning('WiFi permission not granted');
-          return false;
-        }
-
-        final isConnected = result['isConnected'] as bool? ?? false;
-        final isWiFi = result['isWiFi'] as bool? ?? false;
-        final isSecure = result['isSecure'] as bool? ?? false;
-
-        if (isConnected && isWiFi) {
-          final securityType = result['securityType'] as String? ?? 'UNKNOWN';
-          final ssid = result['ssid'] as String? ?? 'Unknown';
-
-          AppLogger.instance
-              .info('WiFi Security: $securityType for network: $ssid');
-          return isSecure;
-        }
-      }
-      return false;
-    } catch (e) {
-      AppLogger.instance.error('Error checking Android WiFi security: $e');
-      // Fallback to basic check
-      try {
-        final wifiName = await _networkInfo.getWifiName();
-        return wifiName != null && wifiName.isNotEmpty;
-      } catch (fallbackError) {
-        return false;
-      }
-    }
-  }
-
-  static Future<bool> _checkWindowsWiFiSecurity() async {
-    try {
-      // Use native Windows method to check WiFi security
-      final result = await _channel.invokeMethod('checkWifiSecurity');
-      if (result is Map) {
-        final hasPermission = result['hasPermission'] as bool? ?? false;
-        if (!hasPermission) {
-          AppLogger.instance.warning('WiFi permission not granted');
-          return false;
-        }
-
-        final isConnected = result['isConnected'] as bool? ?? false;
-        final isWiFi = result['isWiFi'] as bool? ?? false;
-        final isSecure = result['isSecure'] as bool? ?? false;
-
-        if (isConnected && isWiFi) {
-          final securityType = result['securityType'] as String? ?? 'UNKNOWN';
-          final ssid = result['ssid'] as String? ?? 'Unknown';
-
-          AppLogger.instance
-              .info('Windows WiFi Security: $securityType for network: $ssid');
-          return isSecure;
-        }
-      }
-      return false;
-    } catch (e) {
-      AppLogger.instance.error('Error checking Windows WiFi security: $e');
-      // Fallback to basic check
-      try {
-        final wifiName = await _networkInfo.getWifiName();
-        return wifiName != null && wifiName.isNotEmpty;
-      } catch (fallbackError) {
-        return false;
-      }
-    }
-  }
-
   /// Get stable app installation ID (replaces device ID with app-specific stable identifier)
   static Future<String> getAppInstallationId() async {
     try {
@@ -291,13 +158,8 @@ class NetworkSecurityService {
   }
 
   /// Get readable app installation ID
-  static Future<String> getAppInstallationWordId() async {
-    try {
-      return await AppInstallationService.instance.getAppInstallationWordId();
-    } catch (e) {
-      AppLogger.instance.error('Failed to get app installation word ID: $e');
-      return 'temp-device-${DateTime.now().millisecondsSinceEpoch % 10000}';
-    }
+  static Future<String> getReadableAppInstallationId() async {
+    return AppInstallationService.instance.getAppInstallationWordId();
   }
 
   /// Get device display name
@@ -305,16 +167,10 @@ class NetworkSecurityService {
     try {
       if (Platform.isAndroid) {
         final androidInfo = await _deviceInfo.androidInfo;
-        return '${androidInfo.brand} ${androidInfo.model}';
+        return androidInfo.model;
       } else if (Platform.isWindows) {
         final windowsInfo = await _deviceInfo.windowsInfo;
         return windowsInfo.computerName;
-      } else if (Platform.isLinux) {
-        final linuxInfo = await _deviceInfo.linuxInfo;
-        return linuxInfo.name;
-      } else if (Platform.isMacOS) {
-        final macInfo = await _deviceInfo.macOsInfo;
-        return macInfo.computerName;
       } else {
         return 'Unknown Device';
       }
@@ -324,123 +180,12 @@ class NetworkSecurityService {
     }
   }
 
-  /// Check if required permissions are granted
-  static Future<bool> checkPermissions() async {
-    try {
-      if (Platform.isAndroid) {
-        // Get Android version to determine required permissions
-        final androidInfo = await _deviceInfo.androidInfo;
-        final sdkInt = androidInfo.version.sdkInt;
-
-        AppLogger.instance.info(
-            'Android SDK: $sdkInt, Model: ${androidInfo.model}, Brand: ${androidInfo.brand}, Manufacturer: ${androidInfo.manufacturer}');
-
-        // Device-specific handling for known problematic manufacturers
-        final isOppo = androidInfo.brand.toLowerCase().contains('oppo') ||
-            androidInfo.manufacturer.toLowerCase().contains('oppo');
-        final isVivo = androidInfo.brand.toLowerCase().contains('vivo') ||
-            androidInfo.manufacturer.toLowerCase().contains('vivo');
-        final isOnePlus = androidInfo.brand.toLowerCase().contains('oneplus') ||
-            androidInfo.manufacturer.toLowerCase().contains('oneplus');
-
-        if (isOppo || isVivo || isOnePlus) {
-          AppLogger.instance.info(
-              'Detected ColorOS/FunTouch/OxygenOS device - using enhanced permissions strategy');
-        }
-
-        // We only need Location for WiFi scanning and Nearby Devices for modern Android.
-        // Storage permissions should be requested on-demand when sending a file.
-        final permissionsToRequest = <Permission>[];
-
-        // Location permission is always needed for WiFi scanning
-        if (await Permission.locationWhenInUse.isDenied) {
-          permissionsToRequest.add(Permission.locationWhenInUse);
-        }
-
-        // For Android 12 (SDK 31) and above, NEARBY_WIFI_DEVICES is needed.
-        // Only check this permission on supported Android versions
-        if (sdkInt >= 31) {
-          try {
-            if (await Permission.nearbyWifiDevices.isDenied) {
-              permissionsToRequest.add(Permission.nearbyWifiDevices);
-            }
-          } catch (e) {
-            AppLogger.instance.warning(
-                'nearbyWifiDevices permission not available on this device: $e');
-          }
-        } else {
-          // For Android 11 and below, we might need ACCESS_COARSE_LOCATION
-          // in addition to ACCESS_FINE_LOCATION for some devices
-          try {
-            if (await Permission.location.isDenied) {
-              permissionsToRequest.add(Permission.location);
-            }
-          } catch (e) {
-            AppLogger.instance
-                .warning('Additional location permission not available: $e');
-          }
-        }
-
-        if (permissionsToRequest.isNotEmpty) {
-          AppLogger.instance.info(
-              'Requesting permissions: ${permissionsToRequest.map((p) => p.toString()).toList()}');
-          final statuses = await permissionsToRequest.request();
-
-          // Log permission results
-          for (final entry in statuses.entries) {
-            AppLogger.instance.info('Permission ${entry.key}: ${entry.value}');
-          }
-
-          // Check if all requested permissions were granted.
-          final allGranted =
-              statuses.values.every((status) => status.isGranted);
-          AppLogger.instance.info('All permissions granted: $allGranted');
-          return allGranted;
-        } else {
-          AppLogger.instance.info('No permissions need to be requested');
-        }
-      }
-      // If no permissions needed to be requested, or not on Android, return true.
-      return true;
-    } catch (e) {
-      AppLogger.instance.error('Error checking permissions: $e');
-      return false;
-    }
-  }
-
-  /// Request required permissions
-  static Future<Map<Permission, PermissionStatus>> requestPermissions() async {
-    if (Platform.isAndroid) {
-      final androidInfo = await _deviceInfo.androidInfo;
-      final sdkInt = androidInfo.version.sdkInt;
-
-      final permissions = <Permission>[
-        Permission.storage,
-        Permission.manageExternalStorage,
-        Permission.locationWhenInUse,
-      ];
-
-      // Only add nearbyWifiDevices for Android 12+
-      if (sdkInt >= 31) {
-        try {
-          permissions.add(Permission.nearbyWifiDevices);
-        } catch (e) {
-          AppLogger.instance
-              .warning('nearbyWifiDevices permission not available: $e');
-        }
-      }
-
-      return await permissions.request();
-    }
-    return {};
-  }
-
   /// Get local IP address
   static Future<String?> getLocalIpAddress() async {
     try {
       return await _networkInfo.getWifiIP();
     } catch (e) {
-      AppLogger.instance.error('Error getting local IP: $e');
+      AppLogger.instance.error('Error getting local IP address: $e');
       return null;
     }
   }

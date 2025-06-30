@@ -27,9 +27,25 @@ import 'screens/converter_tools_screen.dart';
 import 'screens/calculator_tools_screen.dart';
 import 'screens/p2lan_transfer_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:workmanager/workmanager.dart';
+import 'dart:io';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+// --- Workmanager Setup ---
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    // This background task is a simple keep-alive.
+    // Its purpose is just to wake the app up periodically to prevent the OS
+    // from completely killing the process, allowing P2P timers to continue.
+    // No complex logic is needed here.
+    return Future.value(true);
+  });
+}
+// --- End Workmanager Setup ---
 
 // Global flag to track first time setup
 bool _isFirstTimeSetup = false;
@@ -51,6 +67,14 @@ class BreadcrumbData {
 Future<void> main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize workmanager for background tasks on mobile platforms
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
+  }
 
   // Setup window manager for desktop platforms
   if (!kIsWeb &&
@@ -208,26 +232,18 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-
-    switch (state) {
-      case AppLifecycleState.detached:
-        // App is being terminated
-        _handleAppTermination();
-        break;
-      case AppLifecycleState.paused:
-        // App goes to background (might be killed)
-        _handleAppPaused();
-        break;
-      case AppLifecycleState.resumed:
-        // App comes back to foreground
-        _handleAppResumed();
-        break;
-      case AppLifecycleState.inactive:
-        // App loses focus but still visible (e.g., incoming call)
-        break;
-      case AppLifecycleState.hidden:
-        // App is hidden but still running
-        break;
+    // On Android & iOS, when the app is terminated (swiped from recents),
+    // this lifecycle event is triggered. We use it to gracefully shut down
+    // the P2P networking service.
+    if (state == AppLifecycleState.detached &&
+        (Platform.isAndroid || Platform.isIOS)) {
+      final p2pService = P2PService.instance;
+      // Check if the service is actually running before trying to stop it.
+      if (p2pService.isEnabled) {
+        p2pService.stopNetworking();
+        AppLogger.instance.logInfo(
+            'App detached, stopping P2P networking to clean up services.');
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/p2p_models.dart';
 
 class FileTransferRequestDialog extends StatefulWidget {
@@ -135,6 +136,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isWide = MediaQuery.of(context).size.width > 500;
     final theme = Theme.of(context);
     final deviceName = widget.request.fromUserName;
@@ -171,7 +173,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Incoming Files',
+                        l10n.incomingFiles,
                         style: theme.textTheme.titleLarge
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -222,7 +224,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                           Text(deviceName,
                               style: theme.textTheme.titleMedium
                                   ?.copyWith(fontWeight: FontWeight.bold)),
-                          Text('wants to send you $fileCount file(s)',
+                          Text(l10n.wantsToSendYouFiles(fileCount),
                               style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant)),
                         ],
@@ -239,7 +241,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Files to receive:',
+                    Text(l10n.filesToReceive,
                         style: theme.textTheme.titleSmall
                             ?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
@@ -282,7 +284,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Total size:',
+                      Text(l10n.totalSize,
                           style: theme.textTheme.bodyMedium
                               ?.copyWith(fontWeight: FontWeight.bold)),
                       Text(_formatFileSize(totalSize),
@@ -314,7 +316,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                                       .withValues(alpha: 0.8)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('Reject',
+                        child: Text(l10n.reject,
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
@@ -332,7 +334,7 @@ class _FileTransferRequestDialogState extends State<FileTransferRequestDialog> {
                           elevation:
                               theme.brightness == Brightness.dark ? 2 : 3,
                         ),
-                        child: const Text('Accept',
+                        child: Text(l10n.accept,
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),

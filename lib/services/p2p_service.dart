@@ -15,6 +15,8 @@ import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/hive_service.dart';
 import 'package:setpocket/services/p2p_notification_service.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:workmanager/workmanager.dart';
 
 /// Validation result for file transfer request
 class _FileTransferValidationResult {
@@ -32,9 +34,24 @@ class _FileTransferValidationResult {
 
 class P2PService extends ChangeNotifier {
   static P2PService? _instance;
-  static P2PService get instance => _instance ??= P2PService._();
 
+  // Private constructor
   P2PService._();
+
+  // Public getter for the instance
+  static P2PService get instance {
+    if (_instance == null) {
+      _instance = P2PService._();
+    }
+    return _instance!;
+  }
+
+  // Initialization method
+  static Future<void> init() async {
+    // Get singleton instance and initialize it.
+    // The initialize() method itself handles the "already initialized" case.
+    await instance.initialize();
+  }
 
   // Network components
   ServerSocket? _serverSocket;
@@ -73,6 +90,9 @@ class P2PService extends ChangeNotifier {
 
   // Store download paths for batches (with date folders)
   final Map<String, String> _batchDownloadPaths = {};
+
+  // Store total file counts for each batch to ensure proper cleanup.
+  final Map<String, int> _batchFileCounts = {};
 
   // Map from sender userId to current active batchId for incoming transfers
   final Map<String, String> _activeBatchIdsByUser = {};
@@ -116,6 +136,7 @@ class P2PService extends ChangeNotifier {
   Timer? _heartbeatTimer; // Keep for paired devices
   Timer? _cleanupTimer; // Keep for cleanup
   Timer? _broadcastTimer; // New: Timer for periodic broadcast
+  Timer? _memoryCleanupTimer; // 🔥 NEW: Timer for periodic memory cleanup
 
   // Stream subscriptions
   StreamSubscription? _mdnsSubscription;
@@ -177,18 +198,70 @@ class P2PService extends ChangeNotifier {
     _onNewFileTransferRequest = callback;
   }
 
+  /// Check if notifications are available and should be used
+  bool get _shouldUseNotifications {
+    // Check if notifications are enabled in settings
+    if (_transferSettings?.enableNotifications != true) {
+      return false;
+    }
+
+    // Check if notification service is available
+    final notificationService = P2PNotificationService.instanceOrNull;
+    if (notificationService == null) {
+      return false;
+    }
+
+    // Check if service is ready (initialized + permissions)
+    return notificationService.isReady;
+  }
+
+  /// Safe wrapper for notification service calls
+  Future<void> _safeNotificationCall(Future<void> Function() operation) async {
+    if (!_shouldUseNotifications) {
+      return; // Skip notification call entirely
+    }
+
+    try {
+      await operation();
+    } catch (e) {
+      logWarning('Notification service call failed: $e');
+    }
+  }
+
+  /// Safe wrapper for synchronous notification service calls
+  void _safeNotificationCallSync(void Function() operation) {
+    if (!_shouldUseNotifications) {
+      return; // Skip notification call entirely
+    }
+
+    try {
+      operation();
+    } catch (e) {
+      logWarning('Notification service call failed: $e');
+    }
+  }
+
   /// Initialize P2P service
   Future<void> initialize() async {
     if (_isServiceInitialized) {
       logInfo('P2P Service already initialized, skipping.');
       return;
     }
+    _isServiceInitialized = true;
+    logInfo('P2P Service initializing...');
+
     try {
       // Initialize encryption
       _initializeEncryption();
 
-      // Initialize notifications
-      await P2PNotificationService.instance.initialize();
+      // Initialize notifications service before any other P2P operations
+      try {
+        await P2PNotificationService.init();
+        logInfo('P2P notification service initialized');
+      } catch (e) {
+        logError('Failed to initialize P2P notification service: $e');
+        // Continue without notifications - don't block P2P initialization
+      }
 
       // Load saved data - simple approach like the old version
       await _loadSavedData();
@@ -196,9 +269,9 @@ class P2PService extends ChangeNotifier {
       // Initialize Android-specific paths if needed
       await _initializeAndroidPath();
 
-      _isServiceInitialized = true;
-      logInfo('P2P Service initialized');
+      logInfo('P2P Service initialized successfully');
     } catch (e) {
+      _isServiceInitialized = false; // Allow re-initialization on failure
       logError('Failed to initialize P2P service: $e');
       rethrow;
     }
@@ -230,11 +303,11 @@ class P2PService extends ChangeNotifier {
             'SecurityType: ${_currentNetworkInfo!.securityType}');
       }
 
-      // Check permissions
-      final hasPermissions = await NetworkSecurityService.checkPermissions();
-      if (!hasPermissions) {
-        throw Exception('Required permissions not granted');
-      }
+      // Check permissions have been granted by the UI layer before this is called
+      // final hasPermissions = await NetworkSecurityService.checkPermissions();
+      // if (!hasPermissions) {
+      //   throw Exception('Required permissions not granted');
+      // }
 
       // Create current user profile
       await _createCurrentUser(_currentNetworkInfo!);
@@ -251,8 +324,35 @@ class P2PService extends ChangeNotifier {
       _cleanupTimer =
           Timer.periodic(_cleanupInterval, (_) => _performCleanup());
 
+      // 🔥 NEW: Start periodic memory cleanup timer (every 5 minutes)
+      _memoryCleanupTimer =
+          Timer.periodic(const Duration(minutes: 5), (_) => _cleanupMemory());
+
       _isEnabled = true;
       _connectionStatus = ConnectionStatus.discovering;
+
+      // Register background task to keep the service alive on mobile
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        await Workmanager().registerPeriodicTask(
+          "p2pKeepAliveUniqueName", // Unique name for the task
+          p2pKeepAliveTask, // The task defined in main.dart
+          frequency: const Duration(minutes: 15), // Minimum frequency
+          constraints: Constraints(
+            networkType: NetworkType.connected,
+          ),
+        );
+        logInfo('Registered P2P keep-alive background task.');
+      }
+
+      // Show P2LAN status notification
+      if (_currentUser != null) {
+        await _safeNotificationCall(
+            () => P2PNotificationService.instance.showP2LanStatus(
+                  deviceName: _currentUser!.displayName,
+                  ipAddress: _currentUser!.ipAddress,
+                  connectedDevices: pairedUsers.length,
+                ));
+      }
 
       notifyListeners();
       logInfo('P2P networking started');
@@ -268,6 +368,16 @@ class P2PService extends ChangeNotifier {
   Future<void> stopNetworking() async {
     if (!_isEnabled) return;
 
+    // Immediately hide the status notification for quick user feedback
+    await _safeNotificationCall(
+        () => P2PNotificationService.instance.hideP2LanStatus());
+
+    // Cancel the background task first on mobile
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      await Workmanager().cancelByUniqueName("p2pKeepAliveUniqueName");
+      logInfo('Cancelled P2P keep-alive background task.');
+    }
+
     await _stopServer();
     await _stopDiscovery();
 
@@ -275,6 +385,7 @@ class P2PService extends ChangeNotifier {
     _heartbeatTimer?.cancel();
     _cleanupTimer?.cancel();
     _broadcastTimer?.cancel();
+    _memoryCleanupTimer?.cancel(); // 🔥 NEW: Cancel memory cleanup timer
     _isBroadcasting = false; // Reset broadcast state when stopping all timers
 
     // Send disconnect notifications to all paired users before stopping
@@ -297,12 +408,16 @@ class P2PService extends ChangeNotifier {
 
     // Clean up receiving data
     _incomingFileChunks.clear();
+    _batchDownloadPaths.clear();
+    _batchFileCounts.clear();
+    _activeBatchIdsByUser.clear();
 
     // Clean up task creation locks
     _taskCreationLocks.clear();
 
-    // Clean up pending chunks buffer
-    _pendingChunks.clear();
+    // Hide P2LAN status notification
+    await _safeNotificationCall(
+        () => P2PNotificationService.instance.hideP2LanStatus());
 
     // Reset state flags to reflect that networking is stopped
     _isEnabled = false;
@@ -372,6 +487,9 @@ class P2PService extends ChangeNotifier {
 
         _discoveredUsers[user.id] = user;
         await _saveUser(user);
+
+        // Update P2LAN status notification with new connection count
+        await _updateP2LanStatusNotification();
       }
 
       // Send response
@@ -505,6 +623,9 @@ class P2PService extends ChangeNotifier {
 
       final success = await _sendMessage(targetUser, message);
       if (success) {
+        // 🔥 REGISTER: Register active file transfer batch
+        _registerActiveFileTransferBatch(request.batchId);
+
         // Set up response timeout timer
         _fileTransferResponseTimers[request.requestId] = Timer(
           const Duration(seconds: 65),
@@ -516,6 +637,9 @@ class P2PService extends ChangeNotifier {
       } else {
         // Clean up tasks if request failed
         _cancelTasksByBatchId(request.batchId);
+
+        // 🔥 CLEANUP: Safe cleanup after complete failure
+        cleanupFilePickerCacheIfSafe();
       }
 
       notifyListeners();
@@ -580,10 +704,17 @@ class P2PService extends ChangeNotifier {
         .where((task) => task.batchId == batchId)
         .toList();
 
+    bool hasOutgoingTasks = false;
     for (final task in tasksToCancel) {
+      if (task.isOutgoing) hasOutgoingTasks = true;
       task.status = DataTransferStatus.cancelled;
       task.errorMessage = 'File transfer request failed';
       _cleanupTransfer(task.id);
+    }
+
+    // 🔥 UNREGISTER: Unregister batch when cancelled
+    if (hasOutgoingTasks && batchId.isNotEmpty) {
+      _unregisterFileTransferBatch(batchId);
     }
 
     logInfo('Cancelled ${tasksToCancel.length} tasks for batch $batchId');
@@ -601,10 +732,23 @@ class P2PService extends ChangeNotifier {
             task.isOutgoing)
         .toList();
 
-    for (final task in tasksToCancel) {
-      task.status = DataTransferStatus.cancelled;
-      task.errorMessage = 'No response from receiver (timeout)';
-      _cleanupTransfer(task.id);
+    if (tasksToCancel.isNotEmpty) {
+      // Get batch IDs to unregister
+      final batchIds = tasksToCancel
+          .where((task) => task.batchId?.isNotEmpty == true)
+          .map((task) => task.batchId!)
+          .toSet();
+
+      for (final task in tasksToCancel) {
+        task.status = DataTransferStatus.cancelled;
+        task.errorMessage = 'No response from receiver (timeout)';
+        _cleanupTransfer(task.id);
+      }
+
+      // 🔥 UNREGISTER: Unregister batches when timed out
+      for (final batchId in batchIds) {
+        _unregisterFileTransferBatch(batchId);
+      }
     }
 
     logInfo('File transfer request $requestId timed out');
@@ -626,24 +770,19 @@ class P2PService extends ChangeNotifier {
       _discoveredUsers.clear();
       _pendingRequests.clear();
 
-      // Load saved users - same as old logic, simple and direct
+      // Load saved users
       final usersBox = await Hive.openBox<P2PUser>('p2p_users');
       for (final user in usersBox.values) {
-        // Mark as stored since it's from cache, but keep discovery status simple
         user.isStored = true;
-        user.isOnline = false; // Will be updated when discovered online
+        user.isOnline = false;
         user.lastSeen = DateTime.now().subtract(const Duration(minutes: 1));
-
         _discoveredUsers[user.id] = user;
-        logInfo(
-            'Loaded stored user: ${user.displayName} (${user.id}) - paired: ${user.isPaired}, trusted: ${user.isTrusted}');
       }
+      logInfo('Loaded ${_discoveredUsers.length} stored users.');
 
-      // Load pending requests and clean up any processed ones
+      // Load pending pairing requests
       final requestsBox =
           await Hive.openBox<PairingRequest>('pairing_requests');
-
-      // Remove any processed requests from storage (cleanup)
       final processedRequestIds = <String>[];
       for (final request in requestsBox.values) {
         if (request.isProcessed) {
@@ -652,84 +791,33 @@ class P2PService extends ChangeNotifier {
           _pendingRequests.add(request);
         }
       }
-
-      // Clean up processed requests from storage
       if (processedRequestIds.isNotEmpty) {
         for (final id in processedRequestIds) {
           await requestsBox.delete(id);
         }
         logInfo(
-            'Cleaned up ${processedRequestIds.length} processed pairing requests from storage on startup');
+            'Cleaned up ${processedRequestIds.length} processed pairing requests.');
       }
+      logInfo('Loaded ${_pendingRequests.length} pending pairing requests.');
 
-      // Load transfer settings with migration support
+      // Load transfer settings
       final settingsBox =
           await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
+      _transferSettings = settingsBox.get('settings');
 
-      // TEMPORARY: Clear old settings to force migration to new format
-      // This ensures all new fields are properly initialized
-      if (settingsBox.containsKey('settings')) {
-        try {
-          final existingSettings = settingsBox.get('settings');
-          if (existingSettings != null) {
-            // Check if this is an old version without new fields
-            // This is a simple way to detect if we need migration
-            logInfo('Checking existing settings for compatibility...');
-
-            // For now, always recreate to ensure new fields are present
-            logWarning(
-                'Migrating to new settings format with additional fields...');
-            await settingsBox.clear();
-
-            // Preserve important user settings if possible
-            _transferSettings = P2PDataTransferSettings(
-              downloadPath: existingSettings.downloadPath,
-              createDateFolders: existingSettings.createDateFolders,
-              maxReceiveFileSize: existingSettings.maxReceiveFileSize,
-              maxTotalReceiveSize: existingSettings.maxTotalReceiveSize,
-              maxConcurrentTasks: existingSettings.maxConcurrentTasks,
-              sendProtocol: existingSettings.sendProtocol,
-              maxChunkSize: existingSettings.maxChunkSize,
-              customDisplayName: existingSettings.customDisplayName,
-              uiRefreshRateSeconds: 0, // New field with default
-              enableNotifications: true, // New field with default
-              createSenderFolders: false, // New field with default
-            );
-
-            await settingsBox.put('settings', _transferSettings!);
-            logInfo('Successfully migrated settings with new fields');
-          }
-        } catch (e) {
-          logError('Failed to migrate existing transfer settings: $e');
-          logWarning('Creating completely new default settings...');
-
-          // Clear corrupted settings and create new ones
-          await settingsBox.clear();
-          _transferSettings = _createDefaultTransferSettings();
-          await settingsBox.put('settings', _transferSettings!);
-          logInfo(
-              'Created new default transfer settings after migration error');
-        }
-      } else {
-        // Create default settings if none exist
-        _transferSettings = _createDefaultTransferSettings();
-        // Save default settings to storage
-        await settingsBox.put('settings', _transferSettings!);
-        logInfo(
-            'Created and saved default transfer settings: ${_transferSettings!.downloadPath}');
-      }
-
-      // Double-check that settings are not null
       if (_transferSettings == null) {
-        logError(
-            'Transfer settings are still null after loading! Creating emergency defaults...');
+        logInfo('No P2P transfer settings found, creating defaults.');
+        _transferSettings = _createDefaultTransferSettings();
+        await settingsBox.put('settings', _transferSettings!);
+      } else {
+        logInfo('Successfully loaded P2P transfer settings from storage.');
+      }
+    } catch (e) {
+      logError('Failed to load saved data, using defaults. Error: $e');
+      // Ensure settings are not null on failure
+      if (_transferSettings == null) {
         _transferSettings = _createDefaultTransferSettings();
       }
-
-      logInfo(
-          'Loaded ${_discoveredUsers.length} stored users and ${_pendingRequests.length} pending requests');
-    } catch (e) {
-      logError('Failed to load saved data: $e');
     }
   }
 
@@ -1540,6 +1628,9 @@ class P2PService extends ChangeNotifier {
       if (!validationResult.isValid) {
         await _sendFileTransferResponse(request, false,
             validationResult.rejectReason!, validationResult.rejectMessage!);
+        // Dismiss the notification as the request is now handled
+        await _safeNotificationCall(() => P2PNotificationService.instance
+            .cancelNotification(request.requestId.hashCode));
         return;
       }
 
@@ -1555,12 +1646,11 @@ class P2PService extends ChangeNotifier {
       }
 
       // Show notification for file transfer request (only for non-trusted users)
-      if (_transferSettings?.enableNotifications == true) {
-        await P2PNotificationService.instance.showFileTransferRequest(
-          request: request,
-          enableActions: true,
-        );
-      }
+      await _safeNotificationCall(
+          () => P2PNotificationService.instance.showFileTransferRequest(
+                request: request,
+                enableActions: true,
+              ));
 
       // Add to pending requests and show dialog
       _pendingFileTransferRequests.add(request);
@@ -1677,8 +1767,31 @@ class P2PService extends ChangeNotifier {
     if (accepted && _transferSettings != null) {
       downloadPath = _transferSettings!.downloadPath;
 
-      // Create date folder if enabled
-      if (_transferSettings!.createDateFolders) {
+      // Create sender folder if enabled
+      if (_transferSettings!.createSenderFolders) {
+        // Get sender's display name from discovered users or use a fallback
+        String senderFolderName = 'Unknown';
+        final sender = _discoveredUsers[request.fromUserId];
+        if (sender != null && sender.displayName.isNotEmpty) {
+          // Sanitize sender name for folder creation
+          senderFolderName = _sanitizeFileName(sender.displayName);
+        } else if (request.fromUserName.isNotEmpty) {
+          senderFolderName = _sanitizeFileName(request.fromUserName);
+        } else {
+          senderFolderName = 'User-${request.fromUserId.substring(0, 8)}';
+        }
+
+        downloadPath =
+            '$downloadPath${Platform.pathSeparator}$senderFolderName';
+
+        final dir = Directory(downloadPath);
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+          logInfo('Created sender folder: $downloadPath');
+        }
+      }
+      // Create date folder if enabled (can be combined with sender folders)
+      else if (_transferSettings!.createDateFolders) {
         final dateFolder =
             DateTime.now().toIso8601String().split('T')[0]; // YYYY-MM-DD
         downloadPath = '$downloadPath${Platform.pathSeparator}$dateFolder';
@@ -1713,13 +1826,40 @@ class P2PService extends ChangeNotifier {
 
   /// Accept file transfer request (for trusted users or manual approval)
   Future<void> _acceptFileTransferRequest(FileTransferRequest request) async {
-    // Calculate downloadPath with date folder
+    // Dismiss the notification as the request is now handled
+    await _safeNotificationCall(() => P2PNotificationService.instance
+        .cancelNotification(request.requestId.hashCode));
+
+    // Calculate downloadPath with date/sender folder
     String? downloadPath;
     if (_transferSettings != null) {
       downloadPath = _transferSettings!.downloadPath;
 
-      // Create date folder if enabled
-      if (_transferSettings!.createDateFolders) {
+      // Create sender folder if enabled
+      if (_transferSettings!.createSenderFolders) {
+        // Get sender's display name from discovered users or use a fallback
+        String senderFolderName = 'Unknown';
+        final sender = _discoveredUsers[request.fromUserId];
+        if (sender != null && sender.displayName.isNotEmpty) {
+          // Sanitize sender name for folder creation
+          senderFolderName = _sanitizeFileName(sender.displayName);
+        } else if (request.fromUserName.isNotEmpty) {
+          senderFolderName = _sanitizeFileName(request.fromUserName);
+        } else {
+          senderFolderName = 'User-${request.fromUserId.substring(0, 8)}';
+        }
+
+        downloadPath =
+            '$downloadPath${Platform.pathSeparator}$senderFolderName';
+
+        final dir = Directory(downloadPath);
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+          logInfo('Created sender folder for accepted request: $downloadPath');
+        }
+      }
+      // Create date folder if enabled (can be combined with sender folders)
+      else if (_transferSettings!.createDateFolders) {
         final dateFolder =
             DateTime.now().toIso8601String().split('T')[0]; // YYYY-MM-DD
         downloadPath = '$downloadPath${Platform.pathSeparator}$dateFolder';
@@ -1735,8 +1875,10 @@ class P2PService extends ChangeNotifier {
     // Store downloadPath for future incoming tasks in this batch
     if (downloadPath != null) {
       _batchDownloadPaths[request.batchId] = downloadPath;
+      _batchFileCounts[request.batchId] =
+          request.files.length; // Store file count
       logInfo(
-          'Stored downloadPath for batch ${request.batchId}: $downloadPath');
+          'Stored downloadPath for batch ${request.batchId} (${request.files.length} files): $downloadPath');
     }
 
     // Map sender user to this batch for incoming tasks
@@ -1823,6 +1965,10 @@ class P2PService extends ChangeNotifier {
     }
 
     logInfo('File transfer request timed out: ${request.requestId}');
+
+    // Dismiss the notification as the request has timed out
+    _safeNotificationCallSync(() => P2PNotificationService.instance
+        .cancelNotification(request.requestId.hashCode));
 
     // Send rejection response
     _sendFileTransferResponse(request, false, FileTransferRejectReason.timeout,
@@ -2102,12 +2248,11 @@ class P2PService extends ChangeNotifier {
     notifyListeners();
 
     // Show notification for pairing request
-    if (_transferSettings?.enableNotifications == true) {
-      await P2PNotificationService.instance.showPairingRequest(
-        request: request,
-        enableActions: true,
-      );
-    }
+    await _safeNotificationCall(
+        () => P2PNotificationService.instance.showPairingRequest(
+              request: request,
+              enableActions: true,
+            ));
 
     // Trigger callback for new pairing request (for auto-showing dialogs)
     if (_onNewPairingRequest != null) {
@@ -2133,6 +2278,9 @@ class P2PService extends ChangeNotifier {
         await _saveUser(user);
         logInfo(
             'Pairing response accepted for ${user.displayName}: paired=${user.isPaired}, trusted=${user.isTrusted}, stored=${user.isStored}');
+
+        // Update P2LAN status notification with new connection count
+        await _updateP2LanStatusNotification();
       }
     } else {
       logInfo('Pairing response rejected from user ${message.fromUserId}');
@@ -2180,6 +2328,49 @@ class P2PService extends ChangeNotifier {
       task.transferredBytes += chunkData.length;
       if (task.status != DataTransferStatus.transferring) {
         task.status = DataTransferStatus.transferring;
+        task.startedAt ??= DateTime.now(); // Set startedAt on first chunk
+      }
+
+      final progressPercent = (task.fileSize > 0)
+          ? ((task.transferredBytes / task.fileSize) * 100).round()
+          : 0;
+
+      // Show progress notification for incoming files
+      // Show at start, every 5%, and for final stages
+      if (progressPercent == 0 ||
+          progressPercent % 5 == 0 ||
+          progressPercent > 90 ||
+          isLast) {
+        // Calculate speed and ETA
+        String? speed;
+        String? eta;
+        if (task.startedAt != null &&
+            progressPercent > 0 &&
+            task.transferredBytes > 0) {
+          final elapsed = DateTime.now().difference(task.startedAt!);
+          if (elapsed.inSeconds > 0) {
+            final speedBps = task.transferredBytes / elapsed.inSeconds;
+            final speedFormatted = _formatSpeed(speedBps);
+            if (speedFormatted != null) {
+              speed = speedFormatted;
+
+              // Calculate ETA
+              final remainingBytes = task.fileSize - task.transferredBytes;
+              if (remainingBytes > 0 && speedBps > 0) {
+                final etaSeconds = (remainingBytes / speedBps).round();
+                eta = _formatEta(etaSeconds);
+              }
+            }
+          }
+        }
+        // Use enhanced file transfer status notification
+        await _safeNotificationCall(
+            () => P2PNotificationService.instance.showFileTransferStatus(
+                  task: task,
+                  progress: progressPercent,
+                  speed: speed,
+                  eta: eta,
+                ));
       }
 
       // Only notify UI every 10 chunks to reduce overhead
@@ -2198,6 +2389,30 @@ class P2PService extends ChangeNotifier {
       logError('Failed to process data chunk for task $taskId: $e');
       // Clean up on error to prevent partial files
       _incomingFileChunks.remove(taskId);
+    }
+  }
+
+  String? _formatSpeed(double bytesPerSecond) {
+    if (bytesPerSecond < 1024) {
+      return '${bytesPerSecond.round()} B/s';
+    } else if (bytesPerSecond < 1024 * 1024) {
+      return '${(bytesPerSecond / 1024).round()} KB/s';
+    } else {
+      return '${(bytesPerSecond / (1024 * 1024)).toStringAsFixed(1)} MB/s';
+    }
+  }
+
+  String? _formatEta(int totalSeconds) {
+    if (totalSeconds < 60) {
+      return '${totalSeconds}s left';
+    } else if (totalSeconds < 3600) {
+      final minutes = totalSeconds ~/ 60;
+      final seconds = totalSeconds % 60;
+      return '${minutes}m ${seconds}s left';
+    } else {
+      final hours = totalSeconds ~/ 3600;
+      final minutes = (totalSeconds % 3600) ~/ 60;
+      return '${hours}h ${minutes}m left';
     }
   }
 
@@ -2472,42 +2687,43 @@ class P2PService extends ChangeNotifier {
       logInfo('✅ ASSEMBLE: Updated task $taskId to completed state.');
 
       // Show completion notification for received file
-      if (_transferSettings?.enableNotifications == true) {
-        await P2PNotificationService.instance.showFileTransferCompleted(
-          task: task,
-          success: true,
-        );
-      }
+      await _safeNotificationCall(
+          () => P2PNotificationService.instance.showFileTransferCompleted(
+                task: task,
+                success: true,
+              ));
 
       // Clean up
       _incomingFileChunks.remove(taskId);
 
-      // Clean up batch download path if this was the last file in the batch
-      if (task.batchId != null &&
-          _batchDownloadPaths.containsKey(task.batchId)) {
-        final remainingTasksInBatch = _activeTransfers.values
+      // Clean up batch-specific data if this was the last file in the batch
+      if (task.batchId != null) {
+        final totalFilesInBatch = _batchFileCounts[task.batchId] ?? 0;
+        final completedInBatch = _activeTransfers.values
             .where((t) =>
                 t.batchId == task.batchId &&
                 !t.isOutgoing &&
-                t.status != DataTransferStatus.completed &&
-                t.status != DataTransferStatus.cancelled &&
-                t.status != DataTransferStatus.failed)
+                t.status == DataTransferStatus.completed)
             .length;
 
-        if (remainingTasksInBatch == 0) {
+        logInfo(
+            'Batch ${task.batchId} cleanup check: $completedInBatch / $totalFilesInBatch files completed.');
+
+        if (totalFilesInBatch > 0 && completedInBatch >= totalFilesInBatch) {
+          logInfo('✅ Batch ${task.batchId} complete. Cleaning up resources.');
           _batchDownloadPaths.remove(task.batchId);
+          _batchFileCounts.remove(task.batchId);
 
           // Also clean up user batch mapping
           final userToRemove = _activeBatchIdsByUser.entries
-              .where((entry) => entry.value == task.batchId)
-              .map((entry) => entry.key)
-              .firstOrNull;
-          if (userToRemove != null) {
+              .firstWhere((entry) => entry.value == task.batchId,
+                  orElse: () => const MapEntry('', ''))
+              .key;
+
+          if (userToRemove.isNotEmpty) {
             _activeBatchIdsByUser.remove(userToRemove);
             logInfo('Cleaned up user batch mapping for $userToRemove');
           }
-
-          logInfo('Cleaned up batch downloadPath for ${task.batchId}');
         }
       }
 
@@ -2717,13 +2933,7 @@ class P2PService extends ChangeNotifier {
       logInfo(
           'Starting transfer for ${task.fileName} with chunk size: ${chunkSizeKB}KB (${chunkSizeBytes} bytes) - Settings value: ${_transferSettings?.maxChunkSize}');
 
-      // Show initial progress notification
-      if (_transferSettings?.enableNotifications == true) {
-        await P2PNotificationService.instance.showFileTransferProgress(
-          task: task,
-          progress: 0,
-        );
-      }
+      // Initial progress notification will be shown in the progress listener
 
       // Create isolate for data transfer
       final receivePort = ReceivePort();
@@ -2748,7 +2958,7 @@ class P2PService extends ChangeNotifier {
       _transferIsolates[task.id] = isolate;
 
       // Listen for progress updates
-      receivePort.listen((data) {
+      receivePort.listen((data) async {
         if (data is Map<String, dynamic>) {
           final progress = data['progress'] as double?;
           final completed = data['completed'] as bool? ?? false;
@@ -2757,17 +2967,58 @@ class P2PService extends ChangeNotifier {
           if (progress != null) {
             task.transferredBytes = (task.fileSize * progress).round();
 
-            // Show progress notification - more frequent updates
+            // Show enhanced progress notification - more frequent updates
             if (_transferSettings?.enableNotifications == true) {
               final progressPercent = (progress * 100).round();
               // Show at start, every 5%, and for final stages
               if (progressPercent == 0 ||
                   progressPercent % 5 == 0 ||
                   progressPercent > 90) {
-                P2PNotificationService.instance.showFileTransferProgress(
-                  task: task,
-                  progress: progressPercent,
-                );
+                try {
+                  // Calculate speed and ETA
+                  String? speed;
+                  String? eta;
+                  if (task.startedAt != null &&
+                      progressPercent > 0 &&
+                      task.transferredBytes > 0) {
+                    final elapsed = DateTime.now().difference(task.startedAt!);
+                    if (elapsed.inSeconds > 0) {
+                      final speedBps =
+                          task.transferredBytes / elapsed.inSeconds;
+                      final speedKB = (speedBps / 1024).round();
+                      if (speedKB > 0) {
+                        speed = '${speedKB}KB/s';
+
+                        // Calculate ETA
+                        final remainingBytes =
+                            task.fileSize - task.transferredBytes;
+                        if (remainingBytes > 0) {
+                          final etaSeconds =
+                              (remainingBytes / speedBps).round();
+                          if (etaSeconds < 60) {
+                            eta = '${etaSeconds}s left';
+                          } else {
+                            final etaMinutes = (etaSeconds / 60).round();
+                            eta = '${etaMinutes}m left';
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  // Use enhanced file transfer status notification
+                  await _safeNotificationCall(() =>
+                      P2PNotificationService.instance.showFileTransferStatus(
+                        task: task,
+                        progress: progressPercent,
+                        speed: speed,
+                        eta: eta,
+                      ));
+                } catch (e) {
+                  logError(
+                      'Failed to show file transfer status notification: $e');
+                  // Continue without notification
+                }
               }
             }
           }
@@ -2776,27 +3027,35 @@ class P2PService extends ChangeNotifier {
             task.status = DataTransferStatus.completed;
             task.completedAt = DateTime.now();
 
+            // Cancel progress notification and show completion notification
+            // Cancel the progress notification first
+            await _safeNotificationCall(() => P2PNotificationService.instance
+                .cancelFileTransferStatus(task.id));
+
             // Show completion notification
-            if (_transferSettings?.enableNotifications == true) {
-              P2PNotificationService.instance.showFileTransferCompleted(
-                task: task,
-                success: true,
-              );
-            }
+            await _safeNotificationCall(
+                () => P2PNotificationService.instance.showFileTransferCompleted(
+                      task: task,
+                      success: true,
+                    ));
 
             _cleanupTransfer(task.id);
           } else if (error != null) {
             task.status = DataTransferStatus.failed;
             task.errorMessage = error;
 
+            // Cancel progress notification and show failure notification
+            // Cancel the progress notification first
+            await _safeNotificationCall(() => P2PNotificationService.instance
+                .cancelFileTransferStatus(task.id));
+
             // Show failure notification
-            if (_transferSettings?.enableNotifications == true) {
-              P2PNotificationService.instance.showFileTransferCompleted(
-                task: task,
-                success: false,
-                errorMessage: error,
-              );
-            }
+            await _safeNotificationCall(
+                () => P2PNotificationService.instance.showFileTransferCompleted(
+                      task: task,
+                      success: false,
+                      errorMessage: error,
+                    ));
 
             _cleanupTransfer(task.id);
           }
@@ -2999,12 +3258,87 @@ class P2PService extends ChangeNotifier {
     }
   }
 
+  /// 🔥 NEW: Check if all tasks in a batch are finished and unregister if so
+  void _checkAndUnregisterBatchIfComplete(String? batchId) {
+    if (batchId == null || batchId.isEmpty) return;
+
+    // Check if the batch is still registered
+    if (!_activeFileTransferBatches.contains(batchId)) {
+      return;
+    }
+
+    final batchTasks = _activeTransfers.values
+        .where((task) => task.batchId == batchId)
+        .toList();
+
+    // If there are no tasks for this batch somehow, unregister it.
+    if (batchTasks.isEmpty) {
+      _unregisterFileTransferBatch(batchId);
+      return;
+    }
+
+    final allTasksFinished = batchTasks.every((task) =>
+        task.status == DataTransferStatus.completed ||
+        task.status == DataTransferStatus.failed ||
+        task.status == DataTransferStatus.cancelled ||
+        task.status == DataTransferStatus.rejected);
+
+    if (allTasksFinished) {
+      // Check if there are any successful outgoing transfers in this batch
+      final hasSuccessfulOutgoing = batchTasks.any((task) =>
+          task.isOutgoing && task.status == DataTransferStatus.completed);
+
+      logInfo(
+          'P2PService: All tasks in batch $batchId are finished. Unregistering.');
+      _unregisterFileTransferBatch(batchId);
+
+      // Schedule additional cache cleanup for successful outgoing transfers
+      if (hasSuccessfulOutgoing) {
+        logInfo(
+            'P2PService: Scheduling additional cache cleanup for successful outgoing batch $batchId');
+        Future.delayed(const Duration(seconds: 3), () {
+          cleanupFilePickerCacheIfSafe();
+        });
+      }
+    } else {
+      logInfo(
+          'P2PService: Batch $batchId still has active tasks. Not unregistering.');
+    }
+  }
+
   void _cleanupTransfer(String taskId) {
+    final task =
+        _activeTransfers[taskId]; // Get task before removing isolate info
     final isolate = _transferIsolates.remove(taskId);
     isolate?.kill();
 
     final port = _transferPorts.remove(taskId);
     port?.close();
+
+    // 🔥 FIX: After cleaning up task resources, check if its batch is now complete.
+    if (task != null) {
+      _checkAndUnregisterBatchIfComplete(task.batchId);
+
+      // Schedule immediate cache cleanup if this was the last outgoing task in any batch
+      if (task.isOutgoing && task.status == DataTransferStatus.completed) {
+        // Check if there are any other active outgoing transfers
+        final remainingOutgoingTasks = _activeTransfers.values
+            .where((t) =>
+                t.id != taskId &&
+                t.isOutgoing &&
+                (t.status == DataTransferStatus.transferring ||
+                    t.status == DataTransferStatus.pending))
+            .toList();
+
+        if (remainingOutgoingTasks.isEmpty) {
+          logInfo(
+              'P2PService: Last outgoing task completed, scheduling cache cleanup');
+          Future.delayed(const Duration(seconds: 2), () {
+            cleanupFilePickerCacheIfSafe();
+          });
+        }
+      }
+    }
 
     // Check if we can start any queued transfers
     _startNextQueuedTransfer();
@@ -3246,7 +3580,8 @@ class P2PService extends ChangeNotifier {
       sendProtocol: 'TCP',
       maxChunkSize: 1024, // 1MB - Increase default chunk size for better speed
       uiRefreshRateSeconds: 0, // Default to immediate updates
-      enableNotifications: false, // Default to disable notifications
+      enableNotifications:
+          !Platform.isWindows, // Disable on Windows, enable on other platforms
       createSenderFolders: false, // Default to date folders
     );
   }
@@ -3295,18 +3630,38 @@ class P2PService extends ChangeNotifier {
     }
   }
 
+  /// Update P2LAN status notification with current connection count
+  Future<void> _updateP2LanStatusNotification() async {
+    if (!_isEnabled || _currentUser == null) {
+      return;
+    }
+
+    final connectedDevices = pairedUsers.where((u) => u.isOnline).length;
+    await _safeNotificationCall(
+        () => P2PNotificationService.instance.showP2LanStatus(
+              deviceName: _currentUser!.displayName,
+              ipAddress: _currentUser!.ipAddress,
+              connectedDevices: connectedDevices,
+            ));
+  }
+
   /// Update transfer settings
   Future<bool> updateTransferSettings(P2PDataTransferSettings settings) async {
     try {
-      // Check if notifications are being enabled for the first time
-      final wasNotificationsEnabled =
+      final bool notificationsWereEnabled =
           _transferSettings?.enableNotifications ?? false;
-      final isNotificationsNowEnabled = settings.enableNotifications;
 
       final box =
           await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
       await box.put('settings', settings); // Use fixed key instead of add
       _transferSettings = settings;
+
+      // If notifications were just toggled on, ensure permissions are updated.
+      if (!notificationsWereEnabled && settings.enableNotifications) {
+        logInfo(
+            'Notifications have been enabled in settings. Updating permissions status...');
+        await P2PNotificationService.instance.updatePermissions();
+      }
 
       // 🔥 Update current user's display name if it has changed
       if (_currentUser != null && settings.customDisplayName != null) {
@@ -3315,18 +3670,6 @@ class P2PService extends ChangeNotifier {
           logInfo(
               'Updated current user display name to: ${settings.customDisplayName}');
           notifyListeners(); // Notify UI of the change
-        }
-      }
-
-      // 🔥 Request notification permissions if notifications were just enabled
-      if (!wasNotificationsEnabled && isNotificationsNowEnabled) {
-        logInfo('Notifications enabled - requesting permissions...');
-        final permissionGranted =
-            await P2PNotificationService.instance.requestPermissions();
-        if (!permissionGranted) {
-          logWarning('Notification permissions not granted');
-        } else {
-          logInfo('Notification permissions granted successfully');
         }
       }
 
@@ -3546,10 +3889,64 @@ class P2PService extends ChangeNotifier {
 
   @override
   void dispose() {
+    logInfo('P2PService: Disposing service...');
+
     // Send emergency disconnect to all paired users before disposing
     sendEmergencyDisconnectToAll();
     stopNetworking();
+
+    // Cancel all timers
+    _heartbeatTimer?.cancel();
+    _cleanupTimer?.cancel();
+    _broadcastTimer?.cancel();
+    _memoryCleanupTimer?.cancel();
+
+    // Cancel all file transfer request timers
+    for (final timer in _fileTransferRequestTimers.values) {
+      timer.cancel();
+    }
+    _fileTransferRequestTimers.clear();
+
+    // Close all sockets
+    _broadcastSocket?.close();
+    _udpListenerSocket?.close();
+
+    // 🔥 CLEANUP: Clear all memory caches
+    _incomingFileChunks.clear();
+    _discoveredUsers.clear();
+    _pendingRequests.clear();
+    _pendingFileTransferRequests.clear();
+    _activeTransfers.clear();
+
+    // 🔥 CLEANUP: Clear file picker cache on dispose
+    _cleanupFilePickerCacheSync();
+
+    _isEnabled = false;
+    _isDiscovering = false;
+    _isBroadcasting = false;
+
+    logInfo('P2PService: Service disposed');
     super.dispose();
+  }
+
+  /// 🔥 NEW: Synchronous cleanup for dispose
+  void _cleanupFilePickerCacheSync() {
+    try {
+      // Use Future.microtask to avoid blocking dispose
+      Future.microtask(() async {
+        try {
+          // Force cleanup on dispose regardless of active transfers
+          await FilePicker.platform.clearTemporaryFiles();
+          _lastFilePickerCleanup = DateTime.now();
+          logInfo('P2PService: Force cleared file picker cache on dispose');
+        } catch (e) {
+          logWarning(
+              'P2PService: Failed to clear file picker cache on dispose: $e');
+        }
+      });
+    } catch (e) {
+      logWarning('P2PService: Error scheduling file picker cleanup: $e');
+    }
   }
 
   /// Clear a transfer from the list
@@ -3568,6 +3965,9 @@ class P2PService extends ChangeNotifier {
       logWarning('Task $taskId not found for clear operation');
       return false;
     }
+
+    // 🔥 CLEANUP: Clear file chunks for this task
+    _incomingFileChunks.remove(taskId);
 
     bool fileDeleted = false;
     String? errorMessage;
@@ -3591,6 +3991,10 @@ class P2PService extends ChangeNotifier {
 
     logInfo(
         'Cleared transfer from UI: ${task.fileName}${deleteFile ? (fileDeleted ? ' (file deleted)' : ' (file deletion failed)') : ''}');
+
+    // 🔥 CLEANUP: Trigger memory cleanup after clearing transfer
+    Future.microtask(() => _cleanupMemory());
+
     notifyListeners();
 
     // Return true if task was cleared successfully, regardless of file deletion result
@@ -3614,6 +4018,10 @@ class P2PService extends ChangeNotifier {
       // Cancel timeout timer before processing response
       _fileTransferRequestTimers[requestId]?.cancel();
       _fileTransferRequestTimers.remove(requestId);
+
+      // Dismiss the notification as the request is now handled
+      await _safeNotificationCall(() => P2PNotificationService.instance
+          .cancelNotification(request.requestId.hashCode));
 
       if (accept) {
         await _acceptFileTransferRequest(request);
@@ -3753,6 +4161,9 @@ class P2PService extends ChangeNotifier {
       _broadcastSocket?.close();
       _broadcastSocket = null;
 
+      // 🔥 CLEANUP: Perform memory cleanup when stopping discovery
+      await _cleanupMemory();
+
       logInfo('Discovery services stopped');
     } catch (e) {
       logError('Error stopping discovery: $e');
@@ -3802,6 +4213,122 @@ class P2PService extends ChangeNotifier {
           'Broadcast service initialized on port ${_broadcastSocket!.port}');
     } catch (e) {
       logError('Failed to initialize broadcast service: $e');
+    }
+  }
+
+  /// Cleanup memory and temporary files
+  Future<void> _cleanupMemory() async {
+    try {
+      // 🔥 CLEANUP: Clear file chunks for completed/failed transfers
+      final completedTaskIds = _activeTransfers.entries
+          .where((entry) =>
+              entry.value.status == DataTransferStatus.completed ||
+              entry.value.status == DataTransferStatus.failed ||
+              entry.value.status == DataTransferStatus.cancelled)
+          .map((entry) => entry.key)
+          .toList();
+
+      for (final taskId in completedTaskIds) {
+        _incomingFileChunks.remove(taskId);
+        logInfo(
+            'P2PService: Cleaned up file chunks for completed task: $taskId');
+      }
+
+      // 🔥 CLEANUP: Safe file picker cleanup
+      await cleanupFilePickerCacheIfSafe();
+
+      // 🔥 CLEANUP: Clear old file transfer requests (older than 24 hours)
+      await _cleanupOldFileTransferRequests();
+
+      logInfo('P2PService: Memory cleanup completed');
+    } catch (e) {
+      logError('P2PService: Error during memory cleanup: $e');
+    }
+  }
+
+  /// 🔥 NEW: Cleanup old file transfer requests
+  Future<void> _cleanupOldFileTransferRequests() async {
+    try {
+      final requestsBox =
+          await Hive.openBox<FileTransferRequest>('file_transfer_requests');
+      final cutoffTime = DateTime.now().subtract(const Duration(hours: 24));
+
+      final keysToDelete = <String>[];
+      for (final key in requestsBox.keys) {
+        final request = requestsBox.get(key);
+        if (request != null && request.requestTime.isBefore(cutoffTime)) {
+          keysToDelete.add(key.toString());
+        }
+      }
+
+      for (final key in keysToDelete) {
+        await requestsBox.delete(key);
+      }
+
+      if (keysToDelete.isNotEmpty) {
+        logInfo(
+            'P2PService: Cleaned up ${keysToDelete.length} old file transfer requests');
+      }
+    } catch (e) {
+      logError('P2PService: Error cleaning up old file transfer requests: $e');
+    }
+  }
+
+  // 🔥 NEW: File picker cache management
+  static final Set<String> _activeFileTransferBatches = <String>{};
+  static DateTime? _lastFilePickerCleanup;
+  static const Duration _cleanupCooldown = Duration(minutes: 2);
+
+  /// 🔥 NEW: Register active file transfer batch to prevent cache cleanup
+  void _registerActiveFileTransferBatch(String batchId) {
+    _activeFileTransferBatches.add(batchId);
+    logInfo('P2PService: Registered active file transfer batch: $batchId');
+  }
+
+  /// 🔥 NEW: Unregister file transfer batch when completed/failed
+  void _unregisterFileTransferBatch(String batchId) {
+    _activeFileTransferBatches.remove(batchId);
+    logInfo('P2PService: Unregistered file transfer batch: $batchId');
+
+    // Trigger cleanup after batch is unregistered
+    Future.delayed(const Duration(seconds: 5), () {
+      cleanupFilePickerCacheIfSafe();
+    });
+  }
+
+  /// 🔥 NEW: Safe file picker cache cleanup - only if no active transfers
+  Future<void> cleanupFilePickerCacheIfSafe() async {
+    try {
+      // Check cooldown period to avoid too frequent cleanups
+      final now = DateTime.now();
+      if (_lastFilePickerCleanup != null &&
+          now.difference(_lastFilePickerCleanup!) < _cleanupCooldown) {
+        logInfo('P2PService: Skipped file picker cleanup - cooldown period');
+        return;
+      }
+
+      // Check if there are any active outgoing transfers
+      final hasActiveOutgoingTransfers = _activeTransfers.values.any((task) =>
+          task.isOutgoing &&
+          (task.status == DataTransferStatus.transferring ||
+              task.status == DataTransferStatus.waitingForApproval ||
+              task.status == DataTransferStatus.pending));
+
+      // Check if there are any registered active file transfer batches
+      final hasActiveFileTransferBatches =
+          _activeFileTransferBatches.isNotEmpty;
+
+      if (!hasActiveOutgoingTransfers && !hasActiveFileTransferBatches) {
+        await FilePicker.platform.clearTemporaryFiles();
+        _lastFilePickerCleanup = now;
+        logInfo('P2PService: Safely cleaned up file picker cache');
+      } else {
+        logInfo(
+            'P2PService: Skipped file picker cleanup - active transfers detected '
+            '(outgoing: $hasActiveOutgoingTransfers, batches: $hasActiveFileTransferBatches)');
+      }
+    } catch (e) {
+      logWarning('P2PService: Failed to cleanup file picker cache safely: $e');
     }
   }
 }

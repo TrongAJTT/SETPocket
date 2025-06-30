@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/widgets/generic/radial_menu.dart';
 import 'package:setpocket/widgets/p2p/file_type_radial_menu.dart';
@@ -25,17 +26,45 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
     with SingleTickerProviderStateMixin {
   final List<FileInfo> _selectedFiles = [];
   bool _isLoading = false;
+  bool _filesSent = false;
 
   OverlayEntry? _radialMenuOverlay;
+
+  // Track file picker results for cleanup
+  final List<FilePickerResult> _filePickerResults = [];
 
   @override
   void dispose() {
     _hideRadialMenu();
+    // 🔥 FIX: Only cleanup if dialog was cancelled (not sent)
+    if (!_filesSent) {
+      _cleanupFilePickerCache();
+    }
+    // 🔥 CLEANUP: Clear selected files list to free memory
+    _selectedFiles.clear();
     super.dispose();
+  }
+
+  /// 🔥 NEW: Cleanup file picker temporary files
+  Future<void> _cleanupFilePickerCache() async {
+    try {
+      // Clear file picker cache to free temporary files
+      await FilePicker.platform.clearTemporaryFiles();
+
+      // Clear our tracked results
+      _filePickerResults.clear();
+
+      logInfo(
+          'MultiFileSenderDialog: Cleaned up file picker cache and temporary files');
+    } catch (e) {
+      logWarning(
+          'MultiFileSenderDialog: Failed to cleanup file picker cache: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Row(
         children: [
@@ -59,7 +88,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
                   TextButton.icon(
                     onPressed: _clearAllFiles,
                     icon: const Icon(Icons.clear_all),
-                    label: const Text('Clear All'),
+                    label: Text(l10n.clearAll),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),
@@ -77,7 +106,11 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            // 🔥 CLEANUP: Safe to clean cache when canceling - files won't be used
+            _cleanupFilePickerCache();
+            Navigator.of(context).pop();
+          },
           child: const Text('Cancel'),
         ),
         ElevatedButton.icon(
@@ -89,13 +122,14 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.send),
-          label: Text(_isLoading ? 'Sending...' : 'Send Files'),
+          label: Text(_isLoading ? l10n.sending : l10n.sendFiles),
         ),
       ],
     );
   }
 
   Widget _buildEnhancedAddFilesButton() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _isLoading ? null : _pickFiles,
       onLongPressStart: _isLoading
@@ -125,7 +159,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
               ),
               const SizedBox(width: 8),
               Text(
-                'Add Files',
+                l10n.addFiles,
                 style: TextStyle(
                   color: _isLoading
                       ? Theme.of(context)
@@ -195,6 +229,9 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
       );
 
       if (result != null && result.files.isNotEmpty) {
+        // 🔥 TRACK: Store result for cleanup
+        _filePickerResults.add(result);
+
         await _addFilesFromResult(result);
 
         // Show success message
@@ -241,6 +278,9 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
       );
 
       if (result != null && result.files.isNotEmpty) {
+        // 🔥 TRACK: Store result for cleanup
+        _filePickerResults.add(result);
+
         await _addFilesFromResult(result);
       }
     } catch (e) {
@@ -305,6 +345,8 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
     setState(() {
       _selectedFiles.clear();
     });
+    // 🔥 CLEANUP: Safe to cleanup cache when clearing files - they won't be used
+    _cleanupFilePickerCache();
   }
 
   void _sendFiles() async {
@@ -315,10 +357,15 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
         _isLoading = true;
       });
 
+      // 🔥 FIX: Mark files as sent before calling back
+      _filesSent = true;
+
       final filePaths = _selectedFiles.map((file) => file.path).toList();
       widget.onSendFiles(filePaths);
 
       if (mounted) {
+        // 🔥 IMPORTANT: DO NOT cleanup cache here - files are still needed for transfer
+        // Cache will be cleaned up by P2P service after transfer completes
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -403,6 +450,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _isLoading ? null : _pickFiles,
       onLongPressStart: _isLoading
@@ -429,9 +477,9 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
                 color: Colors.grey[600],
               ),
               const SizedBox(height: 16),
-              const Text(
-                'No files selected',
-                style: TextStyle(
+              Text(
+                l10n.noFilesSelected,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey,
@@ -439,7 +487,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
               ),
               const SizedBox(height: 8),
               Text(
-                'Tap or right-click for options',
+                l10n.tapRightClickForOptions,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -509,6 +557,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
   }
 
   Widget _buildSummarySection() {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: Theme.of(context).colorScheme.secondaryContainer,
       child: Padding(
@@ -517,7 +566,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Transfer Summary',
+              l10n.transferSummary,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                   ),

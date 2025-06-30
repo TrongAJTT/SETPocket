@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,8 +8,12 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/file_storage_service.dart';
 import 'package:setpocket/services/network_security_service.dart';
+import 'package:setpocket/services/p2p_notification_service.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_list_picker.dart';
+import 'package:setpocket/widgets/generic/permission_info_dialog.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
 
 class P2LanTransferSettingsLayout extends StatefulWidget {
   final P2PDataTransferSettings? currentSettings;
@@ -93,65 +98,6 @@ class _P2LanTransferSettingsLayoutState
     const SliderOption(value: 16384, label: '16 MB'),
   ];
 
-  static final List<OptionItem<String>> _protocolOptions = [
-    OptionItem.withDescription(
-      'TCP',
-      'TCP (Reliable)',
-      'More reliable, better for important files',
-    ),
-    OptionItem.withDescription(
-      'UDP',
-      'UDP (Fast)',
-      'Faster but less reliable, good for large files',
-    ),
-  ];
-
-  static final List<OptionItem<String>> _fileOrganizationOptions = [
-    OptionItem.withDescription(
-      'none',
-      'None',
-      'Files go directly to download folder',
-    ),
-    OptionItem.withDescription(
-      'date',
-      'Create date folders',
-      'Organize by date (YYYY-MM-DD)',
-    ),
-    OptionItem.withDescription(
-      'sender',
-      'Create sender folders',
-      'Organize by sender display name',
-    ),
-  ];
-
-  static final List<SliderOption<int>> _uiRefreshRateOptions = [
-    const SliderOption(value: 0, label: 'Immediate'),
-    const SliderOption(value: 1, label: '1 second'),
-    const SliderOption(value: 2, label: '2 seconds'),
-    const SliderOption(value: 3, label: '3 seconds'),
-    const SliderOption(value: 4, label: '4 seconds'),
-    const SliderOption(value: 5, label: '5 seconds'),
-  ];
-
-  static int _getNearestOptionValue(
-      int bytes, List<SliderOption<int>> options) {
-    if (bytes < 0) return -1;
-    if (options.isEmpty) return options.first.value;
-
-    SliderOption<int> closest = options.first;
-    int minDiff = (closest.value - bytes).abs();
-
-    for (final option in options) {
-      final diff = (option.value - bytes).abs();
-      if (diff < minDiff) {
-        minDiff = diff;
-        closest = option;
-      }
-    }
-
-    return closest.value;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -160,10 +106,10 @@ class _P2LanTransferSettingsLayoutState
     _currentSettings =
         widget.currentSettings?.copyWith() ?? _createDefaultSettings();
     _initializeDefaultPath();
-    _loadDeviceName();
+    _getDeviceName();
   }
 
-  Future<void> _loadDeviceName() async {
+  Future<void> _getDeviceName() async {
     try {
       final deviceName = await NetworkSecurityService.getDeviceName();
       if (mounted) {
@@ -221,7 +167,7 @@ class _P2LanTransferSettingsLayoutState
       sendProtocol: 'TCP',
       maxChunkSize: 1024, // 1MB
       uiRefreshRateSeconds: 0, // Default to immediate updates
-      enableNotifications: true, // Default to enable notifications
+      enableNotifications: false, // Default to disable notifications
       createSenderFolders: false, // Default to date folders
     );
   }
@@ -233,6 +179,16 @@ class _P2LanTransferSettingsLayoutState
       return 'date';
     } else {
       return 'none';
+    }
+  }
+
+  String _getFileOrganizationDisplayText(AppLocalizations l10n) {
+    if (_currentSettings.createSenderFolders) {
+      return l10n.fileOrgSender;
+    } else if (_currentSettings.createDateFolders) {
+      return l10n.fileOrgDate;
+    } else {
+      return l10n.fileOrgNone;
     }
   }
 
@@ -307,6 +263,7 @@ class _P2LanTransferSettingsLayoutState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     return Column(
@@ -320,10 +277,16 @@ class _P2LanTransferSettingsLayoutState
           ),
           child: TabBar(
             controller: _tabController,
-            tabs: const [
-              Tab(text: 'Generic', icon: Icon(Icons.person, size: 18)),
-              Tab(text: 'Storage', icon: Icon(Icons.storage, size: 18)),
-              Tab(text: 'Network', icon: Icon(Icons.network_check, size: 18)),
+            tabs: [
+              Tab(
+                  text: l10n.settingsTabGeneric,
+                  icon: const Icon(Icons.person, size: 18)),
+              Tab(
+                  text: l10n.settingsTabStorage,
+                  icon: const Icon(Icons.storage, size: 18)),
+              Tab(
+                  text: l10n.settingsTabNetwork,
+                  icon: const Icon(Icons.network_check, size: 18)),
             ],
             labelStyle: TextStyle(fontSize: widget.isCompact ? 12 : 14),
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -353,20 +316,20 @@ class _P2LanTransferSettingsLayoutState
                 TextButton.icon(
                   onPressed: _resetToDefaults,
                   icon: const Icon(Icons.restore, size: 18),
-                  label: const Text('Reset'),
+                  label: Text(l10n.resetToDefaults),
                 ),
                 const Spacer(),
                 if (widget.onCancel != null) ...[
                   TextButton(
                     onPressed: widget.onCancel,
-                    child: const Text('Cancel'),
+                    child: Text(l10n.cancel),
                   ),
                   const SizedBox(width: 8),
                 ],
                 FilledButton.icon(
                   onPressed: _hasChanges ? _saveSettings : null,
                   icon: const Icon(Icons.save, size: 18),
-                  label: const Text('Save Settings'),
+                  label: Text(l10n.saveSettings),
                 ),
               ],
             ),
@@ -377,12 +340,13 @@ class _P2LanTransferSettingsLayoutState
   }
 
   Widget _buildGenericTab() {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: EdgeInsets.all(widget.isCompact ? 12 : 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('Device Profile', Icons.person),
+          _buildSectionHeader(l10n.deviceProfile, Icons.person),
           const SizedBox(height: 16),
 
           // Display name customization
@@ -393,14 +357,14 @@ class _P2LanTransferSettingsLayoutState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Display Name',
+                    l10n.displayName,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Customize how your device appears to other users',
+                    l10n.displayNameDescription,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -409,11 +373,11 @@ class _P2LanTransferSettingsLayoutState
                   TextField(
                     controller: _displayNameController,
                     decoration: InputDecoration(
-                      labelText: 'Device Display Name',
-                      hintText: 'Enter custom display name...',
+                      labelText: l10n.deviceDisplayNameLabel,
+                      hintText: l10n.deviceDisplayNameHint,
                       border: const OutlineInputBorder(),
                       prefixIcon: const Icon(Icons.edit),
-                      helperText: 'Default: $_currentDeviceName',
+                      helperText: l10n.defaultDisplayName(_currentDeviceName),
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -430,37 +394,43 @@ class _P2LanTransferSettingsLayoutState
           const SizedBox(height: 24),
 
           // User Preferences
-          _buildSectionHeader('User Preferences', Icons.settings),
+          _buildSectionHeader(l10n.userPreferences, Icons.settings),
           const SizedBox(height: 16),
 
-          Card(
-            child: SwitchListTile.adaptive(
-              title: const Text('Enable notifications'),
-              subtitle: const Text('Get notified about transfer events'),
-              value: _currentSettings.enableNotifications,
-              onChanged: (value) {
-                setState(() {
-                  _currentSettings.enableNotifications = value;
-                });
-                _markChanged();
-              },
-              secondary: const Icon(Icons.notifications),
+          // Only show notifications on supported platforms
+          if (!Platform.isWindows) ...[
+            Card(
+              child: SwitchListTile.adaptive(
+                title: Text(l10n.notifications),
+                subtitle: Text(l10n.enableNotificationsDescription),
+                value: _currentSettings.enableNotifications,
+                onChanged: _handleNotificationToggle,
+                secondary: const Icon(Icons.notifications),
+              ),
             ),
-          ),
+          ] else ...[
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.notifications_off),
+                title: Text(l10n.notifications),
+                subtitle: Text(l10n.notSupportedOnWindows),
+                enabled: false,
+              ),
+            ),
+          ],
 
           const SizedBox(height: 24),
 
           // User Interface Performance
-          _buildSectionHeader('User Interface Performance', Icons.tune),
+          _buildSectionHeader(l10n.uiPerformance, Icons.tune),
           const SizedBox(height: 16),
 
           Card(
             child: OptionSlider<int>(
               icon: Icons.schedule,
-              label: 'UI Refresh Rate',
-              subtitle:
-                  'Choose how often transfer progress updates in the UI. Higher frequencies work better on powerful devices.',
-              options: _uiRefreshRateOptions,
+              label: l10n.uiRefreshRate,
+              subtitle: l10n.uiRefreshRateDescription,
+              options: _uiRefreshRateOptions(l10n),
               currentValue: _currentSettings.uiRefreshRateSeconds,
               onChanged: (value) {
                 setState(() {
@@ -474,7 +444,7 @@ class _P2LanTransferSettingsLayoutState
           const SizedBox(height: 24),
 
           // Current Configuration
-          _buildSectionHeader('Current Configuration', Icons.settings),
+          _buildSectionHeader(l10n.currentConfiguration, Icons.settings),
           const SizedBox(height: 16),
           Card(
             child: Padding(
@@ -482,24 +452,22 @@ class _P2LanTransferSettingsLayoutState
               child: Column(
                 children: [
                   _buildConfigRow(
-                      'Display Name',
+                      l10n.displayName,
                       _customDisplayName.isNotEmpty
                           ? _customDisplayName
                           : _currentDeviceName),
-                  _buildConfigRow('Protocol', _currentSettings.sendProtocol),
-                  _buildConfigRow('Max File Size',
+                  _buildConfigRow(
+                      l10n.protocol, _getFileProtocolDisplayText(l10n)),
+                  _buildConfigRow(l10n.maxFileSize,
                       _formatBytes(_currentSettings.maxReceiveFileSize)),
-                  _buildConfigRow('Max Total Size',
+                  _buildConfigRow(l10n.maxTotalSize,
                       _formatBytes(_currentSettings.maxTotalReceiveSize)),
-                  _buildConfigRow('Concurrent Tasks',
-                      '${_currentSettings.maxConcurrentTasks}'),
+                  _buildConfigRow(l10n.concurrentTasks,
+                      _getConcurrentTasksDisplayText(l10n)),
                   _buildConfigRow(
-                      'Chunk Size', '${_currentSettings.maxChunkSize} KB'),
-                  _buildConfigRow(
-                      'Date Folders',
-                      _currentSettings.createDateFolders
-                          ? 'Enabled'
-                          : 'Disabled'),
+                      l10n.chunkSize, '${_currentSettings.maxChunkSize} KB'),
+                  _buildConfigRow(l10n.fileOrganization,
+                      _getFileOrganizationDisplayText(l10n)),
                 ],
               ),
             ),
@@ -508,7 +476,7 @@ class _P2LanTransferSettingsLayoutState
           const SizedBox(height: 24),
 
           // Storage Information
-          _buildSectionHeader('Storage Information', Icons.info),
+          _buildSectionHeader(l10n.storageInfo, Icons.info),
           const SizedBox(height: 16),
           if (_currentSettings.downloadPath.isNotEmpty) ...[
             FutureBuilder<Map<String, String>>(
@@ -522,13 +490,14 @@ class _P2LanTransferSettingsLayoutState
                       child: Column(
                         children: [
                           _buildConfigRowWithWrap(
-                              'Download Path', _currentSettings.downloadPath),
+                              l10n.downloadPath, _currentSettings.downloadPath),
                           if (info['totalSpace'] != null)
-                            _buildConfigRow('Total Space', info['totalSpace']!),
+                            _buildConfigRow(
+                                l10n.totalSpace, info['totalSpace']!),
                           if (info['freeSpace'] != null)
-                            _buildConfigRow('Free Space', info['freeSpace']!),
+                            _buildConfigRow(l10n.freeSpace, info['freeSpace']!),
                           if (info['usedSpace'] != null)
-                            _buildConfigRow('Used Space', info['usedSpace']!),
+                            _buildConfigRow(l10n.usedSpace, info['usedSpace']!),
                         ],
                       ),
                     ),
@@ -545,8 +514,8 @@ class _P2LanTransferSettingsLayoutState
             ),
           ] else ...[
             _buildInfoCard(
-              'No Download Path Set',
-              'Please select a download folder in the Storage tab to see storage information.',
+              l10n.noDownloadPathSet,
+              l10n.noDownloadPathSetDescription,
               Icons.warning,
               color: Theme.of(context).colorScheme.secondaryContainer,
             ),
@@ -557,12 +526,13 @@ class _P2LanTransferSettingsLayoutState
   }
 
   Widget _buildStorageTab() {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: EdgeInsets.all(widget.isCompact ? 12 : 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('Download Location', Icons.folder),
+          _buildSectionHeader(l10n.downloadLocation, Icons.folder),
           const SizedBox(height: 16),
 
           // Download path selector
@@ -586,13 +556,13 @@ class _P2LanTransferSettingsLayoutState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Download Folder',
+                          l10n.downloadFolder,
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           _currentSettings.downloadPath.isEmpty
-                              ? 'Select download folder...'
+                              ? l10n.selectDownloadFolder
                               : _currentSettings.downloadPath,
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -619,8 +589,8 @@ class _P2LanTransferSettingsLayoutState
           if (Platform.isAndroid) ...[
             const SizedBox(height: 12),
             _buildInfoCard(
-              'Android Storage Access',
-              'For security, it\'s recommended to use the app-specific folder. You can select other folders, but this may require additional permissions.',
+              l10n.androidStorageAccess,
+              l10n.androidStorageAccessDescription,
               Icons.security,
             ),
             const SizedBox(height: 8),
@@ -657,7 +627,7 @@ class _P2LanTransferSettingsLayoutState
                         _markChanged();
                       },
                       icon: const Icon(Icons.home, size: 18),
-                      label: const Text('Use App Folder'),
+                      label: Text(l10n.useAppFolder),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
@@ -673,11 +643,11 @@ class _P2LanTransferSettingsLayoutState
           const SizedBox(height: 24),
 
           // Organization settings
-          _buildSectionHeader('File Organization', Icons.auto_awesome),
+          _buildSectionHeader(l10n.fileOrganization, Icons.auto_awesome),
           const SizedBox(height: 16),
 
           OptionListPicker<String>(
-            options: _fileOrganizationOptions,
+            options: _getFileOrganizationOptions(l10n),
             selectedValue: _getFileOrganizationValue(),
             onChanged: (value) {
               _setFileOrganizationValue(value);
@@ -692,44 +662,41 @@ class _P2LanTransferSettingsLayoutState
           const SizedBox(height: 24),
 
           // Size limits
-          _buildSectionHeader('Size Limits', Icons.policy),
+          _buildSectionHeader(l10n.sizeLimits, Icons.tune),
           const SizedBox(height: 16),
 
-          OptionSlider<int>(
-            icon: Icons.description,
-            label: 'Maximum file size (per file)',
-            subtitle: 'Larger files will be automatically rejected',
-            options: _fileSizeOptions,
-            currentValue: _getNearestOptionValue(
-              _currentSettings.maxReceiveFileSize,
-              _fileSizeOptions,
+          Card(
+            child: Column(
+              children: [
+                OptionSlider<int>(
+                  icon: Icons.file_present,
+                  label: l10n.maxFileSizePerFile,
+                  subtitle: l10n.maxFileSizePerFileDescription,
+                  options: _getFileSizeOptions(l10n),
+                  currentValue: _currentSettings.maxReceiveFileSize,
+                  onChanged: (value) {
+                    setState(() {
+                      _currentSettings.maxReceiveFileSize = value;
+                    });
+                    _markChanged();
+                  },
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+                OptionSlider<int>(
+                  icon: Icons.inventory,
+                  label: l10n.maxTotalSize,
+                  subtitle: l10n.maxTotalSizeDescription,
+                  options: _getTotalSizeOptions(l10n),
+                  currentValue: _currentSettings.maxTotalReceiveSize,
+                  onChanged: (value) {
+                    setState(() {
+                      _currentSettings.maxTotalReceiveSize = value;
+                    });
+                    _markChanged();
+                  },
+                ),
+              ],
             ),
-            onChanged: (value) {
-              setState(() {
-                _currentSettings.maxReceiveFileSize = value;
-              });
-              _markChanged();
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          OptionSlider<int>(
-            icon: Icons.inventory_2,
-            label: 'Maximum total size (per transfer batch)',
-            subtitle:
-                'Total size limit for all files in a single transfer request',
-            options: _totalSizeOptions,
-            currentValue: _getNearestOptionValue(
-              _currentSettings.maxTotalReceiveSize,
-              _totalSizeOptions,
-            ),
-            onChanged: (value) {
-              setState(() {
-                _currentSettings.maxTotalReceiveSize = value;
-              });
-              _markChanged();
-            },
           ),
         ],
       ),
@@ -737,18 +704,19 @@ class _P2LanTransferSettingsLayoutState
   }
 
   Widget _buildNetworkTab() {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: EdgeInsets.all(widget.isCompact ? 12 : 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('Transfer Protocol', Icons.lan),
+          _buildSectionHeader(l10n.transferProtocol, Icons.alt_route),
           const SizedBox(height: 16),
 
           // Protocol selection using OptionListPicker
           OptionListPicker<String>(
-            options: _protocolOptions,
-            selectedValue: _currentSettings.sendProtocol.toUpperCase(),
+            options: _getProtocolOptions(l10n),
+            selectedValue: _currentSettings.sendProtocol,
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -765,42 +733,41 @@ class _P2LanTransferSettingsLayoutState
 
           const SizedBox(height: 24),
 
-          _buildSectionHeader('Performance Tuning', Icons.speed),
+          _buildSectionHeader(l10n.performanceTuning, Icons.speed),
           const SizedBox(height: 16),
 
-          OptionSlider<int>(
-            icon: Icons.dynamic_feed,
-            label: 'Concurrent transfers',
-            subtitle: 'More transfers = faster overall but higher CPU usage',
-            options: _concurrentTasksOptions,
-            currentValue: _currentSettings.maxConcurrentTasks > 10
-                ? 99
-                : _currentSettings.maxConcurrentTasks,
-            onChanged: (value) {
-              setState(() {
-                _currentSettings.maxConcurrentTasks = value;
-              });
-              _markChanged();
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          OptionSlider<int>(
-            icon: Icons.data_usage,
-            label: 'Transfer chunk size',
-            subtitle: 'Higher sizes = faster transfers but more memory usage',
-            options: _chunkSizeOptions,
-            currentValue: _getNearestOptionValue(
-              _currentSettings.maxChunkSize,
-              _chunkSizeOptions,
+          Card(
+            child: Column(
+              children: [
+                OptionSlider<int>(
+                  icon: Icons.sync,
+                  label: l10n.concurrentTransfers,
+                  subtitle: l10n.concurrentTransfersSubtitle,
+                  options: _getConcurrentTasksOptions(l10n),
+                  currentValue: _currentSettings.maxConcurrentTasks,
+                  onChanged: (value) {
+                    setState(() {
+                      _currentSettings.maxConcurrentTasks = value;
+                    });
+                    _markChanged();
+                  },
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+                OptionSlider<int>(
+                  icon: Icons.layers,
+                  label: l10n.transferChunkSize,
+                  subtitle: l10n.transferChunkSizeSubtitle,
+                  options: _chunkSizeOptions,
+                  currentValue: _currentSettings.maxChunkSize,
+                  onChanged: (value) {
+                    setState(() {
+                      _currentSettings.maxChunkSize = value;
+                    });
+                    _markChanged();
+                  },
+                ),
+              ],
             ),
-            onChanged: (value) {
-              setState(() {
-                _currentSettings.maxChunkSize = value;
-              });
-              _markChanged();
-            },
           ),
         ],
       ),
@@ -877,8 +844,7 @@ class _P2LanTransferSettingsLayoutState
   Widget _buildInfoCard(String title, String content, IconData icon,
       {Color? color}) {
     return Card(
-      color: color ??
-          Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      color: color ?? Theme.of(context).colorScheme.surfaceContainer,
       elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -913,13 +879,13 @@ class _P2LanTransferSettingsLayoutState
     );
   }
 
-  String _formatBytes(int bytes) {
-    if (bytes < 0) return 'Unlimited';
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024)
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  String _formatBytes(int bytes, [int decimals = 2]) {
+    final l10n = AppLocalizations.of(context)!;
+    if (bytes <= 0) return '0 B';
+    if (bytes < 0) return l10n.unlimited;
+    const suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    final i = (log(bytes) / log(1024)).floor();
+    return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
   Future<Map<String, String>> _getStorageInfo() async {
@@ -996,5 +962,162 @@ class _P2LanTransferSettingsLayoutState
         );
       }
     }
+  }
+
+  Future<void> _handleNotificationToggle(bool enable) async {
+    // Prevent changing the value optimistically in the UI before permission is known
+    // The `setState` calls within this function will handle the final state.
+    if (enable) {
+      // User wants to enable notifications, so request permissions first
+      final bool hasPermission =
+          await P2PNotificationService.instance.requestPermissions();
+
+      if (mounted) {
+        if (hasPermission) {
+          // Permission is granted, update the toggle state
+          setState(() {
+            _currentSettings =
+                _currentSettings.copyWith(enableNotifications: true);
+          });
+        } else {
+          // Permission denied, show an explanatory dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return PermissionInfoDialog(
+                title: 'Enable Notifications',
+                content:
+                    'To receive notifications for pairing and file transfers, you need to enable them in the system settings.',
+                actionText: 'Open Settings',
+                onActionPressed: () {
+                  P2PNotificationService.instance.openNotificationSettings();
+                },
+              );
+            },
+          );
+          // Keep the toggle off
+          setState(() {
+            _currentSettings =
+                _currentSettings.copyWith(enableNotifications: false);
+          });
+        }
+      }
+    } else {
+      // User wants to disable notifications
+      setState(() {
+        _currentSettings =
+            _currentSettings.copyWith(enableNotifications: false);
+      });
+    }
+    _markChanged();
+  }
+
+  List<SliderOption<int>> _uiRefreshRateOptions(AppLocalizations l10n) {
+    return [
+      SliderOption(value: 0, label: l10n.immediate),
+      SliderOption(value: 1, label: '1 ${l10n.secondsLabel}'),
+      SliderOption(value: 2, label: '2 ${l10n.secondsPlural}'),
+      SliderOption(value: 3, label: '3 ${l10n.secondsPlural}'),
+      SliderOption(value: 4, label: '4 ${l10n.secondsPlural}'),
+      SliderOption(value: 5, label: '5 ${l10n.secondsPlural}'),
+    ];
+  }
+
+  List<SliderOption<int>> _getFileSizeOptions(AppLocalizations l10n) {
+    return [
+      const SliderOption(value: 10 * 1024 * 1024, label: '10 MB'),
+      const SliderOption(value: 50 * 1024 * 1024, label: '50 MB'),
+      const SliderOption(value: 100 * 1024 * 1024, label: '100 MB'),
+      const SliderOption(value: 200 * 1024 * 1024, label: '200 MB'),
+      const SliderOption(value: 500 * 1024 * 1024, label: '500 MB'),
+      const SliderOption(value: 1 * 1024 * 1024 * 1024, label: '1 GB'),
+      const SliderOption(value: 2 * 1024 * 1024 * 1024, label: '2 GB'),
+      const SliderOption(value: 5 * 1024 * 1024 * 1024, label: '5 GB'),
+      const SliderOption(value: 10 * 1024 * 1024 * 1024, label: '10 GB'),
+      const SliderOption(value: 50 * 1024 * 1024 * 1024, label: '50 GB'),
+      SliderOption(value: -1, label: l10n.unlimited),
+    ];
+  }
+
+  List<SliderOption<int>> _getTotalSizeOptions(AppLocalizations l10n) {
+    return [
+      const SliderOption(value: 100 * 1024 * 1024, label: '100 MB'),
+      const SliderOption(value: 500 * 1024 * 1024, label: '500 MB'),
+      const SliderOption(value: 1 * 1024 * 1024 * 1024, label: '1 GB'),
+      const SliderOption(value: 2 * 1024 * 1024 * 1024, label: '2 GB'),
+      const SliderOption(value: 5 * 1024 * 1024 * 1024, label: '5 GB'),
+      const SliderOption(value: 10 * 1024 * 1024 * 1024, label: '10 GB'),
+      const SliderOption(value: 20 * 1024 * 1024 * 1024, label: '20 GB'),
+      const SliderOption(value: 50 * 1024 * 1024 * 1024, label: '50 GB'),
+      const SliderOption(value: 100 * 1024 * 1024 * 1024, label: '100 GB'),
+      SliderOption(value: -1, label: l10n.unlimited),
+    ];
+  }
+
+  List<SliderOption<int>> _getConcurrentTasksOptions(AppLocalizations l10n) {
+    return [
+      const SliderOption(value: 1, label: '1'),
+      const SliderOption(value: 2, label: '2'),
+      SliderOption(value: 3, label: '3 ${l10n.defaultValue}'),
+      const SliderOption(value: 4, label: '4'),
+      const SliderOption(value: 5, label: '5'),
+      const SliderOption(value: 6, label: '6'),
+      const SliderOption(value: 8, label: '8'),
+      const SliderOption(value: 10, label: '10'),
+      SliderOption(value: 99, label: l10n.unlimited),
+    ];
+  }
+
+  List<OptionItem<String>> _getProtocolOptions(AppLocalizations l10n) {
+    return [
+      OptionItem.withDescription(
+        'TCP',
+        l10n.protocolTcpReliable,
+        l10n.protocolTcpDescription,
+      ),
+      OptionItem.withDescription(
+        'UDP',
+        l10n.protocolUdpFast,
+        l10n.udpDescription,
+      ),
+    ];
+  }
+
+  List<OptionItem<String>> _getFileOrganizationOptions(AppLocalizations l10n) {
+    return [
+      OptionItem.withDescription(
+        'none',
+        l10n.fileOrgNone,
+        l10n.fileOrgNoneDescription,
+      ),
+      OptionItem.withDescription(
+        'date',
+        l10n.fileOrgDate,
+        l10n.fileOrgDateDescription,
+      ),
+      OptionItem.withDescription(
+        'sender',
+        l10n.fileOrgSender,
+        l10n.fileOrgSenderDescription,
+      ),
+    ];
+  }
+
+  String _getFileProtocolDisplayText(AppLocalizations l10n) {
+    switch (_currentSettings.sendProtocol) {
+      case 'TCP':
+        return l10n.protocolTcpReliable;
+      case 'UDP':
+        return l10n.protocolUdpFast;
+      default:
+        return _currentSettings.sendProtocol;
+    }
+  }
+
+  String _getConcurrentTasksDisplayText(AppLocalizations l10n) {
+    if (_currentSettings.maxConcurrentTasks >= 99) {
+      return l10n.unlimited;
+    }
+    return _currentSettings.maxConcurrentTasks.toString();
   }
 }

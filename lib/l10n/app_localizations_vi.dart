@@ -109,11 +109,14 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get confirmClearAllCache => 'Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu bộ nhớ đệm? Điều này sẽ xóa tất cả template đã lưu nhưng giữ lại cài đặt của bạn.';
+  String get confirmClearAllCache => 'Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu trong bộ nhớ đệm không? Thao tác này sẽ xóa tất cả các mẫu đã lưu nhưng vẫn giữ lại cài đặt của bạn.';
+
+  @override
+  String get cannotClearFollowingCaches => 'Không thể xóa các bộ nhớ đệm sau vì chúng đang được sử dụng:';
 
   @override
   String cacheCleared(Object cacheName) {
-    return 'Đã xóa bộ nhớ đệm $cacheName thành công';
+    return 'Đã xóa thành công bộ nhớ đệm $cacheName';
   }
 
   @override
@@ -126,6 +129,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get close => 'Đóng';
+
+  @override
+  String get online => 'Trực tuyến';
+
+  @override
+  String get offline => 'Ngoại tuyến';
 
   @override
   String get options => 'Tùy chọn';
@@ -1597,16 +1606,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearAll => 'Xóa tất cả';
 
   @override
-  String get converterTools => 'Công cụ Chuyển đổi';
+  String get converterTools => 'Công cụ chuyển đổi';
 
   @override
   String get converterToolsDesc => 'Chuyển đổi giữa các đơn vị và hệ thống khác nhau';
 
   @override
-  String get calculatorTools => 'Công cụ Tính toán';
+  String get calculatorTools => 'Công cụ tính toán';
 
   @override
-  String get calculatorToolsDesc => 'Máy tính chuyên dụng cho sức khỏe, tài chính và nhiều hơn nữa';
+  String get calculatorToolsDesc => 'Các máy tính chuyên dụng cho sức khỏe, tài chính và hơn thế nữa';
 
   @override
   String get lengthConverter => 'Chuyển đổi Chiều dài';
@@ -5131,7 +5140,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get p2pDataTransfer => 'Truyền Dữ Liệu P2P';
 
   @override
-  String get p2pDataTransferDesc => 'Truyền dữ liệu trực tiếp giữa các thiết bị trong cùng mạng';
+  String get p2pDataTransferDesc => 'Truyền tệp giữa các thiết bị trong cùng mạng cục bộ.';
 
   @override
   String get networkSecurityWarning => 'Cảnh báo Bảo mật Mạng';
@@ -5182,7 +5191,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get status => 'Trạng thái';
 
   @override
-  String get connectionStatus => 'Trạng thái Kết nối';
+  String get connectionStatus => 'Trạng thái kết nối';
+
+  @override
+  String get autoConnect => 'Tự động kết nối';
 
   @override
   String get networkInfo => 'Thông tin Mạng';
@@ -5218,10 +5230,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get paired => 'Đã ghép nối';
 
   @override
-  String get trusted => 'Tin cậy';
+  String get lastSeen => 'Lần cuối xuất hiện';
 
   @override
-  String get pair => 'Ghép nối';
+  String get pairedSince => 'Ghép nối từ';
+
+  @override
+  String trusted(String name) {
+    return 'Đã tin tưởng $name';
+  }
+
+  @override
+  String get pair => 'Ghép Nối';
 
   @override
   String get sendFile => 'Gửi File';
@@ -5254,6 +5274,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get p2pPermissionCancel => 'Hủy';
 
   @override
+  String get p2pNearbyDevicesPermissionTitle => 'Yêu cầu quyền truy cập thiết bị gần đó';
+
+  @override
+  String get p2pNearbyDevicesPermissionExplanation => 'Để khám phá các thiết bị lân cận trên các phiên bản Android hiện đại, ứng dụng này cần quyền truy cập các thiết bị WiFi gần đó. Quyền này cho phép ứng dụng quét các mạng WiFi mà không cần quyền truy cập vị trí. Dữ liệu của bạn không được lưu trữ hoặc chia sẻ. Ứng dụng hoạt động phía máy khách và chúng tôi không thu thập bất kỳ dữ liệu người dùng nào.';
+
+  @override
   String get dataTransferRequest => 'Yêu cầu truyền dữ liệu';
 
   @override
@@ -5269,5 +5295,803 @@ class AppLocalizationsVi extends AppLocalizations {
   String get availableDevices => 'Thiết bị có sẵn';
 
   @override
-  String get p2lanTransfer => 'Truyền tệp P2Lan';
+  String get p2lanTransfer => 'Truyền dữ liệu P2Lan';
+
+  @override
+  String get p2lanStatus => 'Trạng thái P2LAN';
+
+  @override
+  String get fileTransferStatus => 'Trạng thái truyền dữ liệu';
+
+  @override
+  String get p2lanActive => 'P2LAN đang hoạt động';
+
+  @override
+  String get readyForConnections => 'Sẵn sàng kết nối';
+
+  @override
+  String devicesConnected(int count) {
+    return '$count thiết bị đã kết nối';
+  }
+
+  @override
+  String deviceConnected(int count) {
+    return '$count thiết bị đã kết nối';
+  }
+
+  @override
+  String get stopP2lan => 'Dừng P2LAN';
+
+  @override
+  String get p2lanStopped => 'P2LAN đã dừng';
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get quickActionsDesc => 'Select up to 4 tools for quick access.';
+
+  @override
+  String get quickActionsManage => 'Manage Quick Actions';
+
+  @override
+  String get cacheDetailsDialogTitle => 'Cache Details';
+
+  @override
+  String get randomGeneratorsCacheDesc => 'Generation history and settings';
+
+  @override
+  String get calculatorToolsCacheDesc => 'Calculation history, graphing calculator data, BMI data, and settings';
+
+  @override
+  String get converterToolsCacheDesc => 'Trạng thái tiền tệ/độ dài, các cài đặt sẵn và bộ đệm tỷ giá hối đoái';
+
+  @override
+  String get p2pDataTransferCacheDesc => 'Cài đặt, hồ sơ thiết bị đã lưu và bộ đệm truyền tệp tạm thời.';
+
+  @override
+  String totalCacheSize(Object count, Object size) {
+    return 'Tổng cộng: $count mục, $size';
+  }
+
+  @override
+  String get clearSelectedCache => 'Xóa bộ nhớ đệm đã chọn';
+
+  @override
+  String get pairWithDevice => 'Bạn có muốn ghép nối với thiết bị này không?';
+
+  @override
+  String get deviceId => 'ID Thiết bị';
+
+  @override
+  String get discoveryTime => 'Thời gian phát hiện';
+
+  @override
+  String get saveConnection => 'Lưu kết nối';
+
+  @override
+  String get autoReconnectDescription => 'Tự động kết nối lại khi cả hai thiết bị trực tuyến';
+
+  @override
+  String get pairingNotificationInfo => 'Người dùng khác sẽ nhận được yêu cầu ghép nối và cần chấp nhận để hoàn tất ghép nối.';
+
+  @override
+  String get sendRequest => 'Gửi yêu cầu';
+
+  @override
+  String get justNow => 'Vừa xong';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes phút trước';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours giờ trước';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '$days ngày trước';
+  }
+
+  @override
+  String get noPairingRequests => 'Không có yêu cầu ghép nối';
+
+  @override
+  String get pairingRequestFrom => 'Yêu cầu ghép nối từ:';
+
+  @override
+  String get sentTime => 'Thời gian gửi';
+
+  @override
+  String get wantsSaveConnection => 'Người này muốn lưu kết nối';
+
+  @override
+  String get trustThisUser => 'Tin tưởng người dùng này';
+
+  @override
+  String get allowFileTransfersWithoutConfirmation => 'Cho phép truyền file mà không cần xác nhận';
+
+  @override
+  String get onlyAcceptFromTrustedDevices => 'Chỉ chấp nhận ghép nối từ các thiết bị tin cậy.';
+
+  @override
+  String get previousRequest => 'Yêu cầu trước';
+
+  @override
+  String get nextRequest => 'Yêu cầu tiếp theo';
+
+  @override
+  String get reject => 'Từ chối';
+
+  @override
+  String get accept => 'Chấp nhận';
+
+  @override
+  String get incomingFiles => 'File đến';
+
+  @override
+  String wantsToSendYouFiles(int count) {
+    return 'muốn gửi cho bạn $count file';
+  }
+
+  @override
+  String get filesToReceive => 'File sẽ nhận:';
+
+  @override
+  String get totalSize => 'Tổng dung lượng:';
+
+  @override
+  String get localFiles => 'File cục bộ';
+
+  @override
+  String get manualDiscovery => 'Tìm kiếm thủ công';
+
+  @override
+  String get transferSettings => 'Cài đặt truyền file';
+
+  @override
+  String get savedDevicesCurrentlyAvailable => 'Thiết bị đã lưu hiện có sẵn';
+
+  @override
+  String get recentlyDiscoveredDevices => 'Thiết bị vừa phát hiện';
+
+  @override
+  String get viewInfo => 'Xem thông tin';
+
+  @override
+  String get trust => 'Tin tưởng';
+
+  @override
+  String get removeTrust => 'Bỏ tin tưởng';
+
+  @override
+  String get unpair => 'Hủy ghép nối';
+
+  @override
+  String get thisDevice => 'Thiết bị này';
+
+  @override
+  String get fileCache => 'Bộ nhớ đệm file';
+
+  @override
+  String get reload => 'Tải lại';
+
+  @override
+  String get clear => 'Xóa';
+
+  @override
+  String get temporaryFilesFromTransfers => 'File tạm thời từ truyền file P2Lan';
+
+  @override
+  String get debug => 'Gỡ lỗi';
+
+  @override
+  String get clearFileCache => 'Xóa bộ nhớ đệm file';
+
+  @override
+  String get fileCacheClearedSuccessfully => 'Đã xóa bộ nhớ đệm file thành công';
+
+  @override
+  String failedToClearCache(String error) {
+    return 'Không thể xóa bộ nhớ đệm: $error';
+  }
+
+  @override
+  String get failedToUpdateSettings => 'Không thể cập nhật cài đặt';
+
+  @override
+  String failedToLoadSettings(String error) {
+    return 'Không thể tải cài đặt: $error';
+  }
+
+  @override
+  String removeTrustFrom(String deviceName) {
+    return 'Bỏ tin tưởng từ $deviceName?';
+  }
+
+  @override
+  String get remove => 'Xóa';
+
+  @override
+  String unpairFrom(String deviceName) {
+    return 'Hủy ghép nối từ $deviceName';
+  }
+
+  @override
+  String get unpairDescription => 'Điều này sẽ xóa hoàn toàn ghép nối từ cả hai thiết bị. Bạn sẽ cần ghép nối lại trong tương lai.\n\nThiết bị kia cũng sẽ được thông báo và kết nối của họ sẽ bị xóa.';
+
+  @override
+  String get holdToUnpair => 'Giữ để hủy ghép nối';
+
+  @override
+  String get unpairing => 'Đang hủy ghép nối...';
+
+  @override
+  String get holdButtonToConfirmUnpair => 'Giữ nút trong 1 giây để xác nhận hủy ghép nối';
+
+  @override
+  String get taskAndFileDeletedSuccessfully => 'Đã xóa tác vụ và file thành công';
+
+  @override
+  String get taskCleared => 'Đã xóa tác vụ';
+
+  @override
+  String get notConnected => 'Chưa kết nối';
+
+  @override
+  String get sending => 'Đang gửi...';
+
+  @override
+  String get sendFiles => 'Gửi file';
+
+  @override
+  String get addFiles => 'Thêm file';
+
+  @override
+  String errorSelectingFiles(String error) {
+    return 'Lỗi chọn file: $error';
+  }
+
+  @override
+  String errorSendingFiles(String error) {
+    return 'Lỗi gửi file: $error';
+  }
+
+  @override
+  String get noFilesSelected => 'Chưa chọn file nào';
+
+  @override
+  String get tapRightClickForOptions => 'Nhấn hoặc chuột phải để xem tùy chọn';
+
+  @override
+  String get transferSummary => 'Tóm tắt truyền file';
+
+  @override
+  String get unlimited => 'Không giới hạn';
+
+  @override
+  String get tcpProtocol => 'TCP';
+
+  @override
+  String get tcpDescription => 'Đáng tin cậy hơn, tốt cho file quan trọng';
+
+  @override
+  String get udpProtocol => 'UDP';
+
+  @override
+  String get udpDescription => 'Nhanh hơn nhưng kém tin cậy hơn, tốt cho các file lớn';
+
+  @override
+  String get noFileOrganization => 'Không';
+
+  @override
+  String get createDateFolders => 'Tạo thư mục theo ngày';
+
+  @override
+  String get organizeFoldersByDate => 'Sắp xếp file theo ngày nhận';
+
+  @override
+  String get createSenderFolders => 'Tạo thư mục theo người gửi';
+
+  @override
+  String get immediate => 'Ngay lập tức';
+
+  @override
+  String get myDevice => 'Thiết bị của tôi';
+
+  @override
+  String get bySenderName => 'Theo tên người gửi';
+
+  @override
+  String get byDate => 'Theo ngày';
+
+  @override
+  String get none => 'Không';
+
+  @override
+  String get resetToDefaults => 'Đặt lại mặc định';
+
+  @override
+  String get resetConfirmation => 'Bạn có chắc muốn đặt lại tất cả cài đặt về giá trị mặc định không?';
+
+  @override
+  String get generic => 'Chung';
+
+  @override
+  String get storage => 'Lưu trữ';
+
+  @override
+  String get network => 'Mạng';
+
+  @override
+  String get saveSettings => 'Lưu cài đặt';
+
+  @override
+  String get deviceProfile => 'Hồ sơ thiết bị';
+
+  @override
+  String get deviceDisplayName => 'Tên hiển thị thiết bị';
+
+  @override
+  String get userPreferences => 'Tùy chọn người dùng';
+
+  @override
+  String get enableNotifications => 'Bật thông báo';
+
+  @override
+  String get getNotifiedAboutTransferEvents => 'Nhận thông báo về sự kiện truyền file';
+
+  @override
+  String get userInterfacePerformance => 'Hiệu suất giao diện';
+
+  @override
+  String get uiRefreshRate => 'Tốc độ làm mới giao diện';
+
+  @override
+  String get currentConfiguration => 'Cấu hình hiện tại';
+
+  @override
+  String get protocol => 'Giao thức';
+
+  @override
+  String get maxFileSize => 'Kích thước file tối đa';
+
+  @override
+  String get maxTotalSize => 'Tổng kích thước tối đa';
+
+  @override
+  String get concurrentTasks => 'Tác vụ đồng thời';
+
+  @override
+  String get chunkSize => 'Kích thước khối';
+
+  @override
+  String get fileOrganization => 'Sắp xếp file';
+
+  @override
+  String get storageInformation => 'Thông tin lưu trữ';
+
+  @override
+  String get downloadPath => 'Đường dẫn tải về';
+
+  @override
+  String get totalSpace => 'Tổng dung lượng';
+
+  @override
+  String get freeSpace => 'Dung lượng trống';
+
+  @override
+  String get usedSpace => 'Dung lượng đã dùng';
+
+  @override
+  String get noDownloadPathSet => 'Chưa đặt đường dẫn tải về';
+
+  @override
+  String get downloadLocation => 'Vị trí tải về';
+
+  @override
+  String get downloadFolder => 'Thư mục tải về';
+
+  @override
+  String get androidStorageAccess => 'Quyền truy cập lưu trữ Android';
+
+  @override
+  String get useAppFolder => 'Dùng thư mục ứng dụng';
+
+  @override
+  String get sizeLimits => 'Giới hạn kích thước';
+
+  @override
+  String get totalSizeLimitDescription => 'Giới hạn tổng kích thước cho tất cả file trong một yêu cầu truyền';
+
+  @override
+  String get transferProtocolSection => 'Giao thức truyền';
+
+  @override
+  String get performanceTuning => 'Tinh chỉnh hiệu suất';
+
+  @override
+  String get concurrentTransfersDescription => 'Nhiều truyền = nhanh hơn tổng thể nhưng dùng CPU cao hơn';
+
+  @override
+  String get transferChunkSizeDescription => 'Kích thước cao hơn = truyền nhanh hơn nhưng dùng bộ nhớ nhiều hơn';
+
+  @override
+  String get permissionsRequiredForP2P => 'Cần quyền để khởi động mạng P2P';
+
+  @override
+  String errorInStartNetworking(String error) {
+    return 'Lỗi khởi động mạng: $error';
+  }
+
+  @override
+  String errorSelectingFilesFromCategory(String category, String error) {
+    return 'Lỗi chọn file từ $category: $error';
+  }
+
+  @override
+  String get loadingDeviceInfo => 'Đang tải thông tin thiết bị...';
+
+  @override
+  String get tempFilesDescription => 'File tạm thời từ truyền file P2Lan';
+
+  @override
+  String get networkDebugCompleted => 'Hoàn tất gỡ lỗi mạng. Kiểm tra log để biết chi tiết.';
+
+  @override
+  String lastRefresh(String time) {
+    return 'Làm mới cuối: $time';
+  }
+
+  @override
+  String get p2pNetworkingPaused => 'Mạng P2P tạm dừng do mất kết nối internet. Sẽ tự động khôi phục khi có kết nối.';
+
+  @override
+  String get noDevicesInRange => 'Không có thiết bị trong tầm. Thử làm mới.';
+
+  @override
+  String get initialDiscoveryInProgress => 'Đang tiến hành khám phá ban đầu...';
+
+  @override
+  String get refreshing => 'Đang làm mới...';
+
+  @override
+  String get pausedNoInternet => 'Tạm dừng (Không có Internet)';
+
+  @override
+  String trustRemoved(String name) {
+    return 'Trust removed from $name';
+  }
+
+  @override
+  String removeTrustConfirm(String name) {
+    return 'Bỏ tin tưởng từ $name?';
+  }
+
+  @override
+  String unpairFromDevice(String name) {
+    return 'Hủy ghép nối từ $name';
+  }
+
+  @override
+  String get holdUnpairInstruction => 'Giữ nút trong 1 giây để xác nhận hủy ghép nối';
+
+  @override
+  String unpaired(String name) {
+    return 'Đã hủy ghép nối từ $name';
+  }
+
+  @override
+  String get taskAndFileDeleted => 'Đã xóa tác vụ và file thành công';
+
+  @override
+  String get clearFileCacheConfirm => 'Điều này sẽ xóa file tạm thời từ truyền file P2Lan. Hành động này không thể hoàn tác.';
+
+  @override
+  String get fileCacheClearedSuccess => 'Đã xóa bộ nhớ đệm file thành công';
+
+  @override
+  String get permissionsRequired => 'Cần quyền để khởi động mạng P2P';
+
+  @override
+  String startedSending(int count, String name) {
+    return 'Bắt đầu gửi $count file đến $name';
+  }
+
+  @override
+  String get transferSettingsUpdated => 'Cập nhật cài đặt truyền file thành công';
+
+  @override
+  String get disconnected => 'Đã ngắt kết nối';
+
+  @override
+  String get discoveringDevices => 'Đang khám phá thiết bị...';
+
+  @override
+  String get connected => 'Đã kết nối';
+
+  @override
+  String get pairing => 'Pairing...';
+
+  @override
+  String get checkingNetwork => 'Đang kiểm tra mạng...';
+
+  @override
+  String get connectedViaMobileData => 'Kết nối qua dữ liệu di động (an toàn)';
+
+  @override
+  String connectedToWifi(String name, String security) {
+    return 'Kết nối đến $name ($security)';
+  }
+
+  @override
+  String get secure => 'secure';
+
+  @override
+  String get unsecure => 'unsecure';
+
+  @override
+  String get connectedViaEthernet => 'Kết nối qua Ethernet (an toàn)';
+
+  @override
+  String get noNetworkConnection => 'Không có kết nối mạng';
+
+  @override
+  String get unknownWifi => 'WiFi không rõ';
+
+  @override
+  String get tcpReliable => 'TCP (Đáng tin cậy)';
+
+  @override
+  String get udpFast => 'UDP (Nhanh)';
+
+  @override
+  String get createDateFoldersDescription => 'Sắp xếp theo ngày (YYYY-MM-DD)';
+
+  @override
+  String get createSenderFoldersDescription => 'Sắp xếp theo tên hiển thị người gửi';
+
+  @override
+  String get maxConcurrentTasks => 'Tác vụ đồng thời tối đa';
+
+  @override
+  String get defaultLabel => 'Mặc định';
+
+  @override
+  String get customDisplayName => 'Tên hiển thị tùy chỉnh';
+
+  @override
+  String get deviceName => 'Tên thiết bị';
+
+  @override
+  String get general => 'Chung';
+
+  @override
+  String get performance => 'Hiệu suất';
+
+  @override
+  String get advanced => 'Nâng cao';
+
+  @override
+  String get discard => 'Hủy bỏ';
+
+  @override
+  String get hasUnsavedChanges => 'Bạn có thay đổi chưa lưu. Bạn có muốn hủy bỏ chúng không?';
+
+  @override
+  String get selectFolder => 'Chọn thư mục';
+
+  @override
+  String get permissionRequired => 'Cần quyền';
+
+  @override
+  String get grantStoragePermission => 'Cấp quyền lưu trữ để chọn thư mục tải về';
+
+  @override
+  String get openSettings => 'Mở Cài đặt';
+
+  @override
+  String get notificationPermissionInfo => 'Quyền thông báo cho phép bạn nhận cập nhật về truyền file và trạng thái kết nối.';
+
+  @override
+  String get secondsLabel => 'giây';
+
+  @override
+  String get secondsPlural => 'giây';
+
+  @override
+  String get networkInfoTitle => 'Thông Tin Mạng';
+
+  @override
+  String get deviceSections => 'Phần Thiết Bị';
+
+  @override
+  String get onlineDevices => 'Thiết Bị Trực Tuyến';
+
+  @override
+  String get newDevices => 'Thiết Bị Mới';
+
+  @override
+  String get addTrust => 'Thêm tin tưởng';
+
+  @override
+  String get emptyDevicesStateTitle => 'Không Tìm Thấy Thiết Bị';
+
+  @override
+  String get viewDeviceInfo => 'Xem thông tin thiết bị';
+
+  @override
+  String get trustUser => 'Tin cậy người dùng';
+
+  @override
+  String get menuSendFiles => 'Gửi File';
+
+  @override
+  String get menuViewInfo => 'Xem Thông Tin';
+
+  @override
+  String get menuPair => 'Ghép Nối';
+
+  @override
+  String get menuTrust => 'Tin Cậy';
+
+  @override
+  String get menuUntrust => 'Xóa Tin Cậy';
+
+  @override
+  String get menuUnpair => 'Hủy Ghép Nối';
+
+  @override
+  String get deviceActions => 'Hành Động Thiết Bị';
+
+  @override
+  String get p2pTemporarilyDisabled => 'P2P tạm thời bị vô hiệu hóa - đang chờ kết nối internet';
+
+  @override
+  String get fileOrgNoneDescription => 'File đi thẳng vào thư mục tải về';
+
+  @override
+  String get fileOrgDateDescription => 'Sắp xếp theo ngày (YYYY-MM-DD)';
+
+  @override
+  String get fileOrgSenderDescription => 'Sắp xếp theo tên hiển thị người gửi';
+
+  @override
+  String get basic => 'Basic';
+
+  @override
+  String get summary => 'Summary';
+
+  @override
+  String get p2lanTransferSettingsTitle => 'P2Lan Transfer Settings';
+
+  @override
+  String get settingsTabGeneric => 'Generic';
+
+  @override
+  String get settingsTabStorage => 'Storage';
+
+  @override
+  String get settingsTabNetwork => 'Network';
+
+  @override
+  String get displayName => 'Tên hiển thị';
+
+  @override
+  String get displayNameDescription => 'Tùy chỉnh cách thiết bị của bạn xuất hiện với người dùng khác';
+
+  @override
+  String get deviceDisplayNameLabel => 'Tên hiển thị thiết bị';
+
+  @override
+  String get deviceDisplayNameHint => 'Nhập tên hiển thị tùy chỉnh...';
+
+  @override
+  String defaultDisplayName(String name) {
+    return 'Mặc định: $name';
+  }
+
+  @override
+  String get notifications => 'Thông báo';
+
+  @override
+  String get notSupportedOnWindows => 'Không hỗ trợ trên Windows';
+
+  @override
+  String get uiPerformance => 'Hiệu suất giao diện';
+
+  @override
+  String get uiRefreshRateDescription => 'Chọn tần suất cập nhật tiến trình truyền file trong giao diện. Tần suất cao hơn hoạt động tốt hơn trên thiết bị mạnh.';
+
+  @override
+  String savedDevicesCount(int count) {
+    return 'Thiết bị đã lưu ($count)';
+  }
+
+  @override
+  String get previouslyPairedOffline => 'Thiết bị đã ghép nối (ngoại tuyến)';
+
+  @override
+  String get statusSaved => 'Đã lưu';
+
+  @override
+  String get statusTrusted => 'Trusted';
+
+  @override
+  String get thisDeviceCardTitle => 'This Device';
+
+  @override
+  String get appInstallationId => 'ID phiên cài ứng dụng';
+
+  @override
+  String get ipAddress => 'Địa chỉ IP';
+
+  @override
+  String get port => 'Cổng';
+
+  @override
+  String get statusOffline => 'Ngoại tuyến';
+
+  @override
+  String get selectDownloadFolder => 'Select download folder...';
+
+  @override
+  String get maxFileSizePerFile => 'Kích thước file tối đa (mỗi file)';
+
+  @override
+  String get transferProtocol => 'Giao thức truyền';
+
+  @override
+  String get concurrentTransfers => 'Tác vụ đồng thời';
+
+  @override
+  String get transferChunkSize => 'Kích thước khối truyền';
+
+  @override
+  String get defaultValue => 'Mặc định';
+
+  @override
+  String get androidStorageAccessDescription => 'For security, it\'s recommended to use the app-specific folder. You can select other folders, but this may require additional permissions.';
+
+  @override
+  String get storageInfo => 'Storage Information';
+
+  @override
+  String get noDownloadPathSetDescription => 'Please select a download folder in the Storage tab to see storage information.';
+
+  @override
+  String get enableNotificationsDescription => 'Get notified about transfer events';
+
+  @override
+  String get maxFileSizePerFileDescription => 'File lớn hơn sẽ bị từ chối tự động';
+
+  @override
+  String get maxTotalSizeDescription => 'Giới hạn tổng kích thước cho tất cả file trong một yêu cầu truyền';
+
+  @override
+  String get concurrentTransfersSubtitle => 'Nhiều luồng truyền hơn = tổng thể nhanh hơn nhưng sử dụng CPU cao hơn';
+
+  @override
+  String get transferChunkSizeSubtitle => 'Kích thước lớn hơn = truyền nhanh hơn nhưng sử dụng nhiều bộ nhớ hơn';
+
+  @override
+  String get protocolTcpReliable => 'TCP (Tin cậy)';
+
+  @override
+  String get protocolTcpDescription => 'Đáng tin cậy hơn, tốt hơn cho các tệp quan trọng';
+
+  @override
+  String get protocolUdpFast => 'UDP (Nhanh)';
+
+  @override
+  String get fileOrgNone => 'Không có';
+
+  @override
+  String get fileOrgDate => 'Theo ngày';
+
+  @override
+  String get fileOrgSender => 'Theo tên người gửi';
 }

@@ -137,25 +137,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
   Future<void> _clearCache() async {
     final l10n = AppLocalizations.of(context)!;
-
-    await showDialog(
-      context: context,
-      builder: (context) => HoldToConfirmDialog(
-        title: l10n.clearAllCache,
-        content: l10n.confirmClearAllCache,
-        actionText: l10n.clearCache,
-        holdText: l10n.holdToClearCache,
-        processingText: l10n.clearingCache,
-        instructionText: l10n.holdToClearCacheInstruction,
-        onConfirmed: () async {
-          Navigator.of(context).pop();
-          await _performClearCache();
-        },
-        holdDuration: const Duration(seconds: 10),
-        actionIcon: Icons.delete_forever,
-        l10n: l10n,
-      ),
-    );
+    await CacheService.confirmAndClearAllCache(context, l10n: l10n);
+    // Refresh info after dialog closes
+    await _loadCacheInfo();
+    await _loadSettings();
   }
 
   Future<void> _performClearCache() async {

@@ -173,6 +173,20 @@ class SettingsService {
     return settings.fetchRetryTimes;
   }
 
+  // Update save random tools state
+  static Future<void> updateSaveRandomToolsState(bool enabled) async {
+    final currentSettings = await getSettings();
+    final updatedSettings =
+        currentSettings.copyWith(saveRandomToolsState: enabled);
+    await saveSettings(updatedSettings);
+  }
+
+  // Get save random tools state
+  static Future<bool> getSaveRandomToolsState() async {
+    final settings = await getSettings();
+    return settings.saveRandomToolsState;
+  }
+
   // Clear settings (for testing or reset)
   static Future<void> clearSettings() async {
     await initialize();

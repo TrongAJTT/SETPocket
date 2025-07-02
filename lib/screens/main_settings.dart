@@ -48,6 +48,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   bool _rememberCalculationHistory = true;
   bool _featureStateSavingEnabled = true;
   bool _askBeforeLoadingHistory = true;
+  bool _saveRandomToolsState = true;
 
   CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
   int _fetchTimeoutSeconds = 10;
@@ -96,6 +97,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         await GraphingCalculatorService.getAskBeforeLoading();
     final rememberCalculationHistory =
         await GraphingCalculatorService.getRememberHistory();
+    final saveRandomToolsState =
+        await SettingsService.getSaveRandomToolsState();
 
     setState(() {
       _themeMode = themeIndex != null
@@ -110,6 +113,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       _fetchRetryTimes = fetchRetryTimes;
       _logRetentionDays = logRetentionDays;
       _askBeforeLoadingHistory = askBeforeLoadingHistory;
+      _saveRandomToolsState = saveRandomToolsState;
 
       _loading = false;
     });
@@ -211,6 +215,11 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     });
 
     await GraphingCalculatorService.setRememberHistory(enabled);
+  }
+
+  void _onSaveRandomToolsStateChanged(bool enabled) async {
+    setState(() => _saveRandomToolsState = enabled);
+    await SettingsService.updateSaveRandomToolsState(enabled);
   }
 
   void _showToolVisibilityDialog() async {
@@ -422,6 +431,8 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildHistorySettings(loc),
+        VerticalSpacingDivider.both(6),
+        _buildSaveRandomToolsStateSettings(loc),
       ],
     );
   }
@@ -559,6 +570,16 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       subtitle: loc.saveFeatureStateDesc,
       value: _featureStateSavingEnabled,
       onChanged: _onFeatureStateSavingChanged,
+      decorator: switchDecorator,
+    );
+  }
+
+  Widget _buildSaveRandomToolsStateSettings(AppLocalizations loc) {
+    return OptionSwitch(
+      title: loc.saveRandomToolsState,
+      subtitle: loc.saveRandomToolsStateDesc,
+      value: _saveRandomToolsState,
+      onChanged: _onSaveRandomToolsStateChanged,
       decorator: switchDecorator,
     );
   }

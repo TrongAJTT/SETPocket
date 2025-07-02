@@ -20,12 +20,20 @@ class SettingsModel extends HiveObject {
   @HiveField(4)
   int fetchRetryTimes;
 
+  @HiveField(5)
+  final bool focusModeEnabled;
+
+  @HiveField(6)
+  final bool saveRandomToolsState;
+
   SettingsModel({
     this.currencyFetchMode = CurrencyFetchMode.onceADay,
     this.fetchTimeoutSeconds = 10,
     this.featureStateSavingEnabled = true, // Always enabled by default
     this.logRetentionDays = 5, // Default to 5 days (minimum in new range)
     this.fetchRetryTimes = 1, // Default to 1 retry
+    this.focusModeEnabled = false,
+    this.saveRandomToolsState = true,
   });
 
   SettingsModel copyWith({
@@ -34,6 +42,8 @@ class SettingsModel extends HiveObject {
     bool? featureStateSavingEnabled,
     int? logRetentionDays,
     int? fetchRetryTimes,
+    bool? focusModeEnabled,
+    bool? saveRandomToolsState,
   }) {
     return SettingsModel(
       currencyFetchMode: currencyFetchMode ?? this.currencyFetchMode,
@@ -42,6 +52,8 @@ class SettingsModel extends HiveObject {
           featureStateSavingEnabled ?? this.featureStateSavingEnabled,
       logRetentionDays: logRetentionDays ?? this.logRetentionDays,
       fetchRetryTimes: fetchRetryTimes ?? this.fetchRetryTimes,
+      focusModeEnabled: focusModeEnabled ?? this.focusModeEnabled,
+      saveRandomToolsState: saveRandomToolsState ?? this.saveRandomToolsState,
     );
   }
 
@@ -52,6 +64,8 @@ class SettingsModel extends HiveObject {
       'featureStateSavingEnabled': featureStateSavingEnabled,
       'logRetentionDays': logRetentionDays,
       'fetchRetryTimes': fetchRetryTimes,
+      'focusModeEnabled': focusModeEnabled,
+      'saveRandomToolsState': saveRandomToolsState,
     };
   }
 
@@ -63,6 +77,8 @@ class SettingsModel extends HiveObject {
       featureStateSavingEnabled: json['featureStateSavingEnabled'] ?? true,
       logRetentionDays: json['logRetentionDays'] ?? 5,
       fetchRetryTimes: json['fetchRetryTimes'] ?? 1,
+      focusModeEnabled: json['focusModeEnabled'] ?? false,
+      saveRandomToolsState: json['saveRandomToolsState'] ?? true,
     );
   }
 }

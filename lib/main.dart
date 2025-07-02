@@ -18,6 +18,7 @@ import 'package:setpocket/services/p2p_service.dart';
 import 'package:setpocket/services/app_installation_service.dart';
 import 'package:setpocket/services/p2p_navigation_service.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/text_template/text_template_gen_list_screen.dart';
@@ -29,6 +30,7 @@ import 'screens/p2lan/p2lan_transfer_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:io';
+import 'package:hive/hive.dart';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -102,6 +104,9 @@ Future<void> main() async {
   // Initialize Hive database first
   await HiveService.initialize();
 
+  // Register all random state adapters
+  _registerRandomStateAdapters();
+
   // Initialize App Installation Service immediately after Hive
   _isFirstTimeSetup = await AppInstallationService.instance.initialize();
 
@@ -121,6 +126,39 @@ Future<void> main() async {
   await _initializeQuickActions();
 
   runApp(const MainApp());
+}
+
+void _registerRandomStateAdapters() {
+  if (!Hive.isAdapterRegistered(60)) {
+    Hive.registerAdapter(NumberGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(61)) {
+    Hive.registerAdapter(PasswordGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(62)) {
+    Hive.registerAdapter(DateGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(65)) {
+    Hive.registerAdapter(TimeGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(64)) {
+    Hive.registerAdapter(DateTimeGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(67)) {
+    Hive.registerAdapter(LatinLetterGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(66)) {
+    Hive.registerAdapter(PlayingCardGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(68)) {
+    Hive.registerAdapter(DiceRollGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(63)) {
+    Hive.registerAdapter(ColorGeneratorStateAdapter());
+  }
+  if (!Hive.isAdapterRegistered(69)) {
+    Hive.registerAdapter(SimpleGeneratorStateAdapter());
+  }
 }
 
 Future<void> _initializeQuickActions() async {

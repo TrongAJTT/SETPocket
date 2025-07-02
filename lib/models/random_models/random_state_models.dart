@@ -1,12 +1,21 @@
 import 'package:hive/hive.dart';
 
+part 'random_state_models.g.dart';
+
 // Simple JSON-based state models for random generators
+@HiveType(typeId: 60)
 class NumberGeneratorState {
+  @HiveField(0)
   final bool isInteger;
+  @HiveField(1)
   final double minValue;
+  @HiveField(2)
   final double maxValue;
+  @HiveField(3)
   final int quantity;
+  @HiveField(4)
   final bool allowDuplicates;
+  @HiveField(5)
   final DateTime lastUpdated;
 
   NumberGeneratorState({
@@ -71,12 +80,19 @@ class NumberGeneratorState {
   }
 }
 
+@HiveType(typeId: 61)
 class PasswordGeneratorState {
+  @HiveField(0)
   final int passwordLength;
+  @HiveField(1)
   final bool includeLowercase;
+  @HiveField(2)
   final bool includeUppercase;
+  @HiveField(3)
   final bool includeNumbers;
+  @HiveField(4)
   final bool includeSpecial;
+  @HiveField(5)
   final DateTime lastUpdated;
 
   PasswordGeneratorState({
@@ -141,11 +157,17 @@ class PasswordGeneratorState {
   }
 }
 
+@HiveType(typeId: 62)
 class DateGeneratorState {
+  @HiveField(0)
   final DateTime startDate;
+  @HiveField(1)
   final DateTime endDate;
+  @HiveField(2)
   final int dateCount;
+  @HiveField(3)
   final bool allowDuplicates;
+  @HiveField(4)
   final DateTime lastUpdated;
 
   DateGeneratorState({
@@ -210,8 +232,11 @@ class DateGeneratorState {
   }
 }
 
+@HiveType(typeId: 63)
 class ColorGeneratorState {
+  @HiveField(0)
   final bool withAlpha;
+  @HiveField(1)
   final DateTime lastUpdated;
 
   ColorGeneratorState({
@@ -253,11 +278,17 @@ class ColorGeneratorState {
 }
 
 // Date Time Generator State
+@HiveType(typeId: 64)
 class DateTimeGeneratorState {
+  @HiveField(0)
   final DateTime startDateTime;
+  @HiveField(1)
   final DateTime endDateTime;
+  @HiveField(2)
   final int dateTimeCount;
+  @HiveField(3)
   final bool allowDuplicates;
+  @HiveField(4)
   final DateTime lastUpdated;
 
   DateTimeGeneratorState({
@@ -323,13 +354,21 @@ class DateTimeGeneratorState {
 }
 
 // Time Generator State
+@HiveType(typeId: 65)
 class TimeGeneratorState {
+  @HiveField(0)
   final int startHour;
+  @HiveField(1)
   final int startMinute;
+  @HiveField(2)
   final int endHour;
+  @HiveField(3)
   final int endMinute;
+  @HiveField(4)
   final int timeCount;
+  @HiveField(5)
   final bool allowDuplicates;
+  @HiveField(6)
   final DateTime lastUpdated;
 
   TimeGeneratorState({
@@ -401,10 +440,15 @@ class TimeGeneratorState {
 }
 
 // Playing Card Generator State
+@HiveType(typeId: 66)
 class PlayingCardGeneratorState {
+  @HiveField(0)
   final bool includeJokers;
+  @HiveField(1)
   final int cardCount;
+  @HiveField(2)
   final bool allowDuplicates;
+  @HiveField(3)
   final DateTime lastUpdated;
 
   PlayingCardGeneratorState({
@@ -458,12 +502,19 @@ class PlayingCardGeneratorState {
 }
 
 // Latin Letter Generator State
+@HiveType(typeId: 67)
 class LatinLetterGeneratorState {
+  @HiveField(0)
   final bool includeUppercase;
+  @HiveField(1)
   final bool includeLowercase;
+  @HiveField(2)
   final int letterCount;
+  @HiveField(3)
   final bool allowDuplicates;
+  @HiveField(4)
   final bool skipAnimation;
+  @HiveField(5)
   final DateTime lastUpdated;
 
   LatinLetterGeneratorState({
@@ -526,9 +577,13 @@ class LatinLetterGeneratorState {
 }
 
 // Dice Roll Generator State
+@HiveType(typeId: 68)
 class DiceRollGeneratorState {
+  @HiveField(0)
   final int diceCount;
+  @HiveField(1)
   final int diceSides;
+  @HiveField(2)
   final DateTime lastUpdated;
 
   DiceRollGeneratorState({
@@ -576,8 +631,11 @@ class DiceRollGeneratorState {
 }
 
 // Simple state for tools with minimal options (Yes/No, Coin Flip, Rock Paper Scissors)
+@HiveType(typeId: 69)
 class SimpleGeneratorState {
+  @HiveField(0)
   final bool skipAnimation;
+  @HiveField(1)
   final DateTime lastUpdated;
 
   SimpleGeneratorState({

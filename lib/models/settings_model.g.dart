@@ -22,13 +22,15 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
       featureStateSavingEnabled: fields[2] as bool,
       logRetentionDays: fields[3] as int,
       fetchRetryTimes: fields[4] as int,
+      focusModeEnabled: fields[5] as bool,
+      saveRandomToolsState: fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SettingsModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.currencyFetchMode)
       ..writeByte(1)
@@ -38,7 +40,11 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
       ..writeByte(3)
       ..write(obj.logRetentionDays)
       ..writeByte(4)
-      ..write(obj.fetchRetryTimes);
+      ..write(obj.fetchRetryTimes)
+      ..writeByte(5)
+      ..write(obj.focusModeEnabled)
+      ..writeByte(6)
+      ..write(obj.saveRandomToolsState);
   }
 
   @override

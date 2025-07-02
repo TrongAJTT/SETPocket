@@ -3,669 +3,261 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/settings_service.dart';
+import 'package:hive/hive.dart';
 
 class RandomStateService {
-  // Keys for different random tools
-  static const String _numberGeneratorKey = 'number_generator_state';
-  static const String _passwordGeneratorKey = 'password_generator_state';
-  static const String _dateGeneratorKey = 'date_generator_state';
-  static const String _colorGeneratorKey = 'color_generator_state';
-  static const String _dateTimeGeneratorKey = 'date_time_generator_state';
-  static const String _timeGeneratorKey = 'time_generator_state';
-  static const String _playingCardGeneratorKey = 'playing_card_generator_state';
-  static const String _latinLetterGeneratorKey = 'latin_letter_generator_state';
-  static const String _diceRollGeneratorKey = 'dice_roll_generator_state';
-  static const String _yesNoGeneratorKey = 'yes_no_generator_state';
-  static const String _coinFlipGeneratorKey = 'coin_flip_generator_state';
-  static const String _rockPaperScissorsGeneratorKey =
-      'rock_paper_scissors_generator_state';
+  static const String _boxName = 'random_states';
+  static Box<dynamic>? _box;
 
-  // Check if feature state saving is enabled
-  static Future<bool> _isFeatureStateSavingEnabled() async {
-    try {
-      final settings = await SettingsService.getSettings();
-      logInfo(
-          'RandomStateService: Feature state saving enabled: ${settings.featureStateSavingEnabled}');
-      return settings.featureStateSavingEnabled;
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get settings, using default enabled=true: $e');
-      return true; // Default to enabled if error occurs
+  // Initialize the service
+  static Future<void> initialize() async {
+    if (_box == null || !_box!.isOpen) {
+      try {
+        _box = await Hive.openBox<dynamic>(_boxName);
+        logInfo('RandomStateService: Box opened successfully');
+      } catch (e) {
+        logError('RandomStateService: Error opening box: $e');
+        rethrow;
+      }
     }
   }
 
-  // Number Generator State Management
-  static Future<NumberGeneratorState> getNumberGeneratorState() async {
+  // Helper method to check if state saving is enabled
+  static Future<bool> _isStateSavingEnabled() async {
     try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default number generator state');
-        return NumberGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_numberGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return NumberGeneratorState.fromJson(json);
-      }
-      return NumberGeneratorState.createDefault();
+      return await SettingsService.getSaveRandomToolsState();
     } catch (e) {
-      logError('RandomStateService: Failed to get number generator state: $e');
-      return NumberGeneratorState.createDefault();
+      logError('RandomStateService: Error checking state saving setting: $e');
+      return true; // Default to enabled if error
     }
   }
 
+  // Generic save method that checks the setting first
+  static Future<void> _saveState<T>(String key, T state) async {
+    try {
+      final isEnabled = await _isStateSavingEnabled();
+      if (!isEnabled) {
+        return; // Don't save if setting is disabled
+      }
+
+      await initialize();
+      await _box!.put(key, state);
+      logDebug('RandomStateService: Saved state for $key');
+    } catch (e) {
+      logError('RandomStateService: Error saving state for $key: $e');
+    }
+  }
+
+  // Generic load method
+  static Future<T> _loadState<T>(String key, T defaultState) async {
+    try {
+      await initialize();
+      final state = _box!.get(key);
+      if (state != null && state is T) {
+        logDebug('RandomStateService: Loaded state for $key');
+        return state;
+      }
+      logDebug('RandomStateService: Using default state for $key');
+      return defaultState;
+    } catch (e) {
+      logError('RandomStateService: Error loading state for $key: $e');
+      return defaultState;
+    }
+  }
+
+  // Number Generator
   static Future<void> saveNumberGeneratorState(
       NumberGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping number generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_numberGeneratorKey, jsonString);
-      logInfo('RandomStateService: Number generator state saved');
-    } catch (e) {
-      logError('RandomStateService: Failed to save number generator state: $e');
-      rethrow;
-    }
+    await _saveState('number_generator', state);
   }
 
-  // Password Generator State Management
-  static Future<PasswordGeneratorState> getPasswordGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default password generator state');
-        return PasswordGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_passwordGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return PasswordGeneratorState.fromJson(json);
-      }
-      return PasswordGeneratorState.createDefault();
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get password generator state: $e');
-      return PasswordGeneratorState.createDefault();
-    }
+  static Future<NumberGeneratorState> getNumberGeneratorState() async {
+    return await _loadState(
+        'number_generator', NumberGeneratorState.createDefault());
   }
 
-  static Future<void> savePasswordGeneratorState(
-      PasswordGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping password generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_passwordGeneratorKey, jsonString);
-      logInfo('RandomStateService: Password generator state saved');
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to save password generator state: $e');
-      rethrow;
-    }
-  }
-
-  // Date Generator State Management
-  static Future<DateGeneratorState> getDateGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default date generator state');
-        return DateGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_dateGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return DateGeneratorState.fromJson(json);
-      }
-      return DateGeneratorState.createDefault();
-    } catch (e) {
-      logError('RandomStateService: Failed to get date generator state: $e');
-      return DateGeneratorState.createDefault();
-    }
-  }
-
-  static Future<void> saveDateGeneratorState(DateGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping date generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_dateGeneratorKey, jsonString);
-      logInfo('RandomStateService: Date generator state saved');
-    } catch (e) {
-      logError('RandomStateService: Failed to save date generator state: $e');
-      rethrow;
-    }
-  }
-
-  // Color Generator State Management
-  static Future<ColorGeneratorState> getColorGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default color generator state');
-        return ColorGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_colorGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return ColorGeneratorState.fromJson(json);
-      }
-      return ColorGeneratorState.createDefault();
-    } catch (e) {
-      logError('RandomStateService: Failed to get color generator state: $e');
-      return ColorGeneratorState.createDefault();
-    }
-  }
-
-  static Future<void> saveColorGeneratorState(ColorGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping color generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_colorGeneratorKey, jsonString);
-      logInfo('RandomStateService: Color generator state saved');
-    } catch (e) {
-      logError('RandomStateService: Failed to save color generator state: $e');
-      rethrow;
-    }
-  }
-
-  // Date Time Generator State Management
-  static Future<DateTimeGeneratorState> getDateTimeGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default date time generator state');
-        return DateTimeGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_dateTimeGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return DateTimeGeneratorState.fromJson(json);
-      }
-      return DateTimeGeneratorState.createDefault();
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get date time generator state: $e');
-      return DateTimeGeneratorState.createDefault();
-    }
-  }
-
-  static Future<void> saveDateTimeGeneratorState(
-      DateTimeGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping date time generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_dateTimeGeneratorKey, jsonString);
-      logInfo('RandomStateService: Date time generator state saved');
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to save date time generator state: $e');
-      rethrow;
-    }
-  }
-
-  // Time Generator State Management
-  static Future<TimeGeneratorState> getTimeGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default time generator state');
-        return TimeGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_timeGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return TimeGeneratorState.fromJson(json);
-      }
-      return TimeGeneratorState.createDefault();
-    } catch (e) {
-      logError('RandomStateService: Failed to get time generator state: $e');
-      return TimeGeneratorState.createDefault();
-    }
-  }
-
-  static Future<void> saveTimeGeneratorState(TimeGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping time generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_timeGeneratorKey, jsonString);
-      logInfo('RandomStateService: Time generator state saved');
-    } catch (e) {
-      logError('RandomStateService: Failed to save time generator state: $e');
-      rethrow;
-    }
-  }
-
-  // Playing Card Generator State Management
-  static Future<PlayingCardGeneratorState>
-      getPlayingCardGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default playing card generator state');
-        return PlayingCardGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_playingCardGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return PlayingCardGeneratorState.fromJson(json);
-      }
-      return PlayingCardGeneratorState.createDefault();
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get playing card generator state: $e');
-      return PlayingCardGeneratorState.createDefault();
-    }
-  }
-
-  static Future<void> savePlayingCardGeneratorState(
-      PlayingCardGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping playing card generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_playingCardGeneratorKey, jsonString);
-      logInfo('RandomStateService: Playing card generator state saved');
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to save playing card generator state: $e');
-      rethrow;
-    }
-  }
-
-  // Latin Letter Generator State Management
-  static Future<LatinLetterGeneratorState>
-      getLatinLetterGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default latin letter generator state');
-        return LatinLetterGeneratorState(
-          includeUppercase: true,
-          includeLowercase: true,
-          letterCount: 5,
-          allowDuplicates: true,
-          skipAnimation: false,
-          lastUpdated: DateTime.now(),
-        );
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_latinLetterGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return LatinLetterGeneratorState.fromJson(json);
-      }
-      return LatinLetterGeneratorState(
-        includeUppercase: true,
-        includeLowercase: true,
-        letterCount: 5,
-        allowDuplicates: true,
-        skipAnimation: false,
-        lastUpdated: DateTime.now(),
-      );
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get latin letter generator state: $e');
-      return LatinLetterGeneratorState(
-        includeUppercase: true,
-        includeLowercase: true,
-        letterCount: 5,
-        allowDuplicates: true,
-        skipAnimation: false,
-        lastUpdated: DateTime.now(),
-      );
-    }
-  }
-
+  // Latin Letter Generator
   static Future<void> saveLatinLetterGeneratorState(
       LatinLetterGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping latin letter generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_latinLetterGeneratorKey, jsonString);
-      logInfo('RandomStateService: Latin letter generator state saved');
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to save latin letter generator state: $e');
-      rethrow;
-    }
+    await _saveState('latin_letter_generator', state);
   }
 
-  // Dice Roll Generator State Management
-  static Future<DiceRollGeneratorState> getDiceRollGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default dice roll generator state');
-        return DiceRollGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_diceRollGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return DiceRollGeneratorState.fromJson(json);
-      }
-      return DiceRollGeneratorState.createDefault();
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get dice roll generator state: $e');
-      return DiceRollGeneratorState.createDefault();
-    }
+  static Future<LatinLetterGeneratorState>
+      getLatinLetterGeneratorState() async {
+    return await _loadState(
+        'latin_letter_generator', LatinLetterGeneratorState.createDefault());
   }
 
+  // Password Generator
+  static Future<void> savePasswordGeneratorState(
+      PasswordGeneratorState state) async {
+    await _saveState('password_generator', state);
+  }
+
+  static Future<PasswordGeneratorState> getPasswordGeneratorState() async {
+    return await _loadState(
+        'password_generator', PasswordGeneratorState.createDefault());
+  }
+
+  // Dice Roll Generator
   static Future<void> saveDiceRollGeneratorState(
       DiceRollGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping dice roll generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_diceRollGeneratorKey, jsonString);
-      logInfo('RandomStateService: Dice roll generator state saved');
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to save dice roll generator state: $e');
-      rethrow;
-    }
+    await _saveState('dice_roll_generator', state);
   }
 
-  // Simple Generators (Yes/No, Coin Flip, Rock Paper Scissors)
-  static Future<SimpleGeneratorState> getYesNoGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default yes no generator state');
-        return SimpleGeneratorState.createDefault();
-      }
+  static Future<DiceRollGeneratorState> getDiceRollGeneratorState() async {
+    return await _loadState(
+        'dice_roll_generator', DiceRollGeneratorState.createDefault());
+  }
 
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_yesNoGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return SimpleGeneratorState.fromJson(json);
-      }
-      return SimpleGeneratorState.createDefault();
-    } catch (e) {
-      logError('RandomStateService: Failed to get yes no generator state: $e');
-      return SimpleGeneratorState.createDefault();
-    }
+  // Playing Card Generator
+  static Future<void> savePlayingCardGeneratorState(
+      PlayingCardGeneratorState state) async {
+    await _saveState('playing_card_generator', state);
+  }
+
+  static Future<PlayingCardGeneratorState>
+      getPlayingCardGeneratorState() async {
+    return await _loadState(
+        'playing_card_generator', PlayingCardGeneratorState.createDefault());
+  }
+
+  // Color Generator
+  static Future<void> saveColorGeneratorState(ColorGeneratorState state) async {
+    await _saveState('color_generator', state);
+  }
+
+  static Future<ColorGeneratorState> getColorGeneratorState() async {
+    return await _loadState(
+        'color_generator', ColorGeneratorState.createDefault());
+  }
+
+  // Date Generator
+  static Future<void> saveDateGeneratorState(DateGeneratorState state) async {
+    await _saveState('date_generator', state);
+  }
+
+  static Future<DateGeneratorState> getDateGeneratorState() async {
+    return await _loadState(
+        'date_generator', DateGeneratorState.createDefault());
+  }
+
+  // Time Generator
+  static Future<void> saveTimeGeneratorState(TimeGeneratorState state) async {
+    await _saveState('time_generator', state);
+  }
+
+  static Future<TimeGeneratorState> getTimeGeneratorState() async {
+    return await _loadState(
+        'time_generator', TimeGeneratorState.createDefault());
+  }
+
+  // Date Time Generator
+  static Future<void> saveDateTimeGeneratorState(
+      DateTimeGeneratorState state) async {
+    await _saveState('date_time_generator', state);
+  }
+
+  static Future<DateTimeGeneratorState> getDateTimeGeneratorState() async {
+    return await _loadState(
+        'date_time_generator', DateTimeGeneratorState.createDefault());
+  }
+
+  // Simple generators (Coin Flip, Yes/No, Rock Paper Scissors)
+  static Future<void> saveCoinFlipGeneratorState(
+      SimpleGeneratorState state) async {
+    await _saveState('coin_flip_generator', state);
+  }
+
+  static Future<SimpleGeneratorState> getCoinFlipGeneratorState() async {
+    return await _loadState(
+        'coin_flip_generator', SimpleGeneratorState.createDefault());
   }
 
   static Future<void> saveYesNoGeneratorState(
       SimpleGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping yes no generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_yesNoGeneratorKey, jsonString);
-      logInfo('RandomStateService: Yes no generator state saved');
-    } catch (e) {
-      logError('RandomStateService: Failed to save yes no generator state: $e');
-      rethrow;
-    }
+    await _saveState('yes_no_generator', state);
   }
 
-  static Future<SimpleGeneratorState> getCoinFlipGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default coin flip generator state');
-        return SimpleGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_coinFlipGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return SimpleGeneratorState.fromJson(json);
-      }
-      return SimpleGeneratorState.createDefault();
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get coin flip generator state: $e');
-      return SimpleGeneratorState.createDefault();
-    }
-  }
-
-  static Future<void> saveCoinFlipGeneratorState(
-      SimpleGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping coin flip generator state save');
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_coinFlipGeneratorKey, jsonString);
-      logInfo('RandomStateService: Coin flip generator state saved');
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to save coin flip generator state: $e');
-      rethrow;
-    }
-  }
-
-  static Future<SimpleGeneratorState>
-      getRockPaperScissorsGeneratorState() async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State loading disabled, returning default rock paper scissors generator state');
-        return SimpleGeneratorState.createDefault();
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_rockPaperScissorsGeneratorKey);
-      if (jsonString != null) {
-        final json = jsonDecode(jsonString) as Map<String, dynamic>;
-        return SimpleGeneratorState.fromJson(json);
-      }
-      return SimpleGeneratorState.createDefault();
-    } catch (e) {
-      logError(
-          'RandomStateService: Failed to get rock paper scissors generator state: $e');
-      return SimpleGeneratorState.createDefault();
-    }
+  static Future<SimpleGeneratorState> getYesNoGeneratorState() async {
+    return await _loadState(
+        'yes_no_generator', SimpleGeneratorState.createDefault());
   }
 
   static Future<void> saveRockPaperScissorsGeneratorState(
       SimpleGeneratorState state) async {
-    try {
-      // Check if feature state saving is enabled
-      final enabled = await _isFeatureStateSavingEnabled();
-      if (!enabled) {
-        logInfo(
-            'RandomStateService: State saving disabled, skipping rock paper scissors generator state save');
-        return;
-      }
+    await _saveState('rock_paper_scissors_generator', state);
+  }
 
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(state.toJson());
-      await prefs.setString(_rockPaperScissorsGeneratorKey, jsonString);
-      logInfo('RandomStateService: Rock paper scissors generator state saved');
+  static Future<SimpleGeneratorState>
+      getRockPaperScissorsGeneratorState() async {
+    return await _loadState(
+        'rock_paper_scissors_generator', SimpleGeneratorState.createDefault());
+  }
+
+  // Clear all states
+  static Future<void> clearAllStates() async {
+    try {
+      await initialize();
+      await _box!.clear();
+      logInfo('RandomStateService: Cleared all states');
     } catch (e) {
-      logError(
-          'RandomStateService: Failed to save rock paper scissors generator state: $e');
-      rethrow;
+      logError('RandomStateService: Error clearing states: $e');
     }
   }
 
-  // Utility methods
+  // Clear specific state
+  static Future<void> clearState(String key) async {
+    try {
+      await initialize();
+      await _box!.delete(key);
+      logDebug('RandomStateService: Cleared state for $key');
+    } catch (e) {
+      logError('RandomStateService: Error clearing state for $key: $e');
+    }
+  }
+
+  // Check if any state exists
   static Future<bool> hasState() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      return getAllStateKeys().any((key) => prefs.containsKey(key));
+      await initialize();
+      return _box!.isNotEmpty;
     } catch (e) {
-      logError('RandomStateService: Failed to check if has state: $e');
+      logError('RandomStateService: Error checking state existence: $e');
       return false;
     }
   }
 
+  // Get total size of all states (approximate)
   static Future<int> getStateSize() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      await initialize();
       int totalSize = 0;
-
-      for (final key in getAllStateKeys()) {
-        final value = prefs.getString(key);
+      for (final key in _box!.keys) {
+        final value = _box!.get(key);
         if (value != null) {
-          totalSize += value.length * 2; // UTF-16 encoding
+          // Approximate size calculation
+          totalSize += key.toString().length * 2; // Key size
+          totalSize += 100; // Approximate value size
         }
       }
-
       return totalSize;
     } catch (e) {
-      logError('RandomStateService: Failed to get state size: $e');
+      logError('RandomStateService: Error calculating state size: $e');
       return 0;
     }
   }
 
-  static Future<void> clearAllStates() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-
-      for (final key in getAllStateKeys()) {
-        await prefs.remove(key);
-      }
-
-      logInfo('RandomStateService: All states cleared');
-    } catch (e) {
-      logError('RandomStateService: Failed to clear all states: $e');
-      rethrow;
-    }
-  }
-
+  // Get all state keys
   static List<String> getAllStateKeys() {
-    return [
-      _numberGeneratorKey,
-      _passwordGeneratorKey,
-      _dateGeneratorKey,
-      _colorGeneratorKey,
-      _dateTimeGeneratorKey,
-      _timeGeneratorKey,
-      _playingCardGeneratorKey,
-      _latinLetterGeneratorKey,
-      _diceRollGeneratorKey,
-      _yesNoGeneratorKey,
-      _coinFlipGeneratorKey,
-      _rockPaperScissorsGeneratorKey,
-    ];
+    try {
+      if (_box == null || !_box!.isOpen) {
+        return [];
+      }
+      return _box!.keys.cast<String>().toList();
+    } catch (e) {
+      logError('RandomStateService: Error getting state keys: $e');
+      return [];
+    }
   }
 }

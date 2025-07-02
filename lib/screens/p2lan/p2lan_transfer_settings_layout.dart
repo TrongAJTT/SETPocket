@@ -11,6 +11,7 @@ import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_notification_service.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_list_picker.dart';
+import 'package:setpocket/widgets/generic/option_item.dart';
 import 'package:setpocket/widgets/generic/permission_info_dialog.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 
@@ -1030,35 +1031,35 @@ class _P2LanTransferSettingsLayoutState
 
   List<OptionItem<String>> _getProtocolOptions(AppLocalizations l10n) {
     return [
-      OptionItem.withDescription(
-        'TCP',
-        l10n.protocolTcpReliable,
-        l10n.protocolTcpDescription,
+      OptionItem(
+        value: 'TCP',
+        label: l10n.protocolTcpReliable,
+        subtitle: l10n.protocolTcpDescription,
       ),
-      OptionItem.withDescription(
-        'UDP',
-        l10n.protocolUdpFast,
-        l10n.udpDescription,
+      OptionItem(
+        value: 'UDP',
+        label: l10n.protocolUdpFast,
+        subtitle: l10n.udpDescription,
       ),
     ];
   }
 
   List<OptionItem<String>> _getFileOrganizationOptions(AppLocalizations l10n) {
     return [
-      OptionItem.withDescription(
-        'none',
-        l10n.fileOrgNone,
-        l10n.fileOrgNoneDescription,
+      OptionItem(
+        value: 'none',
+        label: l10n.fileOrgNone,
+        subtitle: l10n.fileOrgNoneDescription,
       ),
-      OptionItem.withDescription(
-        'date',
-        l10n.fileOrgDate,
-        l10n.fileOrgDateDescription,
+      OptionItem(
+        value: 'date',
+        label: l10n.fileOrgDate,
+        subtitle: l10n.fileOrgDateDescription,
       ),
-      OptionItem.withDescription(
-        'sender',
-        l10n.fileOrgSender,
-        l10n.fileOrgSenderDescription,
+      OptionItem(
+        value: 'sender',
+        label: l10n.fileOrgSender,
+        subtitle: l10n.fileOrgSenderDescription,
       ),
     ];
   }

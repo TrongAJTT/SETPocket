@@ -131,6 +131,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get close => 'Đóng';
 
   @override
+  String get custom => 'Tùy chỉnh';
+
+  @override
   String get online => 'Trực tuyến';
 
   @override
@@ -159,6 +162,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get copy => 'Sao chép';
+
+  @override
+  String get move => 'Di chuyển';
+
+  @override
+  String get destination => 'Đích đến';
+
+  @override
+  String get fileName => 'Tên file';
+
+  @override
+  String get overwrite => 'Ghi đè';
 
   @override
   String get cancel => 'Hủy';
@@ -624,6 +639,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get passwordGenerator => 'Tạo mật khẩu';
 
   @override
+  String get passwordGeneratorDesc => 'Tạo mật khẩu ngẫu nhiên an toàn';
+
+  @override
   String get numCharacters => 'Số ký tự';
 
   @override
@@ -714,7 +732,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get allCalculations => 'All Calculations';
 
   @override
-  String get filterByType => 'Filter by type';
+  String get filterByType => 'Lọc theo loại file';
 
   @override
   String get clearCalculationHistory => 'Clear History';
@@ -1053,6 +1071,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get numberGenerator => 'Tạo số ngẫu nhiên';
 
   @override
+  String get numberGeneratorDesc => 'Tạo dãy số và chuỗi số ngẫu nhiên';
+
+  @override
   String get integers => 'Số nguyên';
 
   @override
@@ -1083,7 +1104,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get yesNo => 'Có hay Không?';
 
   @override
+  String get yesNoDesc => 'Nhận quyết định có/không nhanh chóng';
+
+  @override
   String get flipCoin => 'Tung đồng xu';
+
+  @override
+  String get flipCoinDesc => 'Tung đồng xu ảo để chọn lựa ngẫu nhiên';
 
   @override
   String get flipCoinInstruction => 'Lật đồng xu để xem kết quả';
@@ -1092,7 +1119,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get rockPaperScissors => 'Kéo búa bao';
 
   @override
+  String get rockPaperScissorsDesc => 'Chơi trò chơi kinh điển bằng tay';
+
+  @override
   String get rollDice => 'Tung xúc xắc';
+
+  @override
+  String get rollDiceDesc => 'Tung xúc xắc ảo với số mặt tùy chỉnh';
 
   @override
   String get diceCount => 'Số lượng xúc xắc';
@@ -1102,6 +1135,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get colorGenerator => 'Tạo màu ngẫu nhiên';
+
+  @override
+  String get colorGeneratorDesc => 'Tạo màu sắc và bảng màu ngẫu nhiên';
 
   @override
   String get hex6 => 'HEX (6 chữ số)';
@@ -1116,6 +1152,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get latinLetters => 'Chữ cái Latin';
 
   @override
+  String get latinLettersDesc => 'Tạo chữ cái alphabet ngẫu nhiên';
+
+  @override
   String get letterCount => 'Số lượng chữ cái';
 
   @override
@@ -1126,6 +1165,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get playingCards => 'Bài tây';
+
+  @override
+  String get playingCardsDesc => 'Rút thẻ bài ngẫu nhiên';
 
   @override
   String get includeJokers => 'Bao gồm lá Joker';
@@ -1368,6 +1410,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get selectPreset => 'Chọn';
 
   @override
+  String get selected => 'Đã chọn';
+
+  @override
   String get deletePresetAction => 'Xóa';
 
   @override
@@ -1430,10 +1475,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dateGenerator => 'Tạo ngày ngẫu nhiên';
 
   @override
+  String get dateGeneratorDesc => 'Tạo ngày tháng ngẫu nhiên trong khoảng';
+
+  @override
   String get dateCount => 'Số lượng ngày';
 
   @override
   String get timeGenerator => 'Tạo giờ ngẫu nhiên';
+
+  @override
+  String get timeGeneratorDesc => 'Tạo thời gian trong ngày ngẫu nhiên';
 
   @override
   String get startTime => 'Giờ bắt đầu';
@@ -1446,6 +1497,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dateTimeGenerator => 'Tạo ngày giờ ngẫu nhiên';
+
+  @override
+  String get dateTimeGeneratorDesc => 'Tạo kết hợp ngày và giờ ngẫu nhiên';
 
   @override
   String get heads => 'Sấp';
@@ -1547,10 +1601,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get allToolsHiddenDesc => 'Vui lòng bật ít nhất một công cụ để tiếp tục sử dụng ứng dụng';
 
   @override
-  String get enableAtLeastOneTool => 'Vui lòng bật ít nhất một công cụ';
+  String get enableAtLeastOneTool => 'Vui lòng bật ít nhất một công cụ.';
 
   @override
-  String get toolVisibilityChanged => 'Hiển thị công cụ đã được cập nhật';
+  String get toolVisibilityChanged => 'Thứ tự và hiển thị công cụ đã được cập nhật.';
+
+  @override
+  String get errorMinOneTool => 'Phải có ít nhất một công cụ được hiển thị.';
 
   @override
   String get resetToDefault => 'Đặt lại mặc định';
@@ -2607,6 +2664,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get logActions => 'Hành động log';
+
+  @override
+  String get logApplication => 'Nhật ký Ứng dụng';
 
   @override
   String get previousChunk => 'Phần trước';
@@ -5326,7 +5386,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get p2lanStopped => 'P2LAN đã dừng';
 
   @override
-  String get quickActions => 'Quick Actions';
+  String get quickActions => 'Tác vụ nhanh';
 
   @override
   String get quickActionsDesc => 'Select up to 4 tools for quick access.';
@@ -6091,4 +6151,55 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get fileOrgSender => 'Theo tên người gửi';
+
+  @override
+  String get transferSettingsUpdatedSuccessfully => 'Cập nhật cài đặt truyền file thành công';
+
+  @override
+  String get selectOperation => 'Chọn thao tác';
+
+  @override
+  String get filterAndSort => 'Lọc và Sắp xếp';
+
+  @override
+  String get tapToSelectAgain => 'Nhấn để chọn lại thư mục';
+
+  @override
+  String get notSelected => 'Chưa chọn';
+
+  @override
+  String get selectDestinationFolder => 'Chọn thư mục đích';
+
+  @override
+  String get openInApp => 'Mở trong ứng dụng';
+
+  @override
+  String get copyTo => 'Sao chép vào';
+
+  @override
+  String get moveTo => 'Di chuyển vào';
+
+  @override
+  String get moveOrCopyAndRename => 'Di chuyển hoặc sao chép và đổi tên';
+
+  @override
+  String get share => 'Chia sẻ';
+
+  @override
+  String get confirmDelete => 'Bạn có chắc muốn xóa file';
+
+  @override
+  String get removeSelected => 'Xóa nội dung đã chọn';
+
+  @override
+  String get noFilesFound => 'Không tìm thấy file nào khớp';
+
+  @override
+  String get emptyFolder => 'Thư mục trống';
+
+  @override
+  String get file => 'tệp';
+
+  @override
+  String get quickAccess => 'Truy cập nhanh';
 }

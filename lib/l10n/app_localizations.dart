@@ -323,6 +323,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get custom;
+
   /// No description provided for @online.
   ///
   /// In en, this message translates to:
@@ -382,6 +388,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy'**
   String get copy;
+
+  /// No description provided for @move.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get move;
+
+  /// No description provided for @destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get destination;
+
+  /// No description provided for @fileName.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get fileName;
+
+  /// No description provided for @overwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get overwrite;
 
   /// No description provided for @cancel.
   ///
@@ -1193,6 +1223,12 @@ abstract class AppLocalizations {
   /// **'Password Generator'**
   String get passwordGenerator;
 
+  /// No description provided for @passwordGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate secure random passwords'**
+  String get passwordGeneratorDesc;
+
   /// No description provided for @numCharacters.
   ///
   /// In en, this message translates to:
@@ -1376,7 +1412,7 @@ abstract class AppLocalizations {
   /// No description provided for @filterByType.
   ///
   /// In en, this message translates to:
-  /// **'Filter by type'**
+  /// **'Filter by Type'**
   String get filterByType;
 
   /// No description provided for @clearCalculationHistory.
@@ -2039,6 +2075,12 @@ abstract class AppLocalizations {
   /// **'Number Generator'**
   String get numberGenerator;
 
+  /// No description provided for @numberGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random numbers and sequences'**
+  String get numberGeneratorDesc;
+
   /// No description provided for @integers.
   ///
   /// In en, this message translates to:
@@ -2099,11 +2141,23 @@ abstract class AppLocalizations {
   /// **'Yes or No?'**
   String get yesNo;
 
+  /// No description provided for @yesNoDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get quick yes or no decisions'**
+  String get yesNoDesc;
+
   /// No description provided for @flipCoin.
   ///
   /// In en, this message translates to:
   /// **'Flip Coin'**
   String get flipCoin;
+
+  /// No description provided for @flipCoinDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual coin flip for random choices'**
+  String get flipCoinDesc;
 
   /// No description provided for @flipCoinInstruction.
   ///
@@ -2117,11 +2171,23 @@ abstract class AppLocalizations {
   /// **'Rock Paper Scissors'**
   String get rockPaperScissors;
 
+  /// No description provided for @rockPaperScissorsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Play the classic hand game'**
+  String get rockPaperScissorsDesc;
+
   /// No description provided for @rollDice.
   ///
   /// In en, this message translates to:
   /// **'Roll Dice'**
   String get rollDice;
+
+  /// No description provided for @rollDiceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Roll virtual dice with custom sides'**
+  String get rollDiceDesc;
 
   /// No description provided for @diceCount.
   ///
@@ -2140,6 +2206,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Color Generator'**
   String get colorGenerator;
+
+  /// No description provided for @colorGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random colors and palettes'**
+  String get colorGeneratorDesc;
 
   /// No description provided for @hex6.
   ///
@@ -2165,6 +2237,12 @@ abstract class AppLocalizations {
   /// **'Latin Letters'**
   String get latinLetters;
 
+  /// No description provided for @latinLettersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random alphabet letters'**
+  String get latinLettersDesc;
+
   /// No description provided for @letterCount.
   ///
   /// In en, this message translates to:
@@ -2188,6 +2266,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playing Cards'**
   String get playingCards;
+
+  /// No description provided for @playingCardsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw random playing cards'**
+  String get playingCardsDesc;
 
   /// No description provided for @includeJokers.
   ///
@@ -2645,6 +2729,12 @@ abstract class AppLocalizations {
   /// **'Select'**
   String get selectPreset;
 
+  /// No description provided for @selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get selected;
+
   /// No description provided for @deletePresetAction.
   ///
   /// In en, this message translates to:
@@ -2753,6 +2843,12 @@ abstract class AppLocalizations {
   /// **'Date Generator'**
   String get dateGenerator;
 
+  /// No description provided for @dateGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random dates within ranges'**
+  String get dateGeneratorDesc;
+
   /// No description provided for @dateCount.
   ///
   /// In en, this message translates to:
@@ -2764,6 +2860,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time Generator'**
   String get timeGenerator;
+
+  /// No description provided for @timeGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random times of day'**
+  String get timeGeneratorDesc;
 
   /// No description provided for @startTime.
   ///
@@ -2788,6 +2890,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date & Time Generator'**
   String get dateTimeGenerator;
+
+  /// No description provided for @dateTimeGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate random date and time combinations'**
+  String get dateTimeGeneratorDesc;
 
   /// No description provided for @heads.
   ///
@@ -2990,14 +3098,20 @@ abstract class AppLocalizations {
   /// No description provided for @enableAtLeastOneTool.
   ///
   /// In en, this message translates to:
-  /// **'Please enable at least one tool'**
+  /// **'Please enable at least one tool.'**
   String get enableAtLeastOneTool;
 
   /// No description provided for @toolVisibilityChanged.
   ///
   /// In en, this message translates to:
-  /// **'Tool visibility has been updated'**
+  /// **'Tool visibility and order have been updated.'**
   String get toolVisibilityChanged;
+
+  /// No description provided for @errorMinOneTool.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one tool must be visible.'**
+  String get errorMinOneTool;
 
   /// No description provided for @resetToDefault.
   ///
@@ -5038,6 +5152,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log Actions'**
   String get logActions;
+
+  /// No description provided for @logApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Application'**
+  String get logApplication;
 
   /// No description provided for @previousChunk.
   ///
@@ -11782,6 +11902,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'By Sender Name'**
   String get fileOrgSender;
+
+  /// No description provided for @transferSettingsUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer settings updated successfully'**
+  String get transferSettingsUpdatedSuccessfully;
+
+  /// No description provided for @selectOperation.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Operation'**
+  String get selectOperation;
+
+  /// No description provided for @filterAndSort.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter and Sort'**
+  String get filterAndSort;
+
+  /// No description provided for @tapToSelectAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to select again'**
+  String get tapToSelectAgain;
+
+  /// No description provided for @notSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get notSelected;
+
+  /// No description provided for @selectDestinationFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select destination folder'**
+  String get selectDestinationFolder;
+
+  /// No description provided for @openInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in App'**
+  String get openInApp;
+
+  /// No description provided for @copyTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to'**
+  String get copyTo;
+
+  /// No description provided for @moveTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to'**
+  String get moveTo;
+
+  /// No description provided for @moveOrCopyAndRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Move or Copy and Rename'**
+  String get moveOrCopyAndRename;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete file'**
+  String get confirmDelete;
+
+  /// No description provided for @removeSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove selected content'**
+  String get removeSelected;
+
+  /// No description provided for @noFilesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No files found'**
+  String get noFilesFound;
+
+  /// No description provided for @emptyFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty folder'**
+  String get emptyFolder;
+
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'file'**
+  String get file;
+
+  /// No description provided for @quickAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Access'**
+  String get quickAccess;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

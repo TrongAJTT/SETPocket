@@ -11,6 +11,9 @@ import 'package:setpocket/screens/converters/speed_converter_screen.dart';
 import 'package:setpocket/screens/converters/temperature_converter_screen.dart';
 import 'package:setpocket/screens/converters/data_converter_screen.dart';
 import 'converters/time_converter_screen.dart';
+import 'package:setpocket/widgets/generic/section_item.dart';
+import 'package:setpocket/widgets/generic/section_list_view.dart';
+import 'package:setpocket/widgets/generic/section_grid_view.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -23,184 +26,153 @@ class ConverterToolsScreen extends StatelessWidget {
     this.onToolSelected,
   });
 
+  List<SectionItem> _buildSections(AppLocalizations loc) {
+    return [
+      SectionItem(
+        id: 'currency_converter',
+        title: loc.currencyConverter,
+        subtitle: _getDescription(0, loc),
+        icon: Icons.attach_money,
+        iconColor: Colors.green,
+        content: const CurrencyConverterScreen(),
+      ),
+      SectionItem(
+        id: 'length_converter',
+        title: loc.lengthConverter,
+        subtitle: _getDescription(1, loc),
+        icon: Icons.straighten,
+        iconColor: Colors.blue,
+        content: const LengthConverterNewScreen(),
+      ),
+      SectionItem(
+        id: 'temperature_converter',
+        title: loc.temperatureConverter,
+        subtitle: _getDescription(2, loc),
+        icon: Icons.thermostat,
+        iconColor: Colors.amber,
+        content: const TemperatureConverterScreen(),
+      ),
+      SectionItem(
+        id: 'mass_converter',
+        title: loc.massConverter,
+        subtitle: _getDescription(3, loc),
+        icon: Icons.balance,
+        iconColor: Colors.orange,
+        content: const MassConverterNewScreen(),
+      ),
+      SectionItem(
+        id: 'time_converter',
+        title: loc.timeConverter,
+        subtitle: _getDescription(4, loc),
+        icon: Icons.schedule,
+        iconColor: Colors.red,
+        content: const TimeConverterScreen(),
+      ),
+      SectionItem(
+        id: 'data_converter',
+        title: loc.dataConverter,
+        subtitle: _getDescription(5, loc),
+        icon: Icons.storage,
+        iconColor: Colors.deepOrange,
+        content: const DataConverterScreen(),
+      ),
+      SectionItem(
+        id: 'volume_converter',
+        title: loc.volumeConverter,
+        subtitle: _getDescription(6, loc),
+        icon: Icons.local_drink,
+        iconColor: Colors.cyan,
+        content: const VolumeConverterScreen(),
+      ),
+      SectionItem(
+        id: 'speed_converter',
+        title: loc.speedConverter,
+        subtitle: _getDescription(7, loc),
+        icon: Icons.speed,
+        iconColor: Colors.teal,
+        content: const SpeedConverterScreen(),
+      ),
+      SectionItem(
+        id: 'area_converter',
+        title: loc.areaConverter,
+        subtitle: _getDescription(8, loc),
+        icon: Icons.crop_free,
+        iconColor: Colors.purple,
+        content: const AreaConverterScreen(),
+      ),
+      SectionItem(
+        id: 'weight_converter',
+        title: loc.weightConverter,
+        subtitle: _getDescription(9, loc),
+        icon: Icons.fitness_center,
+        iconColor: Colors.deepPurple,
+        content: const WeightConverterScreen(),
+      ),
+      SectionItem(
+        id: 'number_system_converter',
+        title: loc.numberSystemConverter,
+        subtitle: _getDescription(10, loc),
+        icon: Icons.code,
+        iconColor: Colors.indigo,
+        content: const NumberSystemConverterScreen(),
+      ),
+    ];
+  }
+
+  void _onSectionSelected(
+      String sectionId, AppLocalizations loc, BuildContext context) {
+    final sections = _buildSections(loc);
+    final section = sections.firstWhere((s) => s.id == sectionId);
+
+    if (isEmbedded && onToolSelected != null) {
+      onToolSelected!(section.content, section.title,
+          parentCategory: 'ConverterToolsScreen', icon: section.icon);
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => section.content),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final width = MediaQuery.of(context).size.width;
-    int crossAxisCount;
-    if (width < 1035) {
-      crossAxisCount = 1;
-    } else if (width < 1480) {
-      crossAxisCount = 2;
+    final isDesktop = width > 800;
+
+    final sections = _buildSections(loc);
+
+    Widget content;
+    if (isDesktop) {
+      // Desktop: Use AutoScaleSectionGridView
+      content = AutoScaleSectionGridView(
+        sections: sections,
+        onSectionSelected: (sectionId) =>
+            _onSectionSelected(sectionId, loc, context),
+        minCellWidth: 400,
+        fixedCellHeight: 100,
+        decorator: const SectionGridDecorator(
+          padding: EdgeInsets.all(16),
+        ),
+      );
     } else {
-      crossAxisCount = 3;
+      // Mobile: Use SectionListView
+      content = SectionListView(
+        sections: sections,
+        onSectionSelected: (sectionId) =>
+            _onSectionSelected(sectionId, loc, context),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      );
     }
 
-    final gridView = GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        mainAxisExtent: 100,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-      ),
-      itemCount: 11, // Number of converter tools (increased by 1)
-      itemBuilder: (context, index) {
-        Widget screen;
-        String title;
-        IconData icon;
-        Color iconColor;
-        switch (index) {
-          case 0: // Currency Converter - Most popular (as requested)
-            screen = const CurrencyConverterScreen();
-            title = loc.currencyConverter;
-            icon = Icons.attach_money;
-            iconColor = Colors.green;
-            break;
-          case 1: // Length Converter - Very popular for everyday use
-            screen = const LengthConverterNewScreen();
-            title = loc.lengthConverter;
-            icon = Icons.straighten;
-            iconColor = Colors.blue;
-            break;
-          case 2: // Temperature Converter - Widely used (weather, cooking)
-            screen = const TemperatureConverterScreen();
-            title = loc.temperatureConverter;
-            icon = Icons.thermostat;
-            iconColor = Colors.amber;
-            break;
-          case 3: // Mass Converter - Common for weight measurements
-            screen = const MassConverterNewScreen();
-            title = loc.massConverter;
-            icon = Icons.balance;
-            iconColor = Colors.orange;
-            break;
-          case 4: // Time Converter - Popular for time zones
-            screen = const TimeConverterScreen();
-            title = loc.timeConverter;
-            icon = Icons.schedule;
-            iconColor = Colors.red;
-            break;
-          case 5: // Data Converter - Growing popularity with digital needs
-            screen = const DataConverterScreen();
-            title = loc.dataConverter;
-            icon = Icons.storage;
-            iconColor = Colors.deepOrange;
-            break;
-          case 6: // Volume Converter - Cooking and fluid measurements
-            screen = const VolumeConverterScreen();
-            title = loc.volumeConverter;
-            icon = Icons.local_drink;
-            iconColor = Colors.cyan;
-            break;
-          case 7: // Speed Converter - Transportation, sports
-            screen = const SpeedConverterScreen();
-            title = loc.speedConverter;
-            icon = Icons.speed;
-            iconColor = Colors.teal;
-            break;
-          case 8: // Area Converter - Real estate, land measurements
-            screen = const AreaConverterScreen();
-            title = loc.areaConverter;
-            icon = Icons.crop_free;
-            iconColor = Colors.purple;
-            break;
-          case 9: // Weight Converter - Force measurements (less common)
-            screen = const WeightConverterScreen();
-            title = loc.weightConverter;
-            icon = Icons.fitness_center;
-            iconColor = Colors.deepPurple;
-            break;
-          case 10: // Number System Converter - Specialized technical use
-            screen = const NumberSystemConverterScreen();
-            title = loc.numberSystemConverter;
-            icon = Icons.code;
-            iconColor = Colors.indigo;
-            break;
-          default:
-            screen = const SizedBox();
-            title = "";
-            icon = Icons.error;
-            iconColor = Colors.grey;
-        }
-
-        return Card(
-          elevation: 2,
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              if (isEmbedded && onToolSelected != null) {
-                onToolSelected!(screen, title,
-                    parentCategory: 'ConverterToolsScreen', icon: icon);
-              } else {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => screen),
-                );
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: iconColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: iconColor,
-                      size: 30,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _getDescription(index, loc),
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
     if (isEmbedded) {
-      return gridView;
+      return content;
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(loc.converterTools),
         ),
-        body: gridView,
+        body: content,
       );
     }
   }

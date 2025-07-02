@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/utils/icon_utils.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:open_file/open_file.dart';
 import 'package:setpocket/services/app_logger.dart';
-import 'package:setpocket/widgets/generic/option_grid_selector.dart';
+import 'package:setpocket/widgets/generic/option_grid_picker.dart' as grid;
+import 'package:setpocket/widgets/generic/option_item.dart';
 import 'package:file_picker/file_picker.dart';
 
 enum FileType { all, image, video, audio, document, archive, other }
@@ -411,6 +414,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
   Future<void> _renameFile(String oldPath) async {
     final fileName = path.basename(oldPath);
     final controller = TextEditingController(text: fileName);
+    final l10n = AppLocalizations.of(context)!;
 
     final newName = await showDialog<String>(
       context: context,
@@ -426,11 +430,11 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Đổi tên'),
+            child: Text(l10n.rename),
           ),
         ],
       ),
@@ -519,9 +523,10 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
 
   Future<void> _showAdvancedCopyMoveDialog(String sourcePath) async {
     try {
+      final l10n = AppLocalizations.of(context)!;
       // Step 1: Let user pick an initial directory
       String? destinationDir = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Chọn thư mục đích',
+        dialogTitle: l10n.selectDestinationFolder,
       );
 
       if (destinationDir == null) {
@@ -543,7 +548,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
           return StatefulBuilder(
             builder: (context, setDialogState) {
               return AlertDialog(
-                title: const Text('Tùy chọn nâng cao'),
+                title: Text(l10n.custom),
                 contentPadding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
                 content: SizedBox(
                   width: screenWidth,
@@ -552,20 +557,24 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Operation Type Selector
-                        OptionGridSelector<bool>(
-                          title: 'Chọn thao tác',
+                        grid.OptionGridPicker<bool>(
+                          title: l10n.selectOperation,
                           options: [
-                            const OptionItem<bool>(
+                            OptionItem<bool>(
                               value: true,
-                              label: 'Di chuyển',
-                              icon: Icons.drive_file_move,
-                              iconColor: Colors.blue,
+                              label: l10n.move,
+                              icon: GenericIcon.icon(
+                                Icons.drive_file_move,
+                                color: Colors.blue,
+                              ),
                             ),
-                            const OptionItem<bool>(
+                            OptionItem<bool>(
                               value: false,
-                              label: 'Sao chép',
-                              icon: Icons.copy,
-                              iconColor: Colors.green,
+                              label: l10n.copy,
+                              icon: GenericIcon.icon(
+                                Icons.copy,
+                                color: Colors.green,
+                              ),
                             ),
                           ],
                           selectedValue: isMoveOperation,
@@ -573,23 +582,27 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                             setDialogState(() => isMoveOperation = value);
                           },
                           crossAxisCount: 2,
-                          aspectRatio: 2.5,
+                          aspectRatio: 1.5,
+                          decorator: const grid.OptionGridDecorator(
+                            iconAlign: grid.IconAlign.aboveTitle,
+                            iconSpacing: 4,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         const Divider(height: 1),
                         const SizedBox(height: 16),
                         // Destination Picker
-                        const Text('Đích đến:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(l10n.destination,
+                            style: Theme.of(context).textTheme.titleMedium),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: Text(destinationDir ?? 'Chưa chọn'),
-                          subtitle: const Text('Nhấn để chọn lại thư mục'),
+                          title: Text(destinationDir ?? l10n.notSelected),
+                          subtitle: Text(l10n.tapToSelectAgain),
                           trailing: const Icon(Icons.folder_open),
                           onTap: () async {
                             final newDir =
                                 await FilePicker.platform.getDirectoryPath(
-                              dialogTitle: 'Chọn thư mục đích',
+                              dialogTitle: l10n.selectDestinationFolder,
                             );
                             if (newDir != null) {
                               setDialogState(() => destinationDir = newDir);
@@ -598,8 +611,8 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                         ),
                         const SizedBox(height: 16),
                         // Filename Input
-                        const Text('Tên file:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(l10n.fileName,
+                            style: Theme.of(context).textTheme.titleMedium),
                         TextField(
                           controller: newFileNameController,
                           decoration: const InputDecoration(
@@ -613,7 +626,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Hủy'),
+                    child: Text(l10n.cancel),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -624,7 +637,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                         'fileName': newFileNameController.text.trim(),
                       });
                     },
-                    child: const Text('Áp dụng'),
+                    child: Text(l10n.apply),
                   ),
                 ],
               );
@@ -664,8 +677,8 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                   child: const Text('Hủy')),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Ghi đè'),
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(l10n.overwrite),
               ),
             ],
           ),
@@ -701,13 +714,14 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
   }
 
   void _showFileActions(String filePath) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (context) => Wrap(
         children: [
           ListTile(
             leading: const Icon(Icons.open_in_new),
-            title: const Text('Mở trong ứng dụng'),
+            title: Text(l10n.openInApp),
             onTap: () {
               Navigator.pop(context);
               _openFile(filePath);
@@ -716,7 +730,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
           if (!widget.viewOnly) ...[
             ListTile(
               leading: const Icon(Icons.edit),
-              title: const Text('Đổi tên'),
+              title: Text(l10n.rename),
               onTap: () {
                 Navigator.pop(context);
                 _renameFile(filePath);
@@ -724,7 +738,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
             ),
             ListTile(
               leading: const Icon(Icons.copy),
-              title: const Text('Sao chép vào...'),
+              title: Text('${l10n.copyTo}...'),
               onTap: () {
                 Navigator.pop(context);
                 _copyFile(filePath);
@@ -732,7 +746,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
             ),
             ListTile(
               leading: const Icon(Icons.drive_file_move),
-              title: const Text('Di chuyển vào...'),
+              title: Text('${l10n.moveTo}...'),
               onTap: () {
                 Navigator.pop(context);
                 _moveFile(filePath);
@@ -740,7 +754,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
             ),
             ListTile(
               leading: const Icon(Icons.drive_file_move_outlined),
-              title: const Text('Di chuyển hoặc sao chép và đổi tên...'),
+              title: Text('${l10n.moveOrCopyAndRename}...'),
               onTap: () {
                 Navigator.pop(context);
                 _showAdvancedCopyMoveDialog(filePath);
@@ -748,7 +762,8 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Xóa', style: TextStyle(color: Colors.red)),
+              title:
+                  Text(l10n.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation(filePath);
@@ -757,7 +772,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
           ],
           ListTile(
             leading: const Icon(Icons.share),
-            title: const Text('Chia sẻ'),
+            title: Text(l10n.share),
             onTap: () {
               Navigator.pop(context);
               _shareFile(filePath);
@@ -769,23 +784,23 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
   }
 
   void _showDeleteConfirmation(String filePath) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content:
-            Text('Bạn có chắc muốn xóa file "${path.basename(filePath)}"?'),
+        title: Text(l10n.delete),
+        content: Text('${l10n.confirmDelete} "${path.basename(filePath)}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteFile(filePath);
             },
-            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -794,10 +809,11 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: _isSelectionMode
-            ? Text('${_selectedFiles.length} đã chọn')
+            ? Text('${_selectedFiles.length} ${l10n.selected}')
             : Text(widget.title),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -806,7 +822,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm file...',
+                hintText: l10n.searchHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -840,26 +856,26 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                   : Icons.select_all),
               onPressed: _toggleSelectAll,
               tooltip: _selectedFiles.length == _filteredFiles.length
-                  ? 'Bỏ chọn tất cả'
-                  : 'Chọn tất cả',
+                  ? l10n.deselectAll
+                  : l10n.selectAll,
             ),
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed:
                   _selectedFiles.isNotEmpty ? _deleteSelectedFiles : null,
-              tooltip: 'Xóa file đã chọn',
+              tooltip: l10n.removeSelected,
             ),
           ] else ...[
             // Filter and sort menu
             IconButton(
               icon: const Icon(Icons.tune),
               onPressed: _showFilterSortDialog,
-              tooltip: 'Lọc và sắp xếp',
+              tooltip: l10n.filterAndSort,
             ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: _loadFiles,
-              tooltip: 'Tải lại',
+              tooltip: l10n.reload,
             ),
           ],
         ],
@@ -882,6 +898,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -894,16 +911,14 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
             const Icon(Icons.folder_off, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
-              _searchQuery.isNotEmpty
-                  ? 'Không tìm thấy file nào khớp'
-                  : 'Thư mục trống',
+              _searchQuery.isNotEmpty ? l10n.noFilesFound : l10n.emptyFolder,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: _loadFiles,
               icon: const Icon(Icons.refresh),
-              label: const Text('Tải lại'),
+              label: Text(l10n.reload),
             )
           ],
         ),
@@ -967,21 +982,22 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
 
   void _deleteSelectedFiles() async {
     if (_selectedFiles.isEmpty) return;
+    final l10n = AppLocalizations.of(context)!;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content:
-            Text('Bạn có chắc muốn xóa ${_selectedFiles.length} file đã chọn?'),
+        title: Text(l10n.confirmDelete),
+        content: Text(
+            '${l10n.confirmDelete} ${_selectedFiles.length} ${l10n.selected}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hủy'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -1003,7 +1019,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
         _isSelectionMode = false;
       });
 
-      _showSnackBar('Đã xóa $deletedCount file');
+      _showSnackBar('${l10n.delete} $deletedCount ${l10n.file}');
       _loadFiles();
     }
   }
@@ -1021,6 +1037,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
         FileType tempFileType = _selectedFileType;
         SortCriteria tempSortCriteria = _sortCriteria;
         SortOrder tempSortOrder = _sortOrder;
+        final l10n = AppLocalizations.of(context)!;
 
         return StatefulBuilder(
           builder: (context, setDialogState) {
@@ -1030,7 +1047,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                   Icon(Icons.tune,
                       color: Theme.of(context).colorScheme.primary),
                   const SizedBox(width: 8),
-                  const Text('Lọc và Sắp xếp'),
+                  Text(l10n.filterAndSort),
                 ],
               ),
               contentPadding: EdgeInsets.zero,
@@ -1047,8 +1064,8 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                       children: [
                         const SizedBox(height: 16),
                         // File type filter section
-                        OptionGridSelector<FileType>(
-                          title: 'Lọc theo loại file',
+                        grid.OptionGridPicker<FileType>(
+                          title: l10n.filterByType,
                           options: _buildFileTypeOptions(),
                           selectedValue: tempFileType,
                           crossAxisCount: 3,
@@ -1058,13 +1075,16 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                               tempFileType = value;
                             });
                           },
+                          decorator: const grid.OptionGridDecorator(
+                              iconAlign: grid.IconAlign.aboveTitle,
+                              iconSpacing: 4),
                         ),
                         const SizedBox(height: 24),
                         const Divider(height: 1),
                         const SizedBox(height: 16),
                         // Sort section
-                        SortOptionSelector<SortCriteria>(
-                          title: 'Sắp xếp theo',
+                        grid.SortOptionSelector<SortCriteria>(
+                          title: l10n.sortBy,
                           options: _buildSortOptions(),
                           selectedValue: tempSortCriteria,
                           isAscending: tempSortOrder == SortOrder.ascending,
@@ -1091,7 +1111,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, null), // Cancel
-                  child: const Text('Hủy'),
+                  child: Text(l10n.cancel),
                 ),
                 TextButton(
                   onPressed: () {
@@ -1102,7 +1122,7 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
                       'sortOrder': tempSortOrder,
                     });
                   },
-                  child: const Text('Áp dụng'),
+                  child: Text(l10n.apply),
                 ),
               ],
             );
@@ -1130,77 +1150,86 @@ class _LocalFileManagerWidgetState extends State<LocalFileManagerWidget> {
     }
   }
 
+  final double iconSize = 24;
+
   List<OptionItem<FileType>> _buildFileTypeOptions() {
     return [
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.all,
         label: 'Tất cả',
-        icon: Icons.folder,
+        iconData: Icons.folder,
         iconColor: Colors.blue,
+        iconSize: iconSize,
       ),
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.image,
         label: 'Hình ảnh',
-        icon: Icons.image,
+        iconData: Icons.image,
         iconColor: Colors.green,
+        iconSize: iconSize,
       ),
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.video,
         label: 'Video',
-        icon: Icons.video_file,
+        iconData: Icons.video_file,
         iconColor: Colors.red,
+        iconSize: iconSize,
       ),
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.audio,
         label: 'Âm thanh',
-        icon: Icons.audio_file,
+        iconData: Icons.audio_file,
         iconColor: Colors.purple,
+        iconSize: iconSize,
       ),
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.document,
         label: 'Tài liệu',
-        icon: Icons.description,
+        iconData: Icons.description,
         iconColor: Colors.blue,
+        iconSize: iconSize,
       ),
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.archive,
         label: 'Nén',
-        icon: Icons.archive,
+        iconData: Icons.archive,
         iconColor: Colors.brown,
+        iconSize: iconSize,
       ),
-      const OptionItem(
+      OptionItem.withIcon(
         value: FileType.other,
         label: 'Khác',
-        icon: Icons.insert_drive_file,
+        iconData: Icons.insert_drive_file,
         iconColor: Colors.grey,
+        iconSize: iconSize,
       ),
     ];
   }
 
-  List<SortOptionItem<SortCriteria>> _buildSortOptions() {
+  List<OptionItem<SortCriteria>> _buildSortOptions() {
     return [
-      const SortOptionItem(
+      OptionItem.withIcon(
         value: SortCriteria.name,
         label: 'Tên',
-        icon: Icons.sort_by_alpha,
+        iconData: Icons.sort_by_alpha,
         iconColor: Colors.blue,
       ),
-      const SortOptionItem(
+      OptionItem.withIcon(
         value: SortCriteria.size,
         label: 'Kích thước',
-        icon: Icons.data_usage,
+        iconData: Icons.data_usage,
         iconColor: Colors.orange,
       ),
-      const SortOptionItem(
+      OptionItem.withIcon(
         value: SortCriteria.date,
         label: 'Ngày',
-        icon: Icons.access_time,
+        iconData: Icons.access_time,
         iconColor: Colors.green,
       ),
-      const SortOptionItem(
+      OptionItem.withIcon(
         value: SortCriteria.type,
         label: 'Loại',
-        icon: Icons.category,
+        iconData: Icons.category,
         iconColor: Colors.purple,
       ),
     ];

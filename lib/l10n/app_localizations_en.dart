@@ -131,6 +131,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String get custom => 'Custom';
+
+  @override
   String get online => 'Online';
 
   @override
@@ -159,6 +162,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copy => 'Copy';
+
+  @override
+  String get move => 'Move';
+
+  @override
+  String get destination => 'Destination';
+
+  @override
+  String get fileName => 'File Name';
+
+  @override
+  String get overwrite => 'Overwrite';
 
   @override
   String get cancel => 'Cancel';
@@ -624,6 +639,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordGenerator => 'Password Generator';
 
   @override
+  String get passwordGeneratorDesc => 'Generate secure random passwords';
+
+  @override
   String get numCharacters => 'Number of characters';
 
   @override
@@ -714,7 +732,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allCalculations => 'All Calculations';
 
   @override
-  String get filterByType => 'Filter by type';
+  String get filterByType => 'Filter by Type';
 
   @override
   String get clearCalculationHistory => 'Clear History';
@@ -1053,6 +1071,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get numberGenerator => 'Number Generator';
 
   @override
+  String get numberGeneratorDesc => 'Generate random numbers and sequences';
+
+  @override
   String get integers => 'Integers';
 
   @override
@@ -1083,7 +1104,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yesNo => 'Yes or No?';
 
   @override
+  String get yesNoDesc => 'Get quick yes or no decisions';
+
+  @override
   String get flipCoin => 'Flip Coin';
+
+  @override
+  String get flipCoinDesc => 'Virtual coin flip for random choices';
 
   @override
   String get flipCoinInstruction => 'Flip the coin to see the result';
@@ -1092,7 +1119,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rockPaperScissors => 'Rock Paper Scissors';
 
   @override
+  String get rockPaperScissorsDesc => 'Play the classic hand game';
+
+  @override
   String get rollDice => 'Roll Dice';
+
+  @override
+  String get rollDiceDesc => 'Roll virtual dice with custom sides';
 
   @override
   String get diceCount => 'Number of dice';
@@ -1102,6 +1135,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorGenerator => 'Color Generator';
+
+  @override
+  String get colorGeneratorDesc => 'Generate random colors and palettes';
 
   @override
   String get hex6 => 'HEX (6-digit)';
@@ -1116,6 +1152,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get latinLetters => 'Latin Letters';
 
   @override
+  String get latinLettersDesc => 'Generate random alphabet letters';
+
+  @override
   String get letterCount => 'Number of letters';
 
   @override
@@ -1126,6 +1165,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playingCards => 'Playing Cards';
+
+  @override
+  String get playingCardsDesc => 'Draw random playing cards';
 
   @override
   String get includeJokers => 'Include Jokers';
@@ -1368,6 +1410,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectPreset => 'Select';
 
   @override
+  String get selected => 'Selected';
+
+  @override
   String get deletePresetAction => 'Delete';
 
   @override
@@ -1430,10 +1475,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dateGenerator => 'Date Generator';
 
   @override
+  String get dateGeneratorDesc => 'Generate random dates within ranges';
+
+  @override
   String get dateCount => 'Number of dates';
 
   @override
   String get timeGenerator => 'Time Generator';
+
+  @override
+  String get timeGeneratorDesc => 'Generate random times of day';
 
   @override
   String get startTime => 'Start Time';
@@ -1446,6 +1497,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateTimeGenerator => 'Date & Time Generator';
+
+  @override
+  String get dateTimeGeneratorDesc => 'Generate random date and time combinations';
 
   @override
   String get heads => 'Heads';
@@ -1547,10 +1601,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allToolsHiddenDesc => 'Please enable at least one tool to continue using the application';
 
   @override
-  String get enableAtLeastOneTool => 'Please enable at least one tool';
+  String get enableAtLeastOneTool => 'Please enable at least one tool.';
 
   @override
-  String get toolVisibilityChanged => 'Tool visibility has been updated';
+  String get toolVisibilityChanged => 'Tool visibility and order have been updated.';
+
+  @override
+  String get errorMinOneTool => 'At least one tool must be visible.';
 
   @override
   String get resetToDefault => 'Reset to Default';
@@ -2607,6 +2664,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logActions => 'Log Actions';
+
+  @override
+  String get logApplication => 'Log Application';
 
   @override
   String get previousChunk => 'Previous Chunk';
@@ -6091,4 +6151,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fileOrgSender => 'By Sender Name';
+
+  @override
+  String get transferSettingsUpdatedSuccessfully => 'Transfer settings updated successfully';
+
+  @override
+  String get selectOperation => 'Select Operation';
+
+  @override
+  String get filterAndSort => 'Filter and Sort';
+
+  @override
+  String get tapToSelectAgain => 'Tap to select again';
+
+  @override
+  String get notSelected => 'Not selected';
+
+  @override
+  String get selectDestinationFolder => 'Select destination folder';
+
+  @override
+  String get openInApp => 'Open in App';
+
+  @override
+  String get copyTo => 'Copy to';
+
+  @override
+  String get moveTo => 'Move to';
+
+  @override
+  String get moveOrCopyAndRename => 'Move or Copy and Rename';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get confirmDelete => 'Are you sure you want to delete file';
+
+  @override
+  String get removeSelected => 'Remove selected content';
+
+  @override
+  String get noFilesFound => 'No files found';
+
+  @override
+  String get emptyFolder => 'Empty folder';
+
+  @override
+  String get file => 'file';
+
+  @override
+  String get quickAccess => 'Quick Access';
 }

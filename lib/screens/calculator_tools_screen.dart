@@ -6,6 +6,9 @@ import 'calculators/financial_calculator_screen.dart';
 import 'calculators/discount_calculator_screen.dart';
 import 'calculators/scientific_calculator_screen.dart';
 import 'calculators/graphing_calculator_screen.dart';
+import 'package:setpocket/widgets/generic/section_item.dart';
+import 'package:setpocket/widgets/generic/section_list_view.dart';
+import 'package:setpocket/widgets/generic/section_grid_view.dart';
 
 class CalculatorToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -18,168 +21,116 @@ class CalculatorToolsScreen extends StatelessWidget {
     this.onToolSelected,
   });
 
+  List<SectionItem> _buildSections(AppLocalizations loc) {
+    return [
+      SectionItem(
+        id: 'scientific_calculator',
+        title: loc.scientificCalculator,
+        subtitle: loc.scientificCalculatorDesc,
+        icon: Icons.calculate,
+        iconColor: Colors.teal,
+        content: ScientificCalculatorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'graphing_calculator',
+        title: loc.graphingCalculator,
+        subtitle: loc.graphingCalculatorDesc,
+        icon: Icons.show_chart,
+        iconColor: Colors.indigo,
+        content: GraphingCalculatorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'bmi_calculator',
+        title: loc.bmiCalculator,
+        subtitle: loc.bmiCalculatorDesc,
+        icon: Icons.monitor_weight,
+        iconColor: Colors.blue,
+        content: BmiCalculatorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'financial_calculator',
+        title: loc.financialCalculator,
+        subtitle: loc.financialCalculatorDesc,
+        icon: Icons.attach_money,
+        iconColor: Colors.green,
+        content: FinancialCalculatorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'date_calculator',
+        title: loc.dateCalculator,
+        subtitle: loc.dateCalculatorDesc,
+        icon: Icons.calendar_today,
+        iconColor: Colors.orange,
+        content: DateCalculatorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'discount_calculator',
+        title: loc.discountCalculator,
+        subtitle: loc.discountCalculatorDesc,
+        icon: Icons.local_offer,
+        iconColor: Colors.purple,
+        content: DiscountCalculatorScreen(isEmbedded: isEmbedded),
+      ),
+    ];
+  }
+
+  void _onSectionSelected(
+      String sectionId, AppLocalizations loc, BuildContext context) {
+    final sections = _buildSections(loc);
+    final section = sections.firstWhere((s) => s.id == sectionId);
+
+    if (isEmbedded && onToolSelected != null) {
+      onToolSelected!(section.content, section.title,
+          parentCategory: 'CalculatorToolsScreen', icon: section.icon);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => section.content,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
 
-    int crossAxisCount;
-    if (screenWidth < 600) {
-      // Mobile: 1 column
-      crossAxisCount = 1;
-    } else if (screenWidth < 900) {
-      // Tablet: 2 columns
-      crossAxisCount = 2;
+    final sections = _buildSections(loc);
+
+    Widget content;
+    if (isDesktop) {
+      // Desktop: Use AutoScaleSectionGridView
+      content = AutoScaleSectionGridView(
+        sections: sections,
+        onSectionSelected: (sectionId) =>
+            _onSectionSelected(sectionId, loc, context),
+        minCellWidth: 400,
+        fixedCellHeight: 110,
+        decorator: const SectionGridDecorator(
+          padding: EdgeInsets.all(16),
+        ),
+      );
     } else {
-      // Desktop: 3 columns
-      crossAxisCount = 3;
+      // Mobile: Use SectionListView
+      content = SectionListView(
+        sections: sections,
+        onSectionSelected: (sectionId) =>
+            _onSectionSelected(sectionId, loc, context),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      );
     }
 
-    final calculators = [
-      {
-        'title': localizations.scientificCalculator,
-        'description': localizations.scientificCalculatorDesc,
-        'icon': Icons.calculate,
-        'color': Colors.teal,
-        'builder': () => ScientificCalculatorScreen(isEmbedded: isEmbedded),
-      },
-      {
-        'title': localizations.graphingCalculator,
-        'description': localizations.graphingCalculatorDesc,
-        'icon': Icons.show_chart,
-        'color': Colors.indigo,
-        'builder': () => GraphingCalculatorScreen(isEmbedded: isEmbedded),
-      },
-      {
-        'title': localizations.bmiCalculator,
-        'description': localizations.bmiCalculatorDesc,
-        'icon': Icons.monitor_weight,
-        'color': Colors.blue,
-        'builder': () => BmiCalculatorScreen(isEmbedded: isEmbedded),
-      },
-      {
-        'title': localizations.financialCalculator,
-        'description': localizations.financialCalculatorDesc,
-        'icon': Icons.attach_money,
-        'color': Colors.green,
-        'builder': () => FinancialCalculatorScreen(isEmbedded: isEmbedded),
-      },
-      {
-        'title': localizations.dateCalculator,
-        'description': localizations.dateCalculatorDesc,
-        'icon': Icons.calendar_today,
-        'color': Colors.orange,
-        'builder': () => DateCalculatorScreen(isEmbedded: isEmbedded),
-      },
-      {
-        'title': localizations.discountCalculator,
-        'description': localizations.discountCalculatorDesc,
-        'icon': Icons.local_offer,
-        'color': Colors.purple,
-        'builder': () => DiscountCalculatorScreen(isEmbedded: isEmbedded),
-      },
-    ];
-
-    final gridView = GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        mainAxisExtent: 120,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-      ),
-      itemCount: calculators.length,
-      itemBuilder: (context, index) {
-        final calculator = calculators[index];
-        final title = calculator['title'] as String;
-        final icon = calculator['icon'] as IconData;
-        final color = calculator['color'] as Color;
-
-        return Card(
-          elevation: 2,
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              final builder = calculator['builder'] as Widget Function();
-              final screen = builder();
-              if (isEmbedded && onToolSelected != null) {
-                onToolSelected!(screen, title,
-                    parentCategory: 'CalculatorToolsScreen', icon: icon);
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => screen,
-                  ),
-                );
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  // Icon container
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: color,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Title and description
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          calculator['description'] as String,
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.color
-                                ?.withValues(alpha: 0.7),
-                            fontSize: 14,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
     if (isEmbedded) {
-      return gridView;
+      return content;
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(localizations.calculatorTools),
+          title: Text(loc.calculatorTools),
         ),
-        body: gridView,
+        body: content,
       );
     }
   }

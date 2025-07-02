@@ -422,11 +422,11 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
+        content: const Row(
           children: [
-            const Icon(Icons.construction, color: Colors.white),
-            const SizedBox(width: 8),
-            const Expanded(
+            Icon(Icons.construction, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(
               child: Text(
                 'TODO: Installation progress - Setting up your new installation...',
                 style: TextStyle(color: Colors.white),
@@ -1206,6 +1206,26 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       );
     }
 
+    quickAccess() {
+      // goes directly to the full scrolling view
+      final tool = MainSettingsScreen(
+        isEmbedded: widget.isDesktop,
+        onToolVisibilityChanged: widget.onToolVisibilityChanged,
+        // Go directly to the detailed view
+        initialSectionId: 'user_interface',
+      );
+      if (widget.isDesktop) {
+        widget.onToolSelected?.call(
+          tool,
+          loc.settings,
+          icon: Icons.settings,
+        );
+      } else {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => tool));
+      }
+    }
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -1246,9 +1266,11 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
           iconColor: Colors.grey,
           isSelected: widget.selectedToolType == 'MainSettingsScreen',
           onTap: () {
+            // Short press: goes to the section list screen
             final tool = MainSettingsScreen(
               isEmbedded: widget.isDesktop,
               onToolVisibilityChanged: widget.onToolVisibilityChanged,
+              initialSectionId: null, // Let the screen decide the initial view
             );
             if (widget.isDesktop) {
               widget.onToolSelected?.call(
@@ -1257,11 +1279,12 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
                 icon: Icons.settings,
               );
             } else {
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (context) => tool));
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => tool));
             }
           },
+          onLongPress: quickAccess,
+          quickActionCallback: quickAccess,
           showActions: false,
         ),
         // Development tools removed for production

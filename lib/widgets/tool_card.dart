@@ -9,6 +9,10 @@ class ToolCard extends StatelessWidget {
   final Color? iconColor;
   final bool showActions;
   final bool isSelected;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? quickActionCallback;
 
   const ToolCard({
     super.key,
@@ -19,10 +23,18 @@ class ToolCard extends StatelessWidget {
     this.iconColor,
     this.showActions = true,
     this.isSelected = false,
+    this.onLongPress,
+    this.onEdit,
+    this.onDelete,
+    this.quickActionCallback,
   });
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final showQuickAction = isMobile && quickActionCallback != null;
 
     return Card(
       elevation: isSelected ? 4 : 2,
@@ -33,6 +45,7 @@ class ToolCard extends StatelessWidget {
         waitDuration: const Duration(milliseconds: 500),
         child: InkWell(
           onTap: onTap,
+          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: isSelected
@@ -66,7 +79,17 @@ class ToolCard extends StatelessWidget {
                           ),
                     ),
                   ),
-                  if (showActions)
+                  if (showQuickAction) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: quickActionCallback,
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      iconSize: 20,
+                      tooltip: AppLocalizations.of(context)!.quickAccess,
+                      color: colorScheme.primary,
+                    ),
+                  ],
+                  if (showActions && !showQuickAction)
                     PopupMenuButton<String>(
                       tooltip: AppLocalizations.of(context)!.options,
                       icon: const Icon(Icons.more_vert),

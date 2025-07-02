@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/models/p2p_models.dart';
-import 'package:setpocket/widgets/p2p/p2lan_transfer_settings_layout.dart';
+import 'package:setpocket/screens/p2lan/p2lan_transfer_settings_layout.dart';
 import 'package:setpocket/widgets/generic/generic_settings_dialog.dart';
 import 'package:setpocket/widgets/generic/generic_settings_screen.dart';
 

@@ -12,6 +12,9 @@ import 'package:setpocket/screens/random_tools/playing_card_generator.dart';
 import 'package:setpocket/screens/random_tools/date_generator.dart';
 import 'package:setpocket/screens/random_tools/time_generator.dart';
 import 'package:setpocket/screens/random_tools/date_time_generator.dart';
+import 'package:setpocket/widgets/generic/section_item.dart';
+import 'package:setpocket/widgets/generic/section_list_view.dart';
+import 'package:setpocket/widgets/generic/section_grid_view.dart';
 
 class RandomToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -24,170 +27,164 @@ class RandomToolsScreen extends StatelessWidget {
     this.onToolSelected,
   });
 
+  List<SectionItem> _buildSections(AppLocalizations loc) {
+    return [
+      SectionItem(
+        id: 'password_generator',
+        title: loc.passwordGenerator,
+        subtitle: loc.passwordGeneratorDesc,
+        icon: Icons.password_rounded,
+        iconColor: Colors.purple,
+        content: PasswordGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'number_generator',
+        title: loc.numberGenerator,
+        subtitle: loc.numberGeneratorDesc,
+        icon: Icons.tag,
+        iconColor: Colors.blue,
+        content: NumberGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'yes_no',
+        title: loc.yesNo,
+        subtitle: loc.yesNoDesc,
+        icon: Icons.question_answer,
+        iconColor: Colors.orange,
+        content: YesNoGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'coin_flip',
+        title: loc.flipCoin,
+        subtitle: loc.flipCoinDesc,
+        icon: Icons.monetization_on,
+        iconColor: Colors.amber,
+        content: CoinFlipGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'rock_paper_scissors',
+        title: loc.rockPaperScissors,
+        subtitle: loc.rockPaperScissorsDesc,
+        icon: Icons.sports_mma,
+        iconColor: Colors.brown,
+        content: RockPaperScissorsGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'dice_roll',
+        title: loc.rollDice,
+        subtitle: loc.rollDiceDesc,
+        icon: Icons.casino,
+        iconColor: Colors.red,
+        content: DiceRollGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'color_generator',
+        title: loc.colorGenerator,
+        subtitle: loc.colorGeneratorDesc,
+        icon: Icons.palette,
+        iconColor: Colors.pink,
+        content: ColorGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'latin_letters',
+        title: loc.latinLetters,
+        subtitle: loc.latinLettersDesc,
+        icon: Icons.abc,
+        iconColor: Colors.indigo,
+        content: LatinLetterGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'playing_cards',
+        title: loc.playingCards,
+        subtitle: loc.playingCardsDesc,
+        icon: Icons.style,
+        iconColor: Colors.deepOrange,
+        content: PlayingCardGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'date_generator',
+        title: loc.dateGenerator,
+        subtitle: loc.dateGeneratorDesc,
+        icon: Icons.calendar_today,
+        iconColor: Colors.green,
+        content: DateGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'time_generator',
+        title: loc.timeGenerator,
+        subtitle: loc.timeGeneratorDesc,
+        icon: Icons.access_time,
+        iconColor: Colors.cyan,
+        content: TimeGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+      SectionItem(
+        id: 'date_time_generator',
+        title: loc.dateTimeGenerator,
+        subtitle: loc.dateTimeGeneratorDesc,
+        icon: Icons.schedule,
+        iconColor: Colors.teal,
+        content: DateTimeGeneratorScreen(isEmbedded: isEmbedded),
+      ),
+    ];
+  }
+
+  void _onSectionSelected(
+      String sectionId, AppLocalizations loc, BuildContext context) {
+    final sections = _buildSections(loc);
+    final section = sections.firstWhere((s) => s.id == sectionId);
+
+    if (isEmbedded && onToolSelected != null) {
+      // Desktop mode: sử dụng callback để hiển thị công cụ trong main widget
+      onToolSelected!(section.content, section.title,
+          parentCategory: 'RandomToolsScreen', icon: section.icon);
+    } else {
+      // Mobile mode: navigation stack bình thường
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => section.content),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final width = MediaQuery.of(context).size.width;
-    int crossAxisCount;
-    if (width < 870) {
-      crossAxisCount = 1;
-    } else if (width < 1240) {
-      crossAxisCount = 2;
+    final isDesktop = width > 800;
+
+    final sections = _buildSections(loc);
+
+    Widget content;
+    if (isDesktop) {
+      // Desktop: Use AutoScaleSectionGridView
+      content = AutoScaleSectionGridView(
+        sections: sections,
+        onSectionSelected: (sectionId) =>
+            _onSectionSelected(sectionId, loc, context),
+        minCellWidth: 400,
+        fixedCellHeight: 100,
+        decorator: const SectionGridDecorator(
+          padding: EdgeInsets.all(16),
+        ),
+      );
     } else {
-      crossAxisCount = 3;
+      // Mobile: Use SectionListView
+      content = SectionListView(
+        sections: sections,
+        onSectionSelected: (sectionId) =>
+            _onSectionSelected(sectionId, loc, context),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      );
     }
 
-    final gridView = GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        mainAxisExtent: 100,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-      ),
-      itemCount: 12, // Number of random tools
-      itemBuilder: (context, index) {
-        Widget screen;
-        String title;
-        IconData icon;
-        Color iconColor;
-
-        switch (index) {
-          case 0:
-            screen = PasswordGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.passwordGenerator;
-            icon = Icons.password_rounded;
-            iconColor = Colors.purple;
-            break;
-          case 1:
-            screen = NumberGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.numberGenerator;
-            icon = Icons.tag;
-            iconColor = Colors.blue;
-            break;
-          case 2:
-            screen = YesNoGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.yesNo;
-            icon = Icons.question_answer;
-            iconColor = Colors.orange;
-            break;
-          case 3:
-            screen = CoinFlipGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.flipCoin;
-            icon = Icons.monetization_on;
-            iconColor = Colors.amber;
-            break;
-          case 4:
-            screen = RockPaperScissorsGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.rockPaperScissors;
-            icon = Icons.sports_mma;
-            iconColor = Colors.brown;
-            break;
-          case 5:
-            screen = DiceRollGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.rollDice;
-            icon = Icons.casino;
-            iconColor = Colors.red;
-            break;
-          case 6:
-            screen = ColorGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.colorGenerator;
-            icon = Icons.palette;
-            iconColor = Colors.green;
-            break;
-          case 7:
-            screen = LatinLetterGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.latinLetters;
-            icon = Icons.text_fields;
-            iconColor = Colors.teal;
-            break;
-          case 8:
-            screen = PlayingCardGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.playingCards;
-            icon = Icons.style;
-            iconColor = Colors.indigo;
-            break;
-          case 9:
-            screen = DateGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.dateGenerator;
-            icon = Icons.calendar_today;
-            iconColor = Colors.cyan;
-            break;
-          case 10:
-            screen = TimeGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.timeGenerator;
-            icon = Icons.access_time;
-            iconColor = Colors.deepOrange;
-            break;
-          case 11:
-            screen = DateTimeGeneratorScreen(isEmbedded: isEmbedded);
-            title = loc.dateTimeGenerator;
-            icon = Icons.date_range;
-            iconColor = Colors.deepPurple;
-            break;
-          default:
-            screen = const SizedBox();
-            title = "";
-            icon = Icons.error;
-            iconColor = Colors.grey;
-        }
-
-        return Card(
-          elevation: 2,
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              if (isEmbedded && onToolSelected != null) {
-                // Desktop mode: sử dụng callback để hiển thị công cụ trong main widget
-                onToolSelected!(screen, title,
-                    parentCategory: 'RandomToolsScreen', icon: icon);
-              } else {
-                // Mobile mode: navigation stack bình thường
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => screen),
-                );
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: iconColor.withValues(alpha: 0.2),
-                    radius: 24,
-                    child: Icon(
-                      icon,
-                      color: iconColor,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  const Icon(Icons.chevron_right),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
     if (isEmbedded) {
-      return gridView;
+      return content;
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(loc.random),
           elevation: 0,
         ),
-        body: gridView,
+        body: content,
       );
     }
   }

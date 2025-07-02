@@ -7,6 +7,7 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class CoinFlipGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -143,6 +144,9 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       });
     }
 
+    // Save state when generating
+    await _saveState();
+
     // Save to history if enabled
     if (_historyEnabled && _finalResult != null) {
       if (!mounted) return;
@@ -184,18 +188,18 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       children: [
         // Skip animation option
         Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SwitchListTile(
-              title: Text(loc.skipAnimation),
-              subtitle: Text(loc.skipAnimationDesc),
-              value: _skipAnimation,
-              onChanged: (value) {
-                setState(() {
-                  _skipAnimation = value;
-                });
-                _saveState();
-              },
+          child: OptionSwitch(
+            title: loc.skipAnimation,
+            subtitle: loc.skipAnimationDesc,
+            value: _skipAnimation,
+            onChanged: (value) {
+              setState(() {
+                _skipAnimation = value;
+              });
+              // Don't save state immediately, only save when generating
+            },
+            decorator: OptionSwitchDecorator.compact(context).copyWith(
+              padding: const EdgeInsets.all(16),
             ),
           ),
         ),
@@ -300,7 +304,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
                   label: Text(loc.flipCoin),
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),

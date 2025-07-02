@@ -7,6 +7,10 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/widgets/generic/option_slider.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class DateGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -79,6 +83,16 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
 
   void _generateDates() {
     try {
+      if (_startDate.isAfter(_endDate)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Start date must be before end date.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _generatedDates = RandomGenerator.generateRandomDates(
           startDate: _startDate,
@@ -88,6 +102,9 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
         );
         _copied = false;
       });
+
+      // Save state when generating
+      _saveState();
 
       // Save to history if enabled
       if (_historyEnabled && _generatedDates.isNotEmpty) {
@@ -143,14 +160,17 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
         const SizedBox(height: 8),
         InkWell(
           onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
             ),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -184,7 +204,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
               _endDate = _startDate.add(const Duration(days: 1));
             }
           });
-          _saveState();
+          // Don't save state immediately, only save when generating
         }
       },
     );
@@ -203,103 +223,15 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
           setState(() {
             _endDate = date;
           });
-          _saveState();
+          // Don't save state immediately, only save when generating
         }
       },
     );
-    return Column(
-      children: [
-        startDateSelector,
-        const SizedBox(height: 16),
-        endDateSelector,
-      ],
-    );
-  }
-
-  Widget _buildCountSlider(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.dateCount,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: Slider(
-                value: _dateCountSlider,
-                min: 1,
-                max: 10,
-                divisions: 9,
-                label: _dateCount.toString(),
-                onChanged: (value) {
-                  setState(() {
-                    _dateCountSlider = value;
-                    _dateCount = value.toInt();
-                  });
-                  _saveState();
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _dateCount.toString().padLeft(2, '0'),
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOtherSection(AppLocalizations loc) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWideScreen = constraints.maxWidth > 600;
-
-        final duplicatesCheckbox = CheckboxListTile(
-          title: Text(loc.allowDuplicates),
-          value: _allowDuplicates,
-          onChanged: (value) {
-            setState(() {
-              _allowDuplicates = value ?? true;
-            });
-            _saveState();
-          },
-          contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-        );
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              loc.other,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            if (isWideScreen)
-              // Center vertically on PC
-              Center(
-                child: duplicatesCheckbox,
-              )
-            else
-              // Normal layout on mobile
-              duplicatesCheckbox,
-          ],
-        );
-      },
+    return WidgetLayoutRenderHelper.twoEqualWidthInRow(
+      startDateSelector,
+      endDateSelector,
+      minWidth: 300,
+      horizontalSpacing: 16,
     );
   }
 
@@ -344,6 +276,34 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
     final loc = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('yyyy-MM-dd');
 
+    final numberSlider = OptionSlider<int>(
+      label: loc.dateCount,
+      currentValue: _dateCount,
+      options: List.generate(
+        10,
+        (i) => SliderOption(value: i + 1, label: '${i + 1}'),
+      ),
+      onChanged: (value) {
+        setState(() {
+          _dateCount = value;
+        });
+        // Don't save state immediately, only save when generating
+      },
+      layout: OptionSliderLayout.none,
+    );
+
+    final duplicatesSwitch = OptionSwitch(
+      title: loc.allowDuplicates,
+      value: _allowDuplicates,
+      onChanged: (value) {
+        setState(() {
+          _allowDuplicates = value;
+        });
+        // Don't save state immediately, only save when generating
+      },
+      decorator: OptionSwitchDecorator.compact(context),
+    );
+
     // Build main content widget
     final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -357,29 +317,10 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
               children: [
                 // Date selectors (responsive layout)
                 _buildDateSelectors(loc),
-
-                const SizedBox(height: 16),
-
-                // Count slider and Other section (responsive layout)
-                MediaQuery.of(context).size.width > 600
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 3, child: _buildCountSlider(loc)),
-                          const SizedBox(width: 32),
-                          Expanded(flex: 2, child: _buildOtherSection(loc)),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          _buildCountSlider(loc),
-                          const SizedBox(height: 16),
-                          _buildOtherSection(loc),
-                        ],
-                      ),
-
-                const SizedBox(height: 16),
-
+                VerticalSpacingDivider.onlyTop(12),
+                numberSlider,
+                duplicatesSwitch,
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
                 // Generate button
                 SizedBox(
                   width: double.infinity,
@@ -387,6 +328,11 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
                     onPressed: _generateDates,
                     icon: const Icon(Icons.refresh),
                     label: Text(loc.generate),
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
               ],

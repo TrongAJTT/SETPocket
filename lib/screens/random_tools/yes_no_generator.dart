@@ -6,6 +6,7 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class YesNoGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -96,6 +97,9 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
       _controller.forward();
     }
 
+    // Save state when generating
+    await _saveState();
+
     // Save to history if enabled
     if (_historyEnabled && _result.isNotEmpty) {
       await GenerationHistoryService.addHistoryItem(
@@ -135,18 +139,17 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
       children: [
         // Skip animation option
         Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: CheckboxListTile(
-              title: Text(loc.skipAnimation),
-              subtitle: Text(loc.skipAnimationDesc),
-              value: _skipAnimation,
-              onChanged: (value) {
-                setState(() {
-                  _skipAnimation = value ?? false;
-                });
-                _saveState();
-              },
+          child: OptionSwitch(
+            title: loc.skipAnimation,
+            subtitle: loc.skipAnimationDesc,
+            value: _skipAnimation,
+            onChanged: (value) {
+              setState(() {
+                _skipAnimation = value;
+              });
+            },
+            decorator: OptionSwitchDecorator.compact(context).copyWith(
+              padding: const EdgeInsets.all(16),
             ),
           ),
         ),
@@ -217,11 +220,10 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
                   child: FilledButton.icon(
                     onPressed: _generateResult,
                     icon: const Icon(Icons.help_outline),
-                    label:
-                        Text(_result.isEmpty ? loc.generate : loc.randomResult),
+                    label: Text(loc.randomResult),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),

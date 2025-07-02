@@ -560,7 +560,11 @@
     "randomResult": "Result",
     "flipping": "Flipping...",
     "skipAnimation": "Skip Animation",
-    "skipAnimationDesc": "Disable animation for faster results",
+    "skipAnimationDesc": "Show result immediately without visual effects",
+    "latinLetterGenerationError": "Cannot generate {count} unique letters from the available set. Please reduce the count or allow duplicates.",
+    "quickActions": "Quick Actions",
+    "quickActionsDesc": "Customize shortcuts that appear when you long-press the app icon.",
+    "edit": "Edit",
       "cacheTypeTextTemplates": "Text Templates",
     "cacheTypeTextTemplatesDesc": "Saved text templates and content",
     "cacheTypeAppSettings": "App Settings",    "cacheTypeAppSettingsDesc": "Theme, language, and user preferences",    "cacheTypeRandomGenerators": "Random Generators",
@@ -1354,7 +1358,22 @@
     "understood": "Understood",
     
     "focusMode": "Focus Mode",
-    "focusModeEnabled": "Focus mode enabled",
+    "focusModeEnabled": "Focus Mode",
+    "@focusModeEnabled": {
+        "description": "Focus mode setting label"
+    },
+    "focusModeEnabledDesc": "Hide UI elements for distraction-free experience",
+    "@focusModeEnabledDesc": {
+        "description": "Focus mode setting description"
+    },
+    "saveRandomToolsState": "Save Random Tools State",
+    "@saveRandomToolsState": {
+        "description": "Save random tools state setting label"
+    },
+    "saveRandomToolsStateDesc": "Automatically save tool settings when generating results",
+    "@saveRandomToolsStateDesc": {
+        "description": "Save random tools state setting description"
+    },
     "focusModeDisabled": "Focus mode disabled", 
     "enableFocusMode": "Enable Focus Mode",
     "disableFocusMode": "Disable Focus Mode",
@@ -3541,5 +3560,6 @@
     "noFilesFound": "No files found",
     "emptyFolder": "Empty folder",
     "file": "file",
-    "quickAccess": "Quick Access"
+    "quickAccess": "Quick Access",
+    "colorFormat": "Color Format"
   }

@@ -6,6 +6,10 @@ import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/widgets/generic/option_slider.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -103,6 +107,9 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
 
       _controller.forward(from: 0);
 
+      // Save state when generating
+      _saveState();
+
       // Save to history if enabled
       if (_historyEnabled && cards.isNotEmpty) {
         final cardStrings = cards.map((card) => card.toString()).toList();
@@ -161,79 +168,70 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     }
   }
 
-  Widget _buildSliderControls() {
+  Widget _buildControlsCard(AppLocalizations loc) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppLocalizations.of(context)!.cardCount,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Slider(
-                    value: _cardCount.toDouble(),
-                    min: 1,
-                    max: _includeJokers ? 54 : 52,
-                    divisions: _includeJokers ? 53 : 51,
-                    label: _cardCount.toString(),
-                    onChanged: (value) {
-                      setState(() {
-                        _cardCount = value.round();
-                      });
-                      _saveState();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _cardCount.toString(),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SwitchListTile(
-              title: Text(AppLocalizations.of(context)!.includeJokers),
-              value: _includeJokers,
+            // OptionSlider for card count
+            OptionSlider<int>(
+              label: loc.cardCount,
+              currentValue: _cardCount,
+              options: List.generate(
+                _includeJokers ? 54 : 52, // max cards
+                (i) => SliderOption(value: i + 1, label: '${i + 1}'),
+              ),
               onChanged: (value) {
                 setState(() {
-                  _includeJokers = value;
-                  if (!value && _cardCount > 52) {
-                    _cardCount = 52;
-                  }
+                  _cardCount = value;
                 });
-                _saveState();
               },
+              layout: OptionSliderLayout.none,
             ),
-            SwitchListTile(
-              title: Text(AppLocalizations.of(context)!.allowDuplicates),
-              value: _allowDuplicates,
-              onChanged: (value) {
-                setState(() {
-                  _allowDuplicates = value;
-                });
-                _saveState();
-              },
+            // Two OptionSwitch widgets in a row
+            WidgetLayoutRenderHelper.twoEqualWidthInRow(
+                OptionSwitch(
+                  title: loc.includeJokers,
+                  value: _includeJokers,
+                  onChanged: (value) {
+                    setState(() {
+                      _includeJokers = value;
+                      if (!_includeJokers && _cardCount > 52) {
+                        _cardCount = 52;
+                      }
+                    });
+                  },
+                  decorator: OptionSwitchDecorator.compact(context),
+                ),
+                OptionSwitch(
+                  title: loc.allowDuplicates,
+                  value: _allowDuplicates,
+                  onChanged: (value) {
+                    setState(() {
+                      _allowDuplicates = value;
+                    });
+                  },
+                  decorator: OptionSwitchDecorator.compact(context),
+                ),
+                minWidth: 340,
+                horizontalSpacing: 20,
+                verticalSpacing: 8),
+            VerticalSpacingDivider.specific(top: 6, bottom: 12),
+            // Generate button
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _generateCards,
+                icon: const Icon(Icons.casino),
+                label: Text(loc.generate),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -390,18 +388,9 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
     final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSliderControls(),
+        _buildControlsCard(loc),
         const SizedBox(height: 16),
         _buildResultCard(),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: _generateCards,
-            icon: const Icon(Icons.casino),
-            label: Text(loc.generate),
-          ),
-        ),
       ],
     );
 

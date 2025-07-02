@@ -463,6 +463,7 @@ class LatinLetterGeneratorState {
   final bool includeLowercase;
   final int letterCount;
   final bool allowDuplicates;
+  final bool skipAnimation;
   final DateTime lastUpdated;
 
   LatinLetterGeneratorState({
@@ -470,6 +471,7 @@ class LatinLetterGeneratorState {
     required this.includeLowercase,
     required this.letterCount,
     required this.allowDuplicates,
+    this.skipAnimation = false,
     required this.lastUpdated,
   });
 
@@ -489,6 +491,7 @@ class LatinLetterGeneratorState {
       'includeLowercase': includeLowercase,
       'letterCount': letterCount,
       'allowDuplicates': allowDuplicates,
+      'skipAnimation': skipAnimation,
       'lastUpdated': lastUpdated.toIso8601String(),
     };
   }
@@ -499,9 +502,8 @@ class LatinLetterGeneratorState {
       includeLowercase: json['includeLowercase'] ?? true,
       letterCount: json['letterCount'] ?? 5,
       allowDuplicates: json['allowDuplicates'] ?? true,
-      lastUpdated: json['lastUpdated'] != null
-          ? DateTime.parse(json['lastUpdated'])
-          : DateTime.now(),
+      skipAnimation: json['skipAnimation'] ?? false,
+      lastUpdated: DateTime.parse(json['lastUpdated']),
     );
   }
 
@@ -510,12 +512,14 @@ class LatinLetterGeneratorState {
     bool? includeLowercase,
     int? letterCount,
     bool? allowDuplicates,
+    bool? skipAnimation,
   }) {
     return LatinLetterGeneratorState(
       includeUppercase: includeUppercase ?? this.includeUppercase,
       includeLowercase: includeLowercase ?? this.includeLowercase,
       letterCount: letterCount ?? this.letterCount,
       allowDuplicates: allowDuplicates ?? this.allowDuplicates,
+      skipAnimation: skipAnimation ?? this.skipAnimation,
       lastUpdated: DateTime.now(),
     );
   }

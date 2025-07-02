@@ -23,7 +23,7 @@ class OptionGridDecorator {
   });
 }
 
-class AutoScaleOptionGridSelector<T> extends StatelessWidget {
+class AutoScaleOptionGridPicker<T> extends StatelessWidget {
   final String title;
   final List<OptionItem<T>> options;
   final T selectedValue;
@@ -33,7 +33,7 @@ class AutoScaleOptionGridSelector<T> extends StatelessWidget {
   final double fixedCellHeight;
   final OptionGridDecorator? decorator;
 
-  const AutoScaleOptionGridSelector({
+  const AutoScaleOptionGridPicker({
     super.key,
     required this.title,
     required this.options,
@@ -236,7 +236,7 @@ class AutoScaleOptionGridSelector<T> extends StatelessWidget {
           side: BorderSide(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withValues(alpha: 0.2),
+                : theme.colorScheme.outline.withValues(alpha: 0.5),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -258,8 +258,11 @@ class AutoScaleOptionGridSelector<T> extends StatelessWidget {
   }
 }
 
-class OptionGridSelector<T> extends StatelessWidget {
-  final String title;
+class OptionGridPicker<T> extends StatelessWidget {
+  /// Optional title displayed above the grid.
+  final String? title;
+
+  /// The list of options to display.
   final List<OptionItem<T>> options;
   final T selectedValue;
   final ValueChanged<T> onSelectionChanged;
@@ -267,9 +270,9 @@ class OptionGridSelector<T> extends StatelessWidget {
   final double aspectRatio;
   final OptionGridDecorator? decorator;
 
-  const OptionGridSelector({
+  const OptionGridPicker({
     super.key,
-    required this.title,
+    this.title,
     required this.options,
     required this.selectedValue,
     required this.onSelectionChanged,
@@ -301,16 +304,13 @@ class OptionGridSelector<T> extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Padding(
-          padding: effectiveDecorator.padding ??
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+        if (title != null && title!.isNotEmpty) ...[
+          Text(
+            title!,
+            style: theme.textTheme.titleMedium,
           ),
-        ),
+          const SizedBox(height: 8),
+        ],
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -442,6 +442,12 @@ class OptionGridSelector<T> extends StatelessWidget {
         elevation: isSelected ? 4 : 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(effectiveDecorator.borderRadius),
+          side: BorderSide(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withValues(alpha: 0.5),
+            width: isSelected ? 2 : 1,
+          ),
         ),
         color: option.backgroundColor ??
             (isSelected
@@ -599,6 +605,3 @@ class SortOptionSelector<T> extends StatelessWidget {
     );
   }
 }
-
-// For backward compatibility - OptionGridPicker maps to OptionGridSelector
-typedef OptionGridPicker<T> = OptionGridSelector<T>;

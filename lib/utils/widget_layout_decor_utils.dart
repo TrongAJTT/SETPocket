@@ -29,4 +29,14 @@ class VerticalSpacingDivider extends StatelessWidget {
       child: const Divider(),
     );
   }
+
+  /// Creates a divider with only top spacing.
+  factory VerticalSpacingDivider.onlyTop(double value) {
+    return VerticalSpacingDivider._(top: value, bottom: 0);
+  }
+
+  /// Creates a divider with only bottom spacing.
+  factory VerticalSpacingDivider.onlyBottom(double value) {
+    return VerticalSpacingDivider._(top: 0, bottom: value);
+  }
 }

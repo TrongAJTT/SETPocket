@@ -6,7 +6,9 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'dart:math' as math;
+import 'package:setpocket/widgets/generic/option_slider.dart';
 
 class DiceRollGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -115,6 +117,9 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
       );
     });
 
+    // Save state when generating
+    _saveState();
+
     // Save to history if enabled
     if (_historyEnabled && _results.isNotEmpty) {
       String resultText = _results.length == 1
@@ -190,44 +195,26 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Dice count selector
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      loc.diceCount,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Text(
-                      '$_diceCount',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                Slider(
-                  value: _diceCount.toDouble(),
-                  min: 1,
-                  max: 10,
-                  divisions: 9,
-                  label: _diceCount.toString(),
-                  onChanged: (double value) {
+                OptionSlider<int>(
+                  label: loc.diceCount,
+                  currentValue: _diceCount,
+                  options: List.generate(
+                    10,
+                    (i) => SliderOption(value: i + 1, label: '${i + 1}'),
+                  ),
+                  onChanged: (value) {
                     setState(() {
-                      _diceCount = value.round();
+                      _diceCount = value;
                     });
-                    _saveState();
                   },
+                  layout: OptionSliderLayout.none,
                 ),
-
-                const SizedBox(height: 24),
-
                 // Dice sides selector
                 Text(
                   loc.diceSides,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
-
                 // Wrap with dice side options
                 Wrap(
                   spacing: 8,
@@ -241,15 +228,12 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                           setState(() {
                             _diceSides = sides;
                           });
-                          _saveState();
                         }
                       },
                     );
                   }).toList(),
                 ),
-
-                const SizedBox(height: 24),
-
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
                 // Roll button
                 SizedBox(
                   width: double.infinity,
@@ -257,6 +241,11 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
                     onPressed: _rollDice,
                     icon: const Icon(Icons.casino),
                     label: Text(loc.generate),
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -265,15 +254,15 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
         ),
         if (_results.isNotEmpty) ...[
           const SizedBox(height: 24),
-          AnimatedBuilder(
-            animation: _rollAnimation,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: 1.0 + (_rollAnimation.value * 0.1),
-                child: child,
-              );
-            },
-            child: Card(
+          Card(
+            child: AnimatedBuilder(
+              animation: _rollAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1.0 + (_rollAnimation.value * 0.1),
+                  child: child,
+                );
+              },
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(

@@ -31,7 +31,7 @@ enum OptionSliderLayout { card, none }
 class OptionSlider<T> extends StatelessWidget {
   final String label;
   final String? subtitle;
-  final IconData icon;
+  final IconData? icon;
   final T currentValue;
   final List<SliderOption<T>> options;
   final ValueChanged<T> onChanged;
@@ -42,7 +42,7 @@ class OptionSlider<T> extends StatelessWidget {
     super.key,
     required this.label,
     this.subtitle,
-    required this.icon,
+    this.icon,
     required this.currentValue,
     required this.options,
     required this.onChanged,
@@ -67,10 +67,10 @@ class OptionSlider<T> extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon,
-                color: theme.colorScheme.primary,
-                size: 24), // Slightly larger icon
-            const SizedBox(width: 12),
+            if (icon != null) ...[
+              Icon(icon, color: theme.colorScheme.primary, size: 24),
+              const SizedBox(width: 12),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

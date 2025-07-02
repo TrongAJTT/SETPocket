@@ -158,7 +158,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get saveToHistory => 'Lưu vào lịch sử';
 
   @override
-  String get edit => 'Chỉnh sửa';
+  String get edit => 'Sửa';
 
   @override
   String get copy => 'Sao chép';
@@ -1529,6 +1529,17 @@ class AppLocalizationsVi extends AppLocalizations {
   String get skipAnimationDesc => 'Tắt hoạt ảnh để có kết quả nhanh hơn';
 
   @override
+  String latinLetterGenerationError(Object count) {
+    return 'Không thể tạo $count chữ cái duy nhất từ bộ có sẵn. Vui lòng giảm số lượng hoặc cho phép trùng lặp.';
+  }
+
+  @override
+  String get quickActions => 'Tác vụ nhanh';
+
+  @override
+  String get quickActionsDesc => 'Tùy chỉnh các phím tắt xuất hiện khi bạn nhấn giữ biểu tượng ứng dụng.';
+
+  @override
   String get cacheTypeTextTemplates => 'Mẫu văn bản';
 
   @override
@@ -2860,7 +2871,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get multipleCards => 'Nhiều thẻ chuyển đổi';
 
   @override
-  String get multipleCardsDesc => 'Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riêng.';
+  String get multipleCardsDesc => 'Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riên.';
 
   @override
   String get liveRates => 'Tỷ giá thời gian thực';
@@ -2980,7 +2991,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get focusMode => 'Chế độ tập trung';
 
   @override
-  String get focusModeEnabled => 'Đã bật chế độ tập trung';
+  String get focusModeEnabled => 'Chế độ tập trung';
+
+  @override
+  String get focusModeEnabledDesc => 'Ẩn các thành phần UI để tập trung không bị phân tâm';
+
+  @override
+  String get saveRandomToolsState => 'Lưu trạng thái Random Tools';
+
+  @override
+  String get saveRandomToolsStateDesc => 'Tự động lưu cài đặt công cụ khi tạo kết quả';
 
   @override
   String get focusModeDisabled => 'Đã tắt chế độ tập trung';
@@ -5386,12 +5406,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get p2lanStopped => 'P2LAN đã dừng';
 
   @override
-  String get quickActions => 'Tác vụ nhanh';
-
-  @override
-  String get quickActionsDesc => 'Select up to 4 tools for quick access.';
-
-  @override
   String get quickActionsManage => 'Manage Quick Actions';
 
   @override
@@ -6202,4 +6216,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get quickAccess => 'Truy cập nhanh';
+
+  @override
+  String get colorFormat => 'Định dạng màu';
 }

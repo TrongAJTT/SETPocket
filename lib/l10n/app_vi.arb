@@ -371,7 +371,11 @@
     "scissors": "Kéo",    
     "randomResult": "Kết quả",
     "skipAnimation": "Bỏ qua hoạt ảnh",
-    "skipAnimationDesc": "Tắt hoạt ảnh để có kết quả nhanh hơn",
+    "skipAnimationDesc": "Hiển thị kết quả ngay lập tức mà không có hiệu ứng hình ảnh",
+    "latinLetterGenerationError": "Không thể tạo {count} chữ cái duy nhất từ bộ có sẵn. Vui lòng giảm số lượng hoặc cho phép trùng lặp.",
+    "quickActions": "Tác vụ nhanh",
+    "quickActionsDesc": "Tùy chỉnh các phím tắt xuất hiện khi bạn nhấn giữ biểu tượng ứng dụng.",
+    "edit": "Sửa",
     "cacheDetails": "Chi tiết bộ nhớ đệm",
     "viewCacheDetails": "Xem chi tiết",
     "cacheSize": "Kích thước bộ nhớ đệm",
@@ -1364,7 +1368,7 @@
     "currencyConverterOverview": "Bộ chuyển đổi tiền tệ mạnh mẽ này cho phép bạn chuyển đổi giữa các loại tiền tệ khác nhau với tỷ giá thời gian thực.",
     "keyFeatures": "Tính năng chính",
     "multipleCards": "Nhiều thẻ chuyển đổi",
-    "multipleCardsDesc": "Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riêng.",
+    "multipleCardsDesc": "Tạo nhiều thẻ chuyển đổi, mỗi thẻ có bộ tiền tệ và số tiền riên.",
     "liveRates": "Tỷ giá thời gian thực",
     "liveRatesDesc": "Nhận tỷ giá hối đoái thời gian thực từ các nguồn tài chính đáng tin cậy.",
     "customizeCurrencies": "Tùy chỉnh tiền tệ",
@@ -1424,7 +1428,22 @@
     "understood": "Đã hiểu",
     
     "focusMode": "Chế độ tập trung",
-    "focusModeEnabled": "Đã bật chế độ tập trung",
+    "focusModeEnabled": "Chế độ tập trung",
+    "@focusModeEnabled": {
+        "description": "Focus mode setting label"
+    },
+    "focusModeEnabledDesc": "Ẩn các thành phần UI để tập trung không bị phân tâm",
+    "@focusModeEnabledDesc": {
+        "description": "Focus mode setting description"
+    },
+    "saveRandomToolsState": "Lưu trạng thái Random Tools",
+    "@saveRandomToolsState": {
+        "description": "Save random tools state setting label"
+    },
+    "saveRandomToolsStateDesc": "Tự động lưu cài đặt công cụ khi tạo kết quả",
+    "@saveRandomToolsStateDesc": {
+        "description": "Save random tools state setting description"
+    },
     "focusModeDisabled": "Đã tắt chế độ tập trung",
     "enableFocusMode": "Bật chế độ tập trung",
     "disableFocusMode": "Tắt chế độ tập trung",
@@ -2677,5 +2696,6 @@
     "noFilesFound": "Không tìm thấy file nào khớp",
     "emptyFolder": "Thư mục trống",
     "file": "tệp",
-    "quickAccess": "Truy cập nhanh"
+    "quickAccess": "Truy cập nhanh",
+    "colorFormat": "Định dạng màu"
   }

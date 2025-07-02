@@ -6,7 +6,11 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
-import 'package:setpocket/widgets/quantity_selector.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/widgets/p2p/quantity_selector.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
 
 class LatinLetterGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -24,6 +28,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
   bool _includeLowercase = true;
   int _letterCount = 5;
   bool _allowDuplicates = true;
+  bool _skipAnimation = false;
   List<String> _generatedLetters = [];
   bool _copied = false;
   late AnimationController _controller;
@@ -55,6 +60,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
           _includeLowercase = state.includeLowercase;
           _letterCount = state.letterCount;
           _allowDuplicates = state.allowDuplicates;
+          _skipAnimation = state.skipAnimation;
         });
       }
     } catch (e) {
@@ -69,6 +75,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
         includeLowercase: _includeLowercase,
         letterCount: _letterCount,
         allowDuplicates: _allowDuplicates,
+        skipAnimation: _skipAnimation,
         lastUpdated: DateTime.now(),
       );
       await RandomStateService.saveLatinLetterGeneratorState(state);
@@ -93,26 +100,40 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
   }
 
   void _generateLetters() {
-    _controller.reset();
-    _controller.forward();
+    if (!_skipAnimation) {
+      _controller.reset();
+      _controller.forward();
+    }
 
-    setState(() {
+    try {
       final lettersString = RandomGenerator.generateLatinLetters(
         _letterCount,
         includeUppercase: _includeUppercase,
         includeLowercase: _includeLowercase,
         allowDuplicates: _allowDuplicates,
       );
-      _generatedLetters = lettersString.split('');
-      _copied = false;
-    });
+      setState(() {
+        _generatedLetters = lettersString.split('');
+        _copied = false;
+      });
 
-    // Save to history if enabled
-    if (_historyEnabled && _generatedLetters.isNotEmpty) {
-      GenerationHistoryService.addHistoryItem(
-        _generatedLetters.join(''),
-        'latin_letter',
-      ).then((_) => _loadHistory()); // Refresh history
+      // Save state when generating
+      _saveState();
+
+      // Save to history if enabled
+      if (_historyEnabled && _generatedLetters.isNotEmpty) {
+        GenerationHistoryService.addHistoryItem(
+          _generatedLetters.join(''),
+          'latin_letter',
+        ).then((_) => _loadHistory()); // Refresh history
+      }
+    } on ArgumentError {
+      final loc = AppLocalizations.of(context)!;
+      SnackbarUtils.showTyped(
+        context,
+        loc.latinLetterGenerationError(_letterCount),
+        SnackBarType.error,
+      );
     }
   }
 
@@ -146,23 +167,65 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
     );
   }
 
-  Widget _buildQuantitySelector(AppLocalizations loc) {
-    return Center(
-      child: QuantitySelector(
-        value: _letterCount,
-        minValue: 1,
-        maxValue: 99,
-        smallStep: 1,
-        largeStep: 10,
-        label: loc.letterCount,
-        onChanged: (newValue) {
+  Widget _buildSwitchOptions(AppLocalizations loc) {
+    final switchOptions = [
+      {
+        'title': loc.includeUppercase,
+        'value': _includeUppercase,
+        'onChanged': (bool value) {
           setState(() {
-            _letterCount = newValue;
+            _includeUppercase = value;
           });
-          _saveState();
         },
-        showBorder: false,
-        highlightValue: true,
+      },
+      {
+        'title': loc.includeLowercase,
+        'value': _includeLowercase,
+        'onChanged': (bool value) {
+          setState(() {
+            _includeLowercase = value;
+          });
+        },
+      },
+      {
+        'title': loc.allowDuplicates,
+        'value': _allowDuplicates,
+        'onChanged': (bool value) {
+          setState(() {
+            _allowDuplicates = value;
+          });
+        },
+      },
+      {
+        'title': loc.skipAnimation,
+        'value': _skipAnimation,
+        'onChanged': (bool value) {
+          setState(() {
+            _skipAnimation = value;
+          });
+        },
+      },
+    ];
+
+    return GridBuilderHelper.responsive(
+      builder: (context, index) {
+        final option = switchOptions[index];
+        return OptionSwitch(
+          title: option['title'] as String,
+          value: option['value'] as bool,
+          onChanged: option['onChanged'] as void Function(bool),
+          decorator: OptionSwitchDecorator.compact(context),
+        );
+      },
+      itemCount: switchOptions.length,
+      minItemWidth: 350,
+      maxColumns: 2,
+      decorator: const GridBuilderDecorator(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 16,
+        maxChildHeight: 60,
       ),
     );
   }
@@ -174,10 +237,6 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
     final generatorContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Quantity selector - moved to top and centered
-        _buildQuantitySelector(loc),
-        const SizedBox(height: 24),
-
         // Options card
         Card(
           child: Padding(
@@ -186,59 +245,45 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  loc.options,
+                  loc.letterCount,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
-                CheckboxListTile(
-                  title: Text(loc.includeUppercase),
-                  value: _includeUppercase,
-                  onChanged: (value) {
-                    setState(() {
-                      _includeUppercase = value ?? true;
-                    });
-                    _saveState();
-                  },
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
+                Center(
+                  child: QuantitySelector(
+                    value: _letterCount,
+                    minValue: 1,
+                    maxValue: 99,
+                    smallStep: 1,
+                    largeStep: 10,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _letterCount = newValue;
+                      });
+                    },
+                    showBorder: false,
+                    highlightValue: true,
+                  ),
                 ),
-                CheckboxListTile(
-                  title: Text(loc.includeLowercase),
-                  value: _includeLowercase,
-                  onChanged: (value) {
-                    setState(() {
-                      _includeLowercase = value ?? true;
-                    });
-                    _saveState();
-                  },
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                CheckboxListTile(
-                  title: Text(loc.allowDuplicates),
-                  value: _allowDuplicates,
-                  onChanged: (value) {
-                    setState(() {
-                      _allowDuplicates = value ?? true;
-                    });
-                    _saveState();
-                  },
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
+                VerticalSpacingDivider.specific(top: 12, bottom: 6),
+                _buildSwitchOptions(loc),
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
+                // Generate button
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _generateLetters,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(loc.generate),
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // Generate button
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: _generateLetters,
-            icon: const Icon(Icons.refresh),
-            label: Text(loc.generate),
           ),
         ),
 
@@ -249,6 +294,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
           AnimatedBuilder(
             animation: _animation,
             builder: (context, child) {
+              if (_skipAnimation) return child!;
               return Transform.scale(
                 scale: 0.9 + (_animation.value * 0.1),
                 child: child,

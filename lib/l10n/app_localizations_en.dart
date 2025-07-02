@@ -1526,7 +1526,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipAnimation => 'Skip Animation';
 
   @override
-  String get skipAnimationDesc => 'Disable animation for faster results';
+  String get skipAnimationDesc => 'Show result immediately without visual effects';
+
+  @override
+  String latinLetterGenerationError(Object count) {
+    return 'Cannot generate $count unique letters from the available set. Please reduce the count or allow duplicates.';
+  }
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get quickActionsDesc => 'Select up to 4 tools for quick access.';
 
   @override
   String get cacheTypeTextTemplates => 'Text Templates';
@@ -2980,7 +2991,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusMode => 'Focus Mode';
 
   @override
-  String get focusModeEnabled => 'Focus mode enabled';
+  String get focusModeEnabled => 'Focus Mode';
+
+  @override
+  String get focusModeEnabledDesc => 'Hide UI elements for distraction-free experience';
+
+  @override
+  String get saveRandomToolsState => 'Save Random Tools State';
+
+  @override
+  String get saveRandomToolsStateDesc => 'Automatically save tool settings when generating results';
 
   @override
   String get focusModeDisabled => 'Focus mode disabled';
@@ -5386,12 +5406,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get p2lanStopped => 'P2LAN stopped';
 
   @override
-  String get quickActions => 'Quick Actions';
-
-  @override
-  String get quickActionsDesc => 'Select up to 4 tools for quick access.';
-
-  @override
   String get quickActionsManage => 'Manage Quick Actions';
 
   @override
@@ -6202,4 +6216,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickAccess => 'Quick Access';
+
+  @override
+  String get colorFormat => 'Color Format';
 }

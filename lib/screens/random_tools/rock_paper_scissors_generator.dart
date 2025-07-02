@@ -6,6 +6,7 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class RockPaperScissorsGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -107,6 +108,9 @@ class _RockPaperScissorsGeneratorScreenState
       await _controller.forward();
     }
 
+    // Save state when generating
+    await _saveState();
+
     // Save to history if enabled
     if (_historyEnabled && _result != null) {
       if (!mounted) return;
@@ -187,18 +191,17 @@ class _RockPaperScissorsGeneratorScreenState
       children: [
         // Skip animation option
         Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SwitchListTile(
-              title: Text(loc.skipAnimation),
-              subtitle: Text(loc.skipAnimationDesc),
-              value: _skipAnimation,
-              onChanged: (value) {
-                setState(() {
-                  _skipAnimation = value;
-                });
-                _saveState();
-              },
+          child: OptionSwitch(
+            title: loc.skipAnimation,
+            subtitle: loc.skipAnimationDesc,
+            value: _skipAnimation,
+            onChanged: (value) {
+              setState(() {
+                _skipAnimation = value;
+              });
+            },
+            decorator: OptionSwitchDecorator.compact(context).copyWith(
+              padding: const EdgeInsets.all(16),
             ),
           ),
         ),
@@ -267,7 +270,7 @@ class _RockPaperScissorsGeneratorScreenState
                   label: Text(loc.generate),
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),

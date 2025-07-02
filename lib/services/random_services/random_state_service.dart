@@ -362,7 +362,14 @@ class RandomStateService {
       if (!enabled) {
         logInfo(
             'RandomStateService: State loading disabled, returning default latin letter generator state');
-        return LatinLetterGeneratorState.createDefault();
+        return LatinLetterGeneratorState(
+          includeUppercase: true,
+          includeLowercase: true,
+          letterCount: 5,
+          allowDuplicates: true,
+          skipAnimation: false,
+          lastUpdated: DateTime.now(),
+        );
       }
 
       final prefs = await SharedPreferences.getInstance();
@@ -371,11 +378,25 @@ class RandomStateService {
         final json = jsonDecode(jsonString) as Map<String, dynamic>;
         return LatinLetterGeneratorState.fromJson(json);
       }
-      return LatinLetterGeneratorState.createDefault();
+      return LatinLetterGeneratorState(
+        includeUppercase: true,
+        includeLowercase: true,
+        letterCount: 5,
+        allowDuplicates: true,
+        skipAnimation: false,
+        lastUpdated: DateTime.now(),
+      );
     } catch (e) {
       logError(
           'RandomStateService: Failed to get latin letter generator state: $e');
-      return LatinLetterGeneratorState.createDefault();
+      return LatinLetterGeneratorState(
+        includeUppercase: true,
+        includeLowercase: true,
+        letterCount: 5,
+        allowDuplicates: true,
+        skipAnimation: false,
+        lastUpdated: DateTime.now(),
+      );
     }
   }
 

@@ -7,6 +7,10 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/widgets/generic/option_slider.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
 
 class DateTimeGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -27,7 +31,6 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   DateTime _startDateTime = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDateTime = DateTime.now().add(const Duration(days: 30));
   int _dateTimeCount = 5;
-  double _dateTimeCountSlider = 5.0;
   bool _allowDuplicates = true;
   bool _includeSeconds = false;
   List<DateTime> _generatedDateTimes = [];
@@ -61,7 +64,6 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
           _startDateTime = state.startDateTime;
           _endDateTime = state.endDateTime;
           _dateTimeCount = state.dateTimeCount;
-          _dateTimeCountSlider = state.dateTimeCount.toDouble();
           _allowDuplicates = state.allowDuplicates;
         });
       }
@@ -108,6 +110,9 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         _copied = false;
       });
       _animationController.forward(from: 0.0);
+
+      // Save state when generating
+      _saveState();
 
       // Save to history if enabled
       if (_historyEnabled && generatedDateTimes.isNotEmpty) {
@@ -217,7 +222,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
               _endDateTime = _startDateTime.add(const Duration(hours: 1));
             }
           });
-          _saveState();
+          // Don't save state immediately, only save when generating
         }
       }
     }
@@ -249,14 +254,14 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
               _startDateTime = _endDateTime.subtract(const Duration(hours: 1));
             }
           });
-          _saveState();
+          // Don't save state immediately, only save when generating
         }
       }
     }
   }
 
   Widget _buildDateTimeField(
-      String label, DateTime dateTime, bool isStartDate) {
+      String label, DateTime dateTime, VoidCallback onTap) {
     final dateTimeFormat =
         _includeSeconds ? _dateTimeFormatWithSeconds : _dateTimeFormat;
 
@@ -269,8 +274,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         ),
         const SizedBox(height: 8),
         InkWell(
-          onTap: () =>
-              isStartDate ? _selectStartDateTime() : _selectEndDateTime(),
+          onTap: onTap,
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -301,155 +305,69 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   }
 
   Widget _buildDateTimeSelectors(AppLocalizations loc) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return constraints.maxWidth > 800
-            ? Row(
-                children: [
-                  Expanded(
-                      child: _buildDateTimeField(
-                          loc.startDate, _startDateTime, true)),
-                  const SizedBox(width: 16),
-                  Expanded(
-                      child: _buildDateTimeField(
-                          loc.endDate, _endDateTime, false)),
-                ],
-              )
-            : Column(
-                children: [
-                  _buildDateTimeField(loc.startDate, _startDateTime, true),
-                  const SizedBox(height: 16),
-                  _buildDateTimeField(loc.endDate, _endDateTime, false),
-                ],
-              );
-      },
+    return WidgetLayoutRenderHelper.twoEqualWidthInRow(
+      _buildDateTimeField(
+        loc.startDate,
+        _startDateTime,
+        _selectStartDateTime,
+      ),
+      _buildDateTimeField(
+        loc.endDate,
+        _endDateTime,
+        _selectEndDateTime,
+      ),
+      minWidth: 360,
+      horizontalSpacing: 20,
+      verticalSpacing: 8,
     );
   }
 
   Widget _buildCountSlider(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.dateCount,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: Slider(
-                value: _dateTimeCountSlider,
-                min: 1,
-                max: 20,
-                divisions: 19,
-                label: _dateTimeCount.toString(),
-                onChanged: (value) {
-                  setState(() {
-                    _dateTimeCountSlider = value;
-                    _dateTimeCount = value.round();
-                  });
-                  _saveState();
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  _dateTimeCount.toString(),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return OptionSlider<int>(
+      label: loc.dateCount,
+      currentValue: _dateTimeCount,
+      options: List.generate(
+        20,
+        (i) => SliderOption(value: i + 1, label: '${i + 1}'),
+      ),
+      onChanged: (value) {
+        setState(() {
+          _dateTimeCount = value;
+        });
+        // Don't save state immediately, only save when generating
+      },
+      layout: OptionSliderLayout.none,
+      fixedWidth: 60,
     );
   }
 
   Widget _buildOptionsSection(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.options,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-
-        // Responsive layout for options using LayoutBuilder
-        LayoutBuilder(
-          builder: (context, constraints) {
-            return constraints.maxWidth > 800
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: CheckboxListTile(
-                          title: Text(loc.includeSeconds),
-                          value: _includeSeconds,
-                          onChanged: (value) {
-                            setState(() {
-                              _includeSeconds = value ?? false;
-                            });
-                            _saveState();
-                          },
-                          dense: true,
-                        ),
-                      ),
-                      Expanded(
-                        child: CheckboxListTile(
-                          title: Text(loc.allowDuplicates),
-                          value: _allowDuplicates,
-                          onChanged: (value) {
-                            setState(() {
-                              _allowDuplicates = value ?? true;
-                            });
-                            _saveState();
-                          },
-                          dense: true,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      CheckboxListTile(
-                        title: Text(loc.includeSeconds),
-                        value: _includeSeconds,
-                        onChanged: (value) {
-                          setState(() {
-                            _includeSeconds = value ?? false;
-                          });
-                          _saveState();
-                        },
-                        dense: true,
-                      ),
-                      CheckboxListTile(
-                        title: Text(loc.allowDuplicates),
-                        value: _allowDuplicates,
-                        onChanged: (value) {
-                          setState(() {
-                            _allowDuplicates = value ?? true;
-                          });
-                          _saveState();
-                        },
-                        dense: true,
-                      ),
-                    ],
-                  );
-          },
-        ),
-      ],
+    return WidgetLayoutRenderHelper.twoEqualWidthInRow(
+      OptionSwitch(
+        title: loc.includeSeconds,
+        value: _includeSeconds,
+        onChanged: (value) {
+          setState(() {
+            _includeSeconds = value;
+          });
+          // Don't save state immediately, only save when generating
+        },
+        decorator: OptionSwitchDecorator.compact(context),
+      ),
+      OptionSwitch(
+        title: loc.allowDuplicates,
+        value: _allowDuplicates,
+        onChanged: (value) {
+          setState(() {
+            _allowDuplicates = value;
+          });
+          // Don't save state immediately, only save when generating
+        },
+        decorator: OptionSwitchDecorator.compact(context),
+      ),
+      minWidth: 350,
+      horizontalSpacing: 20,
+      verticalSpacing: 8,
     );
   }
 
@@ -471,19 +389,12 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
               children: [
                 // Date time selectors (responsive layout)
                 _buildDateTimeSelectors(loc),
-
-                const SizedBox(height: 16),
-
+                VerticalSpacingDivider.onlyTop(12),
                 // Count slider
                 _buildCountSlider(loc),
-
-                const SizedBox(height: 16),
-
                 // Options section
                 _buildOptionsSection(loc),
-
-                const SizedBox(height: 16),
-
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
                 // Generate button
                 SizedBox(
                   width: double.infinity,
@@ -491,6 +402,11 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
                     onPressed: _generateDateTimes,
                     icon: const Icon(Icons.refresh),
                     label: Text(loc.generate),
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
               ],

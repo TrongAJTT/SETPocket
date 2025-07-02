@@ -2948,8 +2948,26 @@ abstract class AppLocalizations {
   /// No description provided for @skipAnimationDesc.
   ///
   /// In en, this message translates to:
-  /// **'Disable animation for faster results'**
+  /// **'Show result immediately without visual effects'**
   String get skipAnimationDesc;
+
+  /// No description provided for @latinLetterGenerationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot generate {count} unique letters from the available set. Please reduce the count or allow duplicates.'**
+  String latinLetterGenerationError(Object count);
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
+  /// No description provided for @quickActionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Select up to 4 tools for quick access.'**
+  String get quickActionsDesc;
 
   /// No description provided for @cacheTypeTextTemplates.
   ///
@@ -5741,11 +5759,29 @@ abstract class AppLocalizations {
   /// **'Focus Mode'**
   String get focusMode;
 
-  /// No description provided for @focusModeEnabled.
+  /// Focus mode setting label
   ///
   /// In en, this message translates to:
-  /// **'Focus mode enabled'**
+  /// **'Focus Mode'**
   String get focusModeEnabled;
+
+  /// Focus mode setting description
+  ///
+  /// In en, this message translates to:
+  /// **'Hide UI elements for distraction-free experience'**
+  String get focusModeEnabledDesc;
+
+  /// Save random tools state setting label
+  ///
+  /// In en, this message translates to:
+  /// **'Save Random Tools State'**
+  String get saveRandomToolsState;
+
+  /// Save random tools state setting description
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically save tool settings when generating results'**
+  String get saveRandomToolsStateDesc;
 
   /// No description provided for @focusModeDisabled.
   ///
@@ -10457,18 +10493,6 @@ abstract class AppLocalizations {
   /// **'P2LAN stopped'**
   String get p2lanStopped;
 
-  /// No description provided for @quickActions.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Actions'**
-  String get quickActions;
-
-  /// No description provided for @quickActionsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Select up to 4 tools for quick access.'**
-  String get quickActionsDesc;
-
   /// No description provided for @quickActionsManage.
   ///
   /// In en, this message translates to:
@@ -12004,6 +12028,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quick Access'**
   String get quickAccess;
+
+  /// No description provided for @colorFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Color Format'**
+  String get colorFormat;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

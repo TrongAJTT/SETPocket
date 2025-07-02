@@ -6,6 +6,10 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/widgets/generic/option_slider.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
 
 class PasswordGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -98,6 +102,10 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
         return;
       }
     });
+
+    // Save state when generating
+    await _saveState();
+
     // Save to history if enabled
     if (_historyEnabled && _generatedPassword.isNotEmpty) {
       await GenerationHistoryService.addHistoryItem(
@@ -138,119 +146,70 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
     );
   }
 
-  Widget _buildCheckboxOptions(BuildContext context, AppLocalizations loc) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth >
-            800; // Use LayoutBuilder instead of MediaQuery
-
-        final checkboxOptions = [
-          {
-            'title': loc.includeLowercase,
-            'value': _includeLowercase,
-            'onChanged': (bool? value) {
-              setState(() {
-                _includeLowercase = value ?? true;
-              });
-              _saveState();
-            },
-          },
-          {
-            'title': loc.includeUppercase,
-            'value': _includeUppercase,
-            'onChanged': (bool? value) {
-              setState(() {
-                _includeUppercase = value ?? true;
-              });
-              _saveState();
-            },
-          },
-          {
-            'title': loc.includeNumbers,
-            'value': _includeNumbers,
-            'onChanged': (bool? value) {
-              setState(() {
-                _includeNumbers = value ?? true;
-              });
-              _saveState();
-            },
-          },
-          {
-            'title': loc.includeSpecial,
-            'value': _includeSpecial,
-            'onChanged': (bool? value) {
-              setState(() {
-                _includeSpecial = value ?? true;
-              });
-              _saveState();
-            },
-          },
-        ];
-
-        if (isDesktop) {
-          // Desktop layout: 2 columns
-          return Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: Text(checkboxOptions[0]['title'] as String),
-                      value: checkboxOptions[0]['value'] as bool,
-                      onChanged: checkboxOptions[0]['onChanged'] as void
-                          Function(bool?),
-                      dense: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: Text(checkboxOptions[1]['title'] as String),
-                      value: checkboxOptions[1]['value'] as bool,
-                      onChanged: checkboxOptions[1]['onChanged'] as void
-                          Function(bool?),
-                      dense: true,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: Text(checkboxOptions[2]['title'] as String),
-                      value: checkboxOptions[2]['value'] as bool,
-                      onChanged: checkboxOptions[2]['onChanged'] as void
-                          Function(bool?),
-                      dense: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: Text(checkboxOptions[3]['title'] as String),
-                      value: checkboxOptions[3]['value'] as bool,
-                      onChanged: checkboxOptions[3]['onChanged'] as void
-                          Function(bool?),
-                      dense: true,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        } else {
-          // Mobile layout: 1 column
-          return Column(
-            children: checkboxOptions.map((option) {
-              return CheckboxListTile(
-                title: Text(option['title'] as String),
-                value: option['value'] as bool,
-                onChanged: option['onChanged'] as void Function(bool?),
-                dense: true,
-              );
-            }).toList(),
-          );
-        }
+  Widget _buildSwitchOptions(BuildContext context, AppLocalizations loc) {
+    final switchOptions = [
+      {
+        'title': loc.includeLowercase,
+        'value': _includeLowercase,
+        'onChanged': (bool value) {
+          setState(() {
+            _includeLowercase = value;
+          });
+          // Don't save state immediately, only save when generating
+        },
       },
+      {
+        'title': loc.includeUppercase,
+        'value': _includeUppercase,
+        'onChanged': (bool value) {
+          setState(() {
+            _includeUppercase = value;
+          });
+          // Don't save state immediately, only save when generating
+        },
+      },
+      {
+        'title': loc.includeNumbers,
+        'value': _includeNumbers,
+        'onChanged': (bool value) {
+          setState(() {
+            _includeNumbers = value;
+          });
+          // Don't save state immediately, only save when generating
+        },
+      },
+      {
+        'title': loc.includeSpecial,
+        'value': _includeSpecial,
+        'onChanged': (bool value) {
+          setState(() {
+            _includeSpecial = value;
+          });
+          // Don't save state immediately, only save when generating
+        },
+      },
+    ];
+
+    return GridBuilderHelper.responsive(
+      builder: (context, index) {
+        final option = switchOptions[index];
+        return OptionSwitch(
+          title: option['title'] as String,
+          value: option['value'] as bool,
+          onChanged: option['onChanged'] as void Function(bool),
+          decorator: OptionSwitchDecorator.compact(context),
+        );
+      },
+      itemCount: switchOptions.length,
+      minItemWidth: 400,
+      maxColumns: 2,
+      decorator: const GridBuilderDecorator(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 16,
+        maxChildHeight: 60, // Control the height of each switch row
+      ),
     );
   }
 
@@ -268,40 +227,38 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      loc.numCharacters,
-                      style: Theme.of(context).textTheme.titleMedium,
+                // Password length slider
+                OptionSlider<int>(
+                  label: loc.numCharacters,
+                  currentValue: _passwordLength,
+                  options: List.generate(
+                    29, // 4 to 32 characters
+                    (i) => SliderOption(
+                      value: i + 4,
+                      label: '${i + 4}',
                     ),
-                    Text(
-                      '$_passwordLength',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                Slider(
-                  value: _passwordLength.toDouble(),
-                  min: 4,
-                  max: 32,
-                  divisions: 28,
-                  label: _passwordLength.toString(),
-                  onChanged: (double value) {
+                  ),
+                  onChanged: (int value) {
                     setState(() {
-                      _passwordLength = value.round();
+                      _passwordLength = value;
                     });
-                    _saveState();
+                    // Don't save state immediately, only save when generating
                   },
+                  layout: OptionSliderLayout.none,
                 ),
-                const SizedBox(height: 16),
-                _buildCheckboxOptions(context, loc),
-                const SizedBox(height: 16),
+                VerticalSpacingDivider.specific(top: 0, bottom: 6),
+                // Switch options
+                _buildSwitchOptions(context, loc),
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
+                // Generate button
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                    ),
                     onPressed: _generatePassword,
                     icon: const Icon(Icons.refresh),
                     label: Text(loc.generate),

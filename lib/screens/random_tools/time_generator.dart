@@ -6,6 +6,10 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/widgets/generic/option_slider.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
 
 class TimeGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -21,7 +25,6 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   TimeOfDay _startTime = const TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _endTime = const TimeOfDay(hour: 23, minute: 59);
   int _timeCount = 5;
-  double _timeCountSlider = 5.0;
   bool _allowDuplicates = true;
   List<TimeOfDay> _generatedTimes = [];
   List<int> _generatedSeconds = []; // Store seconds separately
@@ -57,7 +60,6 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
               TimeOfDay(hour: state.startHour, minute: state.startMinute);
           _endTime = TimeOfDay(hour: state.endHour, minute: state.endMinute);
           _timeCount = state.timeCount;
-          _timeCountSlider = state.timeCount.toDouble();
           _allowDuplicates = state.allowDuplicates;
         });
       }
@@ -114,6 +116,9 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
         _copied = false;
       });
       _animationController.forward(from: 0.0);
+
+      // Save state when generating
+      _saveState();
 
       // Save to history if enabled
       if (_historyEnabled && _generatedTimes.isNotEmpty) {
@@ -211,7 +216,6 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                   _endTime = picked;
                 }
               });
-              _saveState();
             }
           },
           child: Container(
@@ -237,128 +241,59 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
     );
   }
 
+  Widget _buildTimeSelectors(AppLocalizations loc) {
+    return WidgetLayoutRenderHelper.twoEqualWidthInRow(
+      _buildTimeField(loc.startTime, _startTime, true),
+      _buildTimeField(loc.endTime, _endTime, false),
+      minWidth: 250,
+      horizontalSpacing: 20,
+      verticalSpacing: 8,
+    );
+  }
+
   Widget _buildCountSlider(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.timeCount,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: Slider(
-                value: _timeCountSlider,
-                min: 1.0,
-                max: 10.0,
-                divisions: 49,
-                label: _timeCount.toString(),
-                onChanged: (value) {
-                  setState(() {
-                    _timeCountSlider = value;
-                    _timeCount = value.round();
-                  });
-                  _saveState();
-                },
-              ),
-            ),
-            Container(
-              width: 60,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _timeCount.toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return OptionSlider<int>(
+      label: loc.timeCount,
+      currentValue: _timeCount,
+      options: List.generate(
+        10,
+        (i) => SliderOption(value: i + 1, label: '${i + 1}'),
+      ),
+      onChanged: (value) {
+        setState(() {
+          _timeCount = value;
+        });
+      },
+      fixedWidth: 60,
+      layout: OptionSliderLayout.none,
     );
   }
 
   Widget _buildOptionsSection(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.options,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-
-        // Responsive layout for options using LayoutBuilder
-        LayoutBuilder(
-          builder: (context, constraints) {
-            return constraints.maxWidth > 800
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: CheckboxListTile(
-                          title: Text(loc.includeSeconds),
-                          value: _includeSeconds,
-                          onChanged: (value) {
-                            setState(() {
-                              _includeSeconds = value ?? false;
-                            });
-                            _saveState();
-                          },
-                          dense: true,
-                        ),
-                      ),
-                      Expanded(
-                        child: CheckboxListTile(
-                          title: Text(loc.allowDuplicates),
-                          value: _allowDuplicates,
-                          onChanged: (value) {
-                            setState(() {
-                              _allowDuplicates = value ?? true;
-                            });
-                            _saveState();
-                          },
-                          dense: true,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      CheckboxListTile(
-                        title: Text(loc.includeSeconds),
-                        value: _includeSeconds,
-                        onChanged: (value) {
-                          setState(() {
-                            _includeSeconds = value ?? false;
-                          });
-                          _saveState();
-                        },
-                        dense: true,
-                      ),
-                      CheckboxListTile(
-                        title: Text(loc.allowDuplicates),
-                        value: _allowDuplicates,
-                        onChanged: (value) {
-                          setState(() {
-                            _allowDuplicates = value ?? true;
-                          });
-                          _saveState();
-                        },
-                        dense: true,
-                      ),
-                    ],
-                  );
-          },
-        ),
-      ],
+    return WidgetLayoutRenderHelper.twoEqualWidthInRow(
+      OptionSwitch(
+        title: loc.includeSeconds,
+        value: _includeSeconds,
+        onChanged: (value) {
+          setState(() {
+            _includeSeconds = value;
+          });
+        },
+        decorator: OptionSwitchDecorator.compact(context),
+      ),
+      OptionSwitch(
+        title: loc.allowDuplicates,
+        value: _allowDuplicates,
+        onChanged: (value) {
+          setState(() {
+            _allowDuplicates = value;
+          });
+        },
+        decorator: OptionSwitchDecorator.compact(context),
+      ),
+      minWidth: 350,
+      horizontalSpacing: 20,
+      verticalSpacing: 8,
     );
   }
 
@@ -377,42 +312,13 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Time range (responsive layout)
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    return constraints.maxWidth > 800
-                        ? Row(
-                            children: [
-                              Expanded(
-                                  child: _buildTimeField(
-                                      loc.startTime, _startTime, true)),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                  child: _buildTimeField(
-                                      loc.endTime, _endTime, false)),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              _buildTimeField(loc.startTime, _startTime, true),
-                              const SizedBox(height: 16),
-                              _buildTimeField(loc.endTime, _endTime, false),
-                            ],
-                          );
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
+                _buildTimeSelectors(loc),
+                VerticalSpacingDivider.onlyTop(12),
                 // Count slider
                 _buildCountSlider(loc),
-
-                const SizedBox(height: 16),
-
                 // Options section
                 _buildOptionsSection(loc),
-
-                const SizedBox(height: 16),
-
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
                 // Generate button
                 SizedBox(
                   width: double.infinity,
@@ -420,6 +326,11 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                     onPressed: _generateTimes,
                     icon: const Icon(Icons.refresh),
                     label: Text(loc.generate),
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
               ],

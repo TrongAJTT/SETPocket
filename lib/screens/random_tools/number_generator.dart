@@ -6,6 +6,12 @@ import 'package:setpocket/services/generation_history_service.dart';
 import 'package:setpocket/services/random_services/random_state_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/widgets/generic/option_grid_picker.dart' as grid;
+import 'package:setpocket/widgets/generic/option_item.dart';
+import 'package:setpocket/widgets/generic/option_slider.dart';
+import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class NumberGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -42,6 +48,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   Future<void> _loadHistory() async {
     final enabled = await GenerationHistoryService.isHistoryEnabled();
     final history = await GenerationHistoryService.getHistory('number');
+    if (!mounted) return;
     setState(() {
       _historyEnabled = enabled;
       _history = history;
@@ -52,6 +59,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   Future<void> _loadState() async {
     try {
       final state = await RandomStateService.getNumberGeneratorState();
+      if (!mounted) return;
       setState(() {
         _isInteger = state.isInteger;
         _minValue = state.minValue;
@@ -187,103 +195,6 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
     }
   }
 
-  Widget _buildMinMaxInputs(BuildContext context, AppLocalizations loc) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth >
-            800; // Use LayoutBuilder instead of MediaQuery
-
-        if (isDesktop) {
-          // Desktop layout: side by side
-          return Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _minValueController,
-                  decoration: InputDecoration(
-                    labelText: loc.minValue,
-                    border: const OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    _isInteger
-                        ? FilteringTextInputFormatter.digitsOnly
-                        : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                  ],
-                  onChanged: (value) {
-                    _minValue = double.tryParse(value) ?? _minValue;
-                    _saveState(); // Save state when value changes
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextField(
-                  controller: _maxValueController,
-                  decoration: InputDecoration(
-                    labelText: loc.maxValue,
-                    border: const OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    _isInteger
-                        ? FilteringTextInputFormatter.digitsOnly
-                        : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                  ],
-                  onChanged: (value) {
-                    _maxValue = double.tryParse(value) ?? _maxValue;
-                    _saveState(); // Save state when value changes
-                  },
-                ),
-              ),
-            ],
-          );
-        } else {
-          // Mobile layout: stacked
-          return Column(
-            children: [
-              TextField(
-                controller: _minValueController,
-                decoration: InputDecoration(
-                  labelText: loc.minValue,
-                  border: const OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  _isInteger
-                      ? FilteringTextInputFormatter.digitsOnly
-                      : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                ],
-                onChanged: (value) {
-                  _minValue = double.tryParse(value) ?? _minValue;
-                  _saveState(); // Save state when value changes
-                },
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _maxValueController,
-                decoration: InputDecoration(
-                  labelText: loc.maxValue,
-                  border: const OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  _isInteger
-                      ? FilteringTextInputFormatter.digitsOnly
-                      : FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                ],
-                onChanged: (value) {
-                  _maxValue = double.tryParse(value) ?? _maxValue;
-                  _saveState(); // Save state when value changes
-                },
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
-
   Widget _buildHistoryWidget(AppLocalizations loc) {
     return RandomGeneratorHistoryWidget(
       historyType: 'number',
@@ -311,96 +222,103 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Number Type',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<bool>(
-                        title: Text(loc.integers),
-                        value: true,
-                        groupValue: _isInteger,
-                        onChanged: (value) {
-                          setState(() {
-                            _isInteger = value ?? true;
-                          });
-                          _saveState(); // Save state when value changes
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<bool>(
-                        title: Text(loc.floatingPoint),
-                        value: false,
-                        groupValue: _isInteger,
-                        onChanged: (value) {
-                          setState(() {
-                            _isInteger = value ?? true;
-                          });
-                          _saveState(); // Save state when value changes
-                        },
-                      ),
-                    ),
+                // 1. Number Type Picker
+                grid.AutoScaleOptionGridPicker<bool>(
+                  title: 'Number Type',
+                  options: [
+                    OptionItem(value: true, label: loc.integers),
+                    OptionItem(value: false, label: loc.floatingPoint),
                   ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Min and Max value input
-                _buildMinMaxInputs(context, loc),
-
-                const SizedBox(height: 16),
-
-                // Quantity
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      loc.quantity,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Text(
-                      '$_quantity',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                Slider(
-                  value: _quantity.toDouble(),
-                  min: 1,
-                  max: 30,
-                  divisions: 29,
-                  label: _quantity.toString(),
-                  onChanged: (double value) {
+                  selectedValue: _isInteger,
+                  onSelectionChanged: (value) {
                     setState(() {
-                      _quantity = value.round();
+                      _isInteger = value;
                     });
-                    _saveState(); // Save state when value changes
                   },
+                  minCellWidth: 150,
+                  maxCellWidth: 400,
+                  fixedCellHeight: 50,
+                  decorator: const grid.OptionGridDecorator(
+                    labelAlign: grid.LabelAlign.center,
+                  ),
                 ),
-
-                // Allow duplicates
-                CheckboxListTile(
-                  title: Text(loc.allowDuplicates),
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
+                // 2. Min/Max Inputs
+                WidgetLayoutRenderHelper.twoEqualWidthInRow(
+                  TextFormField(
+                    controller: _minValueController,
+                    decoration: InputDecoration(
+                      labelText: loc.minValue,
+                      border: const OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      _isInteger
+                          ? FilteringTextInputFormatter.digitsOnly
+                          : FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9.-]')),
+                    ],
+                    onChanged: (value) {
+                      _minValue = double.tryParse(value) ?? _minValue;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _maxValueController,
+                    decoration: InputDecoration(
+                      labelText: loc.maxValue,
+                      border: const OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      _isInteger
+                          ? FilteringTextInputFormatter.digitsOnly
+                          : FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9.-]')),
+                    ],
+                    onChanged: (value) {
+                      _maxValue = double.tryParse(value) ?? _maxValue;
+                    },
+                  ),
+                  horizontalSpacing: 16,
+                  minWidth: 300,
+                ),
+                const SizedBox(height: 8),
+                // 3. Quantity Slider
+                OptionSlider<int>(
+                  label: loc.quantity,
+                  currentValue: _quantity,
+                  options: List.generate(
+                    30,
+                    (i) => SliderOption(value: i + 1, label: '${i + 1}'),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _quantity = value;
+                    });
+                  },
+                  layout: OptionSliderLayout.none,
+                ),
+                // 4. Allow Duplicates Switch
+                OptionSwitch(
+                  title: loc.allowDuplicates,
                   value: _allowDuplicates,
                   onChanged: (value) {
                     setState(() {
-                      _allowDuplicates = value ?? true;
+                      _allowDuplicates = value;
                     });
-                    _saveState(); // Save state when value changes
                   },
+                  decorator: OptionSwitchDecorator.compact(context),
                 ),
-
-                const SizedBox(height: 16),
-
+                VerticalSpacingDivider.specific(top: 6, bottom: 12),
                 // Generate button
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                    ),
                     onPressed: _generateNumbers,
                     icon: const Icon(Icons.refresh),
                     label: Text(loc.generate),

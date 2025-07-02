@@ -449,7 +449,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Widget _buildThemeSettings(AppLocalizations loc) {
-    return grid.AutoScaleOptionGridSelector<ThemeMode>(
+    return grid.AutoScaleOptionGridPicker<ThemeMode>(
       title: loc.theme,
       options: [
         OptionItem.withIcon(
@@ -486,7 +486,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Widget _buildLanguageSettings(AppLocalizations loc) {
-    return grid.AutoScaleOptionGridSelector<String>(
+    return grid.AutoScaleOptionGridPicker<String>(
       title: loc.language,
       options: [
         OptionItem.withEmoji(

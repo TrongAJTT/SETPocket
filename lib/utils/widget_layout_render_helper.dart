@@ -44,7 +44,8 @@ class _AutoCondition extends TwoInARowConditionType {
 class TwoInARowDecorator {
   final DynamicDimension? widthWidget1;
   final DynamicDimension? widthWidget2;
-  final double spacing;
+  final double horizontalSpacing;
+  final double verticalSpacing;
   final MainAxisAlignment mainAxisAlignment;
   final CrossAxisAlignment crossAxisAlignment;
   final MainAxisSize mainAxisSize;
@@ -52,7 +53,8 @@ class TwoInARowDecorator {
   const TwoInARowDecorator({
     this.widthWidget1,
     this.widthWidget2,
-    this.spacing = 8.0,
+    this.horizontalSpacing = 8.0,
+    this.verticalSpacing = 8.0,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.max,
@@ -61,7 +63,8 @@ class TwoInARowDecorator {
   TwoInARowDecorator copyWith({
     DynamicDimension? widthWidget1,
     DynamicDimension? widthWidget2,
-    double? spacing,
+    double? horizontalSpacing,
+    double? verticalSpacing,
     MainAxisAlignment? mainAxisAlignment,
     CrossAxisAlignment? crossAxisAlignment,
     MainAxisSize? mainAxisSize,
@@ -69,7 +72,8 @@ class TwoInARowDecorator {
     return TwoInARowDecorator(
       widthWidget1: widthWidget1 ?? this.widthWidget1,
       widthWidget2: widthWidget2 ?? this.widthWidget2,
-      spacing: spacing ?? this.spacing,
+      horizontalSpacing: horizontalSpacing ?? this.horizontalSpacing,
+      verticalSpacing: verticalSpacing ?? this.verticalSpacing,
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
       mainAxisSize: mainAxisSize ?? this.mainAxisSize,
@@ -206,8 +210,8 @@ class WidgetLayoutRenderHelper {
             );
           } else {
             // For percentage and flex, calculate actual width
-            final calculatedWidth =
-                dimension1.calculate(constraints.maxWidth - decorator.spacing);
+            final calculatedWidth = dimension1
+                .calculate(constraints.maxWidth - decorator.horizontalSpacing);
             children.add(
               SizedBox(
                 width: calculatedWidth,
@@ -221,8 +225,8 @@ class WidgetLayoutRenderHelper {
         }
 
         // Add spacing
-        if (decorator.spacing > 0) {
-          children.add(SizedBox(width: decorator.spacing));
+        if (decorator.horizontalSpacing > 0) {
+          children.add(SizedBox(width: decorator.horizontalSpacing));
         }
 
         // Add second widget with appropriate sizing
@@ -243,7 +247,8 @@ class WidgetLayoutRenderHelper {
             );
           } else {
             // For percentage and flex, calculate actual width
-            final remainingWidth = constraints.maxWidth - decorator.spacing;
+            final remainingWidth =
+                constraints.maxWidth - decorator.horizontalSpacing;
             final calculatedWidth = dimension2.calculate(remainingWidth);
             children.add(
               SizedBox(
@@ -274,11 +279,13 @@ class WidgetLayoutRenderHelper {
     TwoInARowDecorator decorator,
   ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: decorator.mainAxisSize,
+      crossAxisAlignment: decorator.crossAxisAlignment,
+      mainAxisAlignment: decorator.mainAxisAlignment,
       children: [
         widget1,
-        if (decorator.spacing > 0) SizedBox(height: decorator.spacing),
+        if (decorator.verticalSpacing > 0)
+          SizedBox(height: decorator.verticalSpacing),
         widget2,
       ],
     );
@@ -320,7 +327,7 @@ class WidgetLayoutRenderHelper {
     }
 
     // Calculate required width
-    double requiredWidth = decorator.spacing;
+    double requiredWidth = decorator.horizontalSpacing;
 
     if (decorator.widthWidget1?.type == DimensionType.fixed) {
       requiredWidth += decorator.widthWidget1!.value;
@@ -345,8 +352,9 @@ class WidgetLayoutRenderHelper {
   static Widget twoEqualWidthInRow(
     Widget widget1,
     Widget widget2, {
-    double spacing = 8.0,
-    double minWidth = 300.0,
+    double minWidth = 600,
+    double horizontalSpacing = 16.0,
+    double verticalSpacing = 16.0,
   }) {
     return twoInARowThreshold(
       widget1,
@@ -354,7 +362,8 @@ class WidgetLayoutRenderHelper {
       TwoInARowDecorator(
         widthWidget1: DynamicDimension.expanded(),
         widthWidget2: DynamicDimension.expanded(),
-        spacing: spacing,
+        horizontalSpacing: horizontalSpacing,
+        verticalSpacing: verticalSpacing,
       ),
       TwoInARowConditionType.overallWidth(minWidth),
     );
@@ -376,7 +385,7 @@ class WidgetLayoutRenderHelper {
       widthWidget2: fixedFirst
           ? DynamicDimension.expanded()
           : DynamicDimension.fix(fixedWidth),
-      spacing: spacing,
+      horizontalSpacing: spacing,
     );
 
     return twoInARowThreshold(
@@ -396,7 +405,9 @@ class WidgetLayoutRenderHelper {
     return twoInARowThreshold(
       widget1,
       widget2,
-      TwoInARowDecorator(spacing: spacing),
+      TwoInARowDecorator(
+        horizontalSpacing: spacing,
+      ),
       TwoInARowConditionType.auto(),
     );
   }

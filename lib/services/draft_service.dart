@@ -1,34 +1,16 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:setpocket/models/text_template.dart';
 import 'package:setpocket/services/template_service.dart';
-import 'hive_service.dart';
 
 class DraftService {
   static const String _draftsKey = 'drafts';
 
   static Future<List<TemplateDraft>> getDrafts() async {
     try {
-      final box = HiveService.templatesBox;
-      final draftsJson = box.get(_draftsKey, defaultValue: <String>[]);
-
-      if (draftsJson is List) {
-        final drafts = draftsJson
-            .cast<String>()
-            .map((json) => TemplateDraft.fromJson(jsonDecode(json)))
-            .toList();
-
-        // Remove expired drafts
-        final validDrafts = drafts.where((draft) => !draft.isExpired).toList();
-
-        // If we removed any drafts, save the updated list
-        if (validDrafts.length != drafts.length) {
-          await _saveDraftsList(validDrafts);
-        }
-
-        return validDrafts;
-      }
-
-      return [];
+      final prefs = await SharedPreferences.getInstance();
+      final draftsJson = prefs.getStringList(_draftsKey) ?? [];
+      return draftsJson.map((json) => TemplateDraft.fromJson(jsonDecode(json))).toList();
     } catch (e) {
       return [];
     }
@@ -37,19 +19,17 @@ class DraftService {
   static Future<void> saveDraft(TemplateDraft draft) async {
     try {
       final drafts = await getDrafts();
-
-      // Check if draft already exists by ID
       final existingIndex = drafts.indexWhere((d) => d.id == draft.id);
-
+      
       if (existingIndex >= 0) {
-        // Update existing draft with new updatedAt time
-        drafts[existingIndex] = draft.copyWith(updatedAt: DateTime.now());
+        drafts[existingIndex] = draft;
       } else {
-        // Add new draft
         drafts.add(draft);
       }
-
-      await _saveDraftsList(drafts);
+      
+      final prefs = await SharedPreferences.getInstance();
+      final draftsJson = drafts.map((d) => jsonEncode(d.toJson())).toList();
+      await prefs.setStringList(_draftsKey, draftsJson);
     } catch (e) {
       throw Exception('Failed to save draft: $e');
     }
@@ -58,8 +38,11 @@ class DraftService {
   static Future<void> deleteDraft(String draftId) async {
     try {
       final drafts = await getDrafts();
-      final updatedDrafts = drafts.where((d) => d.id != draftId).toList();
-      await _saveDraftsList(updatedDrafts);
+      drafts.removeWhere((d) => d.id == draftId);
+      
+      final prefs = await SharedPreferences.getInstance();
+      final draftsJson = drafts.map((d) => jsonEncode(d.toJson())).toList();
+      await prefs.setStringList(_draftsKey, draftsJson);
     } catch (e) {
       throw Exception('Failed to delete draft: $e');
     }
@@ -68,25 +51,27 @@ class DraftService {
   static Future<TemplateDraft?> getDraftById(String draftId) async {
     try {
       final drafts = await getDrafts();
-      return drafts.firstWhere((d) => d.id == draftId);
+      return drafts.where((d) => d.id == draftId).firstOrNull;
     } catch (e) {
       return null;
     }
   }
 
-  static Future<void> _saveDraftsList(List<TemplateDraft> drafts) async {
-    final box = HiveService.templatesBox;
-    final draftsJson = drafts.map((d) => jsonEncode(d.toJson())).toList();
-    await box.put(_draftsKey, draftsJson);
-  }
-
   static Future<void> clearExpiredDrafts() async {
     try {
       final drafts = await getDrafts();
-      final validDrafts = drafts.where((draft) => !draft.isExpired).toList();
-
+      final now = DateTime.now();
+      const expireDays = 30; // Drafts expire after 30 days
+      
+      final validDrafts = drafts.where((draft) {
+        final age = now.difference(draft.createdAt).inDays;
+        return age <= expireDays;
+      }).toList();
+      
       if (validDrafts.length != drafts.length) {
-        await _saveDraftsList(validDrafts);
+        final prefs = await SharedPreferences.getInstance();
+        final draftsJson = validDrafts.map((d) => jsonEncode(d.toJson())).toList();
+        await prefs.setStringList(_draftsKey, draftsJson);
       }
     } catch (e) {
       // Ignore errors in cleanup
@@ -95,7 +80,8 @@ class DraftService {
 
   static Future<void> clearAllDrafts() async {
     try {
-      await _saveDraftsList([]);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_draftsKey);
     } catch (e) {
       throw Exception('Failed to clear all drafts: $e');
     }
@@ -119,19 +105,16 @@ class DraftService {
         return;
       }
 
-      final existingDraft = await getDraftById(draftId);
-      final now = DateTime.now();
-
       final draft = TemplateDraft(
         id: draftId,
         type: type,
         originalTemplateId: originalTemplateId,
         title: title,
         content: content,
-        createdAt: existingDraft?.createdAt ?? now,
-        updatedAt: now,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
-
+      
       await saveDraft(draft);
     } catch (e) {
       // Auto-save should fail silently to not interrupt user workflow

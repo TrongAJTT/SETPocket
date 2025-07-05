@@ -16,29 +16,21 @@ class LengthStateAdapter implements ConverterStateService {
     logInfo(
         'LengthStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
-    // Convert ConverterState to LengthStateModel
-    final lengthState = LengthStateModel(
-      cards: state.cards
-          .map((card) => LengthCardState(
-                unitCode: card.baseUnitId,
-                amount: card.baseValue,
-                name: card.name,
-                visibleUnits: card.visibleUnits, // Save per-card visible units
-              ))
-          .toList(),
-      visibleUnits: state.globalVisibleUnits.toList(),
-      lastUpdated: DateTime.now(),
-      isFocusMode: state.isFocusMode,
-      viewMode: state.viewMode.name,
-    );
+    // Convert generic ConverterState to LengthStateModel
+    final lengthCards = state.cards.map((card) {
+      return LengthCardState()
+        ..unitCode = card.baseUnitId
+        ..amount = card.baseValue
+        ..name = card.name
+        ..visibleUnits = card.visibleUnits;
+    }).toList();
 
-    logInfo(
-        'LengthStateAdapter: Converted to LengthStateModel with ${lengthState.cards.length} cards');
-    for (int i = 0; i < lengthState.cards.length; i++) {
-      final card = lengthState.cards[i];
-      logInfo(
-          'LengthStateAdapter: Card $i - Name: ${card.name}, Unit: ${card.unitCode}, Amount: ${card.amount}, VisibleUnits: ${card.visibleUnits?.length ?? 0}');
-    }
+    final lengthState = LengthStateModel()
+      ..cards = lengthCards
+      ..visibleUnits = state.globalVisibleUnits.toList()
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = state.isFocusMode
+      ..viewMode = state.viewMode.name;
 
     await LengthStateService.saveState(lengthState);
   }
@@ -58,26 +50,21 @@ class LengthStateAdapter implements ConverterStateService {
 
       // Convert LengthStateModel to ConverterState
       final cards = lengthState.cards.map((card) {
-        // Use per-card visible units if available, otherwise fall back to global
-        final cardVisibleUnits = card.visibleUnits ?? lengthState.visibleUnits;
+        final visibleUnits = card.visibleUnits ?? lengthState.visibleUnits;
         final values = <String, double>{};
 
         // Initialize all units with 0, then set base unit value
-        for (String unit in cardVisibleUnits) {
-          values[unit] = unit == card.unitCode ? card.amount : 0.0;
+        for (String unit in visibleUnits) {
+          values[unit] = unit == card.unitCode ? (card.amount ?? 0.0) : 0.0;
         }
 
-        final convertedCard = ConverterCardState(
+        return ConverterCardState(
           name: card.name ?? 'Card ${lengthState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
-          visibleUnits: cardVisibleUnits,
+          baseUnitId: card.unitCode ?? 'meter',
+          baseValue: card.amount ?? 1.0,
+          visibleUnits: visibleUnits,
           values: values,
         );
-
-        logInfo(
-            'LengthStateAdapter: Converted card - Name: ${convertedCard.name}, BaseUnit: ${convertedCard.baseUnitId}, BaseValue: ${convertedCard.baseValue}, VisibleUnits: ${convertedCard.visibleUnits.length}');
-        return convertedCard;
       }).toList();
 
       // Parse view mode

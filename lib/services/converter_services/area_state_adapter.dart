@@ -32,7 +32,7 @@ class AreaStateAdapter implements ConverterStateService {
         final values = <String, double>{};
         for (final unit in visibleUnits) {
           if (unit == card.unitCode) {
-            values[unit] = card.amount;
+            values[unit] = card.amount ?? 1.0;
           } else {
             values[unit] = 0.0; // Will be calculated by controller
           }
@@ -40,8 +40,8 @@ class AreaStateAdapter implements ConverterStateService {
 
         return ConverterCardState(
           name: card.name ?? 'Card ${areaState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
+          baseUnitId: card.unitCode ?? 'square_meters',
+          baseValue: card.amount ?? 1.0,
           visibleUnits: visibleUnits,
           values: values,
         );
@@ -133,22 +133,20 @@ class AreaStateAdapter implements ConverterStateService {
         logInfo(
             'AreaStateAdapter: Card ${state.cards.indexOf(card)} - Name: ${card.name}, Unit: ${card.baseUnitId}, Amount: ${card.baseValue}, VisibleUnits: ${card.visibleUnits.length}');
 
-        return AreaCardState(
-          unitCode: card.baseUnitId,
-          amount: card.baseValue,
-          name: card.name,
-          visibleUnits: card.visibleUnits,
-          createdAt: DateTime.now(),
-        );
+        return AreaCardState()
+          ..unitCode = card.baseUnitId
+          ..amount = card.baseValue
+          ..name = card.name
+          ..visibleUnits = card.visibleUnits
+          ..createdAt = DateTime.now();
       }).toList();
 
-      final areaState = AreaStateModel(
-        cards: areaCards,
-        visibleUnits: state.globalVisibleUnits.toList(),
-        lastUpdated: DateTime.now(),
-        isFocusMode: state.isFocusMode,
-        viewMode: state.viewMode.name,
-      );
+      final areaState = AreaStateModel()
+        ..cards = areaCards
+        ..visibleUnits = state.globalVisibleUnits.toList()
+        ..lastUpdated = DateTime.now()
+        ..isFocusMode = state.isFocusMode
+        ..viewMode = state.viewMode.name;
 
       logInfo(
           'AreaStateAdapter: Converted to AreaStateModel with ${areaState.cards.length} cards');

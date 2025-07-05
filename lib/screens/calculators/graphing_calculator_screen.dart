@@ -175,7 +175,10 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
   }
 
   Future<void> _saveCurrentState() async {
-    await GraphingCalculatorService.saveCurrentState(_functions, _aspectRatio);
+    final viewportSettings = {
+      'aspectRatio': _aspectRatio,
+    };
+    await GraphingCalculatorService.saveCurrentState(_functions, viewportSettings);
   }
 
   Future<void> _saveCurrentGroupToHistory() async {
@@ -205,9 +208,9 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
       final savedPreference =
           await GraphingCalculatorService.getSaveDialogPreference();
 
-      if (savedPreference != null) {
+      if (savedPreference != null && savedPreference != 'ask') {
         // User has a saved preference, use it directly
-        if (savedPreference) {
+        if (savedPreference == 'always') {
           await _saveCurrentGroupToHistory();
         }
         // Continue with loading regardless of preference
@@ -225,7 +228,7 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
 
         if (rememberChoice) {
           // Save the preference and disable "ask before loading"
-          await GraphingCalculatorService.setSaveDialogPreference(shouldSave);
+          await GraphingCalculatorService.setSaveDialogPreference(shouldSave ? 'always' : 'never');
           await GraphingCalculatorService.setAskBeforeLoading(false);
           await _loadSettings(); // Refresh settings
         }

@@ -80,70 +80,47 @@ class DiscountCalculatorService {
 
   // History Management
   static Future<void> saveToHistory(DiscountCalculationHistory item) async {
-    final box = await HiveService.getBox(_historyBoxName);
-    await box.put(item.id, item.toMap());
+    // TODO: Implement Isar-based discount calculator history storage
   }
 
   static Future<List<DiscountCalculationHistory>> getHistory() async {
-    final box = await HiveService.getBox(_historyBoxName);
-    final items = box.values.map((item) {
-      return DiscountCalculationHistory.fromMap(
-          Map<String, dynamic>.from(item));
-    }).toList();
-
-    // Sort by timestamp, newest first
-    items.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    return items;
+    // TODO: Implement Isar-based discount calculator history storage
+    return [];
   }
 
   static Future<void> removeFromHistory(String id) async {
-    final box = await HiveService.getBox(_historyBoxName);
-    await box.delete(id);
+    // TODO: Implement Isar-based discount calculator history storage
   }
 
   static Future<void> clearHistory() async {
-    final box = await HiveService.getBox(_historyBoxName);
-    await box.clear();
+    // TODO: Implement Isar-based discount calculator history storage
   }
 
   // State Management
   static Future<void> saveCurrentState(DiscountCalculatorState state) async {
-    final box = await HiveService.getBox(_stateBoxName);
-    await box.put(_stateKey, state.toMap());
+    // TODO: Implement Isar-based discount calculator state storage
   }
 
   static Future<DiscountCalculatorState?> getCurrentState() async {
-    final box = await HiveService.getBox(_stateBoxName);
-    final stateMap = box.get(_stateKey);
-    if (stateMap != null) {
-      return DiscountCalculatorState.fromMap(
-          Map<String, dynamic>.from(stateMap));
-    }
+    // TODO: Implement Isar-based discount calculator state storage
     return null;
   }
 
   static Future<void> clearCurrentState() async {
-    final box = await HiveService.getBox(_stateBoxName);
-    await box.delete(_stateKey);
+    // TODO: Implement Isar-based discount calculator state storage
   }
 
   // Form State Management
   static Future<void> saveFormState(Map<String, String> formState) async {
-    final box = await HiveService.getBox(_stateBoxName);
-    await box.put('form_state', formState);
+    // TODO: Implement Isar-based discount calculator form state storage
   }
 
   static Future<Map<String, String>> getFormState() async {
-    final box = await HiveService.getBox(_stateBoxName);
-    final formState = box.get('form_state');
-    if (formState != null && formState is Map) {
-      return Map<String, String>.from(formState);
-    }
+    // TODO: Implement Isar-based discount calculator form state storage
     return {};
   }
 
   static Future<void> clearFormState() async {
-    final box = await HiveService.getBox(_stateBoxName);
-    await box.delete('form_state');
+    // TODO: Implement Isar-based discount calculator form state storage
   }
 }

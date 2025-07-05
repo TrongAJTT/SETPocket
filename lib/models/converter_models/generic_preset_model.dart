@@ -1,23 +1,23 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
+import 'package:setpocket/utils/isar_utils.dart';
 
 part 'generic_preset_model.g.dart';
 
-@HiveType(typeId: 19)
+@Collection()
 class GenericPresetModel {
-  @HiveField(0)
-  final String id;
+  Id get isarId => fastHash(id);
 
-  @HiveField(1)
-  final String name;
+  @Index(unique: true, replace: true)
+  String id;
 
-  @HiveField(2)
-  final List<String> units;
+  String name;
 
-  @HiveField(3)
-  final DateTime createdAt;
+  List<String> units;
 
-  @HiveField(4)
-  final String presetType; // 'currency', 'length', 'weight', etc.
+  DateTime createdAt;
+
+  @Index()
+  String presetType; // 'currency', 'length', 'weight', etc.
 
   GenericPresetModel({
     required this.id,

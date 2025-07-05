@@ -1,20 +1,20 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
+import 'package:setpocket/utils/isar_utils.dart';
 
 part 'currency_preset_model.g.dart';
 
-@HiveType(typeId: 3)
+@Collection()
 class CurrencyPresetModel {
-  @HiveField(0)
-  final String id;
+  Id get isarId => fastHash(id);
 
-  @HiveField(1)
-  final String name;
+  @Index(unique: true, replace: true)
+  String id;
 
-  @HiveField(2)
-  final List<String> currencies;
+  String name;
 
-  @HiveField(3)
-  final DateTime createdAt;
+  List<String> currencies;
+
+  DateTime createdAt;
 
   CurrencyPresetModel({
     required this.id,

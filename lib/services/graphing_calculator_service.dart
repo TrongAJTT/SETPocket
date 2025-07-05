@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:setpocket/models/function_group_history.dart';
 import 'package:setpocket/models/graphing_function.dart';
 import 'package:flutter/material.dart';
-import 'package:setpocket/services/hive_service.dart';
 
 class GraphingCalculatorService {
   static const String _historyBoxName = 'graphing_calculator_history';
@@ -17,196 +16,119 @@ class GraphingCalculatorService {
 
   // Initialize the service
   static Future<void> initialize() async {
-    await HiveService.getBox(_historyBoxName);
-    await HiveService.getBox(_settingsBoxName);
-    await HiveService.getBox(_currentStateBoxName);
+    // TODO: Implement Isar-based graphing calculator storage
   }
 
   // History management
   static Future<List<FunctionGroupHistory>> getHistory() async {
-    final box = await HiveService.getBox(_historyBoxName);
-    final List<FunctionGroupHistory> history = [];
-
-    for (var key in box.keys) {
-      final data = box.get(key);
-      if (data != null && data is Map) {
-        try {
-          final group =
-              FunctionGroupHistory.fromJson(Map<String, dynamic>.from(data));
-          history.add(group);
-        } catch (e) {
-          debugPrint('Error parsing history item: $e');
-        }
-      }
-    }
-
-    // Sort by saved date, newest first
-    history.sort((a, b) => b.savedAt.compareTo(a.savedAt));
-    return history;
+    // TODO: Implement Isar-based graphing calculator history storage
+    return [];
   }
 
   static Future<void> saveToHistory(
       List<GraphingFunction> functions, double aspectRatio) async {
-    if (functions.isEmpty) return;
-
-    final box = await HiveService.getBox(_historyBoxName);
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-
-    final group = FunctionGroupHistory(
-      id: id,
-      functions: functions,
-      savedAt: DateTime.now(),
-      aspectRatio: aspectRatio,
-    );
-
-    await box.put(id, group.toJson());
+    // TODO: Implement Isar-based graphing calculator history storage
   }
 
-  static Future<void> removeFromHistory(String id) async {
-    final box = await HiveService.getBox(_historyBoxName);
-    await box.delete(id);
+  static Future<void> removeFromHistory(String groupId) async {
+    // TODO: Implement Isar-based graphing calculator history storage
   }
 
   static Future<void> clearHistory() async {
-    final box = await HiveService.getBox(_historyBoxName);
-    await box.clear();
+    // TODO: Implement Isar-based graphing calculator history storage
   }
 
   // Settings management
   static Future<bool> getRememberHistory() async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    return box.get(_rememberHistoryKey, defaultValue: true);
-  }
-
-  static Future<void> setRememberHistory(bool value) async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    await box.put(_rememberHistoryKey, value);
-
-    // If remember history is disabled, also disable ask before loading
-    if (!value) {
-      await box.put(_askBeforeLoadingKey, false);
-    }
-  }
-
-  static Future<bool> getAskBeforeLoading() async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    return box.get(_askBeforeLoadingKey, defaultValue: true);
-  }
-
-  static Future<void> setAskBeforeLoading(bool value) async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    await box.put(_askBeforeLoadingKey, value);
-  }
-
-  // Dialog preference management
-  static Future<bool?> getSaveDialogPreference() async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    final preference = box.get(_saveDialogPreferenceKey);
-    return preference; // null = not set, true = always save, false = never save
-  }
-
-  static Future<void> setSaveDialogPreference(bool? value) async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    if (value == null) {
-      await box.delete(_saveDialogPreferenceKey);
-    } else {
-      await box.put(_saveDialogPreferenceKey, value);
-    }
-  }
-
-  static Future<bool> getAutoSaveWhenLoading() async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    return box.get(_autoSaveWhenLoadingKey, defaultValue: false);
-  }
-
-  static Future<void> setAutoSaveWhenLoading(bool value) async {
-    final box = await HiveService.getBox(_settingsBoxName);
-    await box.put(_autoSaveWhenLoadingKey, value);
-  }
-
-  // Utility methods
-  static bool areFunctionGroupsEqual(
-      List<GraphingFunction> group1, List<GraphingFunction> group2) {
-    if (group1.length != group2.length) return false;
-
-    for (int i = 0; i < group1.length; i++) {
-      final f1 = group1[i];
-      final f2 = group2[i];
-
-      if (f1.expression != f2.expression ||
-          f1.isVisible != f2.isVisible ||
-          f1.color.toARGB32() != f2.color.toARGB32()) {
-        return false;
-      }
-    }
+    // TODO: Implement Isar-based settings storage
     return true;
   }
 
+  static Future<void> setRememberHistory(bool value) async {
+    // TODO: Implement Isar-based settings storage
+  }
+
+  static Future<bool> getAskBeforeLoading() async {
+    // TODO: Implement Isar-based settings storage
+    return true;
+  }
+
+  static Future<void> setAskBeforeLoading(bool value) async {
+    // TODO: Implement Isar-based settings storage
+  }
+
+  static Future<bool> getAutoSaveWhenLoading() async {
+    // TODO: Implement Isar-based settings storage
+    return false;
+  }
+
+  static Future<void> setAutoSaveWhenLoading(bool value) async {
+    // TODO: Implement Isar-based settings storage
+  }
+
+  static Future<String> getSaveDialogPreference() async {
+    // TODO: Implement Isar-based settings storage
+    return 'ask';
+  }
+
+  static Future<void> setSaveDialogPreference(String preference) async {
+    // TODO: Implement Isar-based settings storage
+  }
+
   // Current state management
+  static Future<void> saveCurrentState(List<GraphingFunction> functions,
+      Map<String, dynamic> viewportSettings) async {
+    // TODO: Implement Isar-based current state storage
+  }
+
   static Future<Map<String, dynamic>?> getCurrentState() async {
-    final box = await HiveService.getBox(_currentStateBoxName);
-    final data = box.get(_currentStateKey);
-    if (data != null && data is Map) {
-      return Map<String, dynamic>.from(data);
-    }
+    // TODO: Implement Isar-based current state storage
     return null;
   }
 
-  static Future<void> saveCurrentState(
-      List<GraphingFunction> functions, double aspectRatio) async {
-    final box = await HiveService.getBox(_currentStateBoxName);
-
-    final functionsData = functions.map((f) => f.toJson()).toList();
-    final stateData = {
-      'functions': functionsData,
-      'aspectRatio': aspectRatio,
-      'lastUpdated': DateTime.now().toIso8601String(),
-    };
-
-    await box.put(_currentStateKey, stateData);
-  }
-
   static Future<void> clearCurrentState() async {
-    final box = await HiveService.getBox(_currentStateBoxName);
-    await box.delete(_currentStateKey);
+    // TODO: Implement Isar-based current state storage
   }
 
-  // Cache management for settings integration
-  static Future<Map<String, dynamic>> getCacheInfo() async {
-    final history = await getHistory();
-    final currentState = await getCurrentState();
+  // Utility methods
+  static Future<bool> hasData() async {
+    // TODO: Implement Isar-based data check
+    return false;
+  }
 
-    // Calculate cache size (rough estimation)
-    final historySize = history.fold<int>(0, (sum, group) {
-      return sum +
-          group.functions.fold<int>(0, (funcSum, func) {
-            return funcSum +
-                func.expression.length * 2; // Rough char size estimation
-          });
-    });
-
-    final stateSize =
-        currentState != null ? json.encode(currentState).length : 0;
-
-    return {
-      'items': history.length + (currentState != null ? 1 : 0),
-      'size': historySize + stateSize,
-      'history_count': history.length,
-      'has_current_state': currentState != null,
-    };
+  static Future<int> getDataSize() async {
+    // TODO: Implement Isar-based data size calculation
+    return 0;
   }
 
   static Future<void> clearAllData() async {
-    await clearHistory();
-    await clearCurrentState();
+    // TODO: Implement Isar-based clear all data
+  }
 
-    // Reset settings to defaults
-    final settingsBox = await HiveService.getBox(_settingsBoxName);
-    await settingsBox.put(_rememberHistoryKey, true);
-    await settingsBox.put(_askBeforeLoadingKey, true);
+  // Additional methods needed by cache_service
+  static Future<Map<String, dynamic>> getCacheInfo() async {
+    return {
+      'hasData': false,
+      'dataSize': 0,
+    };
   }
 
   static Future<void> clearAllCache() async {
-    await clearAllData();
+    // TODO: Implement Isar-based cache clearing
+  }
+
+  // Method to check if function groups are equal (needed by screens)
+  static bool areFunctionGroupsEqual(List<GraphingFunction> group1, List<GraphingFunction> group2) {
+    if (group1.length != group2.length) return false;
+    
+    for (int i = 0; i < group1.length; i++) {
+      if (group1[i].expression != group2[i].expression ||
+          group1[i].color != group2[i].color ||
+          group1[i].isVisible != group2[i].isVisible) {
+        return false;
+      }
+    }
+    
+    return true;
   }
 }

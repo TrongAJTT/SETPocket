@@ -1,57 +1,87 @@
-import 'package:hive/hive.dart';
+import 'dart:convert';
+import 'package:isar/isar.dart';
 
 part 'unit_template_model.g.dart';
 
-@HiveType(typeId: 15)
-class UnitTemplateModel extends HiveObject {
-  @HiveField(0)
-  String id;
+@collection
+class UnitTemplateModel {
+  Id id = Isar.autoIncrement;
 
-  @HiveField(1)
-  String name;
+  @Index()
+  late String templateId;
 
-  @HiveField(2)
-  String templateType; // 'currency', 'length', 'weight', etc.
+  late String name;
 
-  @HiveField(3)
-  List<String> units; // List of unit IDs
+  @Index()
+  late String templateType; // 'currency', 'length', 'weight', etc.
 
-  @HiveField(4)
-  DateTime createdAt;
+  late List<String> units; // List of unit IDs
 
-  @HiveField(5)
-  Map<String, dynamic>? metadata; // Additional data specific to template type
+  late DateTime createdAt;
+
+  // Store metadata as JSON string for Isar compatibility
+  late String? metadataJson;
 
   UnitTemplateModel({
-    required this.id,
+    this.id = Isar.autoIncrement,
+    required this.templateId,
     required this.name,
     required this.templateType,
     required this.units,
     required this.createdAt,
-    this.metadata,
-  });
+    Map<String, String>? metadata,
+  }) {
+    // Set metadata JSON when metadata is provided
+    if (metadata != null) {
+      metadataJson = jsonEncode(metadata);
+    } else {
+      metadataJson = null;
+    }
+  }
+
+  // Get metadata as map
+  Map<String, String>? getMetadata() {
+    if (metadataJson == null) return null;
+    try {
+      final decoded = jsonDecode(metadataJson!);
+      return Map<String, String>.from(decoded);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Set metadata as map
+  void setMetadata(Map<String, String>? value) {
+    if (value != null) {
+      metadataJson = jsonEncode(value);
+    } else {
+      metadataJson = null;
+    }
+  }
 
   // Convert to JSON
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'templateId': templateId,
       'name': name,
       'templateType': templateType,
       'units': units,
       'createdAt': createdAt.toIso8601String(),
-      'metadata': metadata,
+      'metadata': getMetadata(),
     };
   }
 
   // Create from JSON
   factory UnitTemplateModel.fromJson(Map<String, dynamic> json) {
     return UnitTemplateModel(
-      id: json['id'] as String,
+      templateId: json['templateId'] ?? json['id'], // Support old format
       name: json['name'] as String,
       templateType: json['templateType'] as String,
       units: List<String>.from(json['units'] as List),
       createdAt: DateTime.parse(json['createdAt'] as String),
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      metadata: json['metadata'] != null
+          ? Map<String, String>.from(json['metadata'] as Map)
+          : null,
     );
   }
 
@@ -60,20 +90,14 @@ class UnitTemplateModel extends HiveObject {
       identical(this, other) ||
       other is UnitTemplateModel &&
           runtimeType == other.runtimeType &&
-          id == other.id;
+          templateId == other.templateId;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => templateId.hashCode;
 }
 
-@HiveType(typeId: 16)
 enum TemplateSortOrder {
-  @HiveField(0)
   date,
-
-  @HiveField(1)
   name,
-
-  @HiveField(2)
   type,
 }

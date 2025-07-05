@@ -149,7 +149,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       await DraftService.autoSaveDraft(
         draftId: _currentDraftId!,
         type: widget.template != null ? DraftType.edit : DraftType.create,
-        originalTemplateId: widget.template?.id,
+        originalTemplateId: widget.template?.templateId,
         title: currentTitle,
         content: currentContent,
       );
@@ -215,7 +215,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       final draft = TemplateDraft(
         id: _currentDraftId!,
         type: widget.template != null ? DraftType.edit : DraftType.create,
-        originalTemplateId: widget.template?.id,
+        originalTemplateId: widget.template?.templateId,
         title: _titleController.text,
         content: _contentController.text,
         createdAt: DateTime.now(),
@@ -1426,11 +1426,11 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
     try {
       final title = _titleController.text.trim();
       final content = _contentController.text;
-      final String id =
-          widget.template?.id ?? TemplateService.generateTemplateId();
+      final String templateId =
+          widget.template?.templateId ?? TemplateService.generateTemplateId();
 
       final template = Template(
-        id: id,
+        templateId: templateId,
         title: title,
         content: content,
       );
@@ -1757,7 +1757,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       final draft = TemplateDraft(
         id: _currentDraftId!,
         type: widget.template != null ? DraftType.edit : DraftType.create,
-        originalTemplateId: widget.template?.id,
+        originalTemplateId: widget.template?.templateId,
         title: _titleController.text,
         content: _contentController.text,
         createdAt: DateTime.now(),

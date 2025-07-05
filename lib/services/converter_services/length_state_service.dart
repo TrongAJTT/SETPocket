@@ -1,25 +1,11 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:setpocket/models/converter_models/length_state_model.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/isar_service.dart';
 
 class LengthStateService {
-  static const String _stateBoxName = 'length_states';
   static const String _stateKey = 'length_converter_state';
-  static Box<LengthStateModel>? _stateBox;
-
-  // Initialize the state service
-  static Future<void> initialize() async {
-    try {
-      if (_stateBox == null || !_stateBox!.isOpen) {
-        _stateBox = await Hive.openBox<LengthStateModel>(_stateBoxName);
-        logInfo('LengthStateService: State box opened successfully');
-      }
-    } catch (e) {
-      logError('LengthStateService: Error opening state box: $e');
-      rethrow;
-    }
-  }
 
   // Check if feature state saving is enabled
   static Future<bool> _isFeatureStateSavingEnabled() async {
@@ -50,7 +36,7 @@ class LengthStateService {
         return;
       }
 
-      await initialize();
+      final isar = IsarService.isar;
 
       // Verify state before saving
       logInfo(
@@ -61,11 +47,19 @@ class LengthStateService {
             'LengthStateService: Card $i - Unit: ${card.unitCode}, Amount: ${card.amount}');
       }
 
-      await _stateBox!.put(_stateKey, state);
-      await _stateBox!.flush(); // Force flush to disk for mobile reliability
+      // Update timestamp
+      state.lastUpdated = DateTime.now();
+
+      await isar.writeTxn(() async {
+        await isar.lengthStateModels.clear();
+        await isar.lengthStateModels.put(state);
+      });
 
       // Verify saved state
-      final savedState = _stateBox!.get(_stateKey);
+      final savedState = await isar.lengthStateModels
+          .where()
+          .findAll()
+          .then((list) => list.isNotEmpty ? list.first : null);
       if (savedState != null) {
         logInfo(
             'LengthStateService: State successfully saved and verified with ${savedState.cards.length} cards, focus: ${savedState.isFocusMode}, view: ${savedState.viewMode}');
@@ -93,9 +87,9 @@ class LengthStateService {
         return LengthStateModel.createDefault();
       }
 
-      await initialize();
+      final isar = IsarService.isar;
+      final savedState = await isar.lengthStateModels.where().findFirst();
 
-      final savedState = _stateBox!.get(_stateKey);
       if (savedState != null) {
         logInfo(
             'LengthStateService: Loaded state with ${savedState.cards.length} cards, focus: ${savedState.isFocusMode}, view: ${savedState.viewMode}');
@@ -115,21 +109,11 @@ class LengthStateService {
     try {
       logInfo('LengthStateService: Clearing length converter state');
 
-      Box<LengthStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
 
-      if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box<LengthStateModel>(_stateBoxName);
-      } else {
-        box = await Hive.openBox<LengthStateModel>(_stateBoxName);
-        shouldClose = true;
-      }
-
-      await box.delete(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
+      await isar.writeTxn(() async {
+        await isar.lengthStateModels.clear();
+      });
 
       logInfo('LengthStateService: Successfully cleared state');
     } catch (e) {
@@ -146,23 +130,10 @@ class LengthStateService {
         return false;
       }
 
-      Box<LengthStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
+      final count = await isar.lengthStateModels.count();
 
-      if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box<LengthStateModel>(_stateBoxName);
-      } else {
-        box = await Hive.openBox<LengthStateModel>(_stateBoxName);
-        shouldClose = true;
-      }
-
-      final hasData = box.containsKey(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
-
-      return hasData;
+      return count > 0;
     } catch (e) {
       logError('LengthStateService: Error checking state existence: $e');
       return false;
@@ -177,28 +148,17 @@ class LengthStateService {
         return 0;
       }
 
-      Box<LengthStateModel> box;
-      bool shouldClose = false;
-
-      if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box<LengthStateModel>(_stateBoxName);
-      } else {
-        box = await Hive.openBox<LengthStateModel>(_stateBoxName);
-        shouldClose = true;
-      }
-
-      final state = box.get(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
+      final isar = IsarService.isar;
+      final state = await isar.lengthStateModels.where().findFirst();
 
       if (state != null) {
         // Estimate size based on data
         final cardsSize = state.cards.length * 50; // Rough estimate per card
         final unitsSize =
             state.visibleUnits.length * 20; // Rough estimate per unit
-        return cardsSize + unitsSize + 100; // Plus overhead
+        final baseSize = 100; // Base overhead
+
+        return cardsSize + unitsSize + baseSize;
       }
       return 0;
     } catch (e) {
@@ -207,34 +167,23 @@ class LengthStateService {
     }
   }
 
-  // Get state cache size (alias for backward compatibility)
-  static Future<int> getStateCacheSize() async {
-    return getStateSize();
-  }
-
-  // Debug: Print current state
+  // Debug method
   static Future<void> debugState() async {
     try {
-      await initialize();
-
-      final state = _stateBox!.get(_stateKey);
-
-      logInfo('=== Length State Debug ===');
+      final isar = IsarService.isar;
+      final state = await isar.lengthStateModels.where().findFirst();
+      logInfo('=== LENGTH STATE DEBUG ===');
+      logInfo('State exists: ${state != null}');
       if (state != null) {
         logInfo('Cards: ${state.cards.length}');
-        for (int i = 0; i < state.cards.length; i++) {
-          final card = state.cards[i];
-          logInfo('  Card $i: ${card.unitCode} = ${card.amount}');
-        }
-        logInfo('Visible Units: ${state.visibleUnits.join(", ")}');
-        logInfo('Last Updated: ${state.lastUpdated}');
-      } else {
-        logInfo('No state saved');
+        logInfo('Visible units: ${state.visibleUnits.length}');
+        logInfo('Focus mode: ${state.isFocusMode}');
+        logInfo('View mode: ${state.viewMode}');
+        logInfo('Last updated: ${state.lastUpdated}');
       }
-      logInfo('Box Length: ${_stateBox!.length}');
-      logInfo('=====================');
+      logInfo('=== END DEBUG ===');
     } catch (e) {
-      logError('LengthStateService: Error in debug: $e');
+      logError('LengthStateService: Error debugging state: $e');
     }
   }
 }

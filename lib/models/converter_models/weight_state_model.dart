@@ -1,27 +1,22 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 
 part 'weight_state_model.g.dart';
 
-@HiveType(typeId: 20)
-class WeightCardState extends HiveObject {
-  @HiveField(0)
+@embedded
+class WeightCardState {
   String unitCode;
 
-  @HiveField(1)
   double amount;
 
-  @HiveField(2)
   String? name;
 
-  @HiveField(3)
   List<String>? visibleUnits;
 
-  @HiveField(4)
   DateTime? createdAt;
 
   WeightCardState({
-    required this.unitCode,
-    required this.amount,
+    this.unitCode = 'kilogram',
+    this.amount = 0.0,
     this.name,
     this.visibleUnits,
     DateTime? createdAt,
@@ -33,21 +28,18 @@ class WeightCardState extends HiveObject {
   }
 }
 
-@HiveType(typeId: 21)
-class WeightStateModel extends HiveObject {
-  @HiveField(0)
+@collection
+class WeightStateModel {
+  Id id = Isar.autoIncrement;
+
   List<WeightCardState> cards;
 
-  @HiveField(1)
   List<String> visibleUnits;
 
-  @HiveField(2)
   DateTime lastUpdated;
 
-  @HiveField(3)
   bool isFocusMode;
 
-  @HiveField(4)
   String viewMode;
 
   WeightStateModel({
@@ -84,8 +76,39 @@ class WeightStateModel extends HiveObject {
     );
   }
 
+  /// Copy with method
+  WeightStateModel copyWith({
+    List<WeightCardState>? cards,
+    List<String>? visibleUnits,
+    DateTime? lastUpdated,
+    bool? isFocusMode,
+    String? viewMode,
+  }) {
+    return WeightStateModel(
+      cards: cards ?? this.cards,
+      visibleUnits: visibleUnits ?? this.visibleUnits,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+      isFocusMode: isFocusMode ?? this.isFocusMode,
+      viewMode: viewMode ?? this.viewMode,
+    );
+  }
+
   @override
   String toString() {
     return 'WeightStateModel(cards: ${cards.length}, visibleUnits: ${visibleUnits.length}, lastUpdated: $lastUpdated, isFocusMode: $isFocusMode, viewMode: $viewMode)';
   }
+}
+
+/// Fast hash function to generate Isar Id from String
+int fastHash(String string) {
+  var hash = 0xcbf29ce484222325;
+  var i = 0;
+  while (i < string.length) {
+    final codeUnit = string.codeUnitAt(i++);
+    hash ^= codeUnit >> 8;
+    hash *= 0x100000001b3;
+    hash ^= codeUnit & 0xFF;
+    hash *= 0x100000001b3;
+  }
+  return hash;
 }

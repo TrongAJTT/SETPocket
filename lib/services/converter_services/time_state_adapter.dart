@@ -82,7 +82,6 @@ class TimeStateAdapter implements ConverterStateService {
           amount: card.baseValue,
           name: card.name,
           visibleUnits: card.visibleUnits,
-          createdAt: DateTime.now(),
         );
       }).toList();
 

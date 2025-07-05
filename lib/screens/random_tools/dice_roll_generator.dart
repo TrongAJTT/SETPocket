@@ -80,11 +80,10 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = DiceRollGeneratorState(
-        diceCount: _diceCount,
-        diceSides: _diceSides,
-        lastUpdated: DateTime.now(),
-      );
+      final state = DiceRollGeneratorState()
+        ..diceCount = _diceCount
+        ..diceSides = _diceSides
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveDiceRollGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

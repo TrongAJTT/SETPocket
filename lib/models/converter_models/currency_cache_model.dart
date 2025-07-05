@@ -1,106 +1,131 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:setpocket/services/converter_services/currency_service.dart';
 
 part 'currency_cache_model.g.dart';
 
-@HiveType(typeId: 10)
-class CurrencyCacheModel extends HiveObject {
-  @HiveField(0)
-  Map<String, double> rates;
+@embedded
+class RateEntry {
+  String? key;
+  double? value;
+}
 
-  @HiveField(1)
+@embedded
+class StatusEntry {
+  String? key;
+  int? value;
+}
+
+@embedded
+class FetchTimeEntry {
+  String? key;
+  int? value;
+}
+
+@Collection()
+class CurrencyCacheModel {
+  Id id = Isar.autoIncrement;
+
+  List<RateEntry> rates;
   DateTime lastUpdated;
-
-  @HiveField(2)
   bool isValid;
-
-  @HiveField(3)
-  Map<String, int>? currencyStatuses; // Store status as int (enum index)
-
-  @HiveField(4)
-  Map<String, int>?
-      currencyFetchTimes; // Store last fetch timestamp for each currency
+  List<StatusEntry> currencyStatuses;
+  List<FetchTimeEntry> currencyFetchTimes;
 
   CurrencyCacheModel({
     required this.rates,
     required this.lastUpdated,
     this.isValid = true,
-    this.currencyStatuses,
-    this.currencyFetchTimes,
+    this.currencyStatuses = const [],
+    this.currencyFetchTimes = const [],
   });
 
-  // Helper to get currency status
   CurrencyStatus getCurrencyStatus(String currencyCode) {
-    final statusIndex = currencyStatuses?[currencyCode];
+    final statusIndex = currencyStatuses
+        .firstWhere((e) => e.key == currencyCode, orElse: () => StatusEntry())
+        .value;
     if (statusIndex != null) {
       return CurrencyStatus.values[statusIndex];
     }
     return CurrencyStatus.staticRate;
   }
 
-  // Helper to set currency statuses
   void setCurrencyStatuses(Map<String, CurrencyStatus> statuses) {
-    currencyStatuses = statuses.map((key, value) => MapEntry(key, value.index));
+    currencyStatuses = statuses.entries
+        .map((e) => StatusEntry()
+          ..key = e.key
+          ..value = e.value.index)
+        .toList();
   }
 
-  // Helper to get all currency statuses
-  Map<String, CurrencyStatus> getCurrencyStatuses() {
-    if (currencyStatuses == null) return {};
-
-    return currencyStatuses!.map((key, value) {
-      return MapEntry(key, CurrencyStatus.values[value]);
-    });
+  @ignore
+  Map<String, double> get getRatesAsMap {
+    return {
+      for (var entry in rates)
+        if (entry.key != null && entry.value != null) entry.key!: entry.value!
+    };
   }
 
-  // Helper to set currency fetch times
+  @ignore
+  Map<String, CurrencyStatus> get getCurrencyStatuses {
+    return {
+      for (var entry in currencyStatuses)
+        if (entry.key != null && entry.value != null)
+          entry.key!: CurrencyStatus.values[entry.value!]
+    };
+  }
+
   void setCurrencyFetchTimes(Map<String, DateTime> fetchTimes) {
-    currencyFetchTimes = fetchTimes
-        .map((key, value) => MapEntry(key, value.millisecondsSinceEpoch));
+    currencyFetchTimes = fetchTimes.entries
+        .map((e) => FetchTimeEntry()
+          ..key = e.key
+          ..value = e.value.millisecondsSinceEpoch)
+        .toList();
   }
 
-  // Helper to get currency fetch time
   DateTime? getCurrencyFetchTime(String currencyCode) {
-    final timestamp = currencyFetchTimes?[currencyCode];
+    final timestamp = currencyFetchTimes
+        .firstWhere((e) => e.key == currencyCode,
+            orElse: () => FetchTimeEntry())
+        .value;
     if (timestamp != null) {
       return DateTime.fromMillisecondsSinceEpoch(timestamp);
     }
     return null;
   }
 
-  // Check if currency needs refresh (older than 1 hour)
   bool currencyNeedsRefresh(String currencyCode) {
     final fetchTime = getCurrencyFetchTime(currencyCode);
     if (fetchTime == null) return true;
-
     final now = DateTime.now();
     final difference = now.difference(fetchTime);
     return difference.inHours >= 1;
   }
 
-  // Check if cache is expired (older than 24 hours)
+  @ignore
   bool get isExpired {
     final now = DateTime.now();
     final difference = now.difference(lastUpdated);
     return difference.inHours >= 24;
   }
 
-  // Check if cache should be refreshed based on settings
   bool shouldRefresh(CurrencyFetchMode fetchMode) {
     switch (fetchMode) {
       case CurrencyFetchMode.manual:
-        return false; // Only refresh when manually requested
+        return false;
       case CurrencyFetchMode.onceADay:
         return isExpired;
     }
   }
 }
 
-@HiveType(typeId: 11)
-enum CurrencyFetchMode {
-  @HiveField(0)
-  manual,
+@embedded
+class CurrencyFetchModeProxy {
+  @Enumerated(EnumType.ordinal)
+  late CurrencyFetchMode mode;
+}
 
-  @HiveField(1)
+enum CurrencyFetchMode {
+  manual,
   onceADay,
 }
 

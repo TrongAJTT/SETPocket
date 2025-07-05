@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
+  isar_flutter_libs
   nsd_windows
   permission_handler_windows
   screen_retriever_windows

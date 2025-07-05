@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'package:isar/isar.dart';
+
+part 'date_calculator_models.g.dart';
+
 enum DateCalculationType {
   dateDifference,
   addSubtract,
@@ -28,22 +33,57 @@ enum RecurringPattern {
   yearly,
 }
 
+@collection
 class DateCalculationHistory {
-  final String id;
-  final DateCalculationType type;
-  final Map<String, dynamic> inputs;
-  final Map<String, dynamic> results;
-  final DateTime timestamp;
-  final String displayTitle;
+  Id isarId = Isar.autoIncrement;
 
-  DateCalculationHistory({
+  @Index()
+  late String id;
+
+  @Enumerated(EnumType.name)
+  late DateCalculationType type;
+
+  String? _inputs;
+  String? _results;
+
+  @Index()
+  late DateTime timestamp;
+  late String displayTitle;
+
+  @ignore
+  Map<String, dynamic> get inputs {
+    if (_inputs == null) return {};
+    return json.decode(_inputs!) as Map<String, dynamic>;
+  }
+
+  set inputs(Map<String, dynamic> value) {
+    _inputs = json.encode(value);
+  }
+
+  @ignore
+  Map<String, dynamic> get results {
+    if (_results == null) return {};
+    return json.decode(_results!) as Map<String, dynamic>;
+  }
+
+  set results(Map<String, dynamic> value) {
+    _results = json.encode(value);
+  }
+
+  // No-arg constructor for Isar
+  DateCalculationHistory();
+
+  DateCalculationHistory.fromData({
     required this.id,
     required this.type,
-    required this.inputs,
-    required this.results,
+    required Map<String, dynamic> inputs,
+    required Map<String, dynamic> results,
     required this.timestamp,
     required this.displayTitle,
-  });
+  }) {
+    this.inputs = inputs;
+    this.results = results;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -57,7 +97,7 @@ class DateCalculationHistory {
   }
 
   factory DateCalculationHistory.fromJson(Map<String, dynamic> json) {
-    return DateCalculationHistory(
+    return DateCalculationHistory.fromData(
       id: json['id'] ?? '',
       type: DateCalculationType.values.firstWhere(
         (e) => e.name == json['type'],
@@ -71,18 +111,39 @@ class DateCalculationHistory {
   }
 }
 
+@collection
 class DateCalculatorState {
-  final DateCalculationType activeTab;
-  final Map<String, dynamic> tabStates;
-  final DateTime lastUpdated;
-  final bool isDataConstraintEnabled;
+  Id id = Isar.autoIncrement;
 
-  DateCalculatorState({
+  @Enumerated(EnumType.name)
+  late DateCalculationType activeTab;
+
+  String? _tabStates;
+
+  late DateTime lastUpdated;
+  late bool isDataConstraintEnabled;
+
+  @ignore
+  Map<String, dynamic> get tabStates {
+    if (_tabStates == null) return {};
+    return json.decode(_tabStates!) as Map<String, dynamic>;
+  }
+
+  set tabStates(Map<String, dynamic> value) {
+    _tabStates = json.encode(value);
+  }
+
+  // No-arg constructor for Isar
+  DateCalculatorState();
+
+  DateCalculatorState.fromData({
     required this.activeTab,
-    required this.tabStates,
+    required Map<String, dynamic> tabStates,
     required this.lastUpdated,
     this.isDataConstraintEnabled = false,
-  });
+  }) {
+    this.tabStates = tabStates;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -94,7 +155,7 @@ class DateCalculatorState {
   }
 
   factory DateCalculatorState.fromJson(Map<String, dynamic> json) {
-    return DateCalculatorState(
+    return DateCalculatorState.fromData(
       activeTab: DateCalculationType.values.firstWhere(
         (e) => e.name == json['activeTab'],
         orElse: () => DateCalculationType.dateInfo,

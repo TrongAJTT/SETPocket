@@ -1,30 +1,26 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'converter_models/currency_cache_model.dart';
 
 part 'settings_model.g.dart';
 
-@HiveType(typeId: 12)
-class SettingsModel extends HiveObject {
-  @HiveField(0)
+@Collection()
+class SettingsModel {
+  Id id = 1; // Use a fixed ID for a singleton settings object
+
+  @Enumerated(EnumType.ordinal)
   CurrencyFetchMode currencyFetchMode;
 
-  @HiveField(1)
   int fetchTimeoutSeconds;
 
-  @HiveField(2)
   bool featureStateSavingEnabled;
 
-  @HiveField(3)
   int logRetentionDays;
 
-  @HiveField(4)
   int fetchRetryTimes;
 
-  @HiveField(5)
-  final bool focusModeEnabled;
+  bool focusModeEnabled;
 
-  @HiveField(6)
-  final bool saveRandomToolsState;
+  bool saveRandomToolsState;
 
   SettingsModel({
     this.currencyFetchMode = CurrencyFetchMode.onceADay,

@@ -85,10 +85,9 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = SimpleGeneratorState(
-        skipAnimation: _skipAnimation,
-        lastUpdated: DateTime.now(),
-      );
+      final state = SimpleGeneratorState()
+        ..skipAnimation = _skipAnimation
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveCoinFlipGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

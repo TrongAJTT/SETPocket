@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/models/tool_config.dart';
 import 'package:setpocket/widgets/tool_card.dart';
 import 'package:setpocket/widgets/cache_details_dialog.dart';
@@ -9,6 +10,7 @@ import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/tool_visibility_service.dart';
 import 'package:setpocket/services/quick_actions_service.dart';
 import 'package:setpocket/services/hive_service.dart';
+import 'package:setpocket/services/isar_service.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
@@ -17,8 +19,7 @@ import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/services/p2p_service.dart';
 import 'package:setpocket/services/app_installation_service.dart';
 import 'package:setpocket/services/p2p_navigation_service.dart';
-import 'package:setpocket/models/p2p_models.dart';
-import 'package:setpocket/models/random_models/random_state_models.dart';
+// Removed unused import - random state models now use Isar
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/text_template/text_template_gen_list_screen.dart';
@@ -30,7 +31,6 @@ import 'screens/p2lan/p2lan_transfer_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:io';
-import 'package:hive/hive.dart';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -101,11 +101,13 @@ Future<void> main() async {
     WidgetsBinding.instance.ensureSemantics();
   }
 
-  // Initialize Hive database first
+  // Initialize Hive database first (needed for migration)
   await HiveService.initialize();
 
-  // Register all random state adapters
-  _registerRandomStateAdapters();
+  // Initialize Isar database
+  await IsarService.init();
+
+  // Random state models now use Isar instead of Hive
 
   // Initialize App Installation Service immediately after Hive
   _isFirstTimeSetup = await AppInstallationService.instance.initialize();
@@ -126,39 +128,6 @@ Future<void> main() async {
   await _initializeQuickActions();
 
   runApp(const MainApp());
-}
-
-void _registerRandomStateAdapters() {
-  if (!Hive.isAdapterRegistered(60)) {
-    Hive.registerAdapter(NumberGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(61)) {
-    Hive.registerAdapter(PasswordGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(62)) {
-    Hive.registerAdapter(DateGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(65)) {
-    Hive.registerAdapter(TimeGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(64)) {
-    Hive.registerAdapter(DateTimeGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(67)) {
-    Hive.registerAdapter(LatinLetterGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(66)) {
-    Hive.registerAdapter(PlayingCardGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(68)) {
-    Hive.registerAdapter(DiceRollGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(63)) {
-    Hive.registerAdapter(ColorGeneratorStateAdapter());
-  }
-  if (!Hive.isAdapterRegistered(69)) {
-    Hive.registerAdapter(SimpleGeneratorStateAdapter());
-  }
 }
 
 Future<void> _initializeQuickActions() async {

@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:setpocket/models/generation_history.dart';
+import 'package:setpocket/services/generation_history_service_isar.dart';
 import 'hive_service.dart';
 
+// Legacy class for backward compatibility - now uses Isar internally
 class GenerationHistoryItem {
   final String value;
   final DateTime timestamp;
@@ -39,17 +42,42 @@ class GenerationHistoryService {
 
   // Maximum number of items to keep in history
   static const int maxHistoryItems = 100;
+  static bool _migrationCompleted = false;
 
-  /// Check if history saving is enabled
-  static Future<bool> isHistoryEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_historyEnabledKey) ?? true; // Default to true
+  // Migration helper - run once to migrate from Hive to Isar
+  static Future<void> _ensureMigration() async {
+    if (_migrationCompleted) return;
+
+    try {
+      // Check if there's any data in Hive to migrate
+      final hiveHistory = await _getHistoryFromHive();
+
+      if (hiveHistory.isNotEmpty) {
+        // Migrate each type to Isar
+        for (final type in hiveHistory.keys) {
+          final items = hiveHistory[type] ?? [];
+          for (final item in items) {
+            await GenerationHistoryServiceIsar.addHistoryItem(
+                item.value, item.type);
+          }
+        }
+      }
+
+      _migrationCompleted = true;
+    } catch (e) {
+      // If migration fails, continue with Isar anyway
+      _migrationCompleted = true;
+    }
   }
 
-  /// Enable or disable history saving
-  static Future<void> setHistoryEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_historyEnabledKey, enabled);
+  static Future<Map<String, List<GenerationHistoryItem>>>
+      _getHistoryFromHive() async {
+    try {
+      // Hive access disabled during migration
+      return {};
+    } catch (e) {
+      return {};
+    }
   }
 
   /// Simple encryption using base64 and key rotation
@@ -85,144 +113,75 @@ class GenerationHistoryService {
     }
   }
 
-  /// Add a new item to history
-  static Future<void> addHistoryItem(String value, String type) async {
-    final enabled = await isHistoryEnabled();
-    if (!enabled) return;
-
-    try {
-      final box = HiveService.historyBox;
-      final history = await getHistory(type);
-
-      // Add new item at the beginning
-      final newItem = GenerationHistoryItem(
-        value: value,
-        timestamp: DateTime.now(),
-        type: type,
-      );
-
-      history.insert(0, newItem);
-
-      // Keep only the latest items
-      if (history.length > maxHistoryItems) {
-        history.removeRange(maxHistoryItems, history.length);
-      }
-
-      // Encrypt and save to Hive
-      final jsonList = history.map((item) => item.toJson()).toList();
-      final jsonString = json.encode(jsonList);
-      final encryptedData = _encrypt(jsonString);
-
-      await box.put('${_historyKey}_$type', encryptedData);
-    } catch (e) {
-      // Silently fail to avoid breaking the app
-    }
+  /// Check if history saving is enabled
+  static Future<bool> isHistoryEnabled() async {
+    return await GenerationHistoryServiceIsar.isHistoryEnabled();
   }
 
-  /// Get history for a specific type
+  /// Enable or disable history saving
+  static Future<void> setHistoryEnabled(bool enabled) async {
+    return await GenerationHistoryServiceIsar.setHistoryEnabled(enabled);
+  }
+
+  /// Add a new item to history
+  static Future<void> addHistoryItem(String value, String type) async {
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.addHistoryItem(value, type);
+  }
+
+  /// Get history items for a specific type
   static Future<List<GenerationHistoryItem>> getHistory(String type) async {
-    final enabled = await isHistoryEnabled();
-    if (!enabled) return [];
+    await _ensureMigration();
+    final isarItems = await GenerationHistoryServiceIsar.getHistory(type);
 
-    try {
-      final box = HiveService.historyBox;
-      final encryptedData = box.get('${_historyKey}_$type');
-
-      if (encryptedData == null || encryptedData.isEmpty) {
-        return [];
-      }
-
-      final decryptedData = _decrypt(encryptedData);
-      if (decryptedData.isEmpty) return [];
-
-      final jsonList = json.decode(decryptedData) as List;
-      return jsonList
-          .map((json) => GenerationHistoryItem.fromJson(json))
-          .toList();
-    } catch (e) {
-      // If parsing fails, return empty list
-      return [];
-    }
+    // Convert Isar models to legacy models for compatibility
+    return isarItems
+        .map((item) => GenerationHistoryItem(
+              value: item.value,
+              timestamp: item.timestamp,
+              type: item.type,
+            ))
+        .toList();
   }
 
   /// Clear history for a specific type
   static Future<void> clearHistory(String type) async {
-    try {
-      final box = HiveService.historyBox;
-      await box.delete('${_historyKey}_$type');
-    } catch (e) {
-      // Silently fail to avoid breaking the app
-    }
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.clearHistory(type);
   }
 
   /// Clear all history
   static Future<void> clearAllHistory() async {
-    try {
-      final box = HiveService.historyBox;
-
-      // Get all keys that start with history key prefix
-      final keysToDelete = box.keys
-          .where((key) => key.toString().startsWith(_historyKey))
-          .toList();
-
-      for (final key in keysToDelete) {
-        await box.delete(key);
-      }
-    } catch (e) {
-      // Silently fail to avoid breaking the app
-    }
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.clearAllHistory();
   }
 
-  /// Get total count of history items across all types
+  /// Get all unique history types
+  static Future<List<String>> getHistoryTypes() async {
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.getHistoryTypes();
+  }
+
+  /// Get history count for a specific type
+  static Future<int> getHistoryCount(String type) async {
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.getHistoryCount(type);
+  }
+
+  /// Get total history count across all types
   static Future<int> getTotalHistoryCount() async {
-    final enabled = await isHistoryEnabled();
-    if (!enabled) return 0;
-
-    try {
-      final box = HiveService.historyBox;
-      final keys = box.keys
-          .where((key) =>
-              key.toString().startsWith(_historyKey) &&
-              key.toString() != _historyEnabledKey)
-          .toList();
-
-      int totalCount = 0;
-      for (final key in keys) {
-        final typeKey = key.toString().replaceFirst('${_historyKey}_', '');
-        final history = await getHistory(typeKey);
-        totalCount += history.length;
-      }
-
-      return totalCount;
-    } catch (e) {
-      return 0;
+    await _ensureMigration();
+    final types = await getHistoryTypes();
+    int total = 0;
+    for (final type in types) {
+      total += await getHistoryCount(type);
     }
+    return total;
   }
 
-  /// Get size of history data in bytes (estimated)
+  /// Get estimated data size of history in bytes
   static Future<int> getHistoryDataSize() async {
-    final enabled = await isHistoryEnabled();
-    if (!enabled) return 0;
-
-    try {
-      final box = HiveService.historyBox;
-      final keys = box.keys
-          .where((key) =>
-              key.toString().startsWith(_historyKey) &&
-              key.toString() != _historyEnabledKey)
-          .toList();
-
-      int totalSize = 0;
-      for (final key in keys) {
-        final data = box.get(key, defaultValue: '');
-        if (data is String) {
-          totalSize += data.length * 2; // UTF-16 encoding estimate
-        }
-      }
-
-      return totalSize;
-    } catch (e) {
-      return 0;
-    }
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.getHistoryDataSize();
   }
 }

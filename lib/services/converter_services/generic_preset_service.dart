@@ -1,335 +1,178 @@
-import 'package:hive/hive.dart';
+// import 'package:hive/hive.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/models/converter_models/generic_preset_model.dart';
-import 'package:setpocket/models/converter_models/currency_preset_model.dart';
-import 'package:setpocket/models/converter_models/length_preset_model.dart';
+import 'package:setpocket/services/converter_services/generic_preset_service_isar.dart';
 
-enum PresetSortOrder { name, date }
+export 'package:setpocket/services/converter_services/generic_preset_service_isar.dart' show PresetSortOrder;
 
 class GenericPresetService {
-  static final Map<String, Box<GenericPresetModel>?> _boxes = {};
-  static bool _migrationCompleted = false;
-
-  // Get box name for specific preset type
-  static String _getBoxName(String presetType) =>
-      'generic_${presetType}_presets';
-
-  // Initialize service for specific preset type
+  // Initialize service for specific preset type - no longer needed for Isar
   static Future<void> initialize(String presetType) async {
-    try {
-      final boxName = _getBoxName(presetType);
-      if (_boxes[presetType] == null ||
-          !(_boxes[presetType]?.isOpen ?? false)) {
-        _boxes[presetType] = await Hive.openBox<GenericPresetModel>(boxName);
-        logInfo(
-            'GenericPresetService: Box opened successfully for type: $presetType');
+    logInfo('GenericPresetService: Initialize called for $presetType - using Isar backend');
+  }
 
-        // Perform migration if not completed
-        if (!_migrationCompleted) {
-          await _migrateOldPresets(presetType);
-        }
-      }
+  // Get all presets for a specific type
+  static Future<List<GenericPresetModel>> getAllPresets(String presetType) async {
+    try {
+      return await GenericPresetServiceIsar.getAllPresets(presetType);
     } catch (e) {
-      logError('GenericPresetService: Error opening box for $presetType: $e');
+      logError('GenericPresetService: Error getting all presets for $presetType: $e');
+      return [];
+    }
+  }
+
+  // Save a preset with model
+  static Future<void> savePresetModel(GenericPresetModel preset) async {
+    try {
+      await GenericPresetServiceIsar.savePreset(preset);
+      logInfo('GenericPresetService: Preset saved successfully via Isar');
+    } catch (e) {
+      logError('GenericPresetService: Error saving preset: $e');
       rethrow;
     }
   }
 
-  // Migration logic from old preset services
-  static Future<void> _migrateOldPresets(String presetType) async {
-    try {
-      if (presetType == 'currency') {
-        await _migrateCurrencyPresets();
-      } else if (presetType == 'length') {
-        await _migrateLengthPresets();
-      }
-
-      _migrationCompleted = true;
-      logInfo('GenericPresetService: Migration completed for $presetType');
-    } catch (e) {
-      logError('GenericPresetService: Migration error for $presetType: $e');
-      // Continue operation even if migration fails
-    }
-  }
-
-  // Migrate currency presets
-  static Future<void> _migrateCurrencyPresets() async {
-    try {
-      if (Hive.isBoxOpen('currency_presets')) {
-        final oldBox = Hive.box('currency_presets');
-        final newBox = _getBox('currency');
-
-        // Check if already migrated
-        if (newBox.isNotEmpty) {
-          logInfo('GenericPresetService: Currency presets already migrated');
-          return;
-        }
-
-        for (var key in oldBox.keys) {
-          try {
-            final oldPreset = oldBox.get(key);
-            if (oldPreset is CurrencyPresetModel) {
-              final newPreset = GenericPresetModel(
-                id: oldPreset.id,
-                name: oldPreset.name,
-                units: List<String>.from(oldPreset.currencies),
-                createdAt: oldPreset.createdAt,
-                presetType: 'currency',
-              );
-
-              await newBox.put(newPreset.id, newPreset);
-              logInfo(
-                  'GenericPresetService: Migrated currency preset: ${newPreset.name}');
-            }
-          } catch (e) {
-            logError(
-                'GenericPresetService: Error migrating currency preset $key: $e');
-          }
-        }
-
-        logInfo('GenericPresetService: Currency migration completed');
-      }
-    } catch (e) {
-      logError('GenericPresetService: Currency migration error: $e');
-    }
-  }
-
-  // Migrate length presets
-  static Future<void> _migrateLengthPresets() async {
-    try {
-      if (Hive.isBoxOpen('length_presets')) {
-        final oldBox = Hive.box('length_presets');
-        final newBox = _getBox('length');
-
-        // Check if already migrated
-        if (newBox.isNotEmpty) {
-          logInfo('GenericPresetService: Length presets already migrated');
-          return;
-        }
-
-        for (var key in oldBox.keys) {
-          try {
-            final oldPreset = oldBox.get(key);
-            if (oldPreset is LengthPresetModel) {
-              final newPreset = GenericPresetModel(
-                id: oldPreset.id,
-                name: oldPreset.name,
-                units: List<String>.from(oldPreset.units),
-                createdAt: oldPreset.createdAt,
-                presetType: 'length',
-              );
-
-              await newBox.put(newPreset.id, newPreset);
-              logInfo(
-                  'GenericPresetService: Migrated length preset: ${newPreset.name}');
-            }
-          } catch (e) {
-            logError(
-                'GenericPresetService: Error migrating length preset $key: $e');
-          }
-        }
-
-        logInfo('GenericPresetService: Length migration completed');
-      }
-    } catch (e) {
-      logError('GenericPresetService: Length migration error: $e');
-    }
-  }
-
-  // Get box for specific preset type
-  static Box<GenericPresetModel> _getBox(String presetType) {
-    final box = _boxes[presetType];
-    if (box == null || !box.isOpen) {
-      throw Exception('Box not initialized for preset type: $presetType');
-    }
-    return box;
-  }
-
-  // Save preset
+  // Save a preset with named parameters (for controller compatibility)
   static Future<void> savePreset({
     required String presetType,
     required String name,
     required List<String> units,
   }) async {
-    await initialize(presetType);
-
-    if (name.trim().isEmpty) {
-      throw Exception('Preset name cannot be empty');
-    }
-
-    if (units.isEmpty || units.length > 10) {
-      throw Exception('Preset must contain 1-10 units');
-    }
-
-    final preset = GenericPresetModel.create(
-      name: name.trim(),
-      units: units,
-      presetType: presetType,
-    );
-
-    final box = _getBox(presetType);
-    await box.put(preset.id, preset);
-    await box.flush();
-
-    logInfo(
-        'GenericPresetService: Saved $presetType preset "${preset.name}" with ${preset.units.length} units');
-  }
-
-  // Load all presets for specific type
-  static Future<List<GenericPresetModel>> loadPresets(
-    String presetType, {
-    PresetSortOrder sortOrder = PresetSortOrder.date,
-  }) async {
-    await initialize(presetType);
-
-    final box = _getBox(presetType);
-    final presets =
-        box.values.where((preset) => preset.presetType == presetType).toList();
-
-    // Sort presets
-    switch (sortOrder) {
-      case PresetSortOrder.name:
-        presets.sort(
-            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-        break;
-      case PresetSortOrder.date:
-        presets
-            .sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Newest first
-        break;
-    }
-
-    logInfo(
-        'GenericPresetService: Loaded ${presets.length} $presetType presets, sorted by $sortOrder');
-    return presets;
-  }
-
-  // Get preset by ID
-  static Future<GenericPresetModel?> getPreset(
-      String presetType, String id) async {
-    await initialize(presetType);
-    final box = _getBox(presetType);
-    return box.get(id);
-  }
-
-  // Delete preset
-  static Future<void> deletePreset(String presetType, String id) async {
-    await initialize(presetType);
-
-    final box = _getBox(presetType);
-    final preset = box.get(id);
-    if (preset != null) {
-      await box.delete(id);
-      await box.flush();
-      logInfo(
-          'GenericPresetService: Deleted $presetType preset "${preset.name}"');
+    try {
+      final preset = GenericPresetModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        presetType: presetType,
+        name: name,
+        units: units,
+        createdAt: DateTime.now(),
+      );
+      await savePresetModel(preset);
+    } catch (e) {
+      logError('GenericPresetService: Error saving preset: $e');
+      rethrow;
     }
   }
 
-  // Check if preset name exists
-  static Future<bool> presetNameExists(String presetType, String name) async {
-    await initialize(presetType);
 
-    final box = _getBox(presetType);
-    final normalizedName = name.trim().toLowerCase();
-    return box.values
-        .where((preset) => preset.presetType == presetType)
-        .any((preset) => preset.name.toLowerCase() == normalizedName);
+
+  // Delete a preset
+  static Future<void> deletePreset(String presetType, String presetId) async {
+    try {
+      await GenericPresetServiceIsar.deletePreset(presetId);
+      logInfo('GenericPresetService: Preset deleted successfully via Isar');
+    } catch (e) {
+      logError('GenericPresetService: Error deleting preset: $e');
+      rethrow;
+    }
   }
 
-  // Get preset count
-  static Future<int> getPresetCount(String presetType) async {
-    await initialize(presetType);
-    final box = _getBox(presetType);
-    return box.values.where((preset) => preset.presetType == presetType).length;
+  // Get a specific preset by ID
+  static Future<GenericPresetModel?> getPreset(String presetType, String presetId) async {
+    try {
+      return await GenericPresetServiceIsar.getPreset(presetId);
+    } catch (e) {
+      logError('GenericPresetService: Error getting preset: $e');
+      return null;
+    }
   }
 
-  // Clear all presets for specific type
-  static Future<void> clearAllPresets(String presetType) async {
-    await initialize(presetType);
-    final box = _getBox(presetType);
+  // Update a preset
+  static Future<void> updatePreset(String presetType, GenericPresetModel preset) async {
+    try {
+      await GenericPresetServiceIsar.updatePreset(preset);
+      logInfo('GenericPresetService: Preset updated successfully via Isar');
+    } catch (e) {
+      logError('GenericPresetService: Error updating preset: $e');
+      rethrow;
+    }
+  }
 
-    // Delete only presets of the specific type
-    final keysToDelete = <dynamic>[];
-    for (final entry in box.toMap().entries) {
-      if (entry.value.presetType == presetType) {
-        keysToDelete.add(entry.key);
+  // Get presets count for a specific type
+  static Future<int> getPresetsCount(String presetType) async {
+    try {
+      return await GenericPresetServiceIsar.getPresetsCount(presetType);
+    } catch (e) {
+      logError('GenericPresetService: Error getting presets count: $e');
+      return 0;
+    }
+  }
+
+  // Clear all presets for a specific type
+  static Future<void> clearPresets(String presetType) async {
+    try {
+      await GenericPresetServiceIsar.clearPresets(presetType);
+      logInfo('GenericPresetService: Presets cleared successfully via Isar');
+    } catch (e) {
+      logError('GenericPresetService: Error clearing presets: $e');
+      rethrow;
+    }
+  }
+
+  // Clear all presets for all types - for compatibility
+  static Future<void> clearAllPresets() async {
+    try {
+      // Clear common preset types
+      final presetTypes = ['currency', 'length', 'weight', 'volume', 'area', 'mass', 'time', 'temperature', 'speed'];
+      for (String presetType in presetTypes) {
+        await clearPresets(presetType);
       }
+      logInfo('GenericPresetService: All presets cleared successfully via Isar');
+    } catch (e) {
+      logError('GenericPresetService: Error clearing all presets: $e');
+      rethrow;
     }
-
-    await box.deleteAll(keysToDelete);
-    await box.flush();
-    logInfo('GenericPresetService: Cleared all $presetType presets');
   }
 
-  // Update preset (includes rename functionality)
-  static Future<void> updatePreset(
-    String presetType,
-    String id, {
-    String? name,
-    List<String>? units,
-  }) async {
-    await initialize(presetType);
-
-    final box = _getBox(presetType);
-    final existingPreset = box.get(id);
-    if (existingPreset == null) {
-      throw Exception('Preset not found');
+  // Get sorted presets
+  static Future<List<GenericPresetModel>> getSortedPresets(
+      String presetType, PresetSortOrder sortOrder) async {
+    try {
+      return await GenericPresetServiceIsar.getSortedPresets(presetType, sortOrder);
+    } catch (e) {
+      logError('GenericPresetService: Error getting sorted presets: $e');
+      return [];
     }
-
-    final updatedPreset = existingPreset.copyWith(
-      name: name,
-      units: units,
-    );
-
-    await box.put(id, updatedPreset);
-    await box.flush();
-
-    logInfo(
-        'GenericPresetService: Updated $presetType preset "${updatedPreset.name}"');
   }
 
-  // Rename preset (dedicated method for clarity)
-  static Future<void> renamePreset(
-    String presetType,
-    String id,
-    String newName,
-  ) async {
-    if (newName.trim().isEmpty) {
-      throw Exception('Preset name cannot be empty');
+  // Check if a preset name already exists for a type
+  static Future<bool> presetNameExists(String presetType, String name, {String? excludeId}) async {
+    try {
+      return await GenericPresetServiceIsar.presetNameExists(presetType, name, excludeId: excludeId);
+    } catch (e) {
+      logError('GenericPresetService: Error checking preset name existence: $e');
+      return false;
     }
-
-    // Check if new name already exists
-    if (await presetNameExists(presetType, newName)) {
-      throw Exception('Preset name already exists');
-    }
-
-    await updatePreset(presetType, id, name: newName.trim());
-    logInfo('GenericPresetService: Renamed $presetType preset to "$newName"');
   }
 
-  // Export presets for specific type
-  static Future<List<Map<String, dynamic>>> exportPresets(
-      String presetType) async {
-    await initialize(presetType);
-
-    final box = _getBox(presetType);
-    return box.values
-        .where((preset) => preset.presetType == presetType)
-        .map((preset) => {
-              'id': preset.id,
-              'name': preset.name,
-              'units': preset.units,
-              'presetType': preset.presetType,
-              'createdAt': preset.createdAt.toIso8601String(),
-            })
-        .toList();
+  // Close service - no longer needed for Isar
+  static Future<void> close(String presetType) async {
+    logInfo('GenericPresetService: Close called for $presetType - using Isar backend');
   }
 
-  // Force migration (for debugging)
-  static Future<void> forceMigration() async {
-    _migrationCompleted = false;
-    await _migrateCurrencyPresets();
-    await _migrateLengthPresets();
-    logInfo('GenericPresetService: Force migration completed');
+  // Close all services - no longer needed for Isar
+  static Future<void> closeAll() async {
+    logInfo('GenericPresetService: CloseAll called - using Isar backend');
+  }
+
+  // Load presets for a specific type (alias for getAllPresets)
+  static Future<List<GenericPresetModel>> loadPresets(String presetType) async {
+    return await getAllPresets(presetType);
+  }
+
+  // Rename a preset
+  static Future<void> renamePreset(String presetType, String presetId, String newName) async {
+    try {
+      final preset = await getPreset(presetType, presetId);
+      if (preset != null) {
+        final updatedPreset = preset.copyWith(name: newName);
+        await updatePreset(presetType, updatedPreset);
+        logInfo('GenericPresetService: Preset renamed successfully via Isar');
+      } else {
+        throw Exception('Preset not found');
+      }
+    } catch (e) {
+      logError('GenericPresetService: Error renaming preset: $e');
+      rethrow;
+    }
   }
 }

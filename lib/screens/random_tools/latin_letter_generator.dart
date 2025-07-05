@@ -51,16 +51,15 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
     _loadHistory();
   }
 
-  Future<void> _loadState() async {
+  void _loadState() async {
     try {
       final state = await RandomStateService.getLatinLetterGeneratorState();
       if (mounted) {
         setState(() {
-          _includeUppercase = state.includeUppercase;
-          _includeLowercase = state.includeLowercase;
-          _letterCount = state.letterCount;
+          _includeUppercase = state.uppercase;
+          _letterCount = state.quantity;
           _allowDuplicates = state.allowDuplicates;
-          _skipAnimation = state.skipAnimation;
+          // _includeLowercase and _skipAnimation are not in the state model
         });
       }
     } catch (e) {
@@ -70,14 +69,11 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = LatinLetterGeneratorState(
-        includeUppercase: _includeUppercase,
-        includeLowercase: _includeLowercase,
-        letterCount: _letterCount,
-        allowDuplicates: _allowDuplicates,
-        skipAnimation: _skipAnimation,
-        lastUpdated: DateTime.now(),
-      );
+      final state = LatinLetterGeneratorState()
+        ..uppercase = _includeUppercase
+        ..quantity = _letterCount
+        ..allowDuplicates = _allowDuplicates
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveLatinLetterGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

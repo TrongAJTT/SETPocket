@@ -1,19 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive/hive.dart'; // Commented out during Hive to Isar migration
+// import 'package:hive_flutter/hive_flutter.dart'; // Commented out during Hive to Isar migration
 import 'package:setpocket/services/app_installation_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 void main() {
   group('App Installation ID Stability Tests', () {
     setUpAll(() async {
-      // Initialize Hive for testing
-      Hive.init('test');
+      // Initialize test environment - Hive no longer used
+      // Hive.init('test'); // Commented out during migration
     });
 
     tearDownAll(() async {
-      // Clean up after tests
-      await Hive.deleteFromDisk();
+      // Clean up after tests - Hive no longer used
+      // await Hive.deleteFromDisk(); // Commented out during migration
     });
 
     test('App Installation ID should remain stable across multiple calls',

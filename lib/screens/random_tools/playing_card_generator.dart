@@ -60,7 +60,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
       if (mounted) {
         setState(() {
           _includeJokers = state.includeJokers;
-          _cardCount = state.cardCount;
+          _cardCount = state.quantity;
           _allowDuplicates = state.allowDuplicates;
         });
       }
@@ -71,12 +71,11 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = PlayingCardGeneratorState(
-        includeJokers: _includeJokers,
-        cardCount: _cardCount,
-        allowDuplicates: _allowDuplicates,
-        lastUpdated: DateTime.now(),
-      );
+      final state = PlayingCardGeneratorState()
+        ..includeJokers = _includeJokers
+        ..quantity = _cardCount
+        ..allowDuplicates = _allowDuplicates
+        ..lastUpdated = DateTime.now();
       await RandomStateService.savePlayingCardGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

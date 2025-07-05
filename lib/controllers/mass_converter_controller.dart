@@ -1,7 +1,7 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/mass_converter_service.dart';
 import 'package:setpocket/services/converter_services/mass_state_adapter.dart';
-import 'package:setpocket/services/converter_services/mass_state_service.dart';
+import 'package:setpocket/services/converter_services/mass_state_service_isar.dart';
 import 'package:setpocket/services/converter_services/generic_preset_service.dart';
 import 'package:setpocket/models/converter_models/generic_preset_model.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -84,7 +84,8 @@ class MassConverterController extends ConverterController {
       logInfo('MassConverterController: Force clearing all cache data');
 
       // Clear state service cache
-      await MassStateService.forceClearAllCache();
+      final massStateService = MassStateServiceIsar();
+      await massStateService.clearState();
 
       // Clear controller state through state service adapter
       final adapter = MassStateAdapter();

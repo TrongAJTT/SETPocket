@@ -1,25 +1,17 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/settings_service.dart';
-import 'package:hive/hive.dart';
+// import 'package:hive/hive.dart'; // Commented out during Hive to Isar migration
+import 'package:setpocket/services/isar_service.dart';
 
 class RandomStateService {
   static const String _boxName = 'random_states';
-  static Box<dynamic>? _box;
+  // static Box<dynamic>? _box; // Commented out during migration
 
-  // Initialize the service
+  // Initialize the service - DISABLED during migration
   static Future<void> initialize() async {
-    if (_box == null || !_box!.isOpen) {
-      try {
-        _box = await Hive.openBox<dynamic>(_boxName);
-        logInfo('RandomStateService: Box opened successfully');
-      } catch (e) {
-        logError('RandomStateService: Error opening box: $e');
-        rethrow;
-      }
-    }
+    // Migration note: Random state is now handled differently
+    logInfo('RandomStateService: Initialize called - DISABLED during Isar migration');
   }
 
   // Helper method to check if state saving is enabled
@@ -32,7 +24,7 @@ class RandomStateService {
     }
   }
 
-  // Generic save method that checks the setting first
+  // Generic save method that checks the setting first - DISABLED during migration
   static Future<void> _saveState<T>(String key, T state) async {
     try {
       final isEnabled = await _isStateSavingEnabled();
@@ -40,24 +32,16 @@ class RandomStateService {
         return; // Don't save if setting is disabled
       }
 
-      await initialize();
-      await _box!.put(key, state);
-      logDebug('RandomStateService: Saved state for $key');
+      logInfo('RandomStateService: Save state called for $key - DISABLED during Isar migration');
     } catch (e) {
       logError('RandomStateService: Error saving state for $key: $e');
     }
   }
 
-  // Generic load method
+  // Generic load method - DISABLED during migration
   static Future<T> _loadState<T>(String key, T defaultState) async {
     try {
-      await initialize();
-      final state = _box!.get(key);
-      if (state != null && state is T) {
-        logDebug('RandomStateService: Loaded state for $key');
-        return state;
-      }
-      logDebug('RandomStateService: Using default state for $key');
+      logInfo('RandomStateService: Load state called for $key - returning default during migration');
       return defaultState;
     } catch (e) {
       logError('RandomStateService: Error loading state for $key: $e');
@@ -198,8 +182,7 @@ class RandomStateService {
   // Clear all states
   static Future<void> clearAllStates() async {
     try {
-      await initialize();
-      await _box!.clear();
+      // TODO: Implement Isar-based random state clearing
       logInfo('RandomStateService: Cleared all states');
     } catch (e) {
       logError('RandomStateService: Error clearing states: $e');
@@ -209,8 +192,7 @@ class RandomStateService {
   // Clear specific state
   static Future<void> clearState(String key) async {
     try {
-      await initialize();
-      await _box!.delete(key);
+      // TODO: Implement Isar-based random state clearing
       logDebug('RandomStateService: Cleared state for $key');
     } catch (e) {
       logError('RandomStateService: Error clearing state for $key: $e');
@@ -220,8 +202,8 @@ class RandomStateService {
   // Check if any state exists
   static Future<bool> hasState() async {
     try {
-      await initialize();
-      return _box!.isNotEmpty;
+      // TODO: Implement Isar-based random state check
+      return false;
     } catch (e) {
       logError('RandomStateService: Error checking state existence: $e');
       return false;
@@ -231,17 +213,8 @@ class RandomStateService {
   // Get total size of all states (approximate)
   static Future<int> getStateSize() async {
     try {
-      await initialize();
-      int totalSize = 0;
-      for (final key in _box!.keys) {
-        final value = _box!.get(key);
-        if (value != null) {
-          // Approximate size calculation
-          totalSize += key.toString().length * 2; // Key size
-          totalSize += 100; // Approximate value size
-        }
-      }
-      return totalSize;
+      // TODO: Implement Isar-based random state size calculation
+      return 0;
     } catch (e) {
       logError('RandomStateService: Error calculating state size: $e');
       return 0;
@@ -251,10 +224,8 @@ class RandomStateService {
   // Get all state keys
   static List<String> getAllStateKeys() {
     try {
-      if (_box == null || !_box!.isOpen) {
-        return [];
-      }
-      return _box!.keys.cast<String>().toList();
+      // TODO: Implement Isar-based random state keys retrieval
+      return [];
     } catch (e) {
       logError('RandomStateService: Error getting state keys: $e');
       return [];

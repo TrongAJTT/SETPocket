@@ -1,69 +1,148 @@
 import 'dart:convert';
+import 'package:isar/isar.dart';
 import 'package:setpocket/models/date_calculator_models.dart';
-import 'package:setpocket/services/hive_service.dart';
-import 'package:setpocket/services/calculator_history_service.dart';
-import 'package:setpocket/services/graphing_calculator_service.dart';
+import 'package:setpocket/services/calculator_history_isar_service.dart';
+import 'package:setpocket/services/isar_service.dart';
+import 'package:uuid/uuid.dart';
 
 class DateCalculatorService {
-  static const String _historyBoxName = 'date_calculator_history';
-  static const String _stateBoxName = 'date_calculator_state';
-  static const String _stateKey = 'current_state';
+  final _uuid = const Uuid();
 
-  // History management
+  // History management using Isar
   Future<List<DateCalculationHistory>> getHistory(
       [DateCalculationType? type]) async {
-    final historyEnabled = await GraphingCalculatorService.getRememberHistory();
-    if (!historyEnabled) return [];
-
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      final List<DateCalculationHistory> history = [];
-
-      for (var key in box.keys) {
-        final data = box.get(key);
-        if (data != null && data is Map) {
-          try {
-            final item = DateCalculationHistory.fromJson(
-                Map<String, dynamic>.from(data));
-            if (type == null || item.type == type) {
-              history.add(item);
-            }
-          } catch (e) {
-            // Skip invalid items
-          }
-        }
-      }
-
-      // Sort by timestamp, newest first
-      history.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      return history;
-    } catch (e) {
-      return [];
+    final isar = IsarService.isar;
+    if (type != null) {
+      return await isar.dateCalculationHistorys
+          .filter()
+          .typeEqualTo(type)
+          .sortByTimestampDesc()
+          .findAll();
     }
+    return await isar.dateCalculationHistorys
+        .where()
+        .sortByTimestampDesc()
+        .findAll();
   }
 
   Future<void> saveToHistory(DateCalculationHistory item) async {
-    final historyEnabled = await GraphingCalculatorService.getRememberHistory();
-    if (!historyEnabled) return;
-
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      await box.put(item.id, item.toJson());
-
-      // Also save to general calculator history for consistency
-      final String expression = _formatCalculationForHistory(item);
-      final String result = _formatResultForHistory(item);
-      await CalculatorHistoryService.addHistoryItem(
-        expression,
-        result,
-        'date',
-      );
-
-      // Keep only the latest 100 items
-      await _cleanupHistory();
-    } catch (e) {
-      // Silently fail to avoid breaking the app
+    final isar = IsarService.isar;
+    if (item.id.isEmpty) {
+      item.id = _uuid.v4();
     }
+
+    await isar.writeTxn(() async {
+      await isar.dateCalculationHistorys.put(item);
+    });
+
+    // Also save to general calculator history for consistency
+    final String expression = _formatCalculationForHistory(item);
+    final String result = _formatResultForHistory(item);
+    await CalculatorHistoryIsarService.addHistoryItem(
+      expression,
+      result,
+      'date',
+    );
+
+    // Cleanup old history items
+    await _cleanupHistory();
+  }
+
+  Future<void> _cleanupHistory() async {
+    final isar = IsarService.isar;
+    final count = await isar.dateCalculationHistorys.count();
+    if (count > 100) {
+      final toDelete = await isar.dateCalculationHistorys
+          .where()
+          .sortByTimestamp()
+          .limit(count - 100)
+          .findAll();
+      await isar.writeTxn(() async {
+        await isar.dateCalculationHistorys
+            .deleteAll(toDelete.map((e) => e.isarId).toList());
+      });
+    }
+  }
+
+  Future<void> removeFromHistory(String id) async {
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.dateCalculationHistorys.filter().idEqualTo(id).deleteAll();
+    });
+  }
+
+  Future<void> clearHistory([DateCalculationType? type]) async {
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      if (type == null) {
+        await isar.dateCalculationHistorys.clear();
+      } else {
+        await isar.dateCalculationHistorys
+            .filter()
+            .typeEqualTo(type)
+            .deleteAll();
+      }
+    });
+  }
+
+  // State management using Isar
+  Future<DateCalculatorState?> getCurrentState() async {
+    final isar = IsarService.isar;
+    return await isar.dateCalculatorStates.where().findFirst();
+  }
+
+  Future<void> saveCurrentState(DateCalculatorState state) async {
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.dateCalculatorStates.clear(); // Singleton state
+      await isar.dateCalculatorStates.put(state);
+    });
+  }
+
+  Future<void> clearCurrentState() async {
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.dateCalculatorStates.clear();
+    });
+  }
+
+  // Cache info for settings integration
+  Future<Map<String, dynamic>> getCacheInfo() async {
+    try {
+      final isar = IsarService.isar;
+      final history = await getHistory();
+      final currentState = await getCurrentState();
+
+      int historySize = 0;
+      final historyItems = await isar.dateCalculationHistorys.where().findAll();
+      for (final item in historyItems) {
+        historySize += json.encode(item.toJson()).length;
+      }
+
+      int stateSize = 0;
+      if (currentState != null) {
+        stateSize = json.encode(currentState.toJson()).length;
+      }
+
+      return {
+        'items': history.length + (currentState != null ? 1 : 0),
+        'size': historySize + stateSize,
+        'history_count': history.length,
+        'has_current_state': currentState != null,
+      };
+    } catch (e) {
+      return {
+        'items': 0,
+        'size': 0,
+        'history_count': 0,
+        'has_current_state': false,
+      };
+    }
+  }
+
+  Future<void> clearAllData() async {
+    await clearHistory();
+    await clearCurrentState();
   }
 
   String _formatCalculationForHistory(DateCalculationHistory item) {
@@ -132,118 +211,7 @@ class DateCalculatorService {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  Future<void> _cleanupHistory() async {
-    try {
-      final history = await getHistory();
-      if (history.length > 100) {
-        final box = await HiveService.getBox(_historyBoxName);
-        final itemsToRemove = history.skip(100);
-        for (final item in itemsToRemove) {
-          await box.delete(item.id);
-        }
-      }
-    } catch (e) {
-      // Silently fail
-    }
-  }
-
-  Future<void> removeFromHistory(String id) async {
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      await box.delete(id);
-    } catch (e) {
-      // Silently fail
-    }
-  }
-
-  Future<void> clearHistory([DateCalculationType? type]) async {
-    try {
-      if (type == null) {
-        final box = await HiveService.getBox(_historyBoxName);
-        await box.clear();
-      } else {
-        final history = await getHistory();
-        final box = await HiveService.getBox(_historyBoxName);
-        for (final item in history) {
-          if (item.type == type) {
-            await box.delete(item.id);
-          }
-        }
-      }
-    } catch (e) {
-      // Silently fail
-    }
-  }
-
-  // State management
-  Future<DateCalculatorState?> getCurrentState() async {
-    try {
-      final box = await HiveService.getBox(_stateBoxName);
-      final data = box.get(_stateKey);
-      if (data != null && data is Map) {
-        return DateCalculatorState.fromJson(Map<String, dynamic>.from(data));
-      }
-    } catch (e) {
-      // Return null if error
-    }
-    return null;
-  }
-
-  Future<void> saveCurrentState(DateCalculatorState state) async {
-    try {
-      final box = await HiveService.getBox(_stateBoxName);
-      await box.put(_stateKey, state.toJson());
-    } catch (e) {
-      // Silently fail
-    }
-  }
-
-  Future<void> clearCurrentState() async {
-    try {
-      final box = await HiveService.getBox(_stateBoxName);
-      await box.delete(_stateKey);
-    } catch (e) {
-      // Silently fail
-    }
-  }
-
-  // Cache info for settings integration
-  Future<Map<String, dynamic>> getCacheInfo() async {
-    try {
-      final history = await getHistory();
-      final currentState = await getCurrentState();
-
-      // Calculate size estimation
-      int historySize = 0;
-      for (final item in history) {
-        historySize += json.encode(item.toJson()).length;
-      }
-
-      final stateSize =
-          currentState != null ? json.encode(currentState.toJson()).length : 0;
-
-      return {
-        'items': history.length + (currentState != null ? 1 : 0),
-        'size': historySize + stateSize,
-        'history_count': history.length,
-        'has_current_state': currentState != null,
-      };
-    } catch (e) {
-      return {
-        'items': 0,
-        'size': 0,
-        'history_count': 0,
-        'has_current_state': false,
-      };
-    }
-  }
-
-  Future<void> clearAllData() async {
-    await clearHistory();
-    await clearCurrentState();
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   // Calculation helpers
@@ -592,7 +560,7 @@ class DateCalculatorService {
     final inputs = _getInputsFromState(type, state);
     final displayTitle = _getDisplayTitle(type, state, l10n);
 
-    return DateCalculationHistory(
+    return DateCalculationHistory.fromData(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       type: type,
       displayTitle: displayTitle,

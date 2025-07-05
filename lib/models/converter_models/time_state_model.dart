@@ -1,31 +1,25 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 
 part 'time_state_model.g.dart';
 
-@HiveType(typeId: 24)
-class TimeCardState extends HiveObject {
-  @HiveField(0)
+@embedded
+class TimeCardState {
   String unitCode;
 
-  @HiveField(1)
   double amount;
 
-  @HiveField(2)
   String? name;
 
-  @HiveField(3)
   List<String>? visibleUnits;
 
-  @HiveField(4)
   DateTime createdAt;
 
   TimeCardState({
-    required this.unitCode,
-    required this.amount,
+    this.unitCode = 'seconds',
+    this.amount = 0.0,
     this.name,
     this.visibleUnits,
-    required this.createdAt,
-  });
+  }) : createdAt = DateTime.now();
 
   Map<String, dynamic> toJson() => {
         'unitCode': unitCode,
@@ -36,35 +30,39 @@ class TimeCardState extends HiveObject {
       };
 
   factory TimeCardState.fromJson(Map<String, dynamic> json) {
-    return TimeCardState(
-      unitCode: json['unitCode'] ?? '',
+    final state = TimeCardState(
+      unitCode: json['unitCode'] ?? 'seconds',
       amount: (json['amount'] ?? 0.0).toDouble(),
       name: json['name'],
       visibleUnits: json['visibleUnits'] != null
           ? List<String>.from(json['visibleUnits'])
           : null,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
     );
+    // Set createdAt after creation if needed
+    if (json['createdAt'] != null) {
+      state.createdAt = DateTime.parse(json['createdAt']);
+    }
+    return state;
+  }
+
+  @override
+  String toString() {
+    return 'TimeCardState(unitCode: $unitCode, amount: $amount, name: $name, visibleUnits: $visibleUnits, createdAt: $createdAt)';
   }
 }
 
-@HiveType(typeId: 25)
-class TimeStateModel extends HiveObject {
-  @HiveField(0)
+@collection
+class TimeStateModel {
+  Id get isarId => fastHash('time_state');
+
   List<TimeCardState> cards;
 
-  @HiveField(1)
   List<String> visibleUnits;
 
-  @HiveField(2)
   DateTime lastUpdated;
 
-  @HiveField(3)
   bool isFocusMode;
 
-  @HiveField(4)
   String viewMode;
 
   TimeStateModel({
@@ -105,4 +103,18 @@ class TimeStateModel extends HiveObject {
       viewMode: json['viewMode'] ?? 'cards',
     );
   }
+}
+
+/// Fast hash function to generate Isar Id from String
+int fastHash(String string) {
+  var hash = 0xcbf29ce484222325;
+  var i = 0;
+  while (i < string.length) {
+    final codeUnit = string.codeUnitAt(i++);
+    hash ^= codeUnit >> 8;
+    hash *= 0x100000001b3;
+    hash ^= codeUnit & 0xFF;
+    hash *= 0x100000001b3;
+  }
+  return hash;
 }

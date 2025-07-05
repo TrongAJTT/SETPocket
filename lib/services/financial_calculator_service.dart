@@ -1,81 +1,58 @@
 import 'dart:convert';
 import 'dart:math' show pow;
+import 'package:isar/isar.dart';
 import 'package:setpocket/models/financial_models.dart';
-import 'package:setpocket/services/hive_service.dart';
-import 'package:setpocket/services/calculator_history_service.dart';
-import 'package:setpocket/services/graphing_calculator_service.dart';
+import 'package:setpocket/services/calculator_history_isar_service.dart';
+import 'package:setpocket/services/isar_service.dart';
+import 'package:uuid/uuid.dart';
 
 class FinancialCalculatorService {
-  static const String _historyBoxName = 'financial_calculator_history';
-  static const String _stateBoxName = 'financial_calculator_state';
-  static const String _stateKey = 'current_state';
+  static final _uuid = const Uuid();
 
   // History management
   static Future<List<FinancialCalculationHistory>> getHistory() async {
-    final historyEnabled = await GraphingCalculatorService.getRememberHistory();
-    if (!historyEnabled) return [];
-
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      final List<FinancialCalculationHistory> history = [];
-
-      for (var key in box.keys) {
-        final data = box.get(key);
-        if (data != null && data is Map) {
-          try {
-            final item = FinancialCalculationHistory.fromJson(
-                Map<String, dynamic>.from(data));
-            history.add(item);
-          } catch (e) {
-            // Skip invalid items
-          }
-        }
-      }
-
-      // Sort by timestamp, newest first
-      history.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      return history;
-    } catch (e) {
-      return [];
-    }
+    final isar = IsarService.isar;
+    return await isar.financialCalculationHistorys
+        .where()
+        .sortByTimestampDesc()
+        .findAll();
   }
 
   static Future<void> saveToHistory(FinancialCalculationHistory item) async {
-    final historyEnabled = await GraphingCalculatorService.getRememberHistory();
-    if (!historyEnabled) return;
-
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      await box.put(item.id, item.toJson());
-
-      // Also save to general calculator history for consistency
-      final String expression = _formatCalculationForHistory(item);
-      final String result = _formatResultForHistory(item);
-      await CalculatorHistoryService.addHistoryItem(
-        expression,
-        result,
-        'financial',
-      );
-
-      // Keep only the latest 100 items
-      await _cleanupHistory();
-    } catch (e) {
-      // Silently fail to avoid breaking the app
+    final isar = IsarService.isar;
+    if (item.id.isEmpty) {
+      item.id = _uuid.v4();
     }
+
+    await isar.writeTxn(() async {
+      await isar.financialCalculationHistorys.put(item);
+    });
+
+    // Also save to general calculator history for consistency
+    final String expression = _formatCalculationForHistory(item);
+    final String result = _formatResultForHistory(item);
+    await CalculatorHistoryIsarService.addHistoryItem(
+      expression,
+      result,
+      'financial',
+    );
+
+    await _cleanupHistory();
   }
 
   static Future<void> _cleanupHistory() async {
-    try {
-      final history = await getHistory();
-      if (history.length > 100) {
-        final box = await HiveService.getBox(_historyBoxName);
-        final itemsToRemove = history.skip(100);
-        for (final item in itemsToRemove) {
-          await box.delete(item.id);
-        }
-      }
-    } catch (e) {
-      // Silently fail
+    final isar = IsarService.isar;
+    final count = await isar.financialCalculationHistorys.count();
+    if (count > 100) {
+      final toDelete = await isar.financialCalculationHistorys
+          .where()
+          .sortByTimestamp()
+          .limit(count - 100)
+          .findAll();
+      await isar.writeTxn(() async {
+        await isar.financialCalculationHistorys
+            .deleteAll(toDelete.map((e) => e.isarId).toList());
+      });
     }
   }
 
@@ -84,7 +61,7 @@ class FinancialCalculatorService {
       case FinancialCalculationType.loan:
         return 'Loan: \$${item.inputs['amount']}, ${item.inputs['rate']}%, ${item.inputs['term']}yr';
       case FinancialCalculationType.investment:
-        return 'Investment: \$${item.inputs['initial']}, \$${item.inputs['monthly']}/mo, ${item.inputs['rate']}%, ${item.inputs['term']}yr';
+        return 'Invest: \$${item.inputs['initial']}, \$${item.inputs['monthly']}/mo, ${item.inputs['rate']}%, ${item.inputs['term']}yr';
       case FinancialCalculationType.compoundInterest:
         return 'Compound: \$${item.inputs['principal']}, ${item.inputs['rate']}%, ${item.inputs['time']}yr, ${item.inputs['frequency']}/yr';
     }
@@ -102,70 +79,61 @@ class FinancialCalculatorService {
   }
 
   static Future<void> removeFromHistory(String id) async {
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      await box.delete(id);
-    } catch (e) {
-      // Silently fail
-    }
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.financialCalculationHistorys
+          .filter()
+          .idEqualTo(id)
+          .deleteAll();
+    });
   }
 
   static Future<void> clearHistory() async {
-    try {
-      final box = await HiveService.getBox(_historyBoxName);
-      await box.clear();
-    } catch (e) {
-      // Silently fail
-    }
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.financialCalculationHistorys.clear();
+    });
   }
 
   // State management
   static Future<FinancialCalculatorState?> getCurrentState() async {
-    try {
-      final box = await HiveService.getBox(_stateBoxName);
-      final data = box.get(_stateKey);
-      if (data != null && data is Map) {
-        return FinancialCalculatorState.fromJson(
-            Map<String, dynamic>.from(data));
-      }
-    } catch (e) {
-      // Return null if error
-    }
-    return null;
+    final isar = IsarService.isar;
+    return await isar.financialCalculatorStates.where().findFirst();
   }
 
   static Future<void> saveCurrentState(FinancialCalculatorState state) async {
-    try {
-      final box = await HiveService.getBox(_stateBoxName);
-      await box.put(_stateKey, state.toJson());
-    } catch (e) {
-      // Silently fail
-    }
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.financialCalculatorStates.clear();
+      await isar.financialCalculatorStates.put(state);
+    });
   }
 
   static Future<void> clearCurrentState() async {
-    try {
-      final box = await HiveService.getBox(_stateBoxName);
-      await box.delete(_stateKey);
-    } catch (e) {
-      // Silently fail
-    }
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.financialCalculatorStates.clear();
+    });
   }
 
   // Cache info for settings integration
   static Future<Map<String, dynamic>> getCacheInfo() async {
     try {
+      final isar = IsarService.isar;
       final history = await getHistory();
       final currentState = await getCurrentState();
 
-      // Calculate size estimation
       int historySize = 0;
-      for (final item in history) {
+      final historyItems =
+          await isar.financialCalculationHistorys.where().findAll();
+      for (final item in historyItems) {
         historySize += json.encode(item.toJson()).length;
       }
 
-      final stateSize =
-          currentState != null ? json.encode(currentState.toJson()).length : 0;
+      int stateSize = 0;
+      if (currentState != null) {
+        stateSize = json.encode(currentState.toJson()).length;
+      }
 
       return {
         'items': history.length + (currentState != null ? 1 : 0),
@@ -247,11 +215,12 @@ class FinancialCalculatorService {
     required double principal,
     required double rate,
     required double time,
-    required double frequency,
+    required int frequency,
   }) {
-    final rateDecimal = rate / 100;
-    final compoundAmount =
-        principal * pow(1 + rateDecimal / frequency, frequency * time);
+    final n = frequency.toDouble();
+    final r = rate / 100;
+
+    final compoundAmount = principal * pow(1 + (r / n), n * time);
     final compoundInterestEarned = compoundAmount - principal;
 
     return CompoundInterestCalculationResult(

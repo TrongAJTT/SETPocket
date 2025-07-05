@@ -556,7 +556,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         });
         await GraphingCalculatorService.setAskBeforeLoading(value);
         if (value) {
-          await GraphingCalculatorService.setSaveDialogPreference(null);
+          await GraphingCalculatorService.setSaveDialogPreference('ask');
         }
       },
       isDisabled: !_rememberCalculationHistory || _askBeforeLoadingHistory,

@@ -7,21 +7,21 @@ import 'package:setpocket/models/converter_models/currency_state_model.dart';
 class CurrencyStateAdapter implements ConverterStateService {
   @override
   Future<void> saveState(String converterType, ConverterState state) async {
-    // Convert ConverterState to CurrencyStateModel
-    final currencyState = CurrencyStateModel(
-      cards: state.cards
-          .map((card) => CurrencyCardState(
-                currencyCode: card.baseUnitId,
-                amount: card.baseValue,
-                name: card.name,
-                currencies: card.visibleUnits.toList(),
-              ))
-          .toList(),
-      visibleCurrencies: state.globalVisibleUnits.toList(),
-      lastUpdated: DateTime.now(),
-      isFocusMode: state.isFocusMode,
-      viewMode: state.viewMode.name, // Convert enum to string
-    );
+    // Convert generic ConverterState to CurrencyStateModel
+    final currencyCards = state.cards.map((card) {
+      return CurrencyCardState()
+        ..currencyCode = card.baseUnitId
+        ..amount = card.baseValue
+        ..name = card.name
+        ..currencies = card.visibleUnits;
+    }).toList();
+
+    final currencyState = CurrencyStateModel()
+      ..cards = currencyCards
+      ..visibleCurrencies = state.globalVisibleUnits.toList()
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = state.isFocusMode
+      ..viewMode = state.viewMode.name;
 
     await CurrencyStateService.saveState(currencyState);
   }
@@ -38,16 +38,15 @@ class CurrencyStateAdapter implements ConverterStateService {
 
         // Initialize all units with 0, then set base unit value
         for (String unit in visibleUnits) {
-          values[unit] = unit == card.currencyCode ? card.amount : 0.0;
+          values[unit] = unit == card.currencyCode ? (card.amount ?? 0.0) : 0.0;
         }
 
         return ConverterCardState(
-          name:
-              card.name ?? 'Converter ${currencyState.cards.indexOf(card) + 1}',
-          baseUnitId: card.currencyCode,
-          baseValue: card.amount,
-          visibleUnits: visibleUnits,
-          values: values,
+          name: card.name ?? 'Card ${currencyState.cards.indexOf(card) + 1}',
+          baseUnitId: card.currencyCode ?? 'USD',
+          baseValue: card.amount ?? 1.0,
+          visibleUnits: card.currencies ?? ['USD', 'EUR', 'JPY'],
+          values: {},
         );
       }).toList();
 

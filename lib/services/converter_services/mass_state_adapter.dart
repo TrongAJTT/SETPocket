@@ -1,5 +1,5 @@
 import 'package:setpocket/services/converter_services/converter_service_base.dart';
-import 'package:setpocket/services/converter_services/mass_state_service.dart';
+import 'package:setpocket/services/converter_services/mass_state_service_isar.dart';
 import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'package:setpocket/models/converter_models/mass_state_model.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -16,22 +16,22 @@ class MassStateAdapter implements ConverterStateService {
       logInfo(
           'MassStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
-      // Convert ConverterState to MassStateModel
-      final massState = MassStateModel(
-        cards: state.cards
-            .map((card) => MassCardState(
-                  unitCode: card.baseUnitId,
-                  amount: card.baseValue,
-                  name: card.name,
-                  visibleUnits:
-                      card.visibleUnits, // Save per-card visible units
-                ))
-            .toList(),
-        visibleUnits: state.globalVisibleUnits.toList(),
-        lastUpdated: DateTime.now(),
-        isFocusMode: state.isFocusMode,
-        viewMode: state.viewMode.name,
-      );
+      // Convert generic ConverterState to MassStateModel
+      final massCards = state.cards.map((card) {
+        return MassCardState()
+          ..unitCode = card.baseUnitId
+          ..amount = card.baseValue
+          ..name = card.name
+          ..visibleUnits = card.visibleUnits
+          ..createdAt = DateTime.now();
+      }).toList();
+
+      final massState = MassStateModel()
+        ..cards = massCards
+        ..visibleUnits = state.globalVisibleUnits.toList()
+        ..lastUpdated = DateTime.now()
+        ..isFocusMode = state.isFocusMode
+        ..viewMode = state.viewMode.name;
 
       logInfo(
           'MassStateAdapter: Converted to MassStateModel with ${massState.cards.length} cards');
@@ -41,7 +41,8 @@ class MassStateAdapter implements ConverterStateService {
             'MassStateAdapter: Card $i - Name: ${card.name}, Unit: ${card.unitCode}, Amount: ${card.amount}, VisibleUnits: ${card.visibleUnits?.length ?? 0}');
       }
 
-      await MassStateService.saveState(massState);
+      final massStateService = MassStateServiceIsar();
+      await massStateService.saveState(massState);
       logInfo('MassStateAdapter: Successfully saved state');
     } catch (e) {
       logError('MassStateAdapter: Error saving state: $e');
@@ -53,7 +54,18 @@ class MassStateAdapter implements ConverterStateService {
   Future<ConverterState> loadState(String converterType) async {
     try {
       logInfo('MassStateAdapter: Loading state for $converterType');
-      final massState = await MassStateService.loadState();
+      final massStateService = MassStateServiceIsar();
+      final massState = await massStateService.loadState();
+
+      if (massState == null) {
+        logInfo('MassStateAdapter: No saved state found, returning default state');
+        return ConverterState(
+          cards: [],
+          globalVisibleUnits: <String>{},
+          isFocusMode: false,
+          viewMode: ConverterViewMode.cards,
+        );
+      }
 
       logInfo(
           'MassStateAdapter: Loaded MassStateModel with ${massState.cards.length} cards');
@@ -70,13 +82,13 @@ class MassStateAdapter implements ConverterStateService {
 
         // Initialize all units with 0, then set base unit value
         for (String unit in cardVisibleUnits) {
-          values[unit] = unit == card.unitCode ? card.amount : 0.0;
+          values[unit] = unit == card.unitCode ? (card.amount ?? 0.0) : 0.0;
         }
 
         final convertedCard = ConverterCardState(
           name: card.name ?? 'Card ${massState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
+          baseUnitId: card.unitCode ?? 'kilograms',
+          baseValue: card.amount ?? 1.0,
           visibleUnits: cardVisibleUnits,
           values: values,
         );
@@ -144,7 +156,8 @@ class MassStateAdapter implements ConverterStateService {
   Future<void> clearState(String converterType) async {
     try {
       logInfo('MassStateAdapter: Clearing state for $converterType');
-      await MassStateService.clearState();
+      final massStateService = MassStateServiceIsar();
+      await massStateService.clearState();
       logInfo('MassStateAdapter: State cleared successfully');
     } catch (e) {
       logError('MassStateAdapter: Error clearing state: $e');

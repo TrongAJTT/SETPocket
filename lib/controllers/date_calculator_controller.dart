@@ -533,24 +533,30 @@ class DateCalculatorController with ChangeNotifier {
     _saveState();
   }
 
-  void _saveState() async {
-    final state = _getCurrentStateAsStateObject();
-    await _dateCalculatorService.saveCurrentState(state);
-  }
-
-  DateCalculatorState _getCurrentStateAsStateObject() {
-    return DateCalculatorState(
+  void _saveState() {
+    final state = DateCalculatorState.fromData(
       activeTab: activeTab,
       tabStates: {
         'dateDifference': _dateDifferenceState.toJson(),
         'addSubtract': _addSubtractState.toJson(),
         'age': _ageState.toJson(),
+        'workingDays': _workingDaysState.toJson(),
+        'timezone': _timezoneState.toJson(),
+        'recurring': _recurringState.toJson(),
+        'countdown': _countdownState.toJson(),
+        'timeUnit': _timeUnitState.toJson(),
         'dateInfo': _dateInfoState.toJson(),
-        // Add other states if they exist
+        'nthWeekday': {
+          'year': _nthWeekdayYear,
+          'month': _nthWeekdayMonth,
+          'weekday': _nthWeekdayWeekday,
+          'occurrence': _nthWeekdayOccurrence,
+        },
       },
       lastUpdated: DateTime.now(),
       isDataConstraintEnabled: _isDataConstraintEnabled,
     );
+    _dateCalculatorService.saveCurrentState(state);
   }
 
   String _generateId() {
@@ -806,7 +812,7 @@ class DateCalculatorController with ChangeNotifier {
   Future<void> saveToHistory() async {
     if (_currentResult == null || _currentResult!.containsKey('error')) return;
 
-    final historyItem = DateCalculationHistory(
+    final historyItem = DateCalculationHistory.fromData(
       id: _generateId(),
       type: activeTab,
       timestamp: DateTime.now(),

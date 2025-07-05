@@ -1,24 +1,17 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 
 part 'data_state_model.g.dart';
 
-@HiveType(typeId: 34)
-class DataCardState extends HiveObject {
-  @HiveField(0)
-  String unitCode;
-
-  @HiveField(1)
-  double amount;
-
-  @HiveField(2)
+@embedded
+class DataCardState {
+  String? unitCode;
+  double? amount;
   String? name;
-
-  @HiveField(3)
   List<String>? visibleUnits;
 
   DataCardState({
-    required this.unitCode,
-    required this.amount,
+    this.unitCode,
+    this.amount,
     this.name,
     this.visibleUnits,
   });
@@ -36,8 +29,8 @@ class DataCardState extends HiveObject {
   // Create from JSON
   factory DataCardState.fromJson(Map<String, dynamic> json) {
     return DataCardState(
-      unitCode: json['unitCode'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      unitCode: json['unitCode'] as String?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       visibleUnits: json['visibleUnits'] != null
           ? List<String>.from(json['visibleUnits'])
@@ -46,35 +39,22 @@ class DataCardState extends HiveObject {
   }
 }
 
-@HiveType(typeId: 35)
-class DataStateModel extends HiveObject {
-  @HiveField(0)
-  List<DataCardState> cards;
+@Collection()
+class DataStateModel {
+  Id id = Isar.autoIncrement;
 
-  @HiveField(1)
-  List<String> visibleUnits;
+  List<DataCardState> cards = [];
+  List<String> visibleUnits = [];
+  DateTime? lastUpdated;
+  bool isFocusMode = false;
+  String viewMode = 'cards'; // Store as string for compatibility
 
-  @HiveField(2)
-  DateTime lastUpdated;
-
-  @HiveField(3)
-  bool isFocusMode;
-
-  @HiveField(4)
-  String viewMode; // Store as string for Hive compatibility
-
-  DataStateModel({
-    required this.cards,
-    required this.visibleUnits,
-    required this.lastUpdated,
-    this.isFocusMode = false,
-    this.viewMode = 'cards',
-  });
+  DataStateModel();
 
   // Create default state
   static DataStateModel createDefault() {
-    return DataStateModel(
-      cards: [
+    final model = DataStateModel()
+      ..cards = [
         DataCardState(
           unitCode: 'kilobyte',
           amount: 1024.0,
@@ -85,16 +65,16 @@ class DataStateModel extends HiveObject {
             'gigabyte',
           ],
         ),
-      ],
-      visibleUnits: [
+      ]
+      ..visibleUnits = [
         'kilobyte',
         'megabyte',
         'gigabyte',
-      ],
-      lastUpdated: DateTime.now(),
-      isFocusMode: false,
-      viewMode: 'cards',
-    );
+      ]
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = false
+      ..viewMode = 'cards';
+    return model;
   }
 
   // Convert to JSON
@@ -102,7 +82,7 @@ class DataStateModel extends HiveObject {
     return {
       'cards': cards.map((card) => card.toJson()).toList(),
       'visibleUnits': visibleUnits,
-      'lastUpdated': lastUpdated.toIso8601String(),
+      'lastUpdated': lastUpdated?.toIso8601String(),
       'isFocusMode': isFocusMode,
       'viewMode': viewMode,
     };
@@ -110,15 +90,20 @@ class DataStateModel extends HiveObject {
 
   // Create from JSON
   factory DataStateModel.fromJson(Map<String, dynamic> json) {
-    return DataStateModel(
-      cards: (json['cards'] as List)
-          .map((cardJson) =>
-              DataCardState.fromJson(cardJson as Map<String, dynamic>))
-          .toList(),
-      visibleUnits: List<String>.from(json['visibleUnits'] as List),
-      lastUpdated: DateTime.parse(json['lastUpdated'] as String),
-      isFocusMode: json['isFocusMode'] ?? false,
-      viewMode: json['viewMode'] ?? 'cards',
-    );
+    final model = DataStateModel()
+      ..cards = (json['cards'] as List?)
+              ?.map((cardJson) =>
+                  DataCardState.fromJson(cardJson as Map<String, dynamic>))
+              .toList() ??
+          []
+      ..visibleUnits = json['visibleUnits'] != null
+          ? List<String>.from(json['visibleUnits'] as List)
+          : []
+      ..lastUpdated = json['lastUpdated'] != null
+          ? DateTime.parse(json['lastUpdated'] as String)
+          : DateTime.now()
+      ..isFocusMode = json['isFocusMode'] ?? false
+      ..viewMode = json['viewMode'] ?? 'cards';
+    return model;
   }
 }

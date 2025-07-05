@@ -70,15 +70,14 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = TimeGeneratorState(
-        startHour: _startTime.hour,
-        startMinute: _startTime.minute,
-        endHour: _endTime.hour,
-        endMinute: _endTime.minute,
-        timeCount: _timeCount,
-        allowDuplicates: _allowDuplicates,
-        lastUpdated: DateTime.now(),
-      );
+      final state = TimeGeneratorState()
+        ..startHour = _startTime.hour
+        ..startMinute = _startTime.minute
+        ..endHour = _endTime.hour
+        ..endMinute = _endTime.minute
+        ..timeCount = _timeCount
+        ..allowDuplicates = _allowDuplicates
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveTimeGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

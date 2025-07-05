@@ -29,12 +29,12 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
 
     for (final template in widget.templates) {
       // Remove .json extension for editing, keep only the filename part
-      final fullFilename = _filenames[template.id] ?? '';
+      final fullFilename = _filenames[template.templateId] ?? '';
       final filenameWithoutExtension = fullFilename.endsWith('.json')
           ? fullFilename.substring(0, fullFilename.length - 5)
           : fullFilename;
 
-      _controllers[template.id] = TextEditingController(
+      _controllers[template.templateId] = TextEditingController(
         text: filenameWithoutExtension,
       );
     }
@@ -68,7 +68,7 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
                 itemCount: widget.templates.length,
                 itemBuilder: (context, index) {
                   final template = widget.templates[index];
-                  final controller = _controllers[template.id]!;
+                  final controller = _controllers[template.templateId]!;
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -88,7 +88,7 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
                           ),
                           onChanged: (value) {
                             // Always append .json extension, user cannot modify it
-                            _filenames[template.id] = '${value.trim()}.json';
+                            _filenames[template.templateId] = '${value.trim()}.json';
                           },
                         ),
                       ],
@@ -109,11 +109,11 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
           onPressed: () {
             // Update filenames from controllers
             for (final template in widget.templates) {
-              final controller = _controllers[template.id]!;
+              final controller = _controllers[template.templateId]!;
               final filename = controller.text.trim();
               if (filename.isNotEmpty) {
                 // Always use .json extension, no other extension allowed
-                _filenames[template.id] = '$filename.json';
+                _filenames[template.templateId] = '$filename.json';
               }
             }
 

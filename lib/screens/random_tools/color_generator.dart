@@ -58,10 +58,9 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = ColorGeneratorState(
-        withAlpha: _withAlpha,
-        lastUpdated: DateTime.now(),
-      );
+      final state = ColorGeneratorState()
+        ..withAlpha = _withAlpha
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveColorGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

@@ -62,10 +62,9 @@ class _YesNoGeneratorScreenState extends State<YesNoGeneratorScreen>
 
   Future<void> _saveState() async {
     try {
-      final state = SimpleGeneratorState(
-        skipAnimation: _skipAnimation,
-        lastUpdated: DateTime.now(),
-      );
+      final state = SimpleGeneratorState()
+        ..skipAnimation = _skipAnimation
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveYesNoGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

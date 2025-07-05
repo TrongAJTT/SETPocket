@@ -56,31 +56,28 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
     super.dispose();
   }
 
-  Future<void> _loadState() async {
-    try {
-      final state = await RandomStateService.getDateTimeGeneratorState();
-      if (mounted) {
-        setState(() {
-          _startDateTime = state.startDateTime;
-          _endDateTime = state.endDateTime;
-          _dateTimeCount = state.dateTimeCount;
-          _allowDuplicates = state.allowDuplicates;
-        });
-      }
-    } catch (e) {
-      // Error is already logged in service
+  void _loadState() async {
+    final state = await RandomStateService.getDateTimeGeneratorState();
+    if (state != null) {
+      setState(() {
+        _startDateTime = state.startDateTime ??
+            DateTime.now().subtract(const Duration(days: 365));
+        _endDateTime =
+            state.endDateTime ?? DateTime.now().add(const Duration(days: 365));
+        _dateTimeCount = state.dateTimeCount;
+        _allowDuplicates = state.allowDuplicates;
+      });
     }
   }
 
   Future<void> _saveState() async {
     try {
-      final state = DateTimeGeneratorState(
-        startDateTime: _startDateTime,
-        endDateTime: _endDateTime,
-        dateTimeCount: _dateTimeCount,
-        allowDuplicates: _allowDuplicates,
-        lastUpdated: DateTime.now(),
-      );
+      final state = DateTimeGeneratorState()
+        ..startDateTime = _startDateTime
+        ..endDateTime = _endDateTime
+        ..dateTimeCount = _dateTimeCount
+        ..allowDuplicates = _allowDuplicates
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveDateTimeGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

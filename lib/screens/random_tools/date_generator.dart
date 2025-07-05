@@ -40,32 +40,29 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
     _loadHistory();
   }
 
-  Future<void> _loadState() async {
-    try {
-      final state = await RandomStateService.getDateGeneratorState();
-      if (mounted) {
-        setState(() {
-          _startDate = state.startDate;
-          _endDate = state.endDate;
-          _dateCount = state.dateCount;
-          _dateCountSlider = state.dateCount.toDouble();
-          _allowDuplicates = state.allowDuplicates;
-        });
-      }
-    } catch (e) {
-      // Error is already logged in service
+  void _loadState() async {
+    final state = await RandomStateService.getDateGeneratorState();
+    if (state != null) {
+      setState(() {
+        _startDate = state.startDate ??
+            DateTime.now().subtract(const Duration(days: 365));
+        _endDate =
+            state.endDate ?? DateTime.now().add(const Duration(days: 365));
+        _dateCount = state.dateCount;
+        _dateCountSlider = state.dateCount.toDouble();
+        _allowDuplicates = state.allowDuplicates;
+      });
     }
   }
 
   Future<void> _saveState() async {
     try {
-      final state = DateGeneratorState(
-        startDate: _startDate,
-        endDate: _endDate,
-        dateCount: _dateCount,
-        allowDuplicates: _allowDuplicates,
-        lastUpdated: DateTime.now(),
-      );
+      final state = DateGeneratorState()
+        ..startDate = _startDate
+        ..endDate = _endDate
+        ..dateCount = _dateCount
+        ..allowDuplicates = _allowDuplicates
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveDateGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

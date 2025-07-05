@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
+import 'package:setpocket/models/app_installation.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/isar_service.dart';
 
 /// Service quản lý stable app installation ID
 /// ID này chỉ thay đổi khi người dùng xóa toàn bộ dữ liệu ứng dụng
@@ -13,14 +15,22 @@ class AppInstallationService {
 
   AppInstallationService._();
 
-  static const String _boxName = 'app_installation';
-  static const String _installationIdKey = 'installation_id';
-  static const String _installationWordIdKey = 'installation_word_id';
-  static const String _firstTimeSetupKey = 'first_time_setup_completed';
-
   String? _cachedInstallationId;
   String? _cachedInstallationWordId;
   bool _isInitialized = false;
+
+  Future<AppInstallation> _getInstallationData() async {
+    final isar = IsarService.isar;
+    AppInstallation? installation =
+        await isar.appInstallations.where().findFirst();
+    if (installation == null) {
+      installation = AppInstallation();
+      await isar.writeTxn(() async {
+        await isar.appInstallations.put(installation!);
+      });
+    }
+    return installation;
+  }
 
   /// Khởi tạo service và đảm bảo ID được tạo
   /// Returns true if this is first time setup (new installation)
@@ -28,11 +38,12 @@ class AppInstallationService {
     if (_isInitialized) return false;
 
     try {
-      final box = await Hive.openBox(_boxName);
+      final isar = IsarService.isar;
+      final installation = await _getInstallationData();
 
       // Check if this is first time setup
-      final isFirstTime = !box.containsKey(_firstTimeSetupKey) ||
-          !box.containsKey(_installationIdKey);
+      final isFirstTime = installation.firstTimeSetupCompleted != true ||
+          installation.installationId == null;
 
       if (isFirstTime) {
         logInfo('AppInstallationService: First time setup detected');
@@ -41,7 +52,11 @@ class AppInstallationService {
         await getAppInstallationWordId();
 
         // Mark setup as completed
-        await box.put(_firstTimeSetupKey, true);
+        await isar.writeTxn(() async {
+          final data = await _getInstallationData();
+          data.firstTimeSetupCompleted = true;
+          await isar.appInstallations.put(data);
+        });
         logInfo('AppInstallationService: First time setup completed');
       } else {
         // Load existing IDs
@@ -62,9 +77,9 @@ class AppInstallationService {
   /// Check if this is the first time the app is being used
   Future<bool> isFirstTimeSetup() async {
     try {
-      final box = await Hive.openBox(_boxName);
-      return !box.containsKey(_firstTimeSetupKey) ||
-          !box.containsKey(_installationIdKey);
+      final installation = await _getInstallationData();
+      return installation.firstTimeSetupCompleted != true ||
+          installation.installationId == null;
     } catch (e) {
       logError('Failed to check first time setup: $e');
       return true; // Assume first time if error
@@ -74,8 +89,12 @@ class AppInstallationService {
   /// Mark first time setup as completed
   Future<void> markFirstTimeSetupCompleted() async {
     try {
-      final box = await Hive.openBox(_boxName);
-      await box.put(_firstTimeSetupKey, true);
+      final isar = IsarService.isar;
+      await isar.writeTxn(() async {
+        final installation = await _getInstallationData();
+        installation.firstTimeSetupCompleted = true;
+        await isar.appInstallations.put(installation);
+      });
       logInfo('First time setup marked as completed');
     } catch (e) {
       logError('Failed to mark first time setup completed: $e');
@@ -89,13 +108,18 @@ class AppInstallationService {
     }
 
     try {
-      final box = await Hive.openBox(_boxName);
-      String? installationId = box.get(_installationIdKey);
+      final isar = IsarService.isar;
+      final installation = await _getInstallationData();
+      String? installationId = installation.installationId;
 
       if (installationId == null || installationId.isEmpty) {
         // Tạo installation ID mới
         installationId = _generateStableInstallationId();
-        await box.put(_installationIdKey, installationId);
+        await isar.writeTxn(() async {
+          final data = await _getInstallationData();
+          data.installationId = installationId;
+          await isar.appInstallations.put(data);
+        });
         logInfo('Generated new app installation ID: $installationId');
       } else {
         logInfo('Loaded existing app installation ID: $installationId');
@@ -118,13 +142,18 @@ class AppInstallationService {
     }
 
     try {
-      final box = await Hive.openBox(_boxName);
-      String? installationWordId = box.get(_installationWordIdKey);
+      final isar = IsarService.isar;
+      final installation = await _getInstallationData();
+      String? installationWordId = installation.installationWordId;
 
       if (installationWordId == null || installationWordId.isEmpty) {
         // Tạo installation word ID mới
         installationWordId = _generateReadableInstallationId();
-        await box.put(_installationWordIdKey, installationWordId);
+        await isar.writeTxn(() async {
+          final data = await _getInstallationData();
+          data.installationWordId = installationWordId;
+          await isar.appInstallations.put(data);
+        });
         logInfo('Generated new app installation word ID: $installationWordId');
       } else {
         logInfo(
@@ -286,8 +315,10 @@ class AppInstallationService {
   /// Chỉ sử dụng khi cần test hoặc user request reset
   Future<void> resetAppInstallation() async {
     try {
-      final box = await Hive.openBox(_boxName);
-      await box.clear();
+      final isar = IsarService.isar;
+      await isar.writeTxn(() async {
+        await isar.appInstallations.clear();
+      });
 
       _cachedInstallationId = null;
       _cachedInstallationWordId = null;

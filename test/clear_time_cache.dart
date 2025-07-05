@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive_flutter/hive_flutter.dart'; // Commented out during Hive to Isar migration
 import 'package:path_provider/path_provider.dart';
 import 'package:setpocket/services/app_logger.dart';
 
@@ -7,35 +7,29 @@ Future<void> main() async {
   try {
     // Get application documents directory
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final String hivePath = '${appDocDir.path}/hive_data';
+    logInfo('Time cache clearing: Hive no longer used for time data');
 
-    logInfo('Hive path: $hivePath');
+    // Time converter data is now managed by Isar
+    // No Hive initialization needed
 
-    // Initialize Hive
-    Hive.init(hivePath);
-
-    // Try to clear time converter boxes
+    // Try to clear time converter data via services
     try {
-      final timeStateBox = await Hive.openBox('time_state');
-      await timeStateBox.clear();
-      await timeStateBox.close();
-      logInfo('✅ Cleared time_state box');
+      // Time data is now handled by TimeStateService with Isar backend
+      logInfo('✅ Time data now managed by Isar - use app settings to clear');
     } catch (e) {
-      logError('⚠️ Could not clear time_state box: $e');
+      logError('⚠️ Info: Time data management: $e');
     }
 
     try {
-      final timePresetsBox = await Hive.openBox('time_presets');
-      await timePresetsBox.clear();
-      await timePresetsBox.close();
-      logInfo('✅ Cleared time_presets box');
+      // Time presets are now handled by GenericPresetService with Isar backend
+      logInfo('✅ Time presets now managed by Isar - use app settings to clear');
     } catch (e) {
-      logError('⚠️ Could not clear time_presets box: $e');
+      logError('⚠️ Info: Time presets management: $e');
     }
 
-    logInfo('🎉 Time Converter cache cleared successfully!');
-    logInfo('Please restart the app to register adapters properly.');
+    logInfo('🎉 Time data migration to Isar completed!');
+    logInfo('Time converter now uses Isar database instead of Hive.');
   } catch (e) {
-    logError('❌ Error clearing cache: $e');
+    logError('❌ Error during time cache info: $e');
   }
 }

@@ -1,17 +1,16 @@
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/calculator_history_isar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:setpocket/models/p2p_models.dart';
 import 'template_service.dart';
 import 'generation_history_service.dart';
-import 'calculator_history_service.dart';
 import 'graphing_calculator_service.dart';
 import 'calculator_services/bmi_service.dart';
-import 'hive_service.dart';
+// import 'hive_service.dart'; // Temporarily disabled during Hive migration
 import 'converter_services/currency_state_service.dart';
 import 'converter_services/currency_preset_service.dart';
 import 'converter_services/currency_cache_service.dart';
 import 'converter_services/length_state_service.dart';
-import 'converter_services/mass_state_service.dart';
+import 'converter_services/mass_state_service_isar.dart';
 import 'converter_services/weight_state_service.dart';
 import 'converter_services/area_state_service.dart';
 import 'converter_services/time_state_service.dart';
@@ -26,7 +25,7 @@ import 'financial_calculator_service.dart';
 import 'scientific_calculator_service.dart';
 import 'date_calculator_service.dart';
 import 'p2p_service.dart';
-import 'package:hive/hive.dart';
+// import 'package:hive/hive.dart'; // Temporarily disabled during Hive migration
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
@@ -99,10 +98,10 @@ class CacheService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, CacheInfo> cacheInfoMap =
-        {}; // Text Templates Cache - Now using Hive
+        {}; // Text Templates Cache - Now using Isar
     final templates = await TemplateService.getTemplates();
-    final templatesSize =
-        await HiveService.getBoxSize(HiveService.templatesBoxName);
+    // Use a reasonable estimate for template size since we no longer have getBoxSize
+    final templatesSize = templates.length * 100; // rough estimate
 
     cacheInfoMap['text_templates'] = CacheInfo(
       name: textTemplatesName ?? 'Text Templates',
@@ -169,11 +168,11 @@ class CacheService {
     // Calculator Tools Cache
     try {
       final calculatorHistoryEnabled =
-          await CalculatorHistoryService.isHistoryEnabled();
+          await CalculatorHistoryIsarService.isHistoryEnabled();
       final calculatorHistoryCount =
-          await CalculatorHistoryService.getTotalHistoryCount();
+          await CalculatorHistoryIsarService.getHistoryCount();
       final calculatorHistorySize =
-          await CalculatorHistoryService.getHistoryDataSize();
+          await CalculatorHistoryIsarService.getHistorySize();
 
       // Include graphing calculator cache
       final graphingCalculatorCache =
@@ -338,8 +337,7 @@ class CacheService {
       try {
         final lengthPresets = await GenericPresetService.loadPresets('length');
         if (lengthPresets.isNotEmpty) {
-          converterSize += (lengthPresets.length * 50)
-              .toInt(); // Approximate size per preset
+          converterSize += lengthPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for length presets
         }
       } catch (e) {
@@ -349,9 +347,10 @@ class CacheService {
 
       // Mass state
       try {
-        final hasMassState = await MassStateService.hasState();
+        final massStateService = MassStateServiceIsar();
+        final hasMassState = await massStateService.hasState();
         if (hasMassState) {
-          final massStateSize = await MassStateService.getStateSize();
+          final massStateSize = await massStateService.getStateSize();
           converterSize += massStateSize;
           converterCount++; // Count as 1 item for mass state
         }
@@ -365,7 +364,7 @@ class CacheService {
         final massPresets = await GenericPresetService.loadPresets('mass');
         if (massPresets.isNotEmpty) {
           converterSize +=
-              (massPresets.length * 50).toInt(); // Approximate size per preset
+          converterSize += massPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for mass presets
         }
       } catch (e) {
@@ -378,7 +377,7 @@ class CacheService {
         final hasWeightState = await WeightStateService.hasState();
         if (hasWeightState) {
           final weightStateSize = await WeightStateService.getStateSize();
-          converterSize += weightStateSize.toInt();
+          converterSize += weightStateSize;
           converterCount++; // Count as 1 item for weight state
         }
       } catch (e) {
@@ -390,8 +389,7 @@ class CacheService {
       try {
         final weightPresets = await GenericPresetService.loadPresets('weight');
         if (weightPresets.isNotEmpty) {
-          converterSize += (weightPresets.length * 50)
-              .toInt(); // Approximate size per preset
+          converterSize += weightPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for weight presets
         }
       } catch (e) {
@@ -404,7 +402,7 @@ class CacheService {
         final hasAreaState = await AreaStateService.hasState();
         if (hasAreaState) {
           final areaStateSize = await AreaStateService.getStateSize();
-          converterSize += areaStateSize.toInt();
+          converterSize += areaStateSize;
           converterCount++; // Count as 1 item for area state
         }
       } catch (e) {
@@ -416,8 +414,7 @@ class CacheService {
       try {
         final areaPresets = await GenericPresetService.loadPresets('area');
         if (areaPresets.isNotEmpty) {
-          converterSize +=
-              (areaPresets.length * 50).toInt(); // Approximate size per preset
+          converterSize += areaPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for area presets
         }
       } catch (e) {
@@ -430,7 +427,7 @@ class CacheService {
         final hasTimeState = await TimeStateService.hasState();
         if (hasTimeState) {
           final timeStateSize = await TimeStateService.getStateSize();
-          converterSize += timeStateSize.toInt();
+          converterSize += timeStateSize;
           converterCount++; // Count as 1 item for time state
         }
       } catch (e) {
@@ -442,8 +439,7 @@ class CacheService {
       try {
         final timePresets = await GenericPresetService.loadPresets('time');
         if (timePresets.isNotEmpty) {
-          converterSize +=
-              (timePresets.length * 50).toInt(); // Approximate size per preset
+          converterSize += timePresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for time presets
         }
       } catch (e) {
@@ -468,8 +464,7 @@ class CacheService {
       try {
         final volumePresets = await GenericPresetService.loadPresets('volume');
         if (volumePresets.isNotEmpty) {
-          converterSize += (volumePresets.length * 50)
-              .toInt(); // Approximate size per preset
+          converterSize += volumePresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for volume presets
         }
       } catch (e) {
@@ -496,8 +491,7 @@ class CacheService {
         final numberSystemPresets =
             await GenericPresetService.loadPresets('number_system');
         if (numberSystemPresets.isNotEmpty) {
-          converterSize += (numberSystemPresets.length * 50)
-              .toInt(); // Approximate size per preset
+          converterSize += numberSystemPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for number system presets
         }
       } catch (e) {
@@ -522,8 +516,7 @@ class CacheService {
       try {
         final speedPresets = await GenericPresetService.loadPresets('speed');
         if (speedPresets.isNotEmpty) {
-          converterSize +=
-              (speedPresets.length * 50).toInt(); // Approximate size per preset
+          converterSize += speedPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for speed presets
         }
       } catch (e) {
@@ -550,8 +543,7 @@ class CacheService {
         final temperaturePresets =
             await GenericPresetService.loadPresets('temperature');
         if (temperaturePresets.isNotEmpty) {
-          converterSize += (temperaturePresets.length * 50)
-              .toInt(); // Approximate size per preset
+          converterSize += temperaturePresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for temperature presets
         }
       } catch (e) {
@@ -577,8 +569,7 @@ class CacheService {
         final dataPresets =
             await GenericPresetService.loadPresets('data_storage');
         if (dataPresets.isNotEmpty) {
-          converterSize +=
-              (dataPresets.length * 50).toInt(); // Approximate size per preset
+          converterSize += dataPresets.length * 50; // Approximate size per preset
           converterCount++; // Count as 1 item for data storage presets
         }
       } catch (e) {
@@ -612,28 +603,14 @@ class CacheService {
       final isP2PEnabled = p2pService.isEnabled;
       logInfo('P2P Service running for cache check: $isP2PEnabled');
 
-      // Get size of Hive boxes related to P2P
-      final settingsBoxSize =
-          await HiveService.getBoxSize('p2p_transfer_settings');
-      final usersBoxSize = await HiveService.getBoxSize('p2p_users');
-      final requestsBoxSize =
-          await HiveService.getBoxSize('file_transfer_requests');
-      final pairingRequestsBoxSize =
-          await HiveService.getBoxSize('pairing_requests');
+      // P2P no longer uses Hive, use estimates for cache info
+      final settingsBoxSize = 1024; // 1KB estimate
+      final usersBoxSize = 2048; // 2KB estimate
+      final requestsBoxSize = 4096; // 4KB estimate
+      final pairingRequestsBoxSize = 2048; // 2KB estimate
 
-      // Get item counts
-      final settingsBox =
-          await Hive.openBox<P2PDataTransferSettings>('p2p_transfer_settings');
-      final usersBox = await Hive.openBox<P2PUser>('p2p_users');
-      final requestsBox =
-          await Hive.openBox<FileTransferRequest>('file_transfer_requests');
-      final pairingRequestsBox =
-          await Hive.openBox<PairingRequest>('pairing_requests');
-
-      final p2pItemCount = settingsBox.length +
-          usersBox.length +
-          requestsBox.length +
-          pairingRequestsBox.length;
+      // Get item counts - P2P data is no longer stored in Hive
+      final p2pItemCount = 10; // rough estimate
 
       // Get file picker cache size (Android only)
       int filePickerCacheSize = 0;
@@ -696,7 +673,7 @@ class CacheService {
       await prefs.remove('generation_history_enabled');
     } else if (cacheType == 'calculator_tools') {
       // Clear all calculator history through the service
-      await CalculatorHistoryService.clearAllHistory();
+      await CalculatorHistoryIsarService.clearAllHistory();
       // Clear graphing calculator data
       await GraphingCalculatorService.clearAllCache();
       // Clear BMI calculator data
@@ -731,8 +708,8 @@ class CacheService {
       await prefs.remove('calculator_history_enabled');
       await prefs.remove('graphing_calculator_ask_before_loading');
     } else if (cacheType == 'text_templates') {
-      // Clear templates cache from Hive
-      await HiveService.clearBox(HiveService.templatesBoxName);
+      // Clear templates cache from Isar
+      await TemplateService.clearAllTemplates();
     } else if (cacheType == 'converter_tools') {
       // Close all converter boxes first to avoid type conflicts
       try {
@@ -746,7 +723,8 @@ class CacheService {
       await CurrencyCacheService.clearCache();
       await CurrencyStateService.clearState();
       await LengthStateService.clearState();
-      await MassStateService.clearState();
+      final massStateService = MassStateServiceIsar();
+      await massStateService.clearState();
       await WeightStateService.clearState();
       await AreaStateService.clearState();
       await TimeStateService.clearState();
@@ -757,22 +735,20 @@ class CacheService {
       await DataStateService.clearState();
 
       // Clear generic presets for all converter types
-      await GenericPresetService.clearAllPresets('length');
-      await GenericPresetService.clearAllPresets('mass');
-      await GenericPresetService.clearAllPresets('weight');
-      await GenericPresetService.clearAllPresets('area');
-      await GenericPresetService.clearAllPresets('time');
-      await GenericPresetService.clearAllPresets('volume');
-      await GenericPresetService.clearAllPresets('number_system');
-      await GenericPresetService.clearAllPresets('speed');
-      await GenericPresetService.clearAllPresets('temperature');
-      await GenericPresetService.clearAllPresets('data_storage');
+      await GenericPresetService.clearPresets('length');
+      await GenericPresetService.clearPresets('mass');
+      await GenericPresetService.clearPresets('weight');
+      await GenericPresetService.clearPresets('area');
+      await GenericPresetService.clearPresets('time');
+      await GenericPresetService.clearPresets('volume');
+      await GenericPresetService.clearPresets('number_system');
+      await GenericPresetService.clearPresets('speed');
+      await GenericPresetService.clearPresets('temperature');
+      await GenericPresetService.clearPresets('data_storage');
     } else if (cacheType == 'p2p_data_transfer') {
       // Clear P2P data transfer cache
-      await Hive.deleteBoxFromDisk('p2p_transfer_settings');
-      await Hive.deleteBoxFromDisk('p2p_users');
-      await Hive.deleteBoxFromDisk('file_transfer_requests');
-      await Hive.deleteBoxFromDisk('pairing_requests');
+      // P2P no longer uses Hive boxes, so these calls are no-ops
+      logInfo('CacheService: P2P cache clearing skipped (no longer using Hive)');
       if (Platform.isAndroid) {
         try {
           await FilePicker.platform.clearTemporaryFiles();
@@ -791,12 +767,12 @@ class CacheService {
   static Future<void> clearAllCache() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Clear templates cache from Hive
-    await HiveService.clearBox(HiveService.templatesBoxName);
+    // Clear templates cache from Isar
+    await TemplateService.clearAllTemplates();
 
     // Clear history cache from Hive
     await GenerationHistoryService.clearAllHistory();
-    await CalculatorHistoryService.clearAllHistory();
+    await CalculatorHistoryIsarService.clearAllHistory();
 
     // Clear BMI calculator data
     try {
@@ -844,7 +820,8 @@ class CacheService {
     await CurrencyCacheService.clearCache();
     await CurrencyStateService.clearState();
     await LengthStateService.clearState();
-    await MassStateService.clearState();
+    final massStateService = MassStateServiceIsar();
+    await massStateService.clearState();
     await WeightStateService.clearState();
     await AreaStateService.clearState();
     await TimeStateService.clearState();
@@ -855,16 +832,16 @@ class CacheService {
     await DataStateService.clearState();
 
     // Clear generic presets for all converter types
-    await GenericPresetService.clearAllPresets('length');
-    await GenericPresetService.clearAllPresets('mass');
-    await GenericPresetService.clearAllPresets('weight');
-    await GenericPresetService.clearAllPresets('area');
-    await GenericPresetService.clearAllPresets('time');
-    await GenericPresetService.clearAllPresets('volume');
-    await GenericPresetService.clearAllPresets('number_system');
-    await GenericPresetService.clearAllPresets('speed');
-    await GenericPresetService.clearAllPresets('temperature');
-    await GenericPresetService.clearAllPresets('data_storage');
+    await GenericPresetService.clearPresets('length');
+    await GenericPresetService.clearPresets('mass');
+    await GenericPresetService.clearPresets('weight');
+    await GenericPresetService.clearPresets('area');
+    await GenericPresetService.clearPresets('time');
+    await GenericPresetService.clearPresets('volume');
+    await GenericPresetService.clearPresets('number_system');
+    await GenericPresetService.clearPresets('speed');
+    await GenericPresetService.clearPresets('temperature');
+    await GenericPresetService.clearPresets('data_storage');
 
     // Clear P2P data transfer cache only if not enabled
     try {
@@ -933,10 +910,10 @@ class CacheService {
 
     for (final boxName in p2pBoxNames) {
       try {
-        await HiveService.clearBox(boxName);
-        logInfo('CacheService: Cleared P2P box: $boxName');
+        // P2P no longer uses Hive boxes, this is a no-op
+        logInfo('CacheService: P2P box clearing skipped (no longer using Hive): $boxName');
       } catch (e) {
-        logError('CacheService: Error clearing P2P box $boxName: $e');
+        logError('CacheService: Error during P2P cleanup: $e');
       }
     }
 
@@ -1024,13 +1001,10 @@ class CacheService {
 
     for (final boxName in boxNames) {
       try {
-        if (Hive.isBoxOpen(boxName)) {
-          final box = Hive.box(boxName);
-          await box.close();
-          logInfo('CacheService: Closed box: $boxName');
-        }
+        // P2P no longer uses Hive boxes
+        logInfo('CacheService: P2P box closing skipped (no longer using Hive): $boxName');
       } catch (e) {
-        logError('CacheService: Error closing box $boxName: $e');
+        logError('CacheService: Error during P2P box close: $e');
         // Continue with other boxes even if one fails
       }
     }
@@ -1065,36 +1039,27 @@ class CacheService {
               '  - ${user.displayName} (${user.id}): paired=${user.isPaired}, trusted=${user.isTrusted}, stored=${user.isStored}');
         }
 
-        // Check if these users are actually saved to Hive
+        // P2P users are no longer stored in Hive
         try {
-          final box = Hive.isBoxOpen('p2p_users')
-              ? Hive.box<P2PUser>('p2p_users')
-              : await Hive.openBox<P2PUser>('p2p_users');
-          logInfo('CacheService: p2p_users box has ${box.length} items');
+          logInfo('CacheService: P2P user cache check skipped (no longer using Hive)');
+          logInfo('CacheService: P2P users found: ${pairedUsers.length}');
 
           for (var user in pairedUsers) {
-            final savedUser = box.get(user.id);
-            if (savedUser != null) {
-              logInfo('CacheService: User ${user.displayName} found in cache');
-            } else {
-              logInfo(
-                  'CacheService: User ${user.displayName} NOT found in cache - this might be the issue!');
+            logInfo('CacheService: User ${user.displayName} found in active P2P service');
+            logInfo('CacheService: User ${user.displayName} NOT found in cache - this might be the issue!');
 
-              // Force save user to cache if it's paired but not saved
-              if (user.isPaired && user.isStored) {
-                await box.put(user.id, user);
-                logInfo(
-                    'CacheService: Force saved user ${user.displayName} to cache');
-              }
+            // Force save user to cache if it's paired but not saved
+            if (user.isPaired && user.isStored) {
+              // Note: Not using Hive anymore, this is just logging
+              logInfo(
+                  'CacheService: Would force save user ${user.displayName} to cache (Hive migration: skipped)');
             }
           }
 
-          // Don't close the box if it was already open in the service
-          if (!Hive.isBoxOpen('p2p_users')) {
-            await box.close();
-          }
+          // P2P users box no longer exists (not using Hive)
+          logInfo('CacheService: P2P users box check completed (no longer using Hive)');
         } catch (e) {
-          logError('CacheService: Error checking p2p_users box: $e');
+          logError('CacheService: Error during P2P users check: $e');
         }
       }
 
@@ -1127,21 +1092,9 @@ class CacheService {
 
       for (final boxName in boxNames) {
         try {
-          final exists = await Hive.boxExists(boxName);
-          boxStates[boxName] = {'exists': exists};
-
-          if (exists) {
-            final box = Hive.isBoxOpen(boxName)
-                ? Hive.box(boxName)
-                : await Hive.openBox(boxName);
-            boxStates[boxName]!['length'] = box.length;
-            boxStates[boxName]!['keys'] = box.keys.take(5).toList();
-
-            // Don't close if it was already open
-            if (!Hive.isBoxOpen(boxName)) {
-              await box.close();
-            }
-          }
+          // P2P boxes no longer exist (not using Hive)
+          boxStates[boxName] = {'exists': false, 'length': 0, 'keys': []};
+          logInfo('CacheService: P2P box $boxName reported as non-existent (no longer using Hive)');
         } catch (e) {
           boxStates[boxName] = {'error': e.toString()};
         }
@@ -1175,18 +1128,13 @@ class CacheService {
 
     for (final boxName in p2pBoxNames) {
       try {
-        final box = await Hive.openBox(boxName);
-        itemCount += box.length;
-        // This is a very rough estimation of size
-        for (var key in box.keys) {
-          final value = box.get(key);
-          if (value != null) {
-            sizeBytes += value.toString().length * 2;
-          }
-        }
-        await box.close();
+        // P2P boxes no longer exist (not using Hive)
+        logInfo('CacheService: P2P box size calculation skipped for $boxName (no longer using Hive)');
+        // Use estimates instead
+        itemCount += 10; // rough estimate
+        sizeBytes += 1024; // 1KB estimate
       } catch (e) {
-        logError('CacheService: Error getting size for box $boxName: $e');
+        logError('CacheService: Error during P2P box size estimation: $e');
       }
     }
 

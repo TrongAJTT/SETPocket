@@ -58,14 +58,13 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
 
   Future<void> _saveState() async {
     try {
-      final state = PasswordGeneratorState(
-        passwordLength: _passwordLength,
-        includeLowercase: _includeLowercase,
-        includeUppercase: _includeUppercase,
-        includeNumbers: _includeNumbers,
-        includeSpecial: _includeSpecial,
-        lastUpdated: DateTime.now(),
-      );
+      final state = PasswordGeneratorState()
+        ..passwordLength = _passwordLength
+        ..includeLowercase = _includeLowercase
+        ..includeUppercase = _includeUppercase
+        ..includeNumbers = _includeNumbers
+        ..includeSpecial = _includeSpecial
+        ..lastUpdated = DateTime.now();
       await RandomStateService.savePasswordGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

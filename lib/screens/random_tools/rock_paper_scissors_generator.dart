@@ -68,10 +68,9 @@ class _RockPaperScissorsGeneratorScreenState
 
   Future<void> _saveState() async {
     try {
-      final state = SimpleGeneratorState(
-        skipAnimation: _skipAnimation,
-        lastUpdated: DateTime.now(),
-      );
+      final state = SimpleGeneratorState()
+        ..skipAnimation = _skipAnimation
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveRockPaperScissorsGeneratorState(state);
     } catch (e) {
       // Error is already logged in service

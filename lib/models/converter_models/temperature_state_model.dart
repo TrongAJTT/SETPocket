@@ -1,24 +1,17 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 
 part 'temperature_state_model.g.dart';
 
-@HiveType(typeId: 32)
-class TemperatureCardState extends HiveObject {
-  @HiveField(0)
-  String unitCode;
-
-  @HiveField(1)
-  double amount;
-
-  @HiveField(2)
+@embedded
+class TemperatureCardState {
+  String? unitCode;
+  double? amount;
   String? name;
-
-  @HiveField(3)
   List<String>? visibleUnits;
 
   TemperatureCardState({
-    required this.unitCode,
-    required this.amount,
+    this.unitCode,
+    this.amount,
     this.name,
     this.visibleUnits,
   });
@@ -29,15 +22,15 @@ class TemperatureCardState extends HiveObject {
       'unitCode': unitCode,
       'amount': amount,
       'name': name ?? 'Card 1',
-      'visibleUnits': visibleUnits ?? ['celsius', 'fahrenheit'],
+      'visibleUnits': visibleUnits ?? ['celsius', 'fahrenheit', 'kelvin'],
     };
   }
 
   // Create from JSON
   factory TemperatureCardState.fromJson(Map<String, dynamic> json) {
     return TemperatureCardState(
-      unitCode: json['unitCode'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      unitCode: json['unitCode'] as String?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       visibleUnits: json['visibleUnits'] != null
           ? List<String>.from(json['visibleUnits'])
@@ -46,53 +39,42 @@ class TemperatureCardState extends HiveObject {
   }
 }
 
-@HiveType(typeId: 33)
-class TemperatureStateModel extends HiveObject {
-  @HiveField(0)
-  List<TemperatureCardState> cards;
+@Collection()
+class TemperatureStateModel {
+  Id id = Isar.autoIncrement;
 
-  @HiveField(1)
-  List<String> visibleUnits;
+  List<TemperatureCardState> cards = [];
+  List<String> visibleUnits = [];
+  DateTime? lastUpdated;
+  bool isFocusMode = false;
+  String viewMode = 'cards'; // Store as string for compatibility
 
-  @HiveField(2)
-  DateTime lastUpdated;
-
-  @HiveField(3)
-  bool isFocusMode;
-
-  @HiveField(4)
-  String viewMode; // Store as string for Hive compatibility
-
-  TemperatureStateModel({
-    required this.cards,
-    required this.visibleUnits,
-    required this.lastUpdated,
-    this.isFocusMode = false,
-    this.viewMode = 'cards',
-  });
+  TemperatureStateModel();
 
   // Create default state
   static TemperatureStateModel createDefault() {
-    return TemperatureStateModel(
-      cards: [
+    final model = TemperatureStateModel()
+      ..cards = [
         TemperatureCardState(
           unitCode: 'celsius',
-          amount: 25.0,
+          amount: 0.0,
           name: 'Card 1',
           visibleUnits: [
             'celsius',
             'fahrenheit',
+            'kelvin',
           ],
         ),
-      ],
-      visibleUnits: [
+      ]
+      ..visibleUnits = [
         'celsius',
         'fahrenheit',
-      ],
-      lastUpdated: DateTime.now(),
-      isFocusMode: false,
-      viewMode: 'cards',
-    );
+        'kelvin',
+      ]
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = false
+      ..viewMode = 'cards';
+    return model;
   }
 
   // Convert to JSON
@@ -100,7 +82,7 @@ class TemperatureStateModel extends HiveObject {
     return {
       'cards': cards.map((card) => card.toJson()).toList(),
       'visibleUnits': visibleUnits,
-      'lastUpdated': lastUpdated.toIso8601String(),
+      'lastUpdated': lastUpdated?.toIso8601String(),
       'isFocusMode': isFocusMode,
       'viewMode': viewMode,
     };
@@ -108,15 +90,20 @@ class TemperatureStateModel extends HiveObject {
 
   // Create from JSON
   factory TemperatureStateModel.fromJson(Map<String, dynamic> json) {
-    return TemperatureStateModel(
-      cards: (json['cards'] as List)
-          .map((cardJson) =>
-              TemperatureCardState.fromJson(cardJson as Map<String, dynamic>))
-          .toList(),
-      visibleUnits: List<String>.from(json['visibleUnits'] as List),
-      lastUpdated: DateTime.parse(json['lastUpdated'] as String),
-      isFocusMode: json['isFocusMode'] ?? false,
-      viewMode: json['viewMode'] ?? 'cards',
-    );
+    final model = TemperatureStateModel()
+      ..cards = (json['cards'] as List?)
+              ?.map((cardJson) => TemperatureCardState.fromJson(
+                  cardJson as Map<String, dynamic>))
+              .toList() ??
+          []
+      ..visibleUnits = json['visibleUnits'] != null
+          ? List<String>.from(json['visibleUnits'] as List)
+          : []
+      ..lastUpdated = json['lastUpdated'] != null
+          ? DateTime.parse(json['lastUpdated'] as String)
+          : DateTime.now()
+      ..isFocusMode = json['isFocusMode'] ?? false
+      ..viewMode = json['viewMode'] ?? 'cards';
+    return model;
   }
 }

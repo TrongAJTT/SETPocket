@@ -15,29 +15,21 @@ class DataStateAdapter implements ConverterStateService {
     logInfo(
         'DataStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
-    // Convert ConverterState to DataStateModel
-    final dataState = DataStateModel(
-      cards: state.cards
-          .map((card) => DataCardState(
-                unitCode: card.baseUnitId,
-                amount: card.baseValue,
-                name: card.name,
-                visibleUnits: card.visibleUnits, // Save per-card visible units
-              ))
-          .toList(),
-      visibleUnits: state.globalVisibleUnits.toList(),
-      lastUpdated: DateTime.now(),
-      isFocusMode: state.isFocusMode,
-      viewMode: state.viewMode.name,
-    );
+    // Convert generic ConverterState to DataStateModel
+    final dataCards = state.cards.map((card) {
+      return DataCardState()
+        ..unitCode = card.baseUnitId
+        ..amount = card.baseValue
+        ..name = card.name
+        ..visibleUnits = card.visibleUnits;
+    }).toList();
 
-    logInfo(
-        'DataStateAdapter: Converted to DataStateModel with ${dataState.cards.length} cards');
-    for (int i = 0; i < dataState.cards.length; i++) {
-      final card = dataState.cards[i];
-      logInfo(
-          'DataStateAdapter: Card $i - Name: ${card.name}, Unit: ${card.unitCode}, Amount: ${card.amount}, VisibleUnits: ${card.visibleUnits?.length ?? 0}');
-    }
+    final dataState = DataStateModel()
+      ..cards = dataCards
+      ..visibleUnits = state.globalVisibleUnits.toList()
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = state.isFocusMode
+      ..viewMode = state.viewMode.name;
 
     await DataStateService.saveState(dataState);
   }
@@ -57,20 +49,19 @@ class DataStateAdapter implements ConverterStateService {
 
       // Convert DataStateModel to ConverterState
       final cards = dataState.cards.map((card) {
-        // Use per-card visible units if available, otherwise fall back to global
-        final cardVisibleUnits = card.visibleUnits ?? dataState.visibleUnits;
+        final visibleUnits = card.visibleUnits ?? dataState.visibleUnits;
         final values = <String, double>{};
 
         // Initialize all units with 0, then set base unit value
-        for (String unit in cardVisibleUnits) {
-          values[unit] = unit == card.unitCode ? card.amount : 0.0;
+        for (String unit in visibleUnits) {
+          values[unit] = unit == card.unitCode ? (card.amount ?? 0.0) : 0.0;
         }
 
         final convertedCard = ConverterCardState(
           name: card.name ?? 'Card ${dataState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
-          visibleUnits: cardVisibleUnits,
+          baseUnitId: card.unitCode ?? 'kilobyte',
+          baseValue: card.amount ?? 1024.0,
+          visibleUnits: visibleUnits,
           values: values,
         );
 

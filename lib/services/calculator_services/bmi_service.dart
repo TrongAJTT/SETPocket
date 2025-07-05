@@ -381,13 +381,8 @@ class BmiService {
   // History management
   static Future<List<BmiHistoryEntry>> getHistory() async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      final data = box.get(_historyKey);
-      if (data == null) return [];
-
-      final List<dynamic> historyJson = jsonDecode(data);
-      return historyJson.map((json) => BmiHistoryEntry.fromJson(json)).toList()
-        ..sort((a, b) => b.data.calculatedAt.compareTo(a.data.calculatedAt));
+      // TODO: Implement Isar-based BMI history storage
+      return [];
     } catch (e) {
       debugPrint('Error loading BMI history: $e');
       return [];
@@ -396,30 +391,7 @@ class BmiService {
 
   static Future<void> saveToHistory(BmiHistoryEntry entry) async {
     try {
-      final history = await getHistory();
-
-      // Remove duplicate if exists (same data within 1 minute)
-      history.removeWhere((existing) =>
-          existing.data.height == entry.data.height &&
-          existing.data.weight == entry.data.weight &&
-          existing.data.age == entry.data.age &&
-          existing.data.gender == entry.data.gender &&
-          existing.data.calculatedAt
-                  .difference(entry.data.calculatedAt)
-                  .abs()
-                  .inMinutes <
-              1);
-
-      history.insert(0, entry);
-
-      // Keep only last 100 entries
-      if (history.length > 100) {
-        history.removeRange(100, history.length);
-      }
-
-      final jsonData = jsonEncode(history.map((e) => e.toJson()).toList());
-      final box = await HiveService.getBox<String>('bmi_data');
-      await box.put(_historyKey, jsonData);
+      // TODO: Implement Isar-based BMI history storage
     } catch (e) {
       debugPrint('Error saving BMI history: $e');
     }
@@ -427,12 +399,7 @@ class BmiService {
 
   static Future<void> removeFromHistory(String id) async {
     try {
-      final history = await getHistory();
-      history.removeWhere((entry) => entry.id == id);
-
-      final jsonData = jsonEncode(history.map((e) => e.toJson()).toList());
-      final box = await HiveService.getBox<String>('bmi_data');
-      await box.put(_historyKey, jsonData);
+      // TODO: Implement Isar-based BMI history storage
     } catch (e) {
       debugPrint('Error removing BMI history: $e');
     }
@@ -440,8 +407,7 @@ class BmiService {
 
   static Future<void> clearHistory() async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      await box.delete(_historyKey);
+      // TODO: Implement Isar-based BMI history storage
     } catch (e) {
       debugPrint('Error clearing BMI history: $e');
     }
@@ -450,16 +416,11 @@ class BmiService {
   // Preferences management
   static Future<Map<String, dynamic>> getPreferences() async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      final data = box.get(_preferencesKey);
-      if (data == null) {
-        return {
-          'unitSystem': UnitSystem.metric.index,
-          'rememberLastValues': true,
-          'autoSaveToHistory': true,
-        };
-      }
-      return jsonDecode(data);
+      return {
+        'unitSystem': UnitSystem.metric.index,
+        'rememberLastValues': true,
+        'autoSaveToHistory': true,
+      };
     } catch (e) {
       debugPrint('Error loading BMI preferences: $e');
       return {
@@ -472,8 +433,7 @@ class BmiService {
 
   static Future<void> savePreferences(Map<String, dynamic> preferences) async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      await box.put(_preferencesKey, jsonEncode(preferences));
+      // TODO: Implement Isar-based BMI preferences storage
     } catch (e) {
       debugPrint('Error saving BMI preferences: $e');
     }
@@ -481,8 +441,7 @@ class BmiService {
 
   static Future<void> clearPreferences() async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      await box.delete(_preferencesKey);
+      // TODO: Implement Isar-based BMI preferences storage
     } catch (e) {
       debugPrint('Error clearing BMI preferences: $e');
     }
@@ -491,8 +450,8 @@ class BmiService {
   // Cache management methods
   static Future<bool> hasData() async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      return box.containsKey(_historyKey) || box.containsKey(_preferencesKey);
+      // TODO: Implement Isar-based BMI data check
+      return false;
     } catch (e) {
       debugPrint('Error checking BMI data existence: $e');
       return false;
@@ -501,22 +460,7 @@ class BmiService {
 
   static Future<int> getDataSize() async {
     try {
-      final box = await HiveService.getBox<String>('bmi_data');
-      int size = 0;
-
-      // Calculate history size
-      final historyData = box.get(_historyKey);
-      if (historyData != null) {
-        size += historyData.length * 2; // UTF-16 encoding
-      }
-
-      // Calculate preferences size
-      final preferencesData = box.get(_preferencesKey);
-      if (preferencesData != null) {
-        size += preferencesData.length * 2; // UTF-16 encoding
-      }
-
-      return size;
+      return 0;
     } catch (e) {
       debugPrint('Error calculating BMI data size: $e');
       return 0;

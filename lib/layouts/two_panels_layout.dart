@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/services/calculator_history_service.dart';
 import 'package:setpocket/layouts/three_panels_layout.dart';
+import 'package:setpocket/models/calculator_history.dart';
 
 /// New calculator layout using ThreePanelLayout for consistency
 class TwoPanelsLayout extends StatefulWidget {
@@ -638,12 +638,12 @@ class SinglePanelLayout extends StatelessWidget {
 /// Generic calculator history widget builder for consistency
 class SubPanelWidget extends StatefulWidget {
   final String historyType;
-  final List<CalculatorHistoryItem> history;
+  final List<CalculatorHistory> history;
   final String title;
   final VoidCallback? onClearHistory;
   final Function(String)? onCopyExpression;
   final Function(String)? onCopyResult;
-  final Widget Function(CalculatorHistoryItem, BuildContext)? customItemBuilder;
+  final Widget Function(CalculatorHistory, BuildContext)? customItemBuilder;
 
   const SubPanelWidget({
     super.key,
@@ -760,7 +760,7 @@ class _SubPanelWidgetState extends State<SubPanelWidget> {
   }
 
   Widget _buildDefaultHistoryItem(
-      CalculatorHistoryItem item, BuildContext context, AppLocalizations loc) {
+      CalculatorHistory item, BuildContext context, AppLocalizations loc) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       elevation: 1,

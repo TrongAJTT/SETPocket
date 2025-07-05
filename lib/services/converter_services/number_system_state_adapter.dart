@@ -32,6 +32,7 @@ class NumberSystemStateAdapter implements ConverterStateService {
       globalVisibleUnits: state.globalVisibleUnits.toList(),
       isFocusMode: state.isFocusMode,
       viewMode: state.viewMode.name,
+      lastUpdated: DateTime.now(),
     );
 
     logInfo(

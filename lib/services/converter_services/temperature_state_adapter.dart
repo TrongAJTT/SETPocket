@@ -16,21 +16,21 @@ class TemperatureStateAdapter implements ConverterStateService {
     logInfo(
         'TemperatureStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
-    // Convert ConverterState to TemperatureStateModel
-    final temperatureState = TemperatureStateModel(
-      cards: state.cards
-          .map((card) => TemperatureCardState(
-                unitCode: card.baseUnitId,
-                amount: card.baseValue,
-                name: card.name,
-                visibleUnits: card.visibleUnits, // Save per-card visible units
-              ))
-          .toList(),
-      visibleUnits: state.globalVisibleUnits.toList(),
-      lastUpdated: DateTime.now(),
-      isFocusMode: state.isFocusMode,
-      viewMode: state.viewMode.name,
-    );
+    // Convert generic ConverterState to TemperatureStateModel
+    final temperatureCards = state.cards.map((card) {
+      return TemperatureCardState()
+        ..unitCode = card.baseUnitId
+        ..amount = card.baseValue
+        ..name = card.name
+        ..visibleUnits = card.visibleUnits;
+    }).toList();
+
+    final temperatureState = TemperatureStateModel()
+      ..cards = temperatureCards
+      ..visibleUnits = state.globalVisibleUnits.toList()
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = state.isFocusMode
+      ..viewMode = state.viewMode.name;
 
     logInfo(
         'TemperatureStateAdapter: Converted to TemperatureStateModel with ${temperatureState.cards.length} cards');
@@ -65,13 +65,13 @@ class TemperatureStateAdapter implements ConverterStateService {
 
         // Initialize all units with 0, then set base unit value
         for (String unit in cardVisibleUnits) {
-          values[unit] = unit == card.unitCode ? card.amount : 0.0;
+          values[unit] = unit == card.unitCode ? (card.amount ?? 0.0) : 0.0;
         }
 
         final convertedCard = ConverterCardState(
           name: card.name ?? 'Card ${temperatureState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
+          baseUnitId: card.unitCode ?? 'celsius',
+          baseValue: card.amount ?? 0.0,
           visibleUnits: cardVisibleUnits,
           values: values,
         );

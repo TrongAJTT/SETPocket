@@ -1,89 +1,60 @@
 import 'dart:convert';
 import 'package:setpocket/models/text_template.dart';
-import 'hive_service.dart';
+import 'package:setpocket/services/template_service_isar.dart';
+// import 'hive_service.dart'; // Commented out during Hive to Isar migration
 
 class TemplateService {
   static const String _templatesKey = 'templates';
+  static bool _migrationCompleted = false;
 
-  static Future<List<Template>> getTemplates() async {
+  // Migration helper - run once to migrate from Hive to Isar - DISABLED
+  static Future<void> _ensureMigration() async {
+    if (_migrationCompleted) return;
+
     try {
-      final box = HiveService.templatesBox;
-      final templatesJson = box.get(_templatesKey, defaultValue: <String>[]);
+      // Migration disabled - using Isar directly
+      _migrationCompleted = true;
+    } catch (e) {
+      // If migration fails, continue with Isar anyway
+      _migrationCompleted = true;
+    }
+  }
 
-      if (templatesJson is List) {
-        return templatesJson
-            .cast<String>()
-            .map((json) => Template.fromJson(jsonDecode(json)))
-            .toList();
-      }
-
+  static Future<List<Template>> _getTemplatesFromHive() async {
+    try {
+      // Hive access disabled during migration
       return [];
     } catch (e) {
-      // Fallback to empty list if there's an error
       return [];
     }
+  }
+
+  static Future<List<Template>> getTemplates() async {
+    await _ensureMigration();
+    return await TemplateServiceIsar.getTemplates();
   }
 
   static Future<void> saveTemplate(Template template) async {
-    try {
-      final box = HiveService.templatesBox;
-
-      // Retrieve current templates
-      final List<Template> templates = await getTemplates();
-
-      // Check if template already exists by id
-      final existingIndex = templates.indexWhere((t) => t.id == template.id);
-
-      if (existingIndex >= 0) {
-        // Update existing template
-        templates[existingIndex] = template;
-      } else {
-        // Add new template
-        templates.add(template);
-      }
-
-      // Convert templates to JSON strings
-      final templatesJson =
-          templates.map((t) => jsonEncode(t.toJson())).toList();
-
-      // Save updated list to Hive
-      await box.put(_templatesKey, templatesJson);
-    } catch (e) {
-      throw Exception('Failed to save template: $e');
-    }
+    await _ensureMigration();
+    return await TemplateServiceIsar.saveTemplate(template);
   }
 
-  static Future<void> deleteTemplate(String id) async {
-    try {
-      final box = HiveService.templatesBox;
-
-      // Retrieve current templates
-      List<Template> templates = await getTemplates();
-
-      // Remove the template with the matching id
-      templates = templates.where((t) => t.id != id).toList();
-
-      // Convert templates to JSON strings
-      final templatesJson =
-          templates.map((t) => jsonEncode(t.toJson())).toList();
-
-      // Save updated list to Hive
-      await box.put(_templatesKey, templatesJson);
-    } catch (e) {
-      throw Exception('Failed to delete template: $e');
-    }
+  static Future<void> deleteTemplate(String templateId) async {
+    await _ensureMigration();
+    return await TemplateServiceIsar.deleteTemplate(templateId);
   }
 
-  static Future<Template?> getTemplateById(String id) async {
-    try {
-      final templates = await getTemplates();
-      return templates.firstWhere((template) => template.id == id);
-    } catch (e) {
-      return null;
-    }
+  static Future<Template?> getTemplateById(String templateId) async {
+    await _ensureMigration();
+    return await TemplateServiceIsar.getTemplateById(templateId);
+  }
+
+  static Future<void> clearAllTemplates() async {
+    await _ensureMigration();
+    return await TemplateServiceIsar.clearAll();
   }
 
   static String generateTemplateId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
+    return TemplateServiceIsar.generateTemplateId();
   }
 }

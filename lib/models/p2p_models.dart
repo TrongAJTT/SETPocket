@@ -1,5 +1,6 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
+import 'package:setpocket/utils/isar_utils.dart';
 
 part 'p2p_models.g.dart';
 
@@ -44,64 +45,84 @@ enum FileTransferRejectReason {
   unknown,
 }
 
-@HiveType(typeId: 47)
-class P2PUser extends HiveObject {
-  @HiveField(0)
+@Collection()
+class P2PUser {
+  Id get isarId => fastHash(id);
+
+  @Index(unique: true, replace: true)
   String id;
 
-  @HiveField(1)
   String displayName;
 
-  @HiveField(2)
+  @Index()
   String appInstallationId;
 
-  @HiveField(3)
   String ipAddress;
 
-  @HiveField(4)
   int port;
 
-  @HiveField(5)
   DateTime lastSeen;
 
-  @HiveField(6)
   bool isOnline;
 
-  @HiveField(7)
   bool isPaired;
 
-  @HiveField(8)
   bool isTrusted;
 
-  @HiveField(9)
   bool autoConnect;
 
-  @HiveField(10)
   DateTime? pairedAt;
 
-  @HiveField(11)
   bool isStored; // Indicates if this is a stored/saved connection
 
   P2PUser({
-    String? id,
+    required this.id,
     required this.displayName,
     required this.appInstallationId,
     required this.ipAddress,
     required this.port,
-    DateTime? lastSeen,
+    required this.lastSeen,
     this.isOnline = false,
     this.isPaired = false,
     this.isTrusted = false,
     this.autoConnect = false,
     this.pairedAt,
     this.isStored = false,
-  })  : id = id ?? const Uuid().v4(),
-        lastSeen = lastSeen ?? DateTime.now();
+  });
+
+  factory P2PUser.create({
+    required String displayName,
+    required String appInstallationId,
+    required String ipAddress,
+    required int port,
+    DateTime? lastSeen,
+    bool isOnline = false,
+    bool isPaired = false,
+    bool isTrusted = false,
+    bool autoConnect = false,
+    DateTime? pairedAt,
+    bool isStored = false,
+  }) =>
+      P2PUser(
+        id: const Uuid().v4(),
+        displayName: displayName,
+        appInstallationId: appInstallationId,
+        ipAddress: ipAddress,
+        port: port,
+        lastSeen: lastSeen ?? DateTime.now(),
+        isOnline: isOnline,
+        isPaired: isPaired,
+        isTrusted: isTrusted,
+        autoConnect: autoConnect,
+        pairedAt: pairedAt,
+        isStored: isStored,
+      );
 
   // Backward compatibility getter
   String get deviceId => appInstallationId;
 
   /// Get connection status for UI display
+  @ignore
   ConnectionDisplayStatus get connectionDisplayStatus {
     if (isStored) {
       return isOnline
@@ -150,49 +171,65 @@ class P2PUser extends HiveObject {
       );
 }
 
-@HiveType(typeId: 48)
-class PairingRequest extends HiveObject {
-  @HiveField(0)
+@Collection()
+class PairingRequest {
+  Id get isarId => fastHash(id);
+
+  @Index(unique: true, replace: true)
   String id;
 
-  @HiveField(1)
   String fromUserId;
 
-  @HiveField(2)
   String fromUserName;
 
-  @HiveField(3)
   String fromAppInstallationId;
 
-  @HiveField(4)
   String fromIpAddress;
 
-  @HiveField(5)
   int fromPort;
 
-  @HiveField(6)
   DateTime requestTime;
 
-  @HiveField(7)
   bool wantsSaveConnection;
 
-  @HiveField(8)
   bool isProcessed;
 
   PairingRequest({
-    String? id,
+    required this.id,
     required this.fromUserId,
     required this.fromUserName,
     required this.fromAppInstallationId,
     required this.fromIpAddress,
     required this.fromPort,
-    DateTime? requestTime,
+    required this.requestTime,
     this.wantsSaveConnection = false,
     this.isProcessed = false,
-  })  : id = id ?? const Uuid().v4(),
-        requestTime = requestTime ?? DateTime.now();
+  });
+
+  factory PairingRequest.create({
+    required String fromUserId,
+    required String fromUserName,
+    required String fromAppInstallationId,
+    required String fromIpAddress,
+    required int fromPort,
+    DateTime? requestTime,
+    bool wantsSaveConnection = false,
+    bool isProcessed = false,
+  }) =>
+      PairingRequest(
+        id: const Uuid().v4(),
+        fromUserId: fromUserId,
+        fromUserName: fromUserName,
+        fromAppInstallationId: fromAppInstallationId,
+        fromIpAddress: fromIpAddress,
+        fromPort: fromPort,
+        requestTime: requestTime ?? DateTime.now(),
+        wantsSaveConnection: wantsSaveConnection,
+        isProcessed: isProcessed,
+      );
 
   // Backward compatibility getter
+  @ignore
   String get fromDeviceId => fromAppInstallationId;
 
   Map<String, dynamic> toJson() => {
@@ -226,55 +263,46 @@ class PairingRequest extends HiveObject {
       );
 }
 
-@HiveType(typeId: 49)
-class DataTransferTask extends HiveObject {
-  @HiveField(0)
+@Collection()
+class DataTransferTask {
+  Id get isarId => fastHash(id);
+
+  @Index(unique: true, replace: true)
   String id;
 
-  @HiveField(1)
   String fileName;
 
-  @HiveField(2)
   String filePath;
 
-  @HiveField(3)
   int fileSize;
 
-  @HiveField(4)
+  @Index()
   String targetUserId;
 
-  @HiveField(5)
   String targetUserName;
 
-  @HiveField(6)
+  @Enumerated(EnumType.ordinal)
   DataTransferStatus status;
 
-  @HiveField(7)
   int transferredBytes;
 
-  @HiveField(8)
   DateTime createdAt;
 
-  @HiveField(9)
   DateTime? startedAt;
 
-  @HiveField(10)
   DateTime? completedAt;
 
-  @HiveField(11)
   String? errorMessage;
 
-  @HiveField(12)
   bool isOutgoing;
 
-  @HiveField(13)
   String? savePath;
 
-  @HiveField(14)
+  @Index()
   String? batchId; // Links to file transfer request
 
   DataTransferTask({
-    String? id,
+    required this.id,
     required this.fileName,
     required this.filePath,
     required this.fileSize,
@@ -282,16 +310,50 @@ class DataTransferTask extends HiveObject {
     required this.targetUserName,
     this.status = DataTransferStatus.pending,
     this.transferredBytes = 0,
-    DateTime? createdAt,
+    required this.createdAt,
     this.startedAt,
     this.completedAt,
     this.errorMessage,
     required this.isOutgoing,
     this.savePath,
     this.batchId,
-  })  : id = id ?? const Uuid().v4(),
-        createdAt = createdAt ?? DateTime.now();
+  });
 
+  factory DataTransferTask.create({
+    required String fileName,
+    required String filePath,
+    required int fileSize,
+    required String targetUserId,
+    required String targetUserName,
+    DataTransferStatus status = DataTransferStatus.pending,
+    int transferredBytes = 0,
+    DateTime? createdAt,
+    DateTime? startedAt,
+    DateTime? completedAt,
+    String? errorMessage,
+    required bool isOutgoing,
+    String? savePath,
+    String? batchId,
+  }) =>
+      DataTransferTask(
+        id: const Uuid().v4(),
+        fileName: fileName,
+        filePath: filePath,
+        fileSize: fileSize,
+        targetUserId: targetUserId,
+        targetUserName: targetUserName,
+        status: status,
+        transferredBytes: transferredBytes,
+        createdAt: createdAt ?? DateTime.now(),
+        startedAt: startedAt,
+        completedAt: completedAt,
+        errorMessage: errorMessage,
+        isOutgoing: isOutgoing,
+        savePath: savePath,
+        batchId: batchId,
+      );
+
+  @ignore
   double get progress => fileSize > 0 ? transferredBytes / fileSize : 0.0;
 
   Map<String, dynamic> toJson() => {
@@ -395,13 +457,15 @@ class P2PMessage {
 }
 
 /// Model for file information in transfer request
+@embedded
 class FileTransferInfo {
-  final String fileName;
-  final int fileSize;
+  late String fileName;
+  late int fileSize;
 
-  const FileTransferInfo({
-    required this.fileName,
-    required this.fileSize,
+  // Add a no-arg constructor for Isar
+  FileTransferInfo({
+    this.fileName = '',
+    this.fileSize = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -417,57 +481,73 @@ class FileTransferInfo {
 }
 
 /// File transfer request model
-@HiveType(typeId: 53)
-class FileTransferRequest extends HiveObject {
-  @HiveField(0)
+@Collection()
+class FileTransferRequest {
+  Id get isarId => fastHash(requestId);
+
+  @Index(unique: true, replace: true)
   String requestId;
 
-  @HiveField(1)
+  @Index()
   String batchId; // ID for grouping multiple files in one transfer session
 
-  @HiveField(2)
   String fromUserId;
 
-  @HiveField(3)
   String fromUserName;
 
-  @HiveField(4)
   List<FileTransferInfo> files;
 
-  @HiveField(5)
   int totalSize;
 
-  @HiveField(6)
   String protocol; // 'tcp' or 'udp' or 'quic' (plan)
 
-  @HiveField(7)
   DateTime requestTime;
 
-  @HiveField(8)
   bool isProcessed;
 
-  @HiveField(9)
   int? maxChunkSize; // Sender's preferred chunk size in KB
 
-  @HiveField(10)
   DateTime?
       receivedTime; // Time when request was received at the receiver device
 
   FileTransferRequest({
-    String? requestId,
-    String? batchId,
+    required this.requestId,
+    required this.batchId,
     required this.fromUserId,
     required this.fromUserName,
     required this.files,
     required this.totalSize,
     this.protocol = 'tcp',
-    DateTime? requestTime,
+    required this.requestTime,
     this.isProcessed = false,
     this.maxChunkSize,
     this.receivedTime,
-  })  : requestId = requestId ?? const Uuid().v4(),
-        batchId = batchId ?? const Uuid().v4(),
-        requestTime = requestTime ?? DateTime.now();
+  });
+
+  factory FileTransferRequest.create({
+    required String fromUserId,
+    required String fromUserName,
+    required List<FileTransferInfo> files,
+    required int totalSize,
+    String protocol = 'tcp',
+    DateTime? requestTime,
+    bool isProcessed = false,
+    int? maxChunkSize,
+    DateTime? receivedTime,
+  }) =>
+      FileTransferRequest(
+        requestId: const Uuid().v4(),
+        batchId: const Uuid().v4(),
+        fromUserId: fromUserId,
+        fromUserName: fromUserName,
+        files: files,
+        totalSize: totalSize,
+        protocol: protocol,
+        requestTime: requestTime ?? DateTime.now(),
+        isProcessed: isProcessed,
+        maxChunkSize: maxChunkSize,
+        receivedTime: receivedTime,
+      );
 
   Map<String, dynamic> toJson() => {
         'requestId': requestId,
@@ -570,21 +650,18 @@ class P2PMessageTypes {
 // Workmanager task constants
 const String p2pKeepAliveTask = "p2pKeepAliveTask";
 
-@HiveType(typeId: 52)
-class P2PFileStorageSettings extends HiveObject {
-  @HiveField(0)
+@Collection()
+class P2PFileStorageSettings {
+  Id id = 2; // Fixed ID for singleton
+
   String downloadPath;
 
-  @HiveField(1)
   bool askBeforeDownload;
 
-  @HiveField(2)
   bool createDateFolders;
 
-  @HiveField(3)
   int maxFileSize; // in MB
 
-  @HiveField(4)
   int maxConcurrentTasks;
 
   P2PFileStorageSettings({
@@ -611,48 +688,34 @@ class P2PFileStorageSettings extends HiveObject {
       );
 }
 
-@HiveType(typeId: 56)
-class P2PDataTransferSettings extends HiveObject {
-  @HiveField(0)
+@Collection()
+class P2PDataTransferSettings {
+  Id id = 3; // Fixed ID for singleton
+
   String downloadPath;
 
-  @HiveField(1)
   bool createDateFolders;
-
-  @HiveField(10)
 
   /// Create folders by sender name instead of date
   bool createSenderFolders;
 
-  @HiveField(2)
   int maxReceiveFileSize; // In bytes
 
-  @HiveField(3)
   int maxConcurrentTasks;
 
-  @HiveField(4)
   String sendProtocol; // e.g., 'TCP', 'UDP'
 
-  @HiveField(5)
   int maxTotalReceiveSize; // In bytes
-
-  @HiveField(6)
 
   /// Maximum chunk size for sending files in KILOBYTES.
   int maxChunkSize;
 
-  @HiveField(7)
-
   /// Custom display name for this device (optional)
   String? customDisplayName;
-
-  @HiveField(8)
 
   /// UI refresh rate in seconds for transfer progress updates
   /// 0 = immediate, 1-5 = update every N seconds
   int uiRefreshRateSeconds;
-
-  @HiveField(9)
 
   /// Enable notifications for transfer events
   bool enableNotifications;
@@ -672,7 +735,9 @@ class P2PDataTransferSettings extends HiveObject {
   });
 
   // Helper getters for UI display
+  @ignore
   double get maxReceiveFileSizeInMB => maxReceiveFileSize / (1024 * 1024);
+  @ignore
   double get maxTotalReceiveSizeInGB =>
       maxTotalReceiveSize / (1024 * 1024 * 1024);
 

@@ -80,18 +80,16 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   // Save current state to storage
   Future<void> _saveState() async {
     try {
-      final state = NumberGeneratorState(
-        isInteger: _isInteger,
-        minValue: _minValue,
-        maxValue: _maxValue,
-        quantity: _quantity,
-        allowDuplicates: _allowDuplicates,
-        lastUpdated: DateTime.now(),
-      );
+      final state = NumberGeneratorState()
+        ..isInteger = _isInteger
+        ..minValue = _minValue
+        ..maxValue = _maxValue
+        ..quantity = _quantity
+        ..allowDuplicates = _allowDuplicates
+        ..lastUpdated = DateTime.now();
       await RandomStateService.saveNumberGeneratorState(state);
     } catch (e) {
-      // Error saving state
-      debugPrint('Error saving number generator state: $e');
+      // Error is already logged in service
     }
   }
 

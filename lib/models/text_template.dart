@@ -1,32 +1,43 @@
+import 'package:isar/isar.dart';
 import 'package:logger/logger.dart';
 import 'package:setpocket/services/template_service.dart';
 
+part 'text_template.g.dart';
+
+@collection
 class Template {
-  final String id;
-  final String title;
-  final String content;
+  Id id = Isar.autoIncrement;
+
+  @Index()
+  late String templateId;
+
+  late String title;
+  late String content;
 
   Template({
-    required this.id,
+    this.id = Isar.autoIncrement,
+    required this.templateId,
     required this.title,
     required this.content,
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
+        'templateId': templateId,
         'title': title,
         'content': content,
       };
 
   factory Template.fromJson(Map<String, dynamic> json) => Template(
-        id: json['id'],
+        templateId: json['templateId'] ?? json['id'], // Support old format
         title: json['title'],
         content: json['content'],
       );
 
-  Template copyWith({String? id, String? title, String? content}) {
+  Template copyWith(
+      {Id? id, String? templateId, String? title, String? content}) {
     return Template(
       id: id ?? this.id,
+      templateId: templateId ?? this.templateId,
       title: title ?? this.title,
       content: content ?? this.content,
     );
@@ -48,7 +59,7 @@ class Template {
   }
 
   @override
-  String toString() => 'Template(id: $id, title: $title)';
+  String toString() => 'Template(templateId: $templateId, title: $title)';
 }
 
 class TemplateElement {
@@ -396,7 +407,7 @@ class TemplateDraft {
   // Convert draft to template
   Template toTemplate() {
     return Template(
-      id: originalTemplateId ?? TemplateService.generateTemplateId(),
+      templateId: originalTemplateId ?? TemplateService.generateTemplateId(),
       title: title.trim().isEmpty ? 'Untitled Template' : title,
       content: content,
     );

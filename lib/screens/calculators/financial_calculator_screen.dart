@@ -215,7 +215,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
       // Check if context is still valid before accessing MediaQuery
       if (!mounted) return;
 
-      final state = FinancialCalculatorState(
+      final state = FinancialCalculatorState.fromData(
         activeTabIndex: _currentMainTabIndex,
         loanInputs: _loanControllers
             .map((key, controller) => MapEntry(key, controller.text)),
@@ -242,14 +242,14 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
     final inputs = _loanControllers
         .map((key, controller) => MapEntry(key, controller.text));
 
-    final item = FinancialCalculationHistory(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final item = FinancialCalculationHistory.fromData(
+      id: '', // Service generates ID
       type: FinancialCalculationType.loan,
       inputs: inputs,
       results: _loanResult!.toMap(),
       timestamp: DateTime.now(),
       displayTitle:
-          'Vay \$${inputs['amount']} - ${inputs['rate']}% - ${inputs['term']} năm',
+          'Loan: \$${inputs['amount']} @ ${inputs['rate']}% for ${inputs['term']} years',
     );
 
     await FinancialCalculatorService.saveToHistory(item);
@@ -271,14 +271,14 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
     final inputs = _investmentControllers
         .map((key, controller) => MapEntry(key, controller.text));
 
-    final item = FinancialCalculationHistory(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final item = FinancialCalculationHistory.fromData(
+      id: '', // Service generates ID
       type: FinancialCalculationType.investment,
       inputs: inputs,
       results: _investmentResult!.toMap(),
       timestamp: DateTime.now(),
       displayTitle:
-          'Đầu tư \$${inputs['initial']} + \$${inputs['monthly']}/tháng - ${inputs['rate']}%',
+          'Invest: \$${inputs['initial']} + \$${inputs['monthly']}/mo @ ${inputs['rate']}%',
     );
 
     await FinancialCalculatorService.saveToHistory(item);
@@ -300,14 +300,14 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
     final inputs = _compoundControllers
         .map((key, controller) => MapEntry(key, controller.text));
 
-    final item = FinancialCalculationHistory(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final item = FinancialCalculationHistory.fromData(
+      id: '', // Service generates ID
       type: FinancialCalculationType.compoundInterest,
       inputs: inputs,
       results: _compoundResult!.toMap(),
       timestamp: DateTime.now(),
       displayTitle:
-          'Lãi kép \$${inputs['principal']} - ${inputs['rate']}% - ${inputs['time']} năm',
+          'Compound: \$${inputs['principal']} @ ${inputs['rate']}% for ${inputs['time']} years',
     );
 
     await FinancialCalculatorService.saveToHistory(item);
@@ -738,7 +738,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
     final principal = double.tryParse(_compoundControllers['principal']!.text);
     final rate = double.tryParse(_compoundControllers['rate']!.text);
     final time = double.tryParse(_compoundControllers['time']!.text);
-    final frequency = double.tryParse(_compoundControllers['frequency']!.text);
+    final frequency = int.tryParse(_compoundControllers['frequency']!.text);
 
     if (principal == null ||
         rate == null ||

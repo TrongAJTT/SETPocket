@@ -251,7 +251,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       itemCount: _templates.length,
       itemBuilder: (context, index) {
         final template = _templates[index];
-        final isSelected = _selectedTemplateIds.contains(template.id);
+        final isSelected = _selectedTemplateIds.contains(template.templateId);
 
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -263,7 +263,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                 ? Checkbox(
                     value: isSelected,
                     onChanged: (bool? value) {
-                      _toggleTemplateSelection(template.id);
+                      _toggleTemplateSelection(template.templateId);
                     },
                   )
                 : const Icon(Icons.description),
@@ -328,11 +328,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                     ],
                   ),
             onTap: _isSelectionMode
-                ? () => _toggleTemplateSelection(template.id)
+                ? () => _toggleTemplateSelection(template.templateId)
                 : () => _navigateToUseTemplate(template),
             onLongPress: _isSelectionMode
                 ? null
-                : () => _enterSelectionMode(template.id),
+                : () => _enterSelectionMode(template.templateId),
           ),
         );
       },
@@ -379,7 +379,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           FilledButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              await _deleteTemplate(template.id, l10n);
+              await _deleteTemplate(template.templateId, l10n);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.delete),
@@ -500,7 +500,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
               // Generate a new ID for the imported template
               final newTemplate = template.copyWith(
-                id: TemplateService.generateTemplateId(),
+                templateId: TemplateService.generateTemplateId(),
               );
 
               await TemplateService.saveTemplate(newTemplate);
@@ -546,7 +546,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     try {
       // Create a new template with copied data and a new ID
       final newTemplate = Template(
-        id: TemplateService.generateTemplateId(),
+        templateId: TemplateService.generateTemplateId(),
         title: '${template.title} (${l10n.copySuffix})',
         content: template.content,
       );
@@ -603,7 +603,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
   void _selectAll() {
     setState(() {
-      _selectedTemplateIds.addAll(_templates.map((t) => t.id));
+      _selectedTemplateIds.addAll(_templates.map((t) => t.templateId));
     });
   }
 
@@ -665,7 +665,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
     // Initialize with default filenames
     for (final template in templates) {
-      filenames[template.id] = '${template.title.replaceAll(' ', '_')}.json';
+      filenames[template.templateId] =
+          '${template.title.replaceAll(' ', '_')}.json';
     }
 
     await showDialog(
@@ -705,7 +706,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
 
       for (final template in templates) {
         try {
-          final filename = filenames[template.id] ??
+          final filename = filenames[template.templateId] ??
               '${template.title.replaceAll(' ', '_')}.json';
           final jsonData = template.toJson();
           final jsonString = jsonEncode(jsonData);
@@ -754,7 +755,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       List<Template> templates, AppLocalizations l10n) async {
     try {
       for (final template in templates) {
-        await TemplateService.deleteTemplate(template.id);
+        await TemplateService.deleteTemplate(template.templateId);
       }
 
       _exitSelectionMode();

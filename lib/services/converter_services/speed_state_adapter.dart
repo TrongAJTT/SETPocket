@@ -15,21 +15,21 @@ class SpeedStateAdapter implements ConverterStateService {
     logInfo(
         'SpeedStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
-    // Convert ConverterState to SpeedStateModel
-    final speedState = SpeedStateModel(
-      cards: state.cards
-          .map((card) => SpeedCardState(
-                unitCode: card.baseUnitId,
-                amount: card.baseValue,
-                name: card.name,
-                visibleUnits: card.visibleUnits, // Save per-card visible units
-              ))
-          .toList(),
-      visibleUnits: state.globalVisibleUnits.toList(),
-      lastUpdated: DateTime.now(),
-      isFocusMode: state.isFocusMode,
-      viewMode: state.viewMode.name,
-    );
+    // Convert generic ConverterState to SpeedStateModel
+    final speedCards = state.cards.map((card) {
+      return SpeedCardState()
+        ..unitCode = card.baseUnitId
+        ..amount = card.baseValue
+        ..name = card.name
+        ..visibleUnits = card.visibleUnits;
+    }).toList();
+
+    final speedState = SpeedStateModel()
+      ..cards = speedCards
+      ..visibleUnits = state.globalVisibleUnits.toList()
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = state.isFocusMode
+      ..viewMode = state.viewMode.name;
 
     logInfo(
         'SpeedStateAdapter: Converted to SpeedStateModel with ${speedState.cards.length} cards');
@@ -63,13 +63,13 @@ class SpeedStateAdapter implements ConverterStateService {
 
         // Initialize all units with 0, then set base unit value
         for (String unit in cardVisibleUnits) {
-          values[unit] = unit == card.unitCode ? card.amount : 0.0;
+          values[unit] = unit == card.unitCode ? (card.amount ?? 0.0) : 0.0;
         }
 
         final convertedCard = ConverterCardState(
           name: card.name ?? 'Card ${speedState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
+          baseUnitId: card.unitCode ?? 'meters_per_second',
+          baseValue: card.amount ?? 1.0,
           visibleUnits: cardVisibleUnits,
           values: values,
         );

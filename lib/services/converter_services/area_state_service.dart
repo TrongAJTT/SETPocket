@@ -1,13 +1,12 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 import 'package:setpocket/models/converter_models/area_state_model.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/isar_service.dart';
+import 'dart:convert';
 
 class AreaStateService {
-  static const String _boxName = 'area_converter_state';
-  static const String _stateKey = 'area_state';
-
-  /// Load area converter state from Hive
+  /// Load area converter state from Isar
   static Future<AreaStateModel> loadState() async {
     try {
       logInfo('AreaStateService: Loading area converter state');
@@ -20,48 +19,23 @@ class AreaStateService {
         return _getDefaultState();
       }
 
-      final box = await Hive.openBox(_boxName);
-      final stateData = box.get(_stateKey);
+      final isar = IsarService.isar;
+      final states = await isar.areaStateModels.where().findAll();
+      final state = states.isNotEmpty ? states.first : null;
 
-      if (stateData == null) {
+      if (state == null) {
         logInfo('AreaStateService: No saved state found, creating default');
-        await box.close();
-        return _getDefaultState();
-      }
-
-      AreaStateModel state;
-      if (stateData is AreaStateModel) {
-        state = stateData;
-        logInfo(
-            'AreaStateService: Loaded AreaStateModel with ${state.cards.length} cards');
-      } else if (stateData is Map<String, dynamic>) {
-        state = AreaStateModel.fromJson(stateData);
-        logInfo(
-            'AreaStateService: Converted Map to AreaStateModel with ${state.cards.length} cards');
-      } else {
-        logWarning(
-            'AreaStateService: Invalid state data type: ${stateData.runtimeType}');
-        await box.close();
         return _getDefaultState();
       }
 
       // Validate and migrate state if needed
-      state = _validateAndMigrateState(state);
+      final validatedState = _validateAndMigrateState(state);
 
-      await box.close();
       logInfo(
-          'AreaStateService: Successfully loaded state with ${state.cards.length} cards');
-      return state;
+          'AreaStateService: Successfully loaded state with ${validatedState.cards.length} cards');
+      return validatedState;
     } catch (e) {
       logError('AreaStateService: Error loading state: $e');
-
-      // Handle specific casting errors
-      if (e.toString().contains('DateTime') &&
-          e.toString().contains('String')) {
-        logInfo(
-            'AreaStateService: Detected DateTime casting error, clearing corrupted data');
-        await clearState();
-      }
 
       return _getDefaultState();
     }
@@ -79,24 +53,15 @@ class AreaStateService {
       logInfo(
           'AreaStateService: Saving area converter state with ${state.cards.length} cards');
 
-      Box<AreaStateModel> box;
-      bool shouldClose = false;
-
-      if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box<AreaStateModel>(_boxName);
-      } else {
-        box = await Hive.openBox<AreaStateModel>(_boxName);
-        shouldClose = true;
-      }
+      final isar = IsarService.isar;
 
       // Update timestamp
       state.lastUpdated = DateTime.now();
 
-      await box.put(_stateKey, state);
-
-      if (shouldClose) {
-        await box.close();
-      }
+      await isar.writeTxn(() async {
+        await isar.areaStateModels.clear();
+        await isar.areaStateModels.put(state);
+      });
 
       logInfo('AreaStateService: Successfully saved state');
     } catch (e) {
@@ -110,21 +75,11 @@ class AreaStateService {
     try {
       logInfo('AreaStateService: Clearing area converter state');
 
-      Box<AreaStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
 
-      if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box<AreaStateModel>(_boxName);
-      } else {
-        box = await Hive.openBox<AreaStateModel>(_boxName);
-        shouldClose = true;
-      }
-
-      await box.delete(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
+      await isar.writeTxn(() async {
+        await isar.areaStateModels.clear();
+      });
 
       logInfo('AreaStateService: Successfully cleared state');
     } catch (e) {
@@ -138,21 +93,11 @@ class AreaStateService {
     try {
       logInfo('AreaStateService: Force clearing all cache data');
 
-      Box<AreaStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
 
-      if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box<AreaStateModel>(_boxName);
-      } else {
-        box = await Hive.openBox<AreaStateModel>(_boxName);
-        shouldClose = true;
-      }
-
-      await box.clear();
-
-      if (shouldClose) {
-        await box.close();
-      }
+      await isar.writeTxn(() async {
+        await isar.areaStateModels.clear();
+      });
 
       logInfo('AreaStateService: All cache data cleared successfully');
     } catch (e) {
@@ -163,21 +108,19 @@ class AreaStateService {
 
   /// Get default area converter state
   static AreaStateModel _getDefaultState() {
-    return AreaStateModel(
-      cards: [
-        AreaCardState(
+    return AreaStateModel()
+      ..cards = [
+        AreaCardState.create(
           unitCode: 'square_meters',
           amount: 1.0,
           name: 'Card 1',
           visibleUnits: ['square_meters', 'square_feet', 'square_inches'],
-          createdAt: DateTime.now(),
         ),
-      ],
-      visibleUnits: ['square_meters', 'square_feet', 'square_inches'],
-      lastUpdated: DateTime.now(),
-      isFocusMode: false,
-      viewMode: 'cards',
-    );
+      ]
+      ..visibleUnits = ['square_meters', 'square_feet', 'square_inches']
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = false
+      ..viewMode = 'cards';
   }
 
   /// Validate and migrate state data
@@ -186,7 +129,10 @@ class AreaStateService {
       // Ensure all cards have required fields
       final validCards = <AreaCardState>[];
       for (final card in state.cards) {
-        if (card.unitCode.isNotEmpty && card.amount.isFinite) {
+        if (card.unitCode != null &&
+            card.unitCode!.isNotEmpty &&
+            card.amount != null &&
+            card.amount!.isFinite) {
           // Ensure card has visible units
           if (card.visibleUnits == null || card.visibleUnits!.isEmpty) {
             card.visibleUnits = [
@@ -207,12 +153,11 @@ class AreaStateService {
 
       // Ensure at least one card exists
       if (validCards.isEmpty) {
-        validCards.add(AreaCardState(
+        validCards.add(AreaCardState.create(
           unitCode: 'square_meters',
           amount: 1.0,
           name: 'Card 1',
           visibleUnits: ['square_meters', 'square_feet', 'square_inches'],
-          createdAt: DateTime.now(),
         ));
       }
 
@@ -241,23 +186,10 @@ class AreaStateService {
         return false;
       }
 
-      Box<AreaStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
+      final count = await isar.areaStateModels.count();
 
-      if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box<AreaStateModel>(_boxName);
-      } else {
-        box = await Hive.openBox<AreaStateModel>(_boxName);
-        shouldClose = true;
-      }
-
-      final hasData = box.containsKey(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
-
-      return hasData;
+      return count > 0;
     } catch (e) {
       logError('AreaStateService: Error checking state existence: $e');
       return false;
@@ -272,35 +204,35 @@ class AreaStateService {
         return 0;
       }
 
-      Box<AreaStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
+      final state = await isar.areaStateModels.where().findFirst();
 
-      if (Hive.isBoxOpen(_boxName)) {
-        box = Hive.box<AreaStateModel>(_boxName);
-      } else {
-        box = await Hive.openBox<AreaStateModel>(_boxName);
-        shouldClose = true;
-      }
-
-      final stateData = box.get(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
-
-      if (stateData == null) {
+      if (state == null) {
         return 0;
       }
 
       // Estimate size based on data structure
-      int size = 0;
-      size += stateData.cards.length * 200; // Approximate size per card
-      size += stateData.visibleUnits.length * 20; // Approximate size per unit
-      size += 100; // Base overhead
+      int size = 100; // Base overhead
+      int cardSize = state.cards.length * 200;
+      int unitSize = state.visibleUnits.length * 20;
+      size += cardSize;
+      size += unitSize;
       return size;
     } catch (e) {
       logError('AreaStateService: Error calculating state size: $e');
       return 0;
+    }
+  }
+
+  /// Debug export of the state to JSON
+  static Future<String> debugExport() async {
+    try {
+      final isar = IsarService.isar;
+      final json = await isar.areaStateModels.where().exportJson();
+      return jsonEncode(json);
+    } catch (e) {
+      logError('AreaStateService: Error exporting state to JSON: $e');
+      return 'Error exporting state to JSON: $e';
     }
   }
 }

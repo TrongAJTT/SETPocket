@@ -1,24 +1,17 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 
 part 'speed_state_model.g.dart';
 
-@HiveType(typeId: 30)
-class SpeedCardState extends HiveObject {
-  @HiveField(0)
-  String unitCode;
-
-  @HiveField(1)
-  double amount;
-
-  @HiveField(2)
+@embedded
+class SpeedCardState {
+  String? unitCode;
+  double? amount;
   String? name;
-
-  @HiveField(3)
   List<String>? visibleUnits;
 
   SpeedCardState({
-    required this.unitCode,
-    required this.amount,
+    this.unitCode,
+    this.amount,
     this.name,
     this.visibleUnits,
   });
@@ -30,15 +23,20 @@ class SpeedCardState extends HiveObject {
       'amount': amount,
       'name': name ?? 'Card 1',
       'visibleUnits': visibleUnits ??
-          ['kilometers_per_hour', 'meters_per_second', 'miles_per_hour'],
+          [
+            'meters_per_second',
+            'kilometers_per_hour',
+            'miles_per_hour',
+            'knots'
+          ],
     };
   }
 
   // Create from JSON
   factory SpeedCardState.fromJson(Map<String, dynamic> json) {
     return SpeedCardState(
-      unitCode: json['unitCode'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      unitCode: json['unitCode'] as String?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       visibleUnits: json['visibleUnits'] != null
           ? List<String>.from(json['visibleUnits'])
@@ -47,55 +45,44 @@ class SpeedCardState extends HiveObject {
   }
 }
 
-@HiveType(typeId: 31)
-class SpeedStateModel extends HiveObject {
-  @HiveField(0)
-  List<SpeedCardState> cards;
+@Collection()
+class SpeedStateModel {
+  Id id = Isar.autoIncrement;
 
-  @HiveField(1)
-  List<String> visibleUnits;
+  List<SpeedCardState> cards = [];
+  List<String> visibleUnits = [];
+  DateTime? lastUpdated;
+  bool isFocusMode = false;
+  String viewMode = 'cards'; // Store as string for compatibility
 
-  @HiveField(2)
-  DateTime lastUpdated;
-
-  @HiveField(3)
-  bool isFocusMode;
-
-  @HiveField(4)
-  String viewMode; // Store as string for Hive compatibility
-
-  SpeedStateModel({
-    required this.cards,
-    required this.visibleUnits,
-    required this.lastUpdated,
-    this.isFocusMode = false,
-    this.viewMode = 'cards',
-  });
+  SpeedStateModel();
 
   // Create default state
   static SpeedStateModel createDefault() {
-    return SpeedStateModel(
-      cards: [
+    final model = SpeedStateModel()
+      ..cards = [
         SpeedCardState(
-          unitCode: 'kilometers_per_hour',
+          unitCode: 'meters_per_second',
           amount: 1.0,
           name: 'Card 1',
           visibleUnits: [
-            'kilometers_per_hour',
             'meters_per_second',
+            'kilometers_per_hour',
             'miles_per_hour',
+            'knots',
           ],
         ),
-      ],
-      visibleUnits: [
-        'kilometers_per_hour',
+      ]
+      ..visibleUnits = [
         'meters_per_second',
+        'kilometers_per_hour',
         'miles_per_hour',
-      ],
-      lastUpdated: DateTime.now(),
-      isFocusMode: false,
-      viewMode: 'cards',
-    );
+        'knots',
+      ]
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = false
+      ..viewMode = 'cards';
+    return model;
   }
 
   // Convert to JSON
@@ -103,7 +90,7 @@ class SpeedStateModel extends HiveObject {
     return {
       'cards': cards.map((card) => card.toJson()).toList(),
       'visibleUnits': visibleUnits,
-      'lastUpdated': lastUpdated.toIso8601String(),
+      'lastUpdated': lastUpdated?.toIso8601String(),
       'isFocusMode': isFocusMode,
       'viewMode': viewMode,
     };
@@ -111,15 +98,20 @@ class SpeedStateModel extends HiveObject {
 
   // Create from JSON
   factory SpeedStateModel.fromJson(Map<String, dynamic> json) {
-    return SpeedStateModel(
-      cards: (json['cards'] as List)
-          .map((cardJson) =>
-              SpeedCardState.fromJson(cardJson as Map<String, dynamic>))
-          .toList(),
-      visibleUnits: List<String>.from(json['visibleUnits'] as List),
-      lastUpdated: DateTime.parse(json['lastUpdated'] as String),
-      isFocusMode: json['isFocusMode'] ?? false,
-      viewMode: json['viewMode'] ?? 'cards',
-    );
+    final model = SpeedStateModel()
+      ..cards = (json['cards'] as List?)
+              ?.map((cardJson) =>
+                  SpeedCardState.fromJson(cardJson as Map<String, dynamic>))
+              .toList() ??
+          []
+      ..visibleUnits = json['visibleUnits'] != null
+          ? List<String>.from(json['visibleUnits'] as List)
+          : []
+      ..lastUpdated = json['lastUpdated'] != null
+          ? DateTime.parse(json['lastUpdated'] as String)
+          : DateTime.now()
+      ..isFocusMode = json['isFocusMode'] ?? false
+      ..viewMode = json['viewMode'] ?? 'cards';
+    return model;
   }
 }

@@ -1,25 +1,64 @@
+import 'dart:convert';
+import 'package:isar/isar.dart';
+
+part 'financial_models.g.dart';
+
 enum FinancialCalculationType {
   loan,
   investment,
   compoundInterest,
 }
 
+@collection
 class FinancialCalculationHistory {
-  final String id;
-  final FinancialCalculationType type;
-  final Map<String, dynamic> inputs;
-  final Map<String, dynamic> results;
-  final DateTime timestamp;
-  final String displayTitle;
+  Id isarId = Isar.autoIncrement;
 
-  FinancialCalculationHistory({
+  @Index()
+  late String id;
+
+  @Enumerated(EnumType.name)
+  late FinancialCalculationType type;
+
+  String? _inputs;
+  String? _results;
+
+  @Index()
+  late DateTime timestamp;
+  late String displayTitle;
+
+  @ignore
+  Map<String, dynamic> get inputs {
+    if (_inputs == null) return {};
+    return json.decode(_inputs!) as Map<String, dynamic>;
+  }
+
+  set inputs(Map<String, dynamic> value) {
+    _inputs = json.encode(value);
+  }
+
+  @ignore
+  Map<String, dynamic> get results {
+    if (_results == null) return {};
+    return json.decode(_results!) as Map<String, dynamic>;
+  }
+
+  set results(Map<String, dynamic> value) {
+    _results = json.encode(value);
+  }
+
+  FinancialCalculationHistory();
+
+  FinancialCalculationHistory.fromData({
     required this.id,
     required this.type,
-    required this.inputs,
-    required this.results,
+    required Map<String, dynamic> inputs,
+    required Map<String, dynamic> results,
     required this.timestamp,
     required this.displayTitle,
-  });
+  }) {
+    this.inputs = inputs;
+    this.results = results;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -33,7 +72,7 @@ class FinancialCalculationHistory {
   }
 
   factory FinancialCalculationHistory.fromJson(Map<String, dynamic> json) {
-    return FinancialCalculationHistory(
+    return FinancialCalculationHistory.fromData(
       id: json['id'] ?? '',
       type: FinancialCalculationType.values.firstWhere(
         (e) => e.name == json['type'],
@@ -47,26 +86,81 @@ class FinancialCalculationHistory {
   }
 }
 
+@collection
 class FinancialCalculatorState {
-  final int activeTabIndex;
-  final Map<String, String> loanInputs;
-  final Map<String, String> investmentInputs;
-  final Map<String, String> compoundInputs;
-  final Map<String, dynamic>? loanResults;
-  final Map<String, dynamic>? investmentResults;
-  final Map<String, dynamic>? compoundResults;
-  final DateTime lastModified;
+  Id id = Isar.autoIncrement;
 
-  FinancialCalculatorState({
+  late int activeTabIndex;
+
+  String? _loanInputs;
+  String? _investmentInputs;
+  String? _compoundInputs;
+  String? _loanResults;
+  String? _investmentResults;
+  String? _compoundResults;
+
+  late DateTime lastModified;
+
+  @ignore
+  Map<String, String> get loanInputs => _loanInputs == null
+      ? {}
+      : Map<String, String>.from(json.decode(_loanInputs!));
+  set loanInputs(Map<String, String> value) => _loanInputs = json.encode(value);
+
+  @ignore
+  Map<String, String> get investmentInputs => _investmentInputs == null
+      ? {}
+      : Map<String, String>.from(json.decode(_investmentInputs!));
+  set investmentInputs(Map<String, String> value) =>
+      _investmentInputs = json.encode(value);
+
+  @ignore
+  Map<String, String> get compoundInputs => _compoundInputs == null
+      ? {}
+      : Map<String, String>.from(json.decode(_compoundInputs!));
+  set compoundInputs(Map<String, String> value) =>
+      _compoundInputs = json.encode(value);
+
+  @ignore
+  Map<String, dynamic>? get loanResults => _loanResults == null
+      ? null
+      : Map<String, dynamic>.from(json.decode(_loanResults!));
+  set loanResults(Map<String, dynamic>? value) =>
+      _loanResults = value == null ? null : json.encode(value);
+
+  @ignore
+  Map<String, dynamic>? get investmentResults => _investmentResults == null
+      ? null
+      : Map<String, dynamic>.from(json.decode(_investmentResults!));
+  set investmentResults(Map<String, dynamic>? value) =>
+      _investmentResults = value == null ? null : json.encode(value);
+
+  @ignore
+  Map<String, dynamic>? get compoundResults => _compoundResults == null
+      ? null
+      : Map<String, dynamic>.from(json.decode(_compoundResults!));
+  set compoundResults(Map<String, dynamic>? value) =>
+      _compoundResults = value == null ? null : json.encode(value);
+
+  FinancialCalculatorState();
+
+  FinancialCalculatorState.fromData({
     required this.activeTabIndex,
-    required this.loanInputs,
-    required this.investmentInputs,
-    required this.compoundInputs,
-    this.loanResults,
-    this.investmentResults,
-    this.compoundResults,
+    required Map<String, String> loanInputs,
+    required Map<String, String> investmentInputs,
+    required Map<String, String> compoundInputs,
+    Map<String, dynamic>? loanResults,
+    Map<String, dynamic>? investmentResults,
+    Map<String, dynamic>? compoundResults,
     required this.lastModified,
-  });
+  }) {
+    this.loanInputs = loanInputs;
+    this.investmentInputs = investmentInputs;
+    this.compoundInputs = compoundInputs;
+    this.loanResults = loanResults;
+    this.investmentResults = investmentResults;
+    this.compoundResults = compoundResults;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -82,7 +176,7 @@ class FinancialCalculatorState {
   }
 
   factory FinancialCalculatorState.fromJson(Map<String, dynamic> json) {
-    return FinancialCalculatorState(
+    return FinancialCalculatorState.fromData(
       activeTabIndex: json['activeTabIndex'] ?? 0,
       loanInputs: Map<String, String>.from(json['loanInputs'] ?? {}),
       investmentInputs:
@@ -110,16 +204,16 @@ class FinancialCalculatorState {
     Map<String, dynamic>? investmentResults,
     Map<String, dynamic>? compoundResults,
   }) {
-    return FinancialCalculatorState(
-      activeTabIndex: activeTabIndex ?? this.activeTabIndex,
-      loanInputs: loanInputs ?? this.loanInputs,
-      investmentInputs: investmentInputs ?? this.investmentInputs,
-      compoundInputs: compoundInputs ?? this.compoundInputs,
-      loanResults: loanResults ?? this.loanResults,
-      investmentResults: investmentResults ?? this.investmentResults,
-      compoundResults: compoundResults ?? this.compoundResults,
-      lastModified: DateTime.now(),
-    );
+    final state = FinancialCalculatorState()
+      ..activeTabIndex = activeTabIndex ?? this.activeTabIndex
+      ..loanInputs = loanInputs ?? this.loanInputs
+      ..investmentInputs = investmentInputs ?? this.investmentInputs
+      ..compoundInputs = compoundInputs ?? this.compoundInputs
+      ..loanResults = loanResults ?? this.loanResults
+      ..investmentResults = investmentResults ?? this.investmentResults
+      ..compoundResults = compoundResults ?? this.compoundResults
+      ..lastModified = DateTime.now();
+    return state;
   }
 }
 

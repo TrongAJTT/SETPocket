@@ -1,27 +1,10 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:setpocket/models/converter_models/currency_state_model.dart';
 import 'package:setpocket/services/settings_service.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/isar_service.dart';
 
 class CurrencyStateService {
-  static const String _stateBoxName = 'currency_state';
-  static const String _stateKey = 'converter_state';
-
-  static Box<CurrencyStateModel>? _stateBox;
-
-  // Initialize the state service
-  static Future<void> initialize() async {
-    try {
-      if (_stateBox == null || !_stateBox!.isOpen) {
-        _stateBox = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
-        logInfo('CurrencyStateService: Box opened successfully');
-      }
-    } catch (e) {
-      logError('CurrencyStateService: Error opening box: $e');
-      rethrow;
-    }
-  }
-
   // Check if state saving is enabled
   static Future<bool> isStateSavingEnabled() async {
     try {
@@ -48,12 +31,19 @@ class CurrencyStateService {
         return;
       }
 
-      await initialize();
+      final isar = IsarService.isar;
 
       logInfo(
           'CurrencyStateService: Saving converter state with ${state.cards.length} cards, focus: ${state.isFocusMode}, view: ${state.viewMode}');
-      await _stateBox!.put(_stateKey, state);
-      await _stateBox!.flush(); // Force flush to disk for mobile reliability
+
+      // Update timestamp
+      state.lastUpdated = DateTime.now();
+
+      await isar.writeTxn(() async {
+        await isar.currencyStateModels.clear();
+        await isar.currencyStateModels.put(state);
+      });
+
       logInfo('CurrencyStateService: State saved successfully');
     } catch (e) {
       logError('CurrencyStateService: Error saving state: $e');
@@ -74,9 +64,9 @@ class CurrencyStateService {
         return CurrencyStateModel.getDefault();
       }
 
-      await initialize();
+      final isar = IsarService.isar;
+      final state = await isar.currencyStateModels.where().findFirst();
 
-      final state = _stateBox!.get(_stateKey);
       if (state != null) {
         logInfo(
             'CurrencyStateService: Loaded state with ${state.cards.length} cards, focus: ${state.isFocusMode}, view: ${state.viewMode}');
@@ -96,21 +86,11 @@ class CurrencyStateService {
     try {
       logInfo('CurrencyStateService: Clearing currency converter state');
 
-      Box<CurrencyStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
 
-      if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box<CurrencyStateModel>(_stateBoxName);
-      } else {
-        box = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
-        shouldClose = true;
-      }
-
-      await box.delete(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
+      await isar.writeTxn(() async {
+        await isar.currencyStateModels.clear();
+      });
 
       logInfo('CurrencyStateService: Successfully cleared state');
     } catch (e) {
@@ -127,23 +107,10 @@ class CurrencyStateService {
         return false;
       }
 
-      Box<CurrencyStateModel> box;
-      bool shouldClose = false;
+      final isar = IsarService.isar;
+      final count = await isar.currencyStateModels.count();
 
-      if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box<CurrencyStateModel>(_stateBoxName);
-      } else {
-        box = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
-        shouldClose = true;
-      }
-
-      final hasData = box.containsKey(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
-
-      return hasData;
+      return count > 0;
     } catch (e) {
       logError('CurrencyStateService: Error checking state existence: $e');
       return false;
@@ -158,28 +125,15 @@ class CurrencyStateService {
         return 0;
       }
 
-      Box<CurrencyStateModel> box;
-      bool shouldClose = false;
-
-      if (Hive.isBoxOpen(_stateBoxName)) {
-        box = Hive.box<CurrencyStateModel>(_stateBoxName);
-      } else {
-        box = await Hive.openBox<CurrencyStateModel>(_stateBoxName);
-        shouldClose = true;
-      }
-
-      final state = box.get(_stateKey);
-
-      if (shouldClose) {
-        await box.close();
-      }
+      final isar = IsarService.isar;
+      final state = await isar.currencyStateModels.where().findFirst();
 
       if (state != null) {
         // Estimate size based on data structure
         int size = 0;
-        size += state.cards.length * 150; // Approximate size per card
-        size += state.visibleCurrencies.length *
-            10; // Approximate size per currency
+        size += (state.cards.length * 150).toInt(); // Approximate size per card
+        size += (state.visibleCurrencies.length * 10)
+            .toInt(); // Approximate size per currency
         size += 100; // Base overhead
         return size;
       }
@@ -193,22 +147,20 @@ class CurrencyStateService {
   // Debug method
   static Future<void> debugState() async {
     try {
-      await initialize();
-      final state = _stateBox!.get(_stateKey);
+      final isar = IsarService.isar;
+      final state = await isar.currencyStateModels.where().findFirst();
       logInfo('=== CURRENCY STATE DEBUG ===');
       logInfo('State exists: ${state != null}');
       if (state != null) {
-        logInfo('Cards count: ${state.cards.length}');
-        logInfo('Visible currencies: ${state.visibleCurrencies}');
+        logInfo('Cards: ${state.cards.length}');
+        logInfo('Visible currencies: ${state.visibleCurrencies.length}');
+        logInfo('Focus mode: ${state.isFocusMode}');
+        logInfo('View mode: ${state.viewMode}');
         logInfo('Last updated: ${state.lastUpdated}');
-        for (int i = 0; i < state.cards.length; i++) {
-          final card = state.cards[i];
-          logInfo('Card $i: ${card.currencyCode} = ${card.amount}');
-        }
       }
-      logInfo('=== END STATE DEBUG ===');
+      logInfo('=== END DEBUG ===');
     } catch (e) {
-      logError('CurrencyStateService: Error in debug: $e');
+      logError('CurrencyStateService: Error debugging state: $e');
     }
   }
 }

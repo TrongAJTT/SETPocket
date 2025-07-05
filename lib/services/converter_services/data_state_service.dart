@@ -1,41 +1,26 @@
 import 'package:setpocket/models/converter_models/data_state_model.dart';
 import 'package:setpocket/services/app_logger.dart';
-import 'package:setpocket/services/hive_service.dart';
 
 class DataStateService {
   static const String _boxName = 'data_converter_state';
 
-  // Get the state from Hive
+  // Get the state from storage
   static Future<DataStateModel> loadState() async {
     try {
-      logInfo('Loading data converter state from Hive');
-
-      final box = await HiveService.getBox<DataStateModel>(_boxName);
-      final state = box.get('state');
-
-      if (state != null) {
-        logInfo('Data converter state loaded successfully');
-        return state;
-      } else {
-        logInfo('No saved data converter state found, creating default');
-        return DataStateModel.createDefault();
-      }
+      logInfo('Loading data converter state');
+      // TODO: Implement Isar-based data state storage
+      return DataStateModel.createDefault();
     } catch (e) {
       logError('Error loading data converter state: $e');
       return DataStateModel.createDefault();
     }
   }
 
-  // Save the state to Hive
+  // Save the state to storage
   static Future<void> saveState(DataStateModel state) async {
     try {
-      logInfo('Saving data converter state to Hive');
-
-      state.lastUpdated = DateTime.now();
-      final box = await HiveService.getBox<DataStateModel>(_boxName);
-      await box.put('state', state);
-
-      logInfo('Data converter state saved successfully');
+      logInfo('Saving data converter state');
+      // TODO: Implement Isar-based data state storage
     } catch (e) {
       logError('Error saving data converter state: $e');
     }
@@ -45,11 +30,7 @@ class DataStateService {
   static Future<void> clearState() async {
     try {
       logInfo('Clearing data converter state');
-
-      final box = await HiveService.getBox<DataStateModel>(_boxName);
-      await box.delete('state');
-
-      logInfo('Data converter state cleared successfully');
+      // TODO: Implement Isar-based data state storage
     } catch (e) {
       logError('Error clearing data converter state: $e');
     }
@@ -58,16 +39,7 @@ class DataStateService {
   // Get the size of cached state data
   static Future<int> getCacheSize() async {
     try {
-      final box = await HiveService.getBox<DataStateModel>(_boxName);
-      final state = box.get('state');
-
-      if (state != null) {
-        // Estimate size based on JSON representation
-        final json = state.toJson();
-        final jsonString = json.toString();
-        return jsonString.length * 2; // Rough estimate (UTF-16)
-      }
-
+      // TODO: Implement Isar-based cache size calculation
       return 0;
     } catch (e) {
       logError('Error calculating data converter cache size: $e');
@@ -78,8 +50,8 @@ class DataStateService {
   // Check if we have saved state
   static Future<bool> hasState() async {
     try {
-      final box = await HiveService.getBox<DataStateModel>(_boxName);
-      return box.containsKey('state');
+      // TODO: Implement Isar-based state check
+      return false;
     } catch (e) {
       logError('Error checking data converter state existence: $e');
       return false;

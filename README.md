@@ -1,169 +1,160 @@
-# 🛠️ SETPocket - Your All-in-One Productivity Suite
+# 🛠️ SETPocket
 
-**The ultimate collection of essential tools in your pocket!** A simple, cross-platform application that brings together the most useful everyday utilities you need - from text templates to advanced calculators, random generators to unit converters.
+A cross-platform productivity suite providing essential everyday tools in one application. Built with Flutter to deliver consistent user experience across Windows, Android, and other platforms.
 
-✨ **Available on Windows, Android**  
-🌍 **Supports English and Vietnamese**  
-📱 **Responsive design - works well on both phones, tablets, and desktops**
+## ✨ Features
 
----
+### 📝 Text Template Generator
+- Create and manage reusable text templates with dynamic fields
+- Support for variables, conditional logic, and loops
+- Template import/export functionality
+- Draft auto-save and recovery
 
-## 🚀 Why You'll Love SETPocket
+### 🔄 Unit Converter Suite
+- **💱 Currency Converter**: Real-time exchange rates for 170+ currencies
+- **📏 Length**: Metric and imperial units (meters, feet, kilometers, miles, etc.)
+- **⚖️ Weight & Mass**: Various units including kilograms, pounds, tons
+- **📐 Area**: Square meters, acres, hectares, square feet
+- **🥤 Volume**: Liters, gallons, cups, fluid ounces
+- **🌡️ Temperature**: Celsius, Fahrenheit, Kelvin
+- **⏱️ Time**: Seconds to years conversion
+- **🏃 Speed**: km/h, mph, m/s, knots
+- **💾 Data Storage**: Bytes to terabytes
+- **🔢 Number Systems**: Binary, decimal, hexadecimal, octal
 
-### 📝 **Text Template Generator**
-*Never write the same thing twice!*
-- Create smart templates with dynamic fields (name, date, numbers, etc.)
-- Build complex documents with repeatable sections
-- Auto-fill templates with your data
-- Export/import templates for backup and sharing
-- Perfect for: emails, reports, contracts, forms, invoices
+### 🎲 Random Generator Tools
+- Password generator with customizable complexity
+- Number generators (integers, decimals, ranges)
+- Date and time randomization
+- Decision makers and gaming tools (dice, cards)
+- Color and text generators
 
-### 🎲 **Random Generator Suite** 
-*12 powerful randomization tools for every need!*
-- **🔐 Password Generator:** Ultra-secure passwords with custom rules
-- **🔢 Number Generator:** Random integers, decimals, ranges, no duplicates
-- **✅ Yes/No & Decision Makers:** Quick decisions, coin flips, rock-paper-scissors
-- **🎰 Gaming Tools:** Dice (3-100 sides), playing cards, random selections
-- **🎨 Creative Tools:** Random colors (HEX), Latin letters, text generation
-- **📅 Date & Time Tools:** Random dates, times, datetime ranges
-- Perfect for: games, passwords, testing, creative projects, decision making
+### 🧮 Calculator Suite
+- Scientific calculator with advanced functions
+- Graphing calculator with function plotting
+- BMI and health calculators
+- Financial calculators (loans, interest)
+- Date calculations and discount tools
 
-### 🧮 **Calculator Tools**
-*Professional calculators for every calculation need!*
-- **📊 Scientific Calculator:** Advanced math functions, trigonometry, logarithms
-- **📈 Graphing Calculator:** Plot mathematical functions with interactive charts
-- **⚖️ BMI Calculator:** Health and fitness calculations
-- **💰 Financial Calculator:** Loans, investments, compound interest
-- **📅 Date Calculator:** Calculate date differences, add/subtract time
-- **💸 Discount Calculator:** Shopping discounts, tips, tax calculations
+## 🔧 Tech Stack
 
-### 🔄 **Unit Converter Suite**
-*Convert anything to anything instantly!*
-- **💱 Currency Converter:** Real-time exchange rates for 170+ currencies
-- **📏 Length:** Meters, feet, inches, kilometers, miles, and more
-- **⚖️ Weight & Mass:** Kilograms, pounds, ounces, tons, stones
-- **📐 Area:** Square meters, acres, hectares, square feet
-- **🕐 Time:** Seconds, minutes, hours, days, weeks, years
-- **🥤 Volume:** Liters, gallons, cups, milliliters, fluid ounces
-- **💾 Data Storage:** Bytes, KB, MB, GB, TB, bits
-- **🏃 Speed:** km/h, mph, m/s, knots, Mach
-- **🌡️ Temperature:** Celsius, Fahrenheit, Kelvin
-- **🔢 Number Systems:** Binary, decimal, hexadecimal, octal
+### 🏗️ Core Framework
+- **Flutter 3.x**: Cross-platform UI framework
+- **Dart**: Primary programming language
 
----
+### 💾 Database & Storage
+- **Isar Database**: High-performance local database for data persistence
+- **SharedPreferences**: Settings and user preferences storage
 
-## ⏳ Features that are planned and may update in the future
+### 📚 Key Dependencies
+- **fl_chart**: Interactive charts and graphs for data visualization
+- **math_expressions**: Mathematical expression parsing and evaluation
+- **http**: API communication for currency exchange rates
+- **crypto**: Cryptographic functions for password generation
+- **intl**: Internationalization and localization support
 
-- Todo
-- Note
-- Focus
-- Shortcuts
-- Data Transfer
-- Clipboard Manager
-- Clipboard sync
-- Clipboard pusher
-- Color picker
-- HTTP Requester
+### 🛠️ Development Tools
+- **build_runner**: Code generation for Isar schemas
+- **flutter_gen**: Asset and localization code generation
+- **flutter_lints**: Code quality and style enforcement
 
----
+## 💻 Supported Platforms
 
-## 📱 **Perfect for Everyone**
+### 🖥️ Windows
+- **Minimum**: Windows 10 (1903) or higher
+- **Recommended**: Windows 11
+- **Architecture**: x64 (64-bit)
+- **RAM**: 4GB minimum, 8GB+ recommended
+- **Storage**: 100MB available space
 
-### 👩‍💼 **Business Professionals**
-- Create standardized documents and templates
-- Calculate loans, investments, and financial projections
-- Convert currencies for international business
-- Generate secure passwords for accounts
+### 📱 Android
+- **Minimum**: Android 7.0 (API level 24) or higher
+- **Recommended**: Android 10+ for optimal performance
+- **Architecture**: ARM64, ARMv7, x86_64
+- **RAM**: 2GB minimum, 4GB+ recommended
+- **Storage**: 50MB available space
 
-### 🎓 **Students & Educators**
-- Advanced scientific and graphing calculators
-- Random number generation for statistics
-- Unit conversions for physics and chemistry
-- Template creation for assignments and reports
+### 🚧 Planned Support
+- **🍎 macOS**: macOS 10.14 (Mojave) or higher
+- **🐧 Linux**: Ubuntu 18.04+ / Debian 10+ / Fedora 28+
+- **📱 iOS**: iOS 12.0 or higher
 
-### 🎮 **Gamers & Hobbyists**
-- Dice rolling for tabletop games
-- Random generators for creative projects
-- Playing card draws for card games
-- Decision makers for choices
+*Note: Hardware requirements are estimates based on Flutter framework requirements and app functionality. Actual performance may vary depending on device specifications and usage patterns.*
 
-### 👥 **Everyday Users**
-- BMI and health calculations
-- Shopping discount calculations
-- Password generation for security
-- Date calculations for planning
+## 🌍 Localization
 
----
+- 🇺🇸 English
+- 🇻🇳 Tiếng Việt
 
-## 🌟 **Key Highlights**
+## 🚀 Installation
 
-### ⚡ **Lightning Fast**
-- Instant calculations and conversions
-- Offline functionality - no internet required for most features
-- Smooth, responsive interface on all devices
+### 📋 Prerequisites
+- Flutter SDK 3.0.0 or higher
+- Dart SDK 3.0.0 or higher
 
-### 🎨 **Beautiful Design**
-- Modern Material Design 3 interface
-- Dark and light theme support
-- Intuitive navigation and user experience
+### 👨‍💻 Development Setup
 
-### 🔒 **Privacy Focused**
-- All data stays on your device
-- No tracking or analytics
-- Secure password generation
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/setpocket.git
+cd setpocket
+```
 
-### 🌐 **Cross-Platform**
-- Works on Windows, macOS, Linux, Android, and iOS
-- Responsive design adapts to any screen size
-- Consistent experience across all platforms
+2. Install dependencies:
+```bash
+flutter pub get
+```
 
----
+3. Generate code:
+```bash
+dart run build_runner build
+```
 
-## 💻 **Built with Modern Technology**
+4. Run the application:
+```bash
+flutter run
+```
 
-### 🛠️ **Core Technologies**
-- **Flutter:** Google's UI toolkit for beautiful, natively compiled applications
-- **Material Design 3:** Latest Google design system for modern, accessible interfaces
-- **Dart:** Optimized programming language for fast apps on any platform
+### 📦 Building for Production
 
-### 📚 **Powerful Libraries**
-- **fl_chart:** Advanced interactive charts for graphing calculator
-- **math_expressions:** Mathematical expression parsing and evaluation
-- **shared_preferences:** Local data storage for your settings and templates
-- **http:** Real-time currency exchange rate fetching
+#### 📱 Android APK
+```bash
+flutter build apk --release
+```
 
-### 🌍 **Internationalization**
-- Full localization support with Flutter's i18n framework
-- Easy language switching without app restart
-- Expandable to additional languages
+#### 🖥️ Windows
+```bash
+flutter build windows --release
+```
 
----
+## 📁 Project Structure
 
-### 💡 **Pro Tips**
-- Switch to dark mode in settings for comfortable night use
-- Export your templates to backup or share with colleagues
-- Use quick actions (Android) for instant access to your favorite tools
-- Customize tool visibility to show only what you need
+```
+lib/
+├── main.dart                 # Application entry point
+├── models/                   # Data models and Isar schemas
+├── services/                 # Business logic and data services
+├── screens/                  # UI screens and pages
+├── widgets/                  # Reusable UI components
+├── controllers/              # State management
+├── utils/                    # Utility functions and helpers
+└── l10n/                     # Localization files
+```
 
----
+## 🤝 Contributing
 
-## 🤝 **Community & Support**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### 🐛 **Found a Bug?**
-- Open an issue on GitHub with details
-- We actively monitor and fix reported issues
+## 📄 License
 
-### 💡 **Feature Requests**
-- Suggest new tools or improvements
-- Community-driven development
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### ⭐ **Show Your Support**
-- Star the repository if you find it useful
-- Share with friends and colleagues
-- Leave a review on app stores
+## 🙏 Acknowledgments
 
----
-
-## 📄 **License**
-
-MIT License - Free to use, modify, and distribute.
+- Flutter team for the amazing framework
+- All open-source library contributors
+- Community feedback and suggestions

@@ -249,58 +249,47 @@ class P2PController with ChangeNotifier {
     try {
       _errorMessage = null;
 
-      // Check network security if not already checked
-      if (_networkInfo == null) {
-        await _checkInitialNetworkStatus();
-        if (_errorMessage != null) {
-          // If checking status failed, stop here
-          return false;
-        }
-      }
-
-      // Show warning for unsecure networks
-      if (_networkInfo!.securityLevel == NetworkSecurityLevel.unsecure) {
+      _networkInfo = await NetworkSecurityService.checkNetworkSecurity();
+      if (_networkInfo == null || !_networkInfo!.isSecure) {
         _showSecurityWarning = true;
         notifyListeners();
-        return false; // Wait for user confirmation
+        return false;
       }
+      _showSecurityWarning = false;
 
-      // Start networking
-      final started = await _p2pService.startNetworking();
-      if (!started) {
-        _errorMessage = 'Failed to start P2P networking';
-      } else {
-        // Perform initial discovery after successfully starting networking
-        await _performInitialDiscovery();
+      // Enable the service, which will handle discovery
+      await _p2pService.enable();
+
+      if (_p2pService.isEnabled && !_hasPerformedInitialDiscovery) {
+        await refreshDiscoveredUsers();
       }
-
       notifyListeners();
-      return started;
+      return _p2pService.isEnabled;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'Failed to start networking: $e';
+      logError(_errorMessage!);
       notifyListeners();
       return false;
     }
   }
 
-  /// Start networking after security warning confirmation
+  /// Start networking after user confirms security warning
   Future<bool> startNetworkingWithWarning() async {
     try {
-      _showSecurityWarning = false;
       _errorMessage = null;
+      _showSecurityWarning = false;
 
-      final started = await _p2pService.startNetworking();
-      if (!started) {
-        _errorMessage = 'Failed to start P2P networking';
-      } else {
-        // Perform initial discovery after successfully starting networking
-        await _performInitialDiscovery();
+      // Enable the service, which will handle discovery
+      await _p2pService.enable();
+
+      if (_p2pService.isEnabled && !_hasPerformedInitialDiscovery) {
+        await refreshDiscoveredUsers();
       }
-
       notifyListeners();
-      return started;
+      return _p2pService.isEnabled;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'Failed to start networking with warning: $e';
+      logError(_errorMessage!);
       notifyListeners();
       return false;
     }
@@ -312,13 +301,12 @@ class P2PController with ChangeNotifier {
       await _p2pService.stopNetworking();
       _showSecurityWarning = false;
       _errorMessage = null;
-      _resetDiscoveryState();
       // Reset temporary disabled state when manually stopping
       _isTemporarilyDisabled = false;
-      _wasPreviouslyEnabled = false;
       notifyListeners();
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'Failed to stop P2P networking: $e';
+      logError(_errorMessage!);
       notifyListeners();
     }
   }
@@ -369,8 +357,8 @@ class P2PController with ChangeNotifier {
           // Small delay to ensure network is fully established
           await Future.delayed(const Duration(seconds: 2));
 
-          final success = await _p2pService.startNetworking();
-          if (success) {
+          await _p2pService.enable();
+          if (_p2pService.isEnabled) {
             _errorMessage = null;
             await _checkInitialNetworkStatus();
             logInfo('P2P networking automatically restored');
@@ -560,8 +548,9 @@ class P2PController with ChangeNotifier {
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     if (bytes < 1024 * 1024 * 1024) {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } else {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
     }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   /// Get status icon for user
@@ -669,24 +658,6 @@ class P2PController with ChangeNotifier {
         return Colors.grey;
       case DataTransferStatus.rejected:
         return Colors.red;
-    }
-  }
-
-  /// Perform initial discovery when networking starts
-  Future<void> _performInitialDiscovery() async {
-    if (_hasPerformedInitialDiscovery) return;
-
-    _isRefreshing = true;
-    notifyListeners();
-
-    try {
-      await _p2pService.manualDiscovery();
-      _hasPerformedInitialDiscovery = true;
-    } catch (e) {
-      _errorMessage = 'Initial discovery failed: $e';
-    } finally {
-      _isRefreshing = false;
-      notifyListeners();
     }
   }
 
@@ -948,5 +919,29 @@ class P2PController with ChangeNotifier {
   void clearNewFileTransferRequestCallback() {
     _onNewFileTransferRequest = null;
     _p2pService.setNewFileTransferRequestCallback(null);
+  }
+
+  /// Manually refresh discovered users (force new discovery)
+  Future<void> refreshDiscoveredUsers() async {
+    if (_isRefreshing) return;
+    _isRefreshing = true;
+    _lastDiscoveryTime = DateTime.now();
+    notifyListeners();
+
+    try {
+      // If service is already enabled, stop it first to force a full refresh
+      if (_p2pService.isEnabled) {
+        await _p2pService.stopNetworking();
+      }
+      // Enable the service, which will trigger a new discovery
+      await _p2pService.enable();
+      _hasPerformedInitialDiscovery = true;
+    } catch (e) {
+      _errorMessage = 'Failed to refresh discovered users: $e';
+      logError(_errorMessage!);
+    } finally {
+      _isRefreshing = false;
+      notifyListeners();
+    }
   }
 }

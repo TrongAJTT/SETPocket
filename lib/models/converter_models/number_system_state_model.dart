@@ -1,24 +1,20 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 
 part 'number_system_state_model.g.dart';
 
-@HiveType(typeId: 28)
-class NumberSystemCardState extends HiveObject {
-  @HiveField(0)
+@embedded
+class NumberSystemCardState {
   String unitCode;
 
-  @HiveField(1)
   double amount;
 
-  @HiveField(2)
   String? name;
 
-  @HiveField(3)
   List<String>? visibleUnits;
 
   NumberSystemCardState({
-    required this.unitCode,
-    required this.amount,
+    this.unitCode = 'decimal',
+    this.amount = 0.0,
     this.name,
     this.visibleUnits,
   });
@@ -62,25 +58,26 @@ class NumberSystemCardState extends HiveObject {
   }
 }
 
-@HiveType(typeId: 29)
-class NumberSystemStateModel extends HiveObject {
-  @HiveField(0)
+@collection
+class NumberSystemStateModel {
+  Id id = Isar.autoIncrement;
+
   List<NumberSystemCardState> cards;
 
-  @HiveField(1)
   List<String> globalVisibleUnits;
 
-  @HiveField(2)
   bool isFocusMode;
 
-  @HiveField(3)
   String viewMode; // 'cards' or 'table'
+
+  DateTime lastUpdated;
 
   NumberSystemStateModel({
     required this.cards,
     required this.globalVisibleUnits,
     required this.isFocusMode,
     required this.viewMode,
+    required this.lastUpdated,
   });
 
   // Create default state
@@ -102,6 +99,7 @@ class NumberSystemStateModel extends HiveObject {
       ],
       isFocusMode: false,
       viewMode: 'cards',
+      lastUpdated: DateTime.now(),
     );
   }
 
@@ -112,6 +110,7 @@ class NumberSystemStateModel extends HiveObject {
       'globalVisibleUnits': globalVisibleUnits,
       'isFocusMode': isFocusMode,
       'viewMode': viewMode,
+      'lastUpdated': lastUpdated.toIso8601String(),
     };
   }
 
@@ -141,6 +140,9 @@ class NumberSystemStateModel extends HiveObject {
           ],
       isFocusMode: json['isFocusMode'] ?? false,
       viewMode: json['viewMode'] ?? 'cards',
+      lastUpdated: json['lastUpdated'] != null
+          ? DateTime.parse(json['lastUpdated'])
+          : DateTime.now(),
     );
   }
 
@@ -149,12 +151,28 @@ class NumberSystemStateModel extends HiveObject {
     List<String>? globalVisibleUnits,
     bool? isFocusMode,
     String? viewMode,
+    DateTime? lastUpdated,
   }) {
     return NumberSystemStateModel(
       cards: cards ?? this.cards,
       globalVisibleUnits: globalVisibleUnits ?? this.globalVisibleUnits,
       isFocusMode: isFocusMode ?? this.isFocusMode,
       viewMode: viewMode ?? this.viewMode,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
+}
+
+/// Fast hash function to generate Isar Id from String
+int fastHash(String string) {
+  var hash = 0xcbf29ce484222325;
+  var i = 0;
+  while (i < string.length) {
+    final codeUnit = string.codeUnitAt(i++);
+    hash ^= codeUnit >> 8;
+    hash *= 0x100000001b3;
+    hash ^= codeUnit & 0xFF;
+    hash *= 0x100000001b3;
+  }
+  return hash;
 }

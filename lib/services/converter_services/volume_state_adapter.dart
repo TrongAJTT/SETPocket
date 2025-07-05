@@ -16,21 +16,21 @@ class VolumeStateAdapter implements ConverterStateService {
     logInfo(
         'VolumeStateAdapter: Focus mode: ${state.isFocusMode}, View mode: ${state.viewMode.name}');
 
-    // Convert ConverterState to VolumeStateModel
-    final volumeState = VolumeStateModel(
-      cards: state.cards
-          .map((card) => VolumeCardState(
-                unitCode: card.baseUnitId,
-                amount: card.baseValue,
-                name: card.name,
-                visibleUnits: card.visibleUnits, // Save per-card visible units
-              ))
-          .toList(),
-      visibleUnits: state.globalVisibleUnits.toList(),
-      lastUpdated: DateTime.now(),
-      isFocusMode: state.isFocusMode,
-      viewMode: state.viewMode.name,
-    );
+    // Convert generic ConverterState to VolumeStateModel
+    final volumeCards = state.cards.map((card) {
+      return VolumeCardState()
+        ..unitCode = card.baseUnitId
+        ..amount = card.baseValue
+        ..name = card.name
+        ..visibleUnits = card.visibleUnits;
+    }).toList();
+
+    final volumeState = VolumeStateModel()
+      ..cards = volumeCards
+      ..visibleUnits = state.globalVisibleUnits.toList()
+      ..lastUpdated = DateTime.now()
+      ..isFocusMode = state.isFocusMode
+      ..viewMode = state.viewMode.name;
 
     logInfo(
         'VolumeStateAdapter: Converted to VolumeStateModel with ${volumeState.cards.length} cards');
@@ -64,13 +64,13 @@ class VolumeStateAdapter implements ConverterStateService {
 
         // Initialize all units with 0, then set base unit value
         for (String unit in cardVisibleUnits) {
-          values[unit] = unit == card.unitCode ? card.amount : 0.0;
+          values[unit] = unit == card.unitCode ? (card.amount ?? 0.0) : 0.0;
         }
 
         final convertedCard = ConverterCardState(
           name: card.name ?? 'Card ${volumeState.cards.indexOf(card) + 1}',
-          baseUnitId: card.unitCode,
-          baseValue: card.amount,
+          baseUnitId: card.unitCode ?? 'cubic_meter',
+          baseValue: card.amount ?? 1.0,
           visibleUnits: cardVisibleUnits,
           values: values,
         );

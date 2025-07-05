@@ -1,76 +1,41 @@
-import 'package:hive/hive.dart';
-import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/models/settings_model.dart';
 import 'package:setpocket/models/converter_models/currency_cache_model.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/isar_service.dart';
 
 class SettingsService {
-  static const String _settingsBoxName = 'settings';
-  static const String _settingsKey = 'app_settings';
+  // The singleton settings object will always have an ID of 1
+  static const int _settingsId = 1;
 
-  static Box<SettingsModel>? _settingsBox;
-
-  // Initialize the settings service
+  // No more Hive-specific initialization needed here.
+  // Isar is initialized globally in main.dart.
   static Future<void> initialize() async {
-    try {
-      if (_settingsBox == null || !_settingsBox!.isOpen) {
-        // Note: Hive should already be initialized by HiveService with custom path
-        _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
-        logInfo('SettingsService: Settings box opened successfully');
-      }
-    } catch (e) {
-      // If there's a type error (backward compatibility issue), clear the box and recreate
-      if (e.toString().contains('type') && e.toString().contains('subtype')) {
-        try {
-          await Hive.deleteBoxFromDisk(_settingsBoxName);
-          _settingsBox = await Hive.openBox<SettingsModel>(_settingsBoxName);
-          logInfo(
-              'SettingsService: Reset settings box due to compatibility issue');
-        } catch (resetError) {
-          logError(
-              'SettingsService: Failed to reset settings box: $resetError');
-          rethrow;
-        }
-      } else {
-        logError('SettingsService: Error opening settings box: $e');
-        rethrow;
-      }
-    }
+    // This function is now a placeholder but kept for compatibility
+    // in case it's called from somewhere else. It can be removed later.
+    return;
   }
 
-  // Get current settings
+  // Get current settings from Isar
   static Future<SettingsModel> getSettings() async {
-    await initialize();
+    final isar = IsarService.isar;
+    var settings = await isar.settingsModels.get(_settingsId);
 
-    try {
-      final settings = _settingsBox!.get(_settingsKey);
-      if (settings == null) {
-        // Return default settings
-        final defaultSettings = SettingsModel();
-        await saveSettings(defaultSettings);
-        return defaultSettings;
-      }
-      return settings;
-    } catch (e) {
-      // If reading fails due to compatibility, return default and save it
-      if (e.toString().contains('type') && e.toString().contains('subtype')) {
-        logError('SettingsService: Settings read failed, using defaults: $e');
-        final defaultSettings = SettingsModel();
-        try {
-          await _settingsBox!.clear();
-          await saveSettings(defaultSettings);
-        } catch (clearError) {
-          logError('SettingsService: Failed to clear settings: $clearError');
-        }
-        return defaultSettings;
-      }
-      rethrow;
+    if (settings == null) {
+      logInfo("SettingsService: No settings found in Isar, creating defaults.");
+      final defaultSettings = SettingsModel();
+      await saveSettings(defaultSettings);
+      return defaultSettings;
     }
+    return settings;
   }
 
-  // Save settings
+  // Save settings to Isar
   static Future<void> saveSettings(SettingsModel settings) async {
-    await initialize();
-    await _settingsBox!.put(_settingsKey, settings);
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.settingsModels.put(settings);
+    });
+    logInfo("SettingsService: Settings saved to Isar.");
   }
 
   // Update currency fetch mode
@@ -189,7 +154,9 @@ class SettingsService {
 
   // Clear settings (for testing or reset)
   static Future<void> clearSettings() async {
-    await initialize();
-    await _settingsBox!.delete(_settingsKey);
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.settingsModels.delete(_settingsId);
+    });
   }
 }

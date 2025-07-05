@@ -1,154 +1,98 @@
-import 'package:hive/hive.dart';
-import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/models/converter_models/length_preset_model.dart';
+import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/services/converter_services/generic_preset_service.dart';
 
-enum PresetSortOrder { name, date }
+export 'package:setpocket/services/converter_services/generic_preset_service.dart' show PresetSortOrder;
 
 class LengthPresetService {
-  static const String _boxName = 'length_presets';
-  static Box<LengthPresetModel>? _box;
-
-  // Initialize service
+  /// Initialize service
   static Future<void> initialize() async {
-    try {
-      if (_box == null || !_box!.isOpen) {
-        _box = await Hive.openBox<LengthPresetModel>(_boxName);
-        logInfo('LengthPresetService: Box opened successfully');
-      }
-    } catch (e) {
-      logError('LengthPresetService: Error opening box: $e');
-      rethrow;
-    }
+    logInfo('LengthPresetService: Using GenericPresetService for length presets');
+    // Migration is handled by GenericPresetService
   }
 
-  // Save preset
+  /// Save preset
   static Future<void> savePreset({
     required String name,
     required List<String> units,
   }) async {
-    await initialize();
-
-    if (name.trim().isEmpty) {
-      throw Exception('Preset name cannot be empty');
-    }
-
-    if (units.isEmpty || units.length > 10) {
-      throw Exception('Preset must contain 1-10 units');
-    }
-
-    final preset = LengthPresetModel.create(
-      name: name.trim(),
-      units: units,
-    );
-
-    await _box!.put(preset.id, preset);
-    await _box!.flush();
-
-    logInfo(
-        'LengthPresetService: Saved preset "${preset.name}" with ${preset.units.length} units');
-  }
-
-  // Load all presets
-  static Future<List<LengthPresetModel>> loadPresets({
-    PresetSortOrder sortOrder = PresetSortOrder.date,
-  }) async {
-    await initialize();
-
-    final presets = _box!.values.toList();
-
-    // Sort presets
-    switch (sortOrder) {
-      case PresetSortOrder.name:
-        presets.sort(
-            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-        break;
-      case PresetSortOrder.date:
-        presets
-            .sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Newest first
-        break;
-    }
-
-    logInfo(
-        'LengthPresetService: Loaded ${presets.length} presets, sorted by $sortOrder');
-    return presets;
-  }
-
-  // Get preset by ID
-  static Future<LengthPresetModel?> getPreset(String id) async {
-    await initialize();
-    return _box!.get(id);
-  }
-
-  // Delete preset
-  static Future<void> deletePreset(String id) async {
-    await initialize();
-
-    final preset = _box!.get(id);
-    if (preset != null) {
-      await _box!.delete(id);
-      await _box!.flush();
-      logInfo('LengthPresetService: Deleted preset "${preset.name}"');
-    }
-  }
-
-  // Check if preset name exists
-  static Future<bool> presetNameExists(String name) async {
-    await initialize();
-
-    final normalizedName = name.trim().toLowerCase();
-    return _box!.values
-        .any((preset) => preset.name.toLowerCase() == normalizedName);
-  }
-
-  // Get preset count
-  static Future<int> getPresetCount() async {
-    await initialize();
-    return _box!.length;
-  }
-
-  // Clear all presets (for debugging/testing)
-  static Future<void> clearAllPresets() async {
-    await initialize();
-    await _box!.clear();
-    await _box!.flush();
-    logInfo('LengthPresetService: Cleared all presets');
-  }
-
-  // Update preset
-  static Future<void> updatePreset(
-    String id, {
-    String? name,
-    List<String>? units,
-  }) async {
-    await initialize();
-
-    final existingPreset = _box!.get(id);
-    if (existingPreset == null) {
-      throw Exception('Preset not found');
-    }
-
-    final updatedPreset = existingPreset.copyWith(
+    logInfo('LengthPresetService: Saving via GenericPresetService');
+    return await GenericPresetService.savePreset(
+      presetType: 'length',
       name: name,
       units: units,
     );
-
-    await _box!.put(id, updatedPreset);
-    await _box!.flush();
-
-    logInfo('LengthPresetService: Updated preset "${updatedPreset.name}"');
   }
 
-  // Export presets (returns JSON-like structure)
-  static Future<List<Map<String, dynamic>>> exportPresets() async {
-    await initialize();
+  /// Update preset
+  static Future<void> updatePreset({
+    required String id,
+    required String name,
+    required List<String> units,
+  }) async {
+    logInfo('LengthPresetService: Updating via GenericPresetService');
+    final preset = await GenericPresetService.getPreset('length', id);
+    if (preset != null) {
+      final updatedPreset = preset.copyWith(name: name, units: units);
+      return await GenericPresetService.updatePreset('length', updatedPreset);
+    }
+  }
 
-    return _box!.values
-        .map((preset) => {
-              'id': preset.id,
-              'name': preset.name,
-              'units': preset.units,
-              'createdAt': preset.createdAt.toIso8601String(),
-            })
-        .toList();
+  /// Delete preset
+  static Future<bool> deletePreset(String id) async {
+    logInfo('LengthPresetService: Deleting via GenericPresetService');
+    try {
+      await GenericPresetService.deletePreset('length', id);
+      return true;
+    } catch (e) {
+      logError('LengthPresetService: Error deleting preset: $e');
+      return false;
+    }
+  }
+
+  /// Get all presets
+  static Future<List<LengthPresetModel>> getAllPresets({
+    PresetSortOrder sortOrder = PresetSortOrder.date,
+  }) async {
+    final genericPresets = await GenericPresetService.getSortedPresets('length', sortOrder);
+    return genericPresets.map((preset) => LengthPresetModel(
+      presetId: preset.id,
+      name: preset.name,
+      units: preset.units,
+      createdAt: preset.createdAt,
+      updatedAt: preset.createdAt, // Use createdAt as fallback
+    )).toList();
+  }
+
+  /// Get preset by ID
+  static Future<LengthPresetModel?> getPresetById(String id) async {
+    final genericPreset = await GenericPresetService.getPreset('length', id);
+    if (genericPreset != null) {
+      return LengthPresetModel(
+        presetId: genericPreset.id,
+        name: genericPreset.name,
+        units: genericPreset.units,
+        createdAt: genericPreset.createdAt,
+        updatedAt: genericPreset.createdAt, // Use createdAt as fallback
+      );
+    }
+    return null;
+  }
+
+  /// Check if preset name already exists
+  static Future<bool> presetNameExists(String name, {String? excludeId}) async {
+    return await GenericPresetService.presetNameExists('length', name, excludeId: excludeId);
+  }
+
+  /// Clear all presets
+  static Future<void> clearAllPresets() async {
+    logInfo('LengthPresetService: Clearing via GenericPresetService');
+    return await GenericPresetService.clearPresets('length');
+  }
+
+  /// Get presets data size
+  static Future<int> getPresetsDataSize() async {
+    final presets = await GenericPresetService.getAllPresets('length');
+    return presets.length * 50; // rough estimate
   }
 }

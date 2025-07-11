@@ -12484,6 +12484,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Path'**
   String get path;
+
+  /// No description provided for @p2lanOptionRememberBatchExpandState.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Batch Expand State'**
+  String get p2lanOptionRememberBatchExpandState;
+
+  /// No description provided for @p2lanOptionRememberBatchExpandStateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember the expand state of each batch when the app is closed and reopened'**
+  String get p2lanOptionRememberBatchExpandStateDesc;
+
+  /// No description provided for @p2lanOptionEncryptionTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption Transfer'**
+  String get p2lanOptionEncryptionTransfer;
+
+  /// No description provided for @p2lanOptionEncryptionTransferDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use secure encryption protocol for file transfers, slower but more secure'**
+  String get p2lanOptionEncryptionTransferDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

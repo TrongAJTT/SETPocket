@@ -276,6 +276,7 @@ class P2PTransferSettingsData {
   final bool enableNotifications;
   final bool askBeforeDownload;
   final bool rememberBatchExpandState;
+  final bool enableEncryption;
 
   P2PTransferSettingsData({
     this.downloadPath = '',
@@ -291,6 +292,7 @@ class P2PTransferSettingsData {
     this.enableNotifications = true,
     this.askBeforeDownload = true,
     this.rememberBatchExpandState = false,
+    this.enableEncryption = true,
   });
 
   Map<String, dynamic> toJson() {
@@ -308,6 +310,7 @@ class P2PTransferSettingsData {
       'enableNotifications': enableNotifications,
       'askBeforeDownload': askBeforeDownload,
       'rememberBatchExpandState': rememberBatchExpandState,
+      'enableEncryption': enableEncryption,
     };
   }
 
@@ -326,6 +329,7 @@ class P2PTransferSettingsData {
       enableNotifications: json['enableNotifications'] ?? true,
       askBeforeDownload: json['askBeforeDownload'] ?? true,
       rememberBatchExpandState: json['rememberBatchExpandState'] ?? false,
+      enableEncryption: json['enableEncryption'] ?? true,
     );
   }
 
@@ -343,6 +347,7 @@ class P2PTransferSettingsData {
     bool? enableNotifications,
     bool? askBeforeDownload,
     bool? rememberBatchExpandState,
+    bool? enableEncryption,
   }) {
     return P2PTransferSettingsData(
       downloadPath: downloadPath ?? this.downloadPath,
@@ -359,6 +364,7 @@ class P2PTransferSettingsData {
       askBeforeDownload: askBeforeDownload ?? this.askBeforeDownload,
       rememberBatchExpandState:
           rememberBatchExpandState ?? this.rememberBatchExpandState,
+      enableEncryption: enableEncryption ?? this.enableEncryption,
     );
   }
 }

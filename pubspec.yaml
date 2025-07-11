@@ -37,6 +37,7 @@ dependencies:
   socket_io_client: ^2.0.3+1
   dio: ^5.4.3+1
   encrypt: ^5.0.3
+  pointycastle: ^3.7.3
   uuid: ^4.4.0
   nsd: ^4.0.3
   # workmanager: ^0.5.1  # Temporarily disabled due to Flutter compatibility issues

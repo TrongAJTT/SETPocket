@@ -24,6 +24,7 @@ class P2PSettingsAdapter {
       uiRefreshRateSeconds: newSettings.uiRefreshRateSeconds,
       enableNotifications: newSettings.enableNotifications,
       rememberBatchExpandState: newSettings.rememberBatchExpandState,
+      enableEncryption: newSettings.enableEncryption,
     );
   }
 
@@ -44,6 +45,7 @@ class P2PSettingsAdapter {
       enableNotifications: oldSettings.enableNotifications,
       askBeforeDownload: true, // Default value for new field
       rememberBatchExpandState: oldSettings.rememberBatchExpandState,
+      enableEncryption: oldSettings.enableEncryption,
     );
   }
 
@@ -126,6 +128,7 @@ class P2PSettingsAdapter {
       uiRefreshRateSeconds: 0,
       enableNotifications: true,
       rememberBatchExpandState: false, // Default to false for performance
+      enableEncryption: false, // Default to false for security
     );
   }
 

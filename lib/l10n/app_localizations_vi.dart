@@ -6466,4 +6466,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get path => 'Đường dẫn';
+
+  @override
+  String get p2lanOptionRememberBatchExpandState => 'Nhớ trạng thái lô tác vụ';
+
+  @override
+  String get p2lanOptionRememberBatchExpandStateDesc => 'Nhớ trạng thái mở rộng của mỗi lô tác vụ khi ứng dụng đóng và mở lại';
+
+  @override
+  String get p2lanOptionEncryptionTransfer => 'Truyền mã hóa';
+
+  @override
+  String get p2lanOptionEncryptionTransferDesc => 'Sử dụng giao thức mã hóa hơn cho việc truyền file, chậm hơn nhưng an toàn hơn';
 }

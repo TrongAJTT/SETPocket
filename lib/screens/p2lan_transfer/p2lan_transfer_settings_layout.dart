@@ -387,9 +387,8 @@ class _P2LanTransferSettingsLayoutState
           // Remember Batch Expand State
           Card(
             child: SwitchListTile.adaptive(
-              title: const Text('Remember Batch Expand State'),
-              subtitle: const Text(
-                  'Convenient but uses more resources when loading and may cause lag on low-end devices'),
+              title: Text(l10n.p2lanOptionRememberBatchExpandState),
+              subtitle: Text(l10n.p2lanOptionRememberBatchExpandStateDesc),
               value: _currentSettings.rememberBatchExpandState,
               onChanged: (value) {
                 setState(() {
@@ -398,6 +397,24 @@ class _P2LanTransferSettingsLayoutState
                 _markChanged();
               },
               secondary: const Icon(Icons.expand_more),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Encryption Transfer
+          Card(
+            child: SwitchListTile.adaptive(
+              title: Text(l10n.p2lanOptionEncryptionTransfer),
+              subtitle: Text(l10n.p2lanOptionEncryptionTransferDesc),
+              value: _currentSettings.enableEncryption,
+              onChanged: (value) {
+                setState(() {
+                  _currentSettings.enableEncryption = value;
+                });
+                _markChanged();
+              },
+              secondary: const Icon(Icons.security),
             ),
           ),
 

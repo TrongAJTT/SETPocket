@@ -2860,5 +2860,9 @@
     "bookmarkSaved": "Đã lưu kết quả vào mục đánh dấu",
     "swap": "Hoán đổi",
     "startDateConflixWithEndDateAlarm": "Ngày bắt đầu không thể lớn hơn hoặc trùng với ngày kết thúc",
-    "path": "Đường dẫn"
+    "path": "Đường dẫn",
+    "p2lanOptionRememberBatchExpandState": "Nhớ trạng thái lô tác vụ",
+    "p2lanOptionRememberBatchExpandStateDesc": "Nhớ trạng thái mở rộng của mỗi lô tác vụ khi ứng dụng đóng và mở lại",
+    "p2lanOptionEncryptionTransfer": "Truyền mã hóa",
+    "p2lanOptionEncryptionTransferDesc": "Sử dụng giao thức mã hóa hơn cho việc truyền file, chậm hơn nhưng an toàn hơn"
 }

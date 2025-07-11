@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +16,7 @@ import 'package:setpocket/services/p2p_settings_adapter.dart';
 import 'package:setpocket/utils/isar_utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:setpocket/services/encryption_service.dart';
 
 /// Validation result for file transfer request
 class _FileTransferValidationResult {
@@ -77,6 +77,31 @@ class P2PTransferService extends ChangeNotifier {
   static final Set<String> _activeFileTransferBatches = <String>{};
   static DateTime? _lastFilePickerCleanup;
   static const Duration _cleanupCooldown = Duration(minutes: 2);
+
+  // Encryption session keys management
+  final Map<String, Uint8List> _sessionKeys = {};
+
+  /// Get session key for a user. Returns null if not found.
+  Uint8List? _getSessionKey(String userId) {
+    return _sessionKeys[userId];
+  }
+
+  /// Get or generate session key for a user.
+  Uint8List _getOrCreateSessionKey(String userId) {
+    return _sessionKeys[userId] ??= EncryptionService.generateKey();
+  }
+
+  /// Clear session key for a user
+  void clearSessionKey(String userId) {
+    _sessionKeys.remove(userId);
+    logInfo('P2PTransferService: Session key cleared for user $userId');
+  }
+
+  /// Clear all session keys
+  void clearAllSessionKeys() {
+    _sessionKeys.clear();
+    logInfo('P2PTransferService: All session keys cleared');
+  }
 
   // Getters
   P2PDataTransferSettings? get transferSettings => _transferSettings;
@@ -143,6 +168,7 @@ class P2PTransferService extends ChangeNotifier {
         protocol: _transferSettings?.sendProtocol ?? 'tcp',
         maxChunkSize: _transferSettings?.maxChunkSize,
         requestTime: DateTime.now(),
+        useEncryption: _transferSettings?.enableEncryption ?? false,
       );
 
       // Create transfer tasks in waiting state
@@ -328,13 +354,11 @@ class P2PTransferService extends ChangeNotifier {
     // Clear file chunks for this task
     _incomingFileChunks.remove(taskId);
 
-    bool fileDeleted = false;
     if (deleteFile && !task.isOutgoing && task.savePath != null) {
       try {
         final file = File(task.savePath!);
         if (await file.exists()) {
           await file.delete();
-          fileDeleted = true;
           logInfo(
               'P2PTransferService: Successfully deleted file: ${task.savePath}');
         }
@@ -440,7 +464,15 @@ class P2PTransferService extends ChangeNotifier {
       request.receivedTime = DateTime.now();
 
       logInfo(
-          'P2PTransferService: Received file transfer request from ${request.fromUserName}');
+          'P2PTransferService: Received file transfer request from ${request.fromUserName} '
+          '(Encryption: ${request.useEncryption ? "enabled" : "disabled"})');
+
+      // If sender uses encryption, generate/get session key
+      if (request.useEncryption) {
+        _getOrCreateSessionKey(request.fromUserId);
+        logInfo(
+            'P2PTransferService: Session key prepared for encrypted transfer');
+      }
 
       // Validate sender is paired
       final fromUser = _getTargetUser(request.fromUserId);
@@ -515,6 +547,15 @@ class P2PTransferService extends ChangeNotifier {
       if (response.accepted) {
         logInfo(
             'P2PTransferService: File transfer accepted for batch ${response.batchId}');
+
+        // Store the received session key if available
+        if (response.sessionKeyBase64 != null) {
+          final sessionKey = base64Decode(response.sessionKeyBase64!);
+          _sessionKeys[message.fromUserId] = sessionKey;
+          logInfo(
+              'P2PTransferService: Received and stored session key from user ${message.fromUserId}');
+        }
+
         await _startTransfersWithConcurrencyLimit(batchTasks);
       } else {
         logInfo(
@@ -536,18 +577,48 @@ class P2PTransferService extends ChangeNotifier {
   Future<void> _handleDataChunk(P2PMessage message) async {
     final data = message.data;
     final taskId = data['taskId'] as String?;
-    final chunkDataBase64 = data['data'] as String?;
     final isLast = data['isLast'] as bool? ?? false;
 
-    // Validate required fields
-    if (taskId == null || chunkDataBase64 == null) {
-      logError(
-          'P2PTransferService: Invalid data chunk - missing taskId or data');
+    if (taskId == null) {
+      logError('P2PTransferService: Invalid data chunk - no taskId');
       return;
     }
 
     try {
-      final chunkData = base64Decode(chunkDataBase64);
+      Uint8List? chunkData;
+
+      if (data['enc'] == 'gcm') {
+        final ctBase64 = data['ct'] as String?;
+        final ivBase64 = data['iv'] as String?;
+        final tagBase64 = data['tag'] as String?;
+
+        if (ctBase64 != null && ivBase64 != null && tagBase64 != null) {
+          final sessionKey = _getOrCreateSessionKey(message.fromUserId);
+          final encryptedMap = {
+            'ciphertext': base64Decode(ctBase64),
+            'iv': base64Decode(ivBase64),
+            'tag': base64Decode(tagBase64),
+          };
+          chunkData = EncryptionService.decryptGCM(encryptedMap, sessionKey);
+          if (chunkData == null) {
+            logError(
+                'P2PTransferService: GCM decryption failed for task $taskId. Might be a wrong key or tampered data.');
+            return;
+          }
+        }
+      } else {
+        // Fallback for unencrypted data (e.g., from older clients)
+        final dataBase64 = data['data'] as String?;
+        if (dataBase64 != null) {
+          chunkData = base64Decode(dataBase64);
+        }
+      }
+
+      if (chunkData == null) {
+        logError(
+            'P2PTransferService: Failed to get chunk data for task $taskId');
+        return;
+      }
 
       // Get or create task
       DataTransferTask? task = await _getOrCreateTask(taskId, message, data);
@@ -948,6 +1019,10 @@ class P2PTransferService extends ChangeNotifier {
       final receivePort = ReceivePort();
       _transferPorts[task.id] = receivePort;
 
+      // Check if encryption is enabled for this transfer
+      final useEncryption = _transferSettings?.enableEncryption ?? false;
+      final sessionKey = useEncryption ? _getSessionKey(targetUser.id) : null;
+
       final isolate = await Isolate.spawn(
         _staticDataTransferIsolate,
         {
@@ -957,6 +1032,8 @@ class P2PTransferService extends ChangeNotifier {
           'currentUserId': _networkService.currentUser!.id,
           'maxChunkSize': chunkSizeBytes,
           'protocol': 'tcp',
+          'useEncryption': useEncryption,
+          'sessionKey': sessionKey != null ? base64Encode(sessionKey) : null,
         },
       );
 
@@ -1082,11 +1159,43 @@ class P2PTransferService extends ChangeNotifier {
             fileBytes.sublist(totalSent, totalSent + currentChunkSize);
 
         try {
-          final dataPayload = {
-            'taskId': task.id,
-            'data': base64Encode(chunk),
-            'isLast': (totalSent + currentChunkSize == totalBytes),
-          };
+          Map<String, dynamic> dataPayload;
+
+          // Check if encryption is enabled (passed via parameters)
+          final useEncryption = params['useEncryption'] as bool? ?? false;
+
+          if (useEncryption) {
+            // Get session key (passed via parameters)
+            final sessionKeyBase64 = params['sessionKey'] as String?;
+            if (sessionKeyBase64 != null) {
+              final sessionKey = base64Decode(sessionKeyBase64);
+              final encryptedGCM =
+                  EncryptionService.encryptGCM(chunk, sessionKey);
+
+              dataPayload = {
+                'taskId': task.id,
+                'ct': base64Encode(encryptedGCM['ciphertext']!),
+                'iv': base64Encode(encryptedGCM['iv']!),
+                'tag': base64Encode(encryptedGCM['tag']!),
+                'enc': 'gcm', // Indicate GCM encryption
+                'isLast': (totalSent + currentChunkSize == totalBytes),
+              };
+            } else {
+              // Fallback to unencrypted if no session key
+              dataPayload = {
+                'taskId': task.id,
+                'data': base64Encode(chunk),
+                'isLast': (totalSent + currentChunkSize == totalBytes),
+              };
+            }
+          } else {
+            // Unencrypted chunk (original behavior)
+            dataPayload = {
+              'taskId': task.id,
+              'data': base64Encode(chunk),
+              'isLast': (totalSent + currentChunkSize == totalBytes),
+            };
+          }
 
           if (isFirstChunk) {
             dataPayload['fileName'] = task.fileName;
@@ -1111,8 +1220,8 @@ class P2PTransferService extends ChangeNotifier {
             final lengthHeader = ByteData(4)
               ..setUint32(0, messageBytes.length, Endian.big);
             tcpSocket!.add(lengthHeader.buffer.asUint8List());
-            tcpSocket!.add(messageBytes);
-            await tcpSocket!.flush();
+            tcpSocket.add(messageBytes);
+            await tcpSocket.flush();
           }
 
           totalSent += currentChunkSize;
@@ -1146,7 +1255,7 @@ class P2PTransferService extends ChangeNotifier {
             tcpSocket = await Socket.connect(
                 targetUser.ipAddress, targetUser.port,
                 timeout: const Duration(seconds: 10));
-            tcpSocket?.setOption(SocketOption.tcpNoDelay, true);
+            tcpSocket.setOption(SocketOption.tcpNoDelay, true);
           }
 
           // Reset first chunk flag if we failed on first chunk
@@ -1392,6 +1501,14 @@ class P2PTransferService extends ChangeNotifier {
       }
     }
 
+    String? sessionKeyBase64;
+    if (accepted && request.useEncryption) {
+      final key = _getOrCreateSessionKey(request.fromUserId);
+      sessionKeyBase64 = base64Encode(key);
+      logInfo(
+          'P2PTransferService: Sending session key to user ${request.fromUserId}');
+    }
+
     final response = FileTransferResponse(
       requestId: request.requestId,
       batchId: request.batchId,
@@ -1399,6 +1516,7 @@ class P2PTransferService extends ChangeNotifier {
       rejectReason: rejectReason,
       rejectMessage: rejectMessage,
       downloadPath: downloadPath,
+      sessionKeyBase64: sessionKeyBase64,
     );
 
     final message = {
@@ -1597,7 +1715,8 @@ class P2PTransferService extends ChangeNotifier {
           createSenderFolders: true,
           uiRefreshRateSeconds: 0,
           enableNotifications: true,
-          rememberBatchExpandState: false);
+          rememberBatchExpandState: false,
+          enableEncryption: false);
     }
   }
 
@@ -1692,6 +1811,9 @@ class P2PTransferService extends ChangeNotifier {
     // Clear all memory caches
     _incomingFileChunks.clear();
     _activeTransfers.clear();
+
+    // Clear encryption session keys
+    clearAllSessionKeys();
 
     super.dispose();
   }

@@ -512,6 +512,8 @@ class FileTransferRequest {
   DateTime?
       receivedTime; // Time when request was received at the receiver device
 
+  bool useEncryption; // Whether sender uses encryption for this transfer
+
   FileTransferRequest({
     required this.requestId,
     required this.batchId,
@@ -524,6 +526,7 @@ class FileTransferRequest {
     this.isProcessed = false,
     this.maxChunkSize,
     this.receivedTime,
+    this.useEncryption = false,
   });
 
   factory FileTransferRequest.create({
@@ -536,6 +539,7 @@ class FileTransferRequest {
     bool isProcessed = false,
     int? maxChunkSize,
     DateTime? receivedTime,
+    bool useEncryption = true,
   }) =>
       FileTransferRequest(
         requestId: const Uuid().v4(),
@@ -549,6 +553,7 @@ class FileTransferRequest {
         isProcessed: isProcessed,
         maxChunkSize: maxChunkSize,
         receivedTime: receivedTime,
+        useEncryption: useEncryption,
       );
 
   Map<String, dynamic> toJson() => {
@@ -563,6 +568,7 @@ class FileTransferRequest {
         'isProcessed': isProcessed,
         'maxChunkSize': maxChunkSize,
         'receivedTime': receivedTime?.toIso8601String(),
+        'useEncryption': useEncryption,
       };
 
   factory FileTransferRequest.fromJson(Map<String, dynamic> json) =>
@@ -582,6 +588,7 @@ class FileTransferRequest {
         receivedTime: json['receivedTime'] != null
             ? DateTime.parse(json['receivedTime'] as String)
             : null,
+        useEncryption: json['useEncryption'] as bool? ?? false,
       );
 }
 
@@ -593,6 +600,7 @@ class FileTransferResponse {
   final FileTransferRejectReason? rejectReason;
   final String? rejectMessage;
   final String? downloadPath; // Path where files will be saved if accepted
+  final String? sessionKeyBase64; // AES session key for encrypted transfers
 
   const FileTransferResponse({
     required this.requestId,
@@ -601,6 +609,7 @@ class FileTransferResponse {
     this.rejectReason,
     this.rejectMessage,
     this.downloadPath,
+    this.sessionKeyBase64,
   });
 
   Map<String, dynamic> toJson() => {
@@ -610,6 +619,7 @@ class FileTransferResponse {
         'rejectReason': rejectReason?.name,
         'rejectMessage': rejectMessage,
         'downloadPath': downloadPath,
+        'sessionKeyBase64': sessionKeyBase64,
       };
 
   factory FileTransferResponse.fromJson(Map<String, dynamic> json) =>
@@ -623,6 +633,7 @@ class FileTransferResponse {
             : null,
         rejectMessage: json['rejectMessage'] as String?,
         downloadPath: json['downloadPath'] as String?,
+        sessionKeyBase64: json['sessionKeyBase64'] as String?,
       );
 }
 
@@ -703,6 +714,7 @@ class P2PDataTransferSettings {
   int uiRefreshRateSeconds;
   bool enableNotifications;
   bool rememberBatchExpandState;
+  bool enableEncryption;
 
   P2PDataTransferSettings({
     required this.downloadPath,
@@ -717,6 +729,7 @@ class P2PDataTransferSettings {
     this.enableNotifications = true,
     this.createSenderFolders = false,
     this.rememberBatchExpandState = false,
+    this.enableEncryption = false,
   });
 
   // Helper getters for UI display
@@ -737,6 +750,7 @@ class P2PDataTransferSettings {
     bool? enableNotifications,
     bool? createSenderFolders,
     bool? rememberBatchExpandState,
+    bool? enableEncryption,
   }) {
     return P2PDataTransferSettings(
       downloadPath: downloadPath ?? this.downloadPath,
@@ -752,6 +766,7 @@ class P2PDataTransferSettings {
       createSenderFolders: createSenderFolders ?? this.createSenderFolders,
       rememberBatchExpandState:
           rememberBatchExpandState ?? this.rememberBatchExpandState,
+      enableEncryption: enableEncryption ?? this.enableEncryption,
     );
   }
 
@@ -769,6 +784,7 @@ class P2PDataTransferSettings {
       'uiRefreshRateSeconds': uiRefreshRateSeconds,
       'enableNotifications': enableNotifications,
       'rememberBatchExpandState': rememberBatchExpandState,
+      'enableEncryption': enableEncryption,
     };
   }
 
@@ -786,6 +802,7 @@ class P2PDataTransferSettings {
       enableNotifications: json['enableNotifications'] ?? true,
       createSenderFolders: json['createSenderFolders'] ?? false,
       rememberBatchExpandState: json['rememberBatchExpandState'] ?? false,
+      enableEncryption: json['enableEncryption'] ?? false,
     );
   }
 }

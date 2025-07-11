@@ -6473,4 +6473,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get path => 'Path';
+
+  @override
+  String get p2lanOptionRememberBatchExpandState => 'Remember Batch Expand State';
+
+  @override
+  String get p2lanOptionRememberBatchExpandStateDesc => 'Remember the expand state of each batch when the app is closed and reopened';
+
+  @override
+  String get p2lanOptionEncryptionTransfer => 'Encryption Transfer';
+
+  @override
+  String get p2lanOptionEncryptionTransferDesc => 'Use secure encryption protocol for file transfers, slower but more secure';
 }

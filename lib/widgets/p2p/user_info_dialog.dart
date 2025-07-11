@@ -164,13 +164,6 @@ class UserInfoDialog extends StatelessWidget {
             backgroundColor: Colors.purple,
             labelStyle: const TextStyle(color: Colors.white),
           ),
-        if (user.autoConnect)
-          Chip(
-            label: Text(l10n.autoConnect),
-            avatar: const Icon(Icons.autorenew, size: 16),
-            backgroundColor: Colors.orange,
-            labelStyle: const TextStyle(color: Colors.white),
-          ),
       ],
     );
   }

@@ -2807,6 +2807,30 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
+  /// No description provided for @deleteWithFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete with file'**
+  String get deleteWithFile;
+
+  /// No description provided for @deleteTaskOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete task only'**
+  String get deleteTaskOnly;
+
+  /// No description provided for @deleteTaskWithFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete task with file'**
+  String get deleteTaskWithFile;
+
+  /// No description provided for @deleteTaskWithFileConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this task and file?'**
+  String get deleteTaskWithFileConfirm;
+
   /// No description provided for @createdOn.
   ///
   /// In en, this message translates to:
@@ -10757,13 +10781,13 @@ abstract class AppLocalizations {
   /// **'This person wants to save the connection'**
   String get wantsSaveConnection;
 
-  /// Checkbox to trust user
+  /// No description provided for @trustThisUser.
   ///
   /// In en, this message translates to:
   /// **'Trust this user'**
   String get trustThisUser;
 
-  /// Description for trust user option
+  /// No description provided for @allowFileTransfersWithoutConfirmation.
   ///
   /// In en, this message translates to:
   /// **'Allow file transfers without confirmation'**
@@ -12454,6 +12478,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start date cannot be greater than or equal to end date'**
   String get startDateConflixWithEndDateAlarm;
+
+  /// No description provided for @path.
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get path;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

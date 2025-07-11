@@ -130,6 +130,7 @@ class _P2LanTransferSettingsLayoutState
       uiRefreshRateSeconds: 0, // Default to immediate updates
       enableNotifications: false, // Default to disable notifications
       createSenderFolders: false, // Default to date folders
+      rememberBatchExpandState: false, // Default to false to save resources
     );
   }
 
@@ -380,6 +381,25 @@ class _P2LanTransferSettingsLayoutState
               ),
             ),
           ],
+
+          const SizedBox(height: 16),
+
+          // Remember Batch Expand State
+          Card(
+            child: SwitchListTile.adaptive(
+              title: const Text('Remember Batch Expand State'),
+              subtitle: const Text(
+                  'Convenient but uses more resources when loading and may cause lag on low-end devices'),
+              value: _currentSettings.rememberBatchExpandState,
+              onChanged: (value) {
+                setState(() {
+                  _currentSettings.rememberBatchExpandState = value;
+                });
+                _markChanged();
+              },
+              secondary: const Icon(Icons.expand_more),
+            ),
+          ),
 
           const SizedBox(height: 24),
 

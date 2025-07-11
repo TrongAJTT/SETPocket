@@ -4,7 +4,7 @@ import 'package:setpocket/models/p2p_models.dart';
 
 class UserPairingDialog extends StatefulWidget {
   final P2PUser user;
-  final Function(bool saveConnection) onPair;
+  final Function(bool saveConnection, bool trustUser) onPair;
 
   const UserPairingDialog({
     super.key,
@@ -18,6 +18,7 @@ class UserPairingDialog extends StatefulWidget {
 
 class _UserPairingDialogState extends State<UserPairingDialog> {
   bool _saveConnection = false;
+  bool _trustUser = false;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +137,23 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
             controlAffinity: ListTileControlAffinity.leading,
           ),
 
+          // Trust user option
+          CheckboxListTile(
+            value: _trustUser,
+            onChanged: (value) {
+              setState(() {
+                _trustUser = value ?? false;
+              });
+            },
+            title: Text(l10n.trustThisUser),
+            subtitle: Text(
+              l10n.allowFileTransfersWithoutConfirmation,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            contentPadding: EdgeInsets.zero,
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+
           const SizedBox(height: 12),
 
           // Info box
@@ -171,7 +189,7 @@ class _UserPairingDialogState extends State<UserPairingDialog> {
         ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop();
-            widget.onPair(_saveConnection);
+            widget.onPair(_saveConnection, _trustUser);
           },
           child: Text(l10n.sendRequest),
         ),

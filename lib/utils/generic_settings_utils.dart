@@ -52,6 +52,7 @@ class GenericSettingsUtils {
     dynamic currentSettings,
     required Function(dynamic) onSettingsChanged,
     VoidCallback? onCancel,
+    VoidCallback? onDialogClosed,
     bool showActions = true,
     bool isCompact = false,
     Size? preferredSize,
@@ -63,6 +64,7 @@ class GenericSettingsUtils {
       currentSettings: currentSettings,
       onSettingsChanged: onSettingsChanged,
       onCancel: onCancel,
+      onDialogClosed: onDialogClosed,
       showActions: showActions,
       isCompact: isCompact,
       preferredSize: preferredSize,
@@ -222,6 +224,7 @@ class GenericSettingsUtils {
     dynamic currentSettings,
     required Function(dynamic) onSettingsChanged,
     VoidCallback? onCancel,
+    VoidCallback? onDialogClosed,
     bool showActions = true,
     bool isCompact = false,
     Size? preferredSize,
@@ -235,6 +238,7 @@ class GenericSettingsUtils {
           onSettingsChanged:
               onSettingsChanged as Function(P2PDataTransferSettings),
           onCancel: onCancel,
+          onDialogClosed: onDialogClosed,
           showActions: showActions,
           isCompact: isCompact,
           preferredSize: preferredSize,
@@ -270,7 +274,7 @@ class GenericSettingsUtils {
       case FunctionType.calculatorTools:
         return _createCalculatorToolsConfig(
           context,
-          onSettingsChanged: onSettingsChanged as Function(dynamic),
+          onSettingsChanged: onSettingsChanged,
           onCancel: onCancel,
           showActions: showActions,
           isCompact: isCompact,
@@ -296,6 +300,7 @@ class GenericSettingsUtils {
     P2PDataTransferSettings? currentSettings,
     required Function(P2PDataTransferSettings) onSettingsChanged,
     VoidCallback? onCancel,
+    VoidCallback? onDialogClosed,
     bool showActions = true,
     bool isCompact = false,
     Size? preferredSize,
@@ -308,8 +313,18 @@ class GenericSettingsUtils {
         onSettingsChanged: (settings) {
           onSettingsChanged(settings);
           Navigator.of(context).pop();
+          // Call the callback after successful save
+          if (onDialogClosed != null) {
+            onDialogClosed();
+          }
         },
-        onCancel: onCancel ?? () => Navigator.of(context).pop(),
+        onCancel: () {
+          if (onCancel != null) {
+            onCancel();
+          } else {
+            Navigator.of(context).pop();
+          }
+        },
         showActions: showActions,
         isCompact: isCompact,
       ),
@@ -533,10 +548,11 @@ class GenericSettingsUtils {
     }
   }
 
-  /// Convenience method to quickly open P2P Transfer settings.
+  /// Convenience method to open P2P Transfer settings.
   static void quickOpenP2PTransferSettings(
     BuildContext context, {
     bool showSuccessMessage = true,
+    VoidCallback? onDialogClosed,
   }) async {
     try {
       // Fetch settings asynchronously first
@@ -545,8 +561,8 @@ class GenericSettingsUtils {
       // Ensure the context is still mounted before showing the dialog
       if (!context.mounted) return;
 
-      // Use the generic settings helper for a consistent look and feel
-      navigateQuickSettings(
+      // Use navigateSettings for full responsive dialog like other settings
+      navigateSettings(
         context,
         FunctionType.p2lanTransfer,
         currentSettings: settings,
@@ -555,17 +571,19 @@ class GenericSettingsUtils {
             await P2PSettingsAdapter.updateSettings(
                 newSettings as P2PDataTransferSettings);
 
-            // Pop the dialog on successful save
-            if (context.mounted) {
-              Navigator.of(context).pop();
-            }
-
             if (showSuccessMessage && context.mounted) {
               SnackbarUtils.showTyped(
                 context,
                 'P2P Transfer settings saved successfully',
                 SnackBarType.success,
               );
+            }
+
+            // Call the callback after successful save and UI feedback
+            if (onDialogClosed != null) {
+              // Add small delay to ensure UI updates are complete
+              await Future.delayed(const Duration(milliseconds: 50));
+              onDialogClosed();
             }
           } catch (e) {
             if (context.mounted) {
@@ -577,8 +595,10 @@ class GenericSettingsUtils {
             }
           }
         },
-        onCancel: (context.mounted) ? () => Navigator.of(context).pop() : null,
-        barrierDismissible: true,
+        onDialogClosed: onDialogClosed,
+        showActions: true,
+        isCompact: false,
+        barrierDismissible: false,
       );
     } catch (e) {
       if (context.mounted) {

@@ -325,6 +325,10 @@
     "select": "Chọn",
     "selected": "Đã chọn",
     "delete": "Xóa",
+    "deleteWithFile": "Xóa cùng tập tin",
+    "deleteTaskOnly": "Chỉ xóa tác vụ",
+    "deleteTaskWithFile": "Xóa tác vụ cùng tập tin",
+    "deleteTaskWithFileConfirm": "Bạn có chắc chắn muốn xóa tác vụ và tập tin đã tải về không?",
     "createdOn": "Tạo vào {date}",
     "currencies": "{count} loại tiền",
     "currenciesCount": "{count} loại tiền",
@@ -2855,5 +2859,6 @@
     "clearAllFunctionsSuccess": "Đã xóa tất cả các hàm thành công",
     "bookmarkSaved": "Đã lưu kết quả vào mục đánh dấu",
     "swap": "Hoán đổi",
-    "startDateConflixWithEndDateAlarm": "Ngày bắt đầu không thể lớn hơn hoặc trùng với ngày kết thúc"
+    "startDateConflixWithEndDateAlarm": "Ngày bắt đầu không thể lớn hơn hoặc trùng với ngày kết thúc",
+    "path": "Đường dẫn"
 }

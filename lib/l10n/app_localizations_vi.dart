@@ -1445,6 +1445,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get delete => 'Xóa';
 
   @override
+  String get deleteWithFile => 'Xóa cùng tập tin';
+
+  @override
+  String get deleteTaskOnly => 'Chỉ xóa tác vụ';
+
+  @override
+  String get deleteTaskWithFile => 'Xóa tác vụ cùng tập tin';
+
+  @override
+  String get deleteTaskWithFileConfirm => 'Bạn có chắc chắn muốn xóa tác vụ và tập tin đã tải về không?';
+
+  @override
   String createdOn(Object date) {
     return 'Tạo vào $date';
   }
@@ -6451,4 +6463,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get startDateConflixWithEndDateAlarm => 'Ngày bắt đầu không thể lớn hơn hoặc trùng với ngày kết thúc';
+
+  @override
+  String get path => 'Đường dẫn';
 }

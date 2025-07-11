@@ -15,7 +15,6 @@ import 'package:setpocket/widgets/hold_to_confirm_dialog.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/utils/permission_utils.dart';
 import 'package:setpocket/utils/generic_settings_utils.dart';
-import 'package:setpocket/utils/function_type_utils.dart';
 import 'package:setpocket/widgets/p2p/user_info_dialog.dart';
 import 'package:setpocket/widgets/p2p/multi_file_sender_dialog.dart';
 import 'package:setpocket/widgets/p2p/device_info_card.dart';
@@ -45,6 +44,9 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   // Cache management state
   bool _isCalculatingCacheSize = false;
   String _cachedFileCacheSize = 'Unknown';
+
+  // Batch expand state management
+  final Map<String?, bool> _batchExpandStates = {};
 
   @override
   void initState() {
@@ -96,6 +98,8 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
     if (_isControllerInitialized) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _controller.processPendingFileTransferRequests();
+        // Also reload settings in case they changed externally
+        _controller.reloadTransferSettings();
       });
     }
   }
@@ -509,14 +513,42 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
 
     // Convert to list of batch widgets
     final batchWidgets = <Widget>[];
+    final settings = _controller.transferSettings;
+    final rememberBatchState = settings?.rememberBatchExpandState == true;
+
+    // If setting is disabled, clear any saved states
+    if (!rememberBatchState && _batchExpandStates.isNotEmpty) {
+      _batchExpandStates.clear();
+    }
+
     for (final entry in groupedTransfers.entries) {
+      final batchId = entry.key;
+
+      bool isExpanded;
+      if (rememberBatchState) {
+        // If setting is enabled, use saved state or default to false (collapsed)
+        // This preserves current widget state when setting is first enabled
+        isExpanded = _batchExpandStates[batchId] ?? false;
+        // Only save the state if it doesn't exist yet
+        if (!_batchExpandStates.containsKey(batchId)) {
+          _batchExpandStates[batchId] = false;
+        }
+      } else {
+        // If setting is disabled, default to false (collapsed) for performance
+        isExpanded = false;
+      }
+
       batchWidgets.add(
         TransferBatchWidget(
-          batchId: entry.key,
+          batchId: batchId,
           tasks: entry.value,
+          initialExpanded: isExpanded,
           onCancel: _cancelTransfer,
           onClear: _clearTransfer,
           onClearWithFile: _clearTransferWithFile,
+          onExpandChanged: _onBatchExpandChanged,
+          onClearBatch: _onClearBatch,
+          onClearBatchWithFiles: _onClearBatchWithFiles,
         ),
       );
     }
@@ -532,7 +564,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -892,9 +924,9 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       context: context,
       builder: (context) => UserPairingDialog(
         user: user,
-        onPair: (saveConnection) async {
-          final success =
-              await _controller.sendPairingRequest(user, saveConnection);
+        onPair: (saveConnection, trustUser) async {
+          final success = await _controller.sendPairingRequest(
+              user, saveConnection, trustUser);
           if (!success && _controller.errorMessage != null) {
             _showErrorSnackBar(_controller.errorMessage!);
           }
@@ -1371,28 +1403,15 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       await _controller.initializationComplete;
 
       if (mounted) {
-        GenericSettingsUtils.navigateSettings(
+        // Show settings dialog with immediate reload callback
+        GenericSettingsUtils.quickOpenP2PTransferSettings(
           context,
-          FunctionType.p2lanTransfer,
-          currentSettings: _controller.transferSettings,
-          onSettingsChanged: (dynamic settings) async {
-            final p2pSettings = settings as P2PDataTransferSettings;
-            final l10n = AppLocalizations.of(context)!;
-            final success =
-                await _controller.updateTransferSettings(p2pSettings);
+          showSuccessMessage: true,
+          onDialogClosed: () async {
             if (mounted) {
-              SnackbarUtils.showTyped(
-                context,
-                success
-                    ? l10n.transferSettingsUpdated
-                    : _controller.errorMessage ?? l10n.failedToUpdateSettings,
-                success ? SnackBarType.success : SnackBarType.error,
-              );
+              await _controller.reloadTransferSettings();
             }
           },
-          showActions: true,
-          isCompact: false,
-          barrierDismissible: false,
         );
       }
     } catch (e) {
@@ -1521,7 +1540,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       final deviceUser = P2PUser(
         id: appInstallationId,
         displayName: deviceName,
-        appInstallationId: appInstallationId,
+        profileId: appInstallationId,
         ipAddress: _controller.currentUser?.ipAddress ?? 'Not connected',
         port: _controller.currentUser?.port ?? 0,
         isOnline: _controller.isEnabled,
@@ -1753,6 +1772,55 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         _handleNotificationTapped(payload);
         break;
     }
+  }
+
+  // Batch management methods
+
+  void _onBatchExpandChanged(String? batchId, bool expanded) {
+    // Only persist expand state if the setting is enabled
+    final settings = _controller.transferSettings;
+    if (settings?.rememberBatchExpandState == true) {
+      setState(() {
+        _batchExpandStates[batchId] = expanded;
+      });
+    }
+    // If setting is disabled, still trigger setState to reflect UI changes immediately
+    // but don't save to _batchExpandStates
+    else {
+      setState(() {});
+    }
+  }
+
+  void _onClearBatch(String? batchId) {
+    if (batchId == null) return;
+
+    // Clear all tasks in the batch
+    final tasksInBatch = _controller.activeTransfers
+        .where((task) => task.batchId == batchId)
+        .toList();
+
+    for (final task in tasksInBatch) {
+      _controller.clearTransfer(task.id);
+    }
+
+    // Remove from expand states
+    _batchExpandStates.remove(batchId);
+  }
+
+  void _onClearBatchWithFiles(String? batchId) {
+    if (batchId == null) return;
+
+    // Clear all tasks in the batch with files
+    final tasksInBatch = _controller.activeTransfers
+        .where((task) => task.batchId == batchId)
+        .toList();
+
+    for (final task in tasksInBatch) {
+      _controller.clearTransferWithFile(task.id, true);
+    }
+
+    // Remove from expand states
+    _batchExpandStates.remove(batchId);
   }
 
   // Debug methods removed - using simple native device ID now

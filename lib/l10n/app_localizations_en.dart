@@ -1452,6 +1452,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
+  String get deleteWithFile => 'Delete with file';
+
+  @override
+  String get deleteTaskOnly => 'Delete task only';
+
+  @override
+  String get deleteTaskWithFile => 'Delete task with file';
+
+  @override
+  String get deleteTaskWithFileConfirm => 'Are you sure you want to delete this task and file?';
+
+  @override
   String createdOn(Object date) {
     return 'Created on $date';
   }
@@ -6458,4 +6470,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startDateConflixWithEndDateAlarm => 'Start date cannot be greater than or equal to end date';
+
+  @override
+  String get path => 'Path';
 }

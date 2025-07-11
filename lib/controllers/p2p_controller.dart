@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/network_security_service.dart';
-import 'package:setpocket/services/p2p_services/p2p_service.dart';
+import 'package:setpocket/services/p2p_services/p2p_service_manager.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 
 class P2PController with ChangeNotifier {
-  final P2PService _p2pService = P2PService.instance;
+  final P2PServiceManager _p2pService = P2PServiceManager.instance;
 
   // UI State
   bool _isInitialized = false;
@@ -168,7 +168,6 @@ class P2PController with ChangeNotifier {
       primary.isStored = secondary.isStored;
       primary.isPaired = secondary.isPaired;
       primary.isTrusted = secondary.isTrusted;
-      primary.autoConnect = secondary.autoConnect;
       primary.pairedAt = secondary.pairedAt;
     }
 
@@ -202,14 +201,14 @@ class P2PController with ChangeNotifier {
   bool get isTemporarilyDisabled => _isTemporarilyDisabled;
 
   /// Access to P2P service for advanced operations
-  P2PService get p2pService => _p2pService;
+  P2PServiceManager get p2pService => _p2pService;
 
   /// Initialize the controller
   Future<void> initialize() async {
     if (_isInitialized) return;
     try {
       // Initialize P2P services with proper initialization order
-      await P2PService.init();
+      await P2PServiceManager.init();
 
       // Automatically check network status on initialization
       await _checkInitialNetworkStatus();
@@ -402,7 +401,7 @@ class P2PController with ChangeNotifier {
 
   /// Send pairing request
   Future<bool> sendPairingRequest(
-      P2PUser targetUser, bool saveConnection) async {
+      P2PUser targetUser, bool saveConnection, bool trustUser) async {
     try {
       _errorMessage = null;
       final success =
@@ -670,8 +669,7 @@ class P2PController with ChangeNotifier {
       notifyListeners();
 
       await _p2pService.manualDiscovery();
-      _p2pService.lastDiscoveryTime =
-          DateTime.now(); // Update time after discovery runs
+      _lastDiscoveryTime = DateTime.now(); // Update time after discovery runs
 
       // 🔥 FIXED: Spinner chỉ xoay 10 giây thay vì 60 giây
       await Future.delayed(const Duration(seconds: 10));
@@ -847,6 +845,19 @@ class P2PController with ChangeNotifier {
 
   /// Get current transfer settings
   P2PDataTransferSettings? get transferSettings => _p2pService.transferSettings;
+
+  /// Reload transfer settings from storage (for when settings changed externally)
+  Future<void> reloadTransferSettings() async {
+    try {
+      await _p2pService.reloadTransferSettings();
+      notifyListeners();
+      logInfo('P2PController: Transfer settings reloaded');
+    } catch (e) {
+      _errorMessage = 'Failed to reload transfer settings: $e';
+      logError(_errorMessage!);
+      notifyListeners();
+    }
+  }
 
   /// Respond to file transfer request
   Future<bool> respondToFileTransferRequest(

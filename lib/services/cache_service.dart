@@ -17,7 +17,7 @@ import 'converter_services/temperature_unified_service.dart';
 import 'converter_services/data_unified_service.dart';
 import 'converter_services/number_system_unified_service.dart';
 import 'random_services/unified_random_state_service.dart';
-import 'p2p_services/p2p_service.dart';
+import 'p2p_services/p2p_service_manager.dart';
 import 'calculator_services/calculator_tools_service.dart';
 // import 'package:hive/hive.dart'; // Temporarily disabled during Hive migration
 import 'package:file_picker/file_picker.dart';
@@ -515,7 +515,7 @@ class CacheService {
 
     // P2P Data Transfer Cache
     try {
-      final p2pService = P2PService.instance;
+      final p2pService = P2PServiceManager.instance;
       final isP2PEnabled = p2pService.isEnabled;
       logInfo('P2P Service running for cache check: $isP2PEnabled');
 
@@ -788,7 +788,7 @@ class CacheService {
 
     // 🔥 SAFE: Only clear file picker cache if P2P is not active
     try {
-      final p2pService = P2PService.instance;
+      final p2pService = P2PServiceManager.instance;
       if (!p2pService.isEnabled) {
         await FilePicker.platform.clearTemporaryFiles();
         logInfo(
@@ -805,7 +805,7 @@ class CacheService {
   /// Check if P2P Data Transfer is currently enabled
   static Future<bool> isP2PEnabled() async {
     try {
-      return P2PService.instance.isEnabled;
+      return P2PServiceManager.instance.isEnabled;
     } catch (e) {
       logError('CacheService: Error checking P2P status: $e');
       return false;
@@ -885,7 +885,7 @@ class CacheService {
     try {
       logInfo('CacheService: Starting P2P data sync...');
 
-      final p2pService = P2PService.instance;
+      final p2pService = P2PServiceManager.instance;
 
       // Check discovered users
       final discoveredUsers = p2pService.discoveredUsers;
@@ -949,7 +949,7 @@ class CacheService {
 
     try {
       // Check P2P service state
-      final p2pService = P2PService.instance;
+      final p2pService = P2PServiceManager.instance;
       result['service_enabled'] = p2pService.isEnabled;
       result['discovered_users'] = p2pService.discoveredUsers.length;
       result['paired_users'] = p2pService.pairedUsers.length;

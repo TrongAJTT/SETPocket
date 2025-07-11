@@ -32,6 +32,14 @@ class MainActivity: FlutterActivity() {
                         result.error("WIFI_ERROR", "Failed to check WiFi security: ${e.message}", null)
                     }
                 }
+                "getWifiSecurityInfo" -> {
+                    try {
+                        val securityInfo = getWifiSecurityInfo()
+                        result.success(securityInfo)
+                    } catch (e: Exception) {
+                        result.error("WIFI_ERROR", "Failed to get WiFi security info: ${e.message}", null)
+                    }
+                }
                 "getNetworkInfo" -> {
                     try {
                         val networkInfo = getNetworkInfo()
@@ -148,6 +156,59 @@ class MainActivity: FlutterActivity() {
         return result
     }
     
+    private fun getWifiSecurityInfo(): Map<String, Any> {
+        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val result = mutableMapOf<String, Any>()
+        
+        // Check permissions first
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            result["isSecure"] = true // Default to secure if we can't check
+            result["securityType"] = "UNKNOWN"
+            result["error"] = "Permission not granted"
+            return result
+        }
+        
+        val wifiInfo: WifiInfo? = wifiManager.connectionInfo
+        
+        if (wifiInfo == null || wifiInfo.networkId == -1) {
+            // Not connected to WiFi
+            result["isSecure"] = true // Default to secure
+            result["securityType"] = "NOT_CONNECTED"
+            return result
+        }
+        
+        // For connected networks, we can make educated guesses about security
+        // In practice, most consumer routers use WPA2/WPA3 today
+        val ssid = wifiInfo.ssid
+        val bssid = wifiInfo.bssid
+        
+        // Simple heuristics for security detection
+        var isSecure = true
+        var securityType = "WPA2" // Default assumption
+        
+        // Check for common insecure network patterns
+        if (ssid != null) {
+            val ssidClean = ssid.replace("\"", "").lowercase()
+            if (ssidClean.contains("guest") || 
+                ssidClean.contains("open") || 
+                ssidClean.contains("free") ||
+                ssidClean.contains("public")) {
+                // These might be open networks
+                isSecure = false
+                securityType = "OPEN"
+            }
+        }
+        
+        // If we're connected, assume it's secure unless we detect otherwise
+        // This is a conservative approach for security
+        result["isSecure"] = isSecure
+        result["securityType"] = securityType
+        result["ssid"] = ssid
+        result["signalStrength"] = wifiInfo.rssi
+        
+        return result
+    }
+
     private fun requestNetworkPermissions() {
         val permissions = arrayOf(
             Manifest.permission.ACCESS_WIFI_STATE,

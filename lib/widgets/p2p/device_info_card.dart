@@ -205,14 +205,6 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
             labelStyle: const TextStyle(color: Colors.white, fontSize: 12),
             visualDensity: VisualDensity.compact,
           ),
-        if (widget.user!.autoConnect)
-          Chip(
-            label: Text(l10n.autoConnect),
-            avatar: const Icon(Icons.autorenew, size: 14),
-            backgroundColor: Colors.orange,
-            labelStyle: const TextStyle(color: Colors.white, fontSize: 12),
-            visualDensity: VisualDensity.compact,
-          ),
       ],
     );
   }
@@ -220,8 +212,7 @@ class _DeviceInfoCardState extends State<DeviceInfoCard> {
   bool _hasAnyStatus() {
     return widget.user!.isPaired ||
         widget.user!.isTrusted ||
-        widget.user!.isStored ||
-        widget.user!.autoConnect;
+        widget.user!.isStored;
   }
 
   String _formatLastSeen(DateTime lastSeen) {

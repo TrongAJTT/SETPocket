@@ -55,7 +55,7 @@ class P2PUser {
   String displayName;
 
   @Index()
-  String appInstallationId;
+  String profileId; // Unified field replacing appInstallationId and deviceId
 
   String ipAddress;
 
@@ -69,8 +69,6 @@ class P2PUser {
 
   bool isTrusted;
 
-  bool autoConnect;
-
   DateTime? pairedAt;
 
   bool isStored; // Indicates if this is a stored/saved connection
@@ -78,48 +76,46 @@ class P2PUser {
   P2PUser({
     required this.id,
     required this.displayName,
-    required this.appInstallationId,
+    required this.profileId,
     required this.ipAddress,
     required this.port,
     required this.lastSeen,
     this.isOnline = false,
     this.isPaired = false,
     this.isTrusted = false,
-    this.autoConnect = false,
     this.pairedAt,
     this.isStored = false,
   });
 
   factory P2PUser.create({
     required String displayName,
-    required String appInstallationId,
+    required String profileId,
     required String ipAddress,
     required int port,
     DateTime? lastSeen,
     bool isOnline = false,
     bool isPaired = false,
     bool isTrusted = false,
-    bool autoConnect = false,
     DateTime? pairedAt,
     bool isStored = false,
   }) =>
       P2PUser(
         id: const Uuid().v4(),
         displayName: displayName,
-        appInstallationId: appInstallationId,
+        profileId: profileId,
         ipAddress: ipAddress,
         port: port,
         lastSeen: lastSeen ?? DateTime.now(),
         isOnline: isOnline,
         isPaired: isPaired,
         isTrusted: isTrusted,
-        autoConnect: autoConnect,
         pairedAt: pairedAt,
         isStored: isStored,
       );
 
-  // Backward compatibility getter
-  String get deviceId => appInstallationId;
+  // Backward compatibility getters
+  String get deviceId => profileId;
+  String get appInstallationId => profileId;
 
   /// Get connection status for UI display
   @ignore
@@ -136,17 +132,17 @@ class P2PUser {
   Map<String, dynamic> toJson() => {
         'id': id,
         'displayName': displayName,
-        'appInstallationId': appInstallationId,
-        // Keep old field for backward compatibility
-        'deviceId': appInstallationId,
-        'appSessionId': appInstallationId, // For backward compatibility
+        'profileId': profileId,
+        // Keep old fields for backward compatibility
+        'appInstallationId': profileId,
+        'deviceId': profileId,
+        'appSessionId': profileId,
         'ipAddress': ipAddress,
         'port': port,
         'lastSeen': lastSeen.toIso8601String(),
         'isOnline': isOnline,
         'isPaired': isPaired,
         'isTrusted': isTrusted,
-        'autoConnect': autoConnect,
         'pairedAt': pairedAt?.toIso8601String(),
         'isStored': isStored,
       };
@@ -155,7 +151,8 @@ class P2PUser {
         id: json['id'],
         displayName: json['displayName'],
         // Try new field first, fallback to old fields for backward compatibility
-        appInstallationId: json['appInstallationId'] ??
+        profileId: json['profileId'] ??
+            json['appInstallationId'] ??
             json['appSessionId'] ??
             json['deviceId'],
         ipAddress: json['ipAddress'],
@@ -164,7 +161,6 @@ class P2PUser {
         isOnline: json['isOnline'] ?? false,
         isPaired: json['isPaired'] ?? false,
         isTrusted: json['isTrusted'] ?? false,
-        autoConnect: json['autoConnect'] ?? false,
         pairedAt:
             json['pairedAt'] != null ? DateTime.parse(json['pairedAt']) : null,
         isStored: json['isStored'] ?? false,
@@ -182,7 +178,7 @@ class PairingRequest {
 
   String fromUserName;
 
-  String fromAppInstallationId;
+  String fromProfileId;
 
   String fromIpAddress;
 
@@ -198,7 +194,7 @@ class PairingRequest {
     required this.id,
     required this.fromUserId,
     required this.fromUserName,
-    required this.fromAppInstallationId,
+    required this.fromProfileId,
     required this.fromIpAddress,
     required this.fromPort,
     required this.requestTime,
@@ -209,7 +205,7 @@ class PairingRequest {
   factory PairingRequest.create({
     required String fromUserId,
     required String fromUserName,
-    required String fromAppInstallationId,
+    required String fromProfileId,
     required String fromIpAddress,
     required int fromPort,
     DateTime? requestTime,
@@ -220,7 +216,7 @@ class PairingRequest {
         id: const Uuid().v4(),
         fromUserId: fromUserId,
         fromUserName: fromUserName,
-        fromAppInstallationId: fromAppInstallationId,
+        fromProfileId: fromProfileId,
         fromIpAddress: fromIpAddress,
         fromPort: fromPort,
         requestTime: requestTime ?? DateTime.now(),
@@ -228,9 +224,11 @@ class PairingRequest {
         isProcessed: isProcessed,
       );
 
-  // Backward compatibility getter
+  // Backward compatibility getters
   @ignore
-  String get fromDeviceId => fromAppInstallationId;
+  String get fromDeviceId => fromProfileId;
+  @ignore
+  String get fromAppInstallationId => fromProfileId;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -252,7 +250,7 @@ class PairingRequest {
         fromUserId: json['fromUserId'],
         fromUserName: json['fromUserName'],
         // Try new field first, fallback to old fields for backward compatibility
-        fromAppInstallationId: json['fromAppInstallationId'] ??
+        fromProfileId: json['fromAppInstallationId'] ??
             json['fromAppSessionId'] ??
             json['fromDeviceId'],
         fromIpAddress: json['fromIpAddress'],
@@ -448,11 +446,15 @@ class P2PMessage {
       };
 
   factory P2PMessage.fromJson(Map<String, dynamic> json) => P2PMessage(
-        type: json['type'],
-        fromUserId: json['fromUserId'],
-        toUserId: json['toUserId'],
-        data: Map<String, dynamic>.from(json['data']),
-        timestamp: DateTime.parse(json['timestamp']),
+        type: json['type'] as String? ?? '',
+        fromUserId: json['fromUserId'] as String? ?? '',
+        toUserId: json['toUserId'] as String? ?? '',
+        data: json['data'] is Map<String, dynamic>
+            ? Map<String, dynamic>.from(json['data'])
+            : <String, dynamic>{},
+        timestamp: json['timestamp'] != null
+            ? DateTime.tryParse(json['timestamp'] as String) ?? DateTime.now()
+            : DateTime.now(),
       );
 }
 
@@ -700,6 +702,7 @@ class P2PDataTransferSettings {
   String? customDisplayName;
   int uiRefreshRateSeconds;
   bool enableNotifications;
+  bool rememberBatchExpandState;
 
   P2PDataTransferSettings({
     required this.downloadPath,
@@ -713,6 +716,7 @@ class P2PDataTransferSettings {
     this.uiRefreshRateSeconds = 0,
     this.enableNotifications = true,
     this.createSenderFolders = false,
+    this.rememberBatchExpandState = false,
   });
 
   // Helper getters for UI display
@@ -732,6 +736,7 @@ class P2PDataTransferSettings {
     int? uiRefreshRateSeconds,
     bool? enableNotifications,
     bool? createSenderFolders,
+    bool? rememberBatchExpandState,
   }) {
     return P2PDataTransferSettings(
       downloadPath: downloadPath ?? this.downloadPath,
@@ -745,6 +750,8 @@ class P2PDataTransferSettings {
       uiRefreshRateSeconds: uiRefreshRateSeconds ?? this.uiRefreshRateSeconds,
       enableNotifications: enableNotifications ?? this.enableNotifications,
       createSenderFolders: createSenderFolders ?? this.createSenderFolders,
+      rememberBatchExpandState:
+          rememberBatchExpandState ?? this.rememberBatchExpandState,
     );
   }
 
@@ -761,6 +768,7 @@ class P2PDataTransferSettings {
       'customDisplayName': customDisplayName,
       'uiRefreshRateSeconds': uiRefreshRateSeconds,
       'enableNotifications': enableNotifications,
+      'rememberBatchExpandState': rememberBatchExpandState,
     };
   }
 
@@ -777,6 +785,7 @@ class P2PDataTransferSettings {
       uiRefreshRateSeconds: json['uiRefreshRateSeconds'] ?? 0,
       enableNotifications: json['enableNotifications'] ?? true,
       createSenderFolders: json['createSenderFolders'] ?? false,
+      rememberBatchExpandState: json['rememberBatchExpandState'] ?? false,
     );
   }
 }

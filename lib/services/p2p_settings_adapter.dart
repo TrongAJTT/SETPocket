@@ -23,6 +23,7 @@ class P2PSettingsAdapter {
       customDisplayName: newSettings.customDisplayName,
       uiRefreshRateSeconds: newSettings.uiRefreshRateSeconds,
       enableNotifications: newSettings.enableNotifications,
+      rememberBatchExpandState: newSettings.rememberBatchExpandState,
     );
   }
 
@@ -42,6 +43,7 @@ class P2PSettingsAdapter {
       uiRefreshRateSeconds: oldSettings.uiRefreshRateSeconds,
       enableNotifications: oldSettings.enableNotifications,
       askBeforeDownload: true, // Default value for new field
+      rememberBatchExpandState: oldSettings.rememberBatchExpandState,
     );
   }
 
@@ -123,6 +125,7 @@ class P2PSettingsAdapter {
       customDisplayName: null,
       uiRefreshRateSeconds: 0,
       enableNotifications: true,
+      rememberBatchExpandState: false, // Default to false for performance
     );
   }
 

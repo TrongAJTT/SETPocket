@@ -275,6 +275,7 @@ class P2PTransferSettingsData {
   final int uiRefreshRateSeconds;
   final bool enableNotifications;
   final bool askBeforeDownload;
+  final bool rememberBatchExpandState;
 
   P2PTransferSettingsData({
     this.downloadPath = '',
@@ -289,6 +290,7 @@ class P2PTransferSettingsData {
     this.uiRefreshRateSeconds = 0,
     this.enableNotifications = true,
     this.askBeforeDownload = true,
+    this.rememberBatchExpandState = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -305,6 +307,7 @@ class P2PTransferSettingsData {
       'uiRefreshRateSeconds': uiRefreshRateSeconds,
       'enableNotifications': enableNotifications,
       'askBeforeDownload': askBeforeDownload,
+      'rememberBatchExpandState': rememberBatchExpandState,
     };
   }
 
@@ -322,6 +325,7 @@ class P2PTransferSettingsData {
       uiRefreshRateSeconds: json['uiRefreshRateSeconds'] ?? 0,
       enableNotifications: json['enableNotifications'] ?? true,
       askBeforeDownload: json['askBeforeDownload'] ?? true,
+      rememberBatchExpandState: json['rememberBatchExpandState'] ?? false,
     );
   }
 
@@ -338,6 +342,7 @@ class P2PTransferSettingsData {
     int? uiRefreshRateSeconds,
     bool? enableNotifications,
     bool? askBeforeDownload,
+    bool? rememberBatchExpandState,
   }) {
     return P2PTransferSettingsData(
       downloadPath: downloadPath ?? this.downloadPath,
@@ -352,6 +357,8 @@ class P2PTransferSettingsData {
       uiRefreshRateSeconds: uiRefreshRateSeconds ?? this.uiRefreshRateSeconds,
       enableNotifications: enableNotifications ?? this.enableNotifications,
       askBeforeDownload: askBeforeDownload ?? this.askBeforeDownload,
+      rememberBatchExpandState:
+          rememberBatchExpandState ?? this.rememberBatchExpandState,
     );
   }
 }

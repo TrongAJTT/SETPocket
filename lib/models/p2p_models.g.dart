@@ -22,65 +22,65 @@ const P2PUserSchema = CollectionSchema(
       name: r'appInstallationId',
       type: IsarType.string,
     ),
-    r'autoConnect': PropertySchema(
-      id: 1,
-      name: r'autoConnect',
-      type: IsarType.bool,
-    ),
     r'deviceId': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'deviceId',
       type: IsarType.string,
     ),
     r'displayName': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'displayName',
       type: IsarType.string,
     ),
     r'id': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'id',
       type: IsarType.string,
     ),
     r'ipAddress': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'ipAddress',
       type: IsarType.string,
     ),
     r'isOnline': PropertySchema(
-      id: 6,
+      id: 5,
       name: r'isOnline',
       type: IsarType.bool,
     ),
     r'isPaired': PropertySchema(
-      id: 7,
+      id: 6,
       name: r'isPaired',
       type: IsarType.bool,
     ),
     r'isStored': PropertySchema(
-      id: 8,
+      id: 7,
       name: r'isStored',
       type: IsarType.bool,
     ),
     r'isTrusted': PropertySchema(
-      id: 9,
+      id: 8,
       name: r'isTrusted',
       type: IsarType.bool,
     ),
     r'lastSeen': PropertySchema(
-      id: 10,
+      id: 9,
       name: r'lastSeen',
       type: IsarType.dateTime,
     ),
     r'pairedAt': PropertySchema(
-      id: 11,
+      id: 10,
       name: r'pairedAt',
       type: IsarType.dateTime,
     ),
     r'port': PropertySchema(
-      id: 12,
+      id: 11,
       name: r'port',
       type: IsarType.long,
+    ),
+    r'profileId': PropertySchema(
+      id: 12,
+      name: r'profileId',
+      type: IsarType.string,
     )
   },
   estimateSize: _p2PUserEstimateSize,
@@ -102,14 +102,14 @@ const P2PUserSchema = CollectionSchema(
         )
       ],
     ),
-    r'appInstallationId': IndexSchema(
-      id: 1787023171002166025,
-      name: r'appInstallationId',
+    r'profileId': IndexSchema(
+      id: 6052971939042612300,
+      name: r'profileId',
       unique: false,
       replace: false,
       properties: [
         IndexPropertySchema(
-          name: r'appInstallationId',
+          name: r'profileId',
           type: IndexType.hash,
           caseSensitive: true,
         )
@@ -135,6 +135,7 @@ int _p2PUserEstimateSize(
   bytesCount += 3 + object.displayName.length * 3;
   bytesCount += 3 + object.id.length * 3;
   bytesCount += 3 + object.ipAddress.length * 3;
+  bytesCount += 3 + object.profileId.length * 3;
   return bytesCount;
 }
 
@@ -145,18 +146,18 @@ void _p2PUserSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.appInstallationId);
-  writer.writeBool(offsets[1], object.autoConnect);
-  writer.writeString(offsets[2], object.deviceId);
-  writer.writeString(offsets[3], object.displayName);
-  writer.writeString(offsets[4], object.id);
-  writer.writeString(offsets[5], object.ipAddress);
-  writer.writeBool(offsets[6], object.isOnline);
-  writer.writeBool(offsets[7], object.isPaired);
-  writer.writeBool(offsets[8], object.isStored);
-  writer.writeBool(offsets[9], object.isTrusted);
-  writer.writeDateTime(offsets[10], object.lastSeen);
-  writer.writeDateTime(offsets[11], object.pairedAt);
-  writer.writeLong(offsets[12], object.port);
+  writer.writeString(offsets[1], object.deviceId);
+  writer.writeString(offsets[2], object.displayName);
+  writer.writeString(offsets[3], object.id);
+  writer.writeString(offsets[4], object.ipAddress);
+  writer.writeBool(offsets[5], object.isOnline);
+  writer.writeBool(offsets[6], object.isPaired);
+  writer.writeBool(offsets[7], object.isStored);
+  writer.writeBool(offsets[8], object.isTrusted);
+  writer.writeDateTime(offsets[9], object.lastSeen);
+  writer.writeDateTime(offsets[10], object.pairedAt);
+  writer.writeLong(offsets[11], object.port);
+  writer.writeString(offsets[12], object.profileId);
 }
 
 P2PUser _p2PUserDeserialize(
@@ -166,18 +167,17 @@ P2PUser _p2PUserDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = P2PUser(
-    appInstallationId: reader.readString(offsets[0]),
-    autoConnect: reader.readBoolOrNull(offsets[1]) ?? false,
-    displayName: reader.readString(offsets[3]),
-    id: reader.readString(offsets[4]),
-    ipAddress: reader.readString(offsets[5]),
-    isOnline: reader.readBoolOrNull(offsets[6]) ?? false,
-    isPaired: reader.readBoolOrNull(offsets[7]) ?? false,
-    isStored: reader.readBoolOrNull(offsets[8]) ?? false,
-    isTrusted: reader.readBoolOrNull(offsets[9]) ?? false,
-    lastSeen: reader.readDateTime(offsets[10]),
-    pairedAt: reader.readDateTimeOrNull(offsets[11]),
-    port: reader.readLong(offsets[12]),
+    displayName: reader.readString(offsets[2]),
+    id: reader.readString(offsets[3]),
+    ipAddress: reader.readString(offsets[4]),
+    isOnline: reader.readBoolOrNull(offsets[5]) ?? false,
+    isPaired: reader.readBoolOrNull(offsets[6]) ?? false,
+    isStored: reader.readBoolOrNull(offsets[7]) ?? false,
+    isTrusted: reader.readBoolOrNull(offsets[8]) ?? false,
+    lastSeen: reader.readDateTime(offsets[9]),
+    pairedAt: reader.readDateTimeOrNull(offsets[10]),
+    port: reader.readLong(offsets[11]),
+    profileId: reader.readString(offsets[12]),
   );
   return object;
 }
@@ -192,7 +192,7 @@ P _p2PUserDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
+      return (reader.readString(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
@@ -200,7 +200,7 @@ P _p2PUserDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 6:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 7:
@@ -208,13 +208,13 @@ P _p2PUserDeserializeProp<P>(
     case 8:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 9:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
-    case 10:
       return (reader.readDateTime(offset)) as P;
-    case 11:
+    case 10:
       return (reader.readDateTimeOrNull(offset)) as P;
-    case 12:
+    case 11:
       return (reader.readLong(offset)) as P;
+    case 12:
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -402,45 +402,45 @@ extension P2PUserQueryWhere on QueryBuilder<P2PUser, P2PUser, QWhereClause> {
     });
   }
 
-  QueryBuilder<P2PUser, P2PUser, QAfterWhereClause> appInstallationIdEqualTo(
-      String appInstallationId) {
+  QueryBuilder<P2PUser, P2PUser, QAfterWhereClause> profileIdEqualTo(
+      String profileId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'appInstallationId',
-        value: [appInstallationId],
+        indexName: r'profileId',
+        value: [profileId],
       ));
     });
   }
 
-  QueryBuilder<P2PUser, P2PUser, QAfterWhereClause> appInstallationIdNotEqualTo(
-      String appInstallationId) {
+  QueryBuilder<P2PUser, P2PUser, QAfterWhereClause> profileIdNotEqualTo(
+      String profileId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'appInstallationId',
+              indexName: r'profileId',
               lower: [],
-              upper: [appInstallationId],
+              upper: [profileId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'appInstallationId',
-              lower: [appInstallationId],
+              indexName: r'profileId',
+              lower: [profileId],
               includeLower: false,
               upper: [],
             ));
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'appInstallationId',
-              lower: [appInstallationId],
+              indexName: r'profileId',
+              lower: [profileId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'appInstallationId',
+              indexName: r'profileId',
               lower: [],
-              upper: [appInstallationId],
+              upper: [profileId],
               includeUpper: false,
             ));
       }
@@ -582,16 +582,6 @@ extension P2PUserQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'appInstallationId',
         value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> autoConnectEqualTo(
-      bool value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'autoConnect',
-        value: value,
       ));
     });
   }
@@ -1382,6 +1372,136 @@ extension P2PUserQueryFilter
       ));
     });
   }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'profileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'profileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'profileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'profileId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'profileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'profileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'profileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'profileId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'profileId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterFilterCondition> profileIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'profileId',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension P2PUserQueryObject
@@ -1400,18 +1520,6 @@ extension P2PUserQuerySortBy on QueryBuilder<P2PUser, P2PUser, QSortBy> {
   QueryBuilder<P2PUser, P2PUser, QAfterSortBy> sortByAppInstallationIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'appInstallationId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> sortByAutoConnect() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'autoConnect', Sort.asc);
-    });
-  }
-
-  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> sortByAutoConnectDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'autoConnect', Sort.desc);
     });
   }
 
@@ -1546,6 +1654,18 @@ extension P2PUserQuerySortBy on QueryBuilder<P2PUser, P2PUser, QSortBy> {
       return query.addSortBy(r'port', Sort.desc);
     });
   }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> sortByProfileId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profileId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> sortByProfileIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profileId', Sort.desc);
+    });
+  }
 }
 
 extension P2PUserQuerySortThenBy
@@ -1559,18 +1679,6 @@ extension P2PUserQuerySortThenBy
   QueryBuilder<P2PUser, P2PUser, QAfterSortBy> thenByAppInstallationIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'appInstallationId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> thenByAutoConnect() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'autoConnect', Sort.asc);
-    });
-  }
-
-  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> thenByAutoConnectDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'autoConnect', Sort.desc);
     });
   }
 
@@ -1717,6 +1825,18 @@ extension P2PUserQuerySortThenBy
       return query.addSortBy(r'port', Sort.desc);
     });
   }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> thenByProfileId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profileId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<P2PUser, P2PUser, QAfterSortBy> thenByProfileIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profileId', Sort.desc);
+    });
+  }
 }
 
 extension P2PUserQueryWhereDistinct
@@ -1726,12 +1846,6 @@ extension P2PUserQueryWhereDistinct
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'appInstallationId',
           caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<P2PUser, P2PUser, QDistinct> distinctByAutoConnect() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'autoConnect');
     });
   }
 
@@ -1804,6 +1918,13 @@ extension P2PUserQueryWhereDistinct
       return query.addDistinctBy(r'port');
     });
   }
+
+  QueryBuilder<P2PUser, P2PUser, QDistinct> distinctByProfileId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'profileId', caseSensitive: caseSensitive);
+    });
+  }
 }
 
 extension P2PUserQueryProperty
@@ -1817,12 +1938,6 @@ extension P2PUserQueryProperty
   QueryBuilder<P2PUser, String, QQueryOperations> appInstallationIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'appInstallationId');
-    });
-  }
-
-  QueryBuilder<P2PUser, bool, QQueryOperations> autoConnectProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'autoConnect');
     });
   }
 
@@ -1891,6 +2006,12 @@ extension P2PUserQueryProperty
       return query.addPropertyName(r'port');
     });
   }
+
+  QueryBuilder<P2PUser, String, QQueryOperations> profileIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'profileId');
+    });
+  }
 }
 
 // coverage:ignore-file
@@ -1904,20 +2025,20 @@ const PairingRequestSchema = CollectionSchema(
   name: r'PairingRequest',
   id: 1782595776270177333,
   properties: {
-    r'fromAppInstallationId': PropertySchema(
-      id: 0,
-      name: r'fromAppInstallationId',
-      type: IsarType.string,
-    ),
     r'fromIpAddress': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'fromIpAddress',
       type: IsarType.string,
     ),
     r'fromPort': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'fromPort',
       type: IsarType.long,
+    ),
+    r'fromProfileId': PropertySchema(
+      id: 2,
+      name: r'fromProfileId',
+      type: IsarType.string,
     ),
     r'fromUserId': PropertySchema(
       id: 3,
@@ -1984,8 +2105,8 @@ int _pairingRequestEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.fromAppInstallationId.length * 3;
   bytesCount += 3 + object.fromIpAddress.length * 3;
+  bytesCount += 3 + object.fromProfileId.length * 3;
   bytesCount += 3 + object.fromUserId.length * 3;
   bytesCount += 3 + object.fromUserName.length * 3;
   bytesCount += 3 + object.id.length * 3;
@@ -1998,9 +2119,9 @@ void _pairingRequestSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.fromAppInstallationId);
-  writer.writeString(offsets[1], object.fromIpAddress);
-  writer.writeLong(offsets[2], object.fromPort);
+  writer.writeString(offsets[0], object.fromIpAddress);
+  writer.writeLong(offsets[1], object.fromPort);
+  writer.writeString(offsets[2], object.fromProfileId);
   writer.writeString(offsets[3], object.fromUserId);
   writer.writeString(offsets[4], object.fromUserName);
   writer.writeString(offsets[5], object.id);
@@ -2016,9 +2137,9 @@ PairingRequest _pairingRequestDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = PairingRequest(
-    fromAppInstallationId: reader.readString(offsets[0]),
-    fromIpAddress: reader.readString(offsets[1]),
-    fromPort: reader.readLong(offsets[2]),
+    fromIpAddress: reader.readString(offsets[0]),
+    fromPort: reader.readLong(offsets[1]),
+    fromProfileId: reader.readString(offsets[2]),
     fromUserId: reader.readString(offsets[3]),
     fromUserName: reader.readString(offsets[4]),
     id: reader.readString(offsets[5]),
@@ -2039,9 +2160,9 @@ P _pairingRequestDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
-    case 2:
       return (reader.readLong(offset)) as P;
+    case 2:
+      return (reader.readString(offset)) as P;
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
@@ -2252,143 +2373,6 @@ extension PairingRequestQueryWhere
 extension PairingRequestQueryFilter
     on QueryBuilder<PairingRequest, PairingRequest, QFilterCondition> {
   QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'fromAppInstallationId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'fromAppInstallationId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'fromAppInstallationId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'fromAppInstallationId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'fromAppInstallationId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'fromAppInstallationId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'fromAppInstallationId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdMatches(String pattern,
-          {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'fromAppInstallationId',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'fromAppInstallationId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
-      fromAppInstallationIdIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'fromAppInstallationId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
       fromIpAddressEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2576,6 +2560,142 @@ extension PairingRequestQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fromProfileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'fromProfileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'fromProfileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'fromProfileId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'fromProfileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'fromProfileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'fromProfileId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'fromProfileId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fromProfileId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterFilterCondition>
+      fromProfileIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'fromProfileId',
+        value: '',
       ));
     });
   }
@@ -3129,20 +3249,6 @@ extension PairingRequestQueryLinks
 extension PairingRequestQuerySortBy
     on QueryBuilder<PairingRequest, PairingRequest, QSortBy> {
   QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
-      sortByFromAppInstallationId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'fromAppInstallationId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
-      sortByFromAppInstallationIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'fromAppInstallationId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
       sortByFromIpAddress() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fromIpAddress', Sort.asc);
@@ -3166,6 +3272,20 @@ extension PairingRequestQuerySortBy
       sortByFromPortDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fromPort', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
+      sortByFromProfileId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fromProfileId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
+      sortByFromProfileIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fromProfileId', Sort.desc);
     });
   }
 
@@ -3255,20 +3375,6 @@ extension PairingRequestQuerySortBy
 extension PairingRequestQuerySortThenBy
     on QueryBuilder<PairingRequest, PairingRequest, QSortThenBy> {
   QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
-      thenByFromAppInstallationId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'fromAppInstallationId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
-      thenByFromAppInstallationIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'fromAppInstallationId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
       thenByFromIpAddress() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fromIpAddress', Sort.asc);
@@ -3292,6 +3398,20 @@ extension PairingRequestQuerySortThenBy
       thenByFromPortDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fromPort', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
+      thenByFromProfileId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fromProfileId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QAfterSortBy>
+      thenByFromProfileIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fromProfileId', Sort.desc);
     });
   }
 
@@ -3394,14 +3514,6 @@ extension PairingRequestQuerySortThenBy
 extension PairingRequestQueryWhereDistinct
     on QueryBuilder<PairingRequest, PairingRequest, QDistinct> {
   QueryBuilder<PairingRequest, PairingRequest, QDistinct>
-      distinctByFromAppInstallationId({bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'fromAppInstallationId',
-          caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<PairingRequest, PairingRequest, QDistinct>
       distinctByFromIpAddress({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'fromIpAddress',
@@ -3412,6 +3524,14 @@ extension PairingRequestQueryWhereDistinct
   QueryBuilder<PairingRequest, PairingRequest, QDistinct> distinctByFromPort() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'fromPort');
+    });
+  }
+
+  QueryBuilder<PairingRequest, PairingRequest, QDistinct>
+      distinctByFromProfileId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fromProfileId',
+          caseSensitive: caseSensitive);
     });
   }
 
@@ -3467,13 +3587,6 @@ extension PairingRequestQueryProperty
   }
 
   QueryBuilder<PairingRequest, String, QQueryOperations>
-      fromAppInstallationIdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'fromAppInstallationId');
-    });
-  }
-
-  QueryBuilder<PairingRequest, String, QQueryOperations>
       fromIpAddressProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fromIpAddress');
@@ -3483,6 +3596,13 @@ extension PairingRequestQueryProperty
   QueryBuilder<PairingRequest, int, QQueryOperations> fromPortProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fromPort');
+    });
+  }
+
+  QueryBuilder<PairingRequest, String, QQueryOperations>
+      fromProfileIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fromProfileId');
     });
   }
 

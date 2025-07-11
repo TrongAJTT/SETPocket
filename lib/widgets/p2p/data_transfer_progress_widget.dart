@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/utils/size_utils.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/widgets/generic/generic_dialog.dart';
 
 class DataTransferProgressWidget extends StatelessWidget {
   final DataTransferTask task;
@@ -19,6 +23,7 @@ class DataTransferProgressWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (isInBatch) {
       return _buildCompactView(context);
     } else {
@@ -170,6 +175,8 @@ class DataTransferProgressWidget extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (task.status == DataTransferStatus.transferring && onCancel != null) {
       return IconButton(
         onPressed: onCancel,
@@ -201,23 +208,24 @@ class DataTransferProgressWidget extends StatelessWidget {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'clear',
               child: Row(
                 children: [
-                  Icon(Icons.delete_forever),
-                  SizedBox(width: 8),
-                  Text('Xóa task'),
+                  const Icon(Icons.delete_forever),
+                  const SizedBox(width: 8),
+                  Text(l10n.delete),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete_with_file',
               child: Row(
                 children: [
-                  Icon(Icons.delete_sweep, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete with file', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete_sweep, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text(l10n.deleteWithFile,
+                      style: const TextStyle(color: Colors.red)),
                 ],
               ),
             ),
@@ -253,24 +261,25 @@ class DataTransferProgressWidget extends StatelessWidget {
   }
 
   void _showDeleteWithFileDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Task and File'),
-        content: Column(
+      builder: (context) => GenericDialog(
+        header: GenericDialogHeader(title: l10n.deleteTaskWithFile),
+        body: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Bạn có muốn xóa task và file đã tải về không?'),
+            Text(l10n.deleteTaskWithFileConfirm),
             const SizedBox(height: 8),
             Text(
-              'File: ${task.fileName}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              task.fileName,
+              style: const TextStyle(fontWeight: FontWeight.w300),
             ),
             if (task.savePath != null) ...[
               const SizedBox(height: 4),
               Text(
-                'Path: ${task.savePath}',
+                '${l10n.path}: ${task.savePath}',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -300,30 +309,36 @@ class DataTransferProgressWidget extends StatelessWidget {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onClearWithFile?.call(false); // Clear task only
-            },
-            child: const Text('Chỉ xóa task'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onClearWithFile?.call(true); // Delete task and file
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Xóa cả file'),
-          ),
-        ],
+        footer: GenericDialogFooter(
+          child: WidgetLayoutRenderHelper.oneLeftTwoRight(
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.cancel),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onClearWithFile?.call(false); // Clear task only
+                },
+                child: Text(l10n.deleteTaskOnly),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onClearWithFile?.call(true); // Delete task and file
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(l10n.deleteWithFile),
+              ),
+              threeInARowMinWidth: 400,
+              twoInARowMinWidth: 0),
+        ),
+        decorator: GenericDialogDecorator(
+            width: DynamicDimension.flexibilityMax(90, 700),
+            displayTopDivider: true),
       ),
     );
   }

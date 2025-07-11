@@ -115,14 +115,31 @@ class NetworkSecurityService {
 
   static Future<NetworkInfo> _getWiFiInfo() async {
     try {
-      // Fallback to standard method, DO NOT request permission here
+      // Try to get WiFi security info from native platform first (Android)
+      bool isSecure = true;
+      String securityType = 'UNKNOWN';
+
+      if (Platform.isAndroid) {
+        try {
+          final result = await _channel.invokeMethod('getWifiSecurityInfo');
+          if (result is Map) {
+            isSecure = result['isSecure'] as bool? ?? true;
+            securityType = result['securityType'] as String? ?? 'UNKNOWN';
+            logInfo(
+                'Native WiFi security check: secure=$isSecure, type=$securityType');
+          }
+        } catch (e) {
+          logWarning('Failed to get native WiFi security info: $e');
+          // Fallback to assuming secure
+          isSecure = true;
+        }
+      }
+
+      // Get standard WiFi info
       final wifiName = await _networkInfo.getWifiName();
       final wifiSSID = await _networkInfo.getWifiBSSID();
       final ipAddress = await _networkInfo.getWifiIP();
       final gatewayAddress = await _networkInfo.getWifiGatewayIP();
-
-      // Assume secure and let user decide if warning is shown
-      bool isSecure = true;
 
       return NetworkInfo(
         wifiName: wifiName,
@@ -135,6 +152,7 @@ class NetworkSecurityService {
         securityLevel: isSecure
             ? NetworkSecurityLevel.secure
             : NetworkSecurityLevel.unsecure,
+        securityType: securityType,
       );
     } catch (e) {
       AppLogger.instance.error('Error getting WiFi info: $e');
@@ -196,5 +214,14 @@ class NetworkSecurityService {
     return networkInfo.isWiFi ||
         networkInfo.isMobile ||
         (networkInfo.securityType == 'ETHERNET');
+  }
+
+  // Helper methods for logging
+  static void logInfo(String message) {
+    AppLogger.instance.info('NetworkSecurityService: $message');
+  }
+
+  static void logWarning(String message) {
+    AppLogger.instance.warning('NetworkSecurityService: $message');
   }
 }

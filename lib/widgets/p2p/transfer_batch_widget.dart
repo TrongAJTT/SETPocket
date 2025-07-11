@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/widgets/p2p/data_transfer_progress_widget.dart';
+import 'package:setpocket/utils/generic_dialog_utils.dart';
+import 'package:setpocket/widgets/generic/radial_menu.dart';
 
 class TransferBatchWidget extends StatefulWidget {
   final String? batchId;
@@ -8,6 +10,10 @@ class TransferBatchWidget extends StatefulWidget {
   final void Function(String taskId) onCancel;
   final void Function(String taskId) onClear;
   final void Function(String taskId, bool deleteFile) onClearWithFile;
+  final bool initialExpanded;
+  final void Function(String? batchId, bool expanded)? onExpandChanged;
+  final void Function(String? batchId)? onClearBatch;
+  final void Function(String? batchId)? onClearBatchWithFiles;
 
   const TransferBatchWidget({
     super.key,
@@ -16,6 +22,10 @@ class TransferBatchWidget extends StatefulWidget {
     required this.onCancel,
     required this.onClear,
     required this.onClearWithFile,
+    this.initialExpanded = true,
+    this.onExpandChanged,
+    this.onClearBatch,
+    this.onClearBatchWithFiles,
   });
 
   @override
@@ -23,7 +33,22 @@ class TransferBatchWidget extends StatefulWidget {
 }
 
 class _TransferBatchWidgetState extends State<TransferBatchWidget> {
-  bool _isExpanded = true;
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initialExpanded;
+  }
+
+  @override
+  void didUpdateWidget(TransferBatchWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update expand state if initialExpanded changed
+    if (widget.initialExpanded != oldWidget.initialExpanded) {
+      _isExpanded = widget.initialExpanded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,12 +127,15 @@ class _TransferBatchWidgetState extends State<TransferBatchWidget> {
       statusText = 'Đang chờ';
     }
 
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         setState(() {
           _isExpanded = !_isExpanded;
         });
+        widget.onExpandChanged?.call(widget.batchId, _isExpanded);
       },
+      onLongPress: () => _showBatchContextMenu(),
+      onSecondaryTap: () => _showBatchContextMenu(),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -258,5 +286,94 @@ class _TransferBatchWidgetState extends State<TransferBatchWidget> {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  void _showBatchContextMenu() {
+    if (widget.batchId == null) return;
+
+    // Get the RenderBox to position the radial menu
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final position = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+
+    // Center the radial menu on the batch header
+    final centerX = position.dx + size.width / 2;
+    final centerY = position.dy + size.height / 2;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            // Tap anywhere to close
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+            // Radial menu positioned at the batch header
+            RadialMenu<String>(
+              initialPosition: Offset(centerX, centerY),
+              radius: 100,
+              items: [
+                RadialMenuItem<String>(
+                  value: 'clear_batch',
+                  icon: Icons.delete_outline,
+                  label: 'Clear Batch',
+                  color: Colors.orange,
+                ),
+                RadialMenuItem<String>(
+                  value: 'clear_with_files',
+                  icon: Icons.delete_forever,
+                  label: 'Clear with Files',
+                  color: Colors.red,
+                ),
+              ],
+              onItemSelected: (value) {
+                Navigator.of(context).pop();
+                if (value == 'clear_batch') {
+                  _clearBatch();
+                } else if (value == 'clear_with_files') {
+                  _clearBatchWithFiles();
+                }
+              },
+              onCancel: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _clearBatch() {
+    GenericDialogUtils.showSimpleGenericClearDialog(
+      context: context,
+      title: 'Clear Batch',
+      description:
+          'Are you sure you want to clear this batch from the transfer list?',
+      onConfirm: () {
+        widget.onClearBatch?.call(widget.batchId);
+      },
+    );
+  }
+
+  void _clearBatchWithFiles() {
+    GenericDialogUtils.showSimpleHoldClearDialog(
+      context: context,
+      title: 'Clear Batch with Files',
+      content:
+          'This will remove the batch and permanently delete all downloaded files. This action cannot be undone.',
+      duration: const Duration(seconds: 2),
+      onConfirm: () {
+        widget.onClearBatchWithFiles?.call(widget.batchId);
+      },
+    );
   }
 }

@@ -550,6 +550,10 @@
     "sortByDate": "Date",
     "noPresetsFound": "No presets found",
     "delete": "Delete",
+    "deleteWithFile": "Delete with file",
+    "deleteTaskOnly": "Delete task only",
+    "deleteTaskWithFile": "Delete task with file",
+    "deleteTaskWithFileConfirm": "Are you sure you want to delete this task and file?",
     "createdOn": "Created on {date}",
     "currencies": "{count} currencies",
     "currenciesCount": "{count} currencies",
@@ -2675,13 +2679,7 @@
         "description": "Message when sender wants to save connection"
     },
     "trustThisUser": "Trust this user",
-    "@trustThisUser": {
-        "description": "Checkbox to trust user"
-    },
     "allowFileTransfersWithoutConfirmation": "Allow file transfers without confirmation",
-    "@allowFileTransfersWithoutConfirmation": {
-        "description": "Description for trust user option"
-    },
     "onlyAcceptFromTrustedDevices": "Only accept pairing from devices you trust.",
     "@onlyAcceptFromTrustedDevices": {
         "description": "Security warning about pairing"
@@ -3713,5 +3711,6 @@
     "clearAllFunctionsSuccess": "All functions cleared successfully",
     "bookmarkSaved": "Bookmark content saved",
     "swap": "Swap",
-    "startDateConflixWithEndDateAlarm": "Start date cannot be greater than or equal to end date"
+    "startDateConflixWithEndDateAlarm": "Start date cannot be greater than or equal to end date",
+    "path": "Path"
   }

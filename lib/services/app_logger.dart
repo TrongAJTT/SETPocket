@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
-import 'settings_service.dart';
+import 'settings_models_service.dart';
 
 /// Unified App Logger with integrated file logging
 /// Features:
@@ -499,7 +499,8 @@ class AppLogger {
   /// Cleanup old logs based on settings
   Future<void> cleanupOldLogs() async {
     try {
-      final retentionDays = await SettingsService.getLogRetentionDays();
+      final settings = await ExtensibleSettingsService.getGlobalSettings();
+      final retentionDays = settings.logRetentionDays;
       if (retentionDays == -1) return; // Keep forever
 
       final files = await getLogFiles();
@@ -535,7 +536,8 @@ class AppLogger {
   /// Force cleanup now - manual trigger for immediate cleanup
   Future<int> forceCleanupNow() async {
     try {
-      final retentionDays = await SettingsService.getLogRetentionDays();
+      final settings = await ExtensibleSettingsService.getGlobalSettings();
+      final retentionDays = settings.logRetentionDays;
       if (retentionDays == -1) {
         info('Force cleanup skipped: retention set to keep forever');
         return 0; // Keep forever

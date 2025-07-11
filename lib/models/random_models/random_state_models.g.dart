@@ -2858,13 +2858,18 @@ const DateTimeGeneratorStateSchema = CollectionSchema(
       name: r'endDateTime',
       type: IsarType.dateTime,
     ),
-    r'lastUpdated': PropertySchema(
+    r'includeSeconds': PropertySchema(
       id: 3,
+      name: r'includeSeconds',
+      type: IsarType.bool,
+    ),
+    r'lastUpdated': PropertySchema(
+      id: 4,
       name: r'lastUpdated',
       type: IsarType.dateTime,
     ),
     r'startDateTime': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'startDateTime',
       type: IsarType.dateTime,
     )
@@ -2901,8 +2906,9 @@ void _dateTimeGeneratorStateSerialize(
   writer.writeBool(offsets[0], object.allowDuplicates);
   writer.writeLong(offsets[1], object.dateTimeCount);
   writer.writeDateTime(offsets[2], object.endDateTime);
-  writer.writeDateTime(offsets[3], object.lastUpdated);
-  writer.writeDateTime(offsets[4], object.startDateTime);
+  writer.writeBool(offsets[3], object.includeSeconds);
+  writer.writeDateTime(offsets[4], object.lastUpdated);
+  writer.writeDateTime(offsets[5], object.startDateTime);
 }
 
 DateTimeGeneratorState _dateTimeGeneratorStateDeserialize(
@@ -2916,8 +2922,9 @@ DateTimeGeneratorState _dateTimeGeneratorStateDeserialize(
   object.dateTimeCount = reader.readLong(offsets[1]);
   object.endDateTime = reader.readDateTimeOrNull(offsets[2]);
   object.id = id;
-  object.lastUpdated = reader.readDateTimeOrNull(offsets[3]);
-  object.startDateTime = reader.readDateTimeOrNull(offsets[4]);
+  object.includeSeconds = reader.readBool(offsets[3]);
+  object.lastUpdated = reader.readDateTimeOrNull(offsets[4]);
+  object.startDateTime = reader.readDateTimeOrNull(offsets[5]);
   return object;
 }
 
@@ -2935,8 +2942,10 @@ P _dateTimeGeneratorStateDeserializeProp<P>(
     case 2:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 5:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -3237,6 +3246,16 @@ extension DateTimeGeneratorStateQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState,
+      QAfterFilterCondition> includeSecondsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'includeSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState,
       QAfterFilterCondition> lastUpdatedIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -3436,6 +3455,20 @@ extension DateTimeGeneratorStateQuerySortBy
   }
 
   QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QAfterSortBy>
+      sortByIncludeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QAfterSortBy>
+      sortByIncludeSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QAfterSortBy>
       sortByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.asc);
@@ -3523,6 +3556,20 @@ extension DateTimeGeneratorStateQuerySortThenBy on QueryBuilder<
   }
 
   QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QAfterSortBy>
+      thenByIncludeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QAfterSortBy>
+      thenByIncludeSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QAfterSortBy>
       thenByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.asc);
@@ -3575,6 +3622,13 @@ extension DateTimeGeneratorStateQueryWhereDistinct
   }
 
   QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QDistinct>
+      distinctByIncludeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'includeSeconds');
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, DateTimeGeneratorState, QDistinct>
       distinctByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastUpdated');
@@ -3615,6 +3669,13 @@ extension DateTimeGeneratorStateQueryProperty on QueryBuilder<
       endDateTimeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'endDateTime');
+    });
+  }
+
+  QueryBuilder<DateTimeGeneratorState, bool, QQueryOperations>
+      includeSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'includeSeconds');
     });
   }
 
@@ -3660,23 +3721,28 @@ const TimeGeneratorStateSchema = CollectionSchema(
       name: r'endMinute',
       type: IsarType.long,
     ),
-    r'lastUpdated': PropertySchema(
+    r'includeSeconds': PropertySchema(
       id: 3,
+      name: r'includeSeconds',
+      type: IsarType.bool,
+    ),
+    r'lastUpdated': PropertySchema(
+      id: 4,
       name: r'lastUpdated',
       type: IsarType.dateTime,
     ),
     r'startHour': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'startHour',
       type: IsarType.long,
     ),
     r'startMinute': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'startMinute',
       type: IsarType.long,
     ),
     r'timeCount': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'timeCount',
       type: IsarType.long,
     )
@@ -3713,10 +3779,11 @@ void _timeGeneratorStateSerialize(
   writer.writeBool(offsets[0], object.allowDuplicates);
   writer.writeLong(offsets[1], object.endHour);
   writer.writeLong(offsets[2], object.endMinute);
-  writer.writeDateTime(offsets[3], object.lastUpdated);
-  writer.writeLong(offsets[4], object.startHour);
-  writer.writeLong(offsets[5], object.startMinute);
-  writer.writeLong(offsets[6], object.timeCount);
+  writer.writeBool(offsets[3], object.includeSeconds);
+  writer.writeDateTime(offsets[4], object.lastUpdated);
+  writer.writeLong(offsets[5], object.startHour);
+  writer.writeLong(offsets[6], object.startMinute);
+  writer.writeLong(offsets[7], object.timeCount);
 }
 
 TimeGeneratorState _timeGeneratorStateDeserialize(
@@ -3730,10 +3797,11 @@ TimeGeneratorState _timeGeneratorStateDeserialize(
   object.endHour = reader.readLong(offsets[1]);
   object.endMinute = reader.readLong(offsets[2]);
   object.id = id;
-  object.lastUpdated = reader.readDateTimeOrNull(offsets[3]);
-  object.startHour = reader.readLong(offsets[4]);
-  object.startMinute = reader.readLong(offsets[5]);
-  object.timeCount = reader.readLong(offsets[6]);
+  object.includeSeconds = reader.readBool(offsets[3]);
+  object.lastUpdated = reader.readDateTimeOrNull(offsets[4]);
+  object.startHour = reader.readLong(offsets[5]);
+  object.startMinute = reader.readLong(offsets[6]);
+  object.timeCount = reader.readLong(offsets[7]);
   return object;
 }
 
@@ -3751,12 +3819,14 @@ P _timeGeneratorStateDeserializeProp<P>(
     case 2:
       return (reader.readLong(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
-      return (reader.readLong(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 5:
       return (reader.readLong(offset)) as P;
     case 6:
+      return (reader.readLong(offset)) as P;
+    case 7:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -4033,6 +4103,16 @@ extension TimeGeneratorStateQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterFilterCondition>
+      includeSecondsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'includeSeconds',
+        value: value,
       ));
     });
   }
@@ -4331,6 +4411,20 @@ extension TimeGeneratorStateQuerySortBy
   }
 
   QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterSortBy>
+      sortByIncludeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterSortBy>
+      sortByIncludeSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterSortBy>
       sortByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.asc);
@@ -4446,6 +4540,20 @@ extension TimeGeneratorStateQuerySortThenBy
   }
 
   QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterSortBy>
+      thenByIncludeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterSortBy>
+      thenByIncludeSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'includeSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, TimeGeneratorState, QAfterSortBy>
       thenByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.asc);
@@ -4526,6 +4634,13 @@ extension TimeGeneratorStateQueryWhereDistinct
   }
 
   QueryBuilder<TimeGeneratorState, TimeGeneratorState, QDistinct>
+      distinctByIncludeSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'includeSeconds');
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, TimeGeneratorState, QDistinct>
       distinctByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastUpdated');
@@ -4578,6 +4693,13 @@ extension TimeGeneratorStateQueryProperty
   QueryBuilder<TimeGeneratorState, int, QQueryOperations> endMinuteProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'endMinute');
+    });
+  }
+
+  QueryBuilder<TimeGeneratorState, bool, QQueryOperations>
+      includeSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'includeSeconds');
     });
   }
 
@@ -7983,13 +8105,23 @@ const LatinLetterGeneratorStateSchema = CollectionSchema(
       name: r'lastUpdated',
       type: IsarType.dateTime,
     ),
-    r'quantity': PropertySchema(
+    r'lowercase': PropertySchema(
       id: 2,
+      name: r'lowercase',
+      type: IsarType.bool,
+    ),
+    r'quantity': PropertySchema(
+      id: 3,
       name: r'quantity',
       type: IsarType.long,
     ),
+    r'skipAnimation': PropertySchema(
+      id: 4,
+      name: r'skipAnimation',
+      type: IsarType.bool,
+    ),
     r'uppercase': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'uppercase',
       type: IsarType.bool,
     )
@@ -8025,8 +8157,10 @@ void _latinLetterGeneratorStateSerialize(
 ) {
   writer.writeBool(offsets[0], object.allowDuplicates);
   writer.writeDateTime(offsets[1], object.lastUpdated);
-  writer.writeLong(offsets[2], object.quantity);
-  writer.writeBool(offsets[3], object.uppercase);
+  writer.writeBool(offsets[2], object.lowercase);
+  writer.writeLong(offsets[3], object.quantity);
+  writer.writeBool(offsets[4], object.skipAnimation);
+  writer.writeBool(offsets[5], object.uppercase);
 }
 
 LatinLetterGeneratorState _latinLetterGeneratorStateDeserialize(
@@ -8039,8 +8173,10 @@ LatinLetterGeneratorState _latinLetterGeneratorStateDeserialize(
   object.allowDuplicates = reader.readBool(offsets[0]);
   object.id = id;
   object.lastUpdated = reader.readDateTimeOrNull(offsets[1]);
-  object.quantity = reader.readLong(offsets[2]);
-  object.uppercase = reader.readBool(offsets[3]);
+  object.lowercase = reader.readBool(offsets[2]);
+  object.quantity = reader.readLong(offsets[3]);
+  object.skipAnimation = reader.readBool(offsets[4]);
+  object.uppercase = reader.readBool(offsets[5]);
   return object;
 }
 
@@ -8056,8 +8192,12 @@ P _latinLetterGeneratorStateDeserializeProp<P>(
     case 1:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 3:
+      return (reader.readLong(offset)) as P;
+    case 4:
+      return (reader.readBool(offset)) as P;
+    case 5:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -8302,6 +8442,16 @@ extension LatinLetterGeneratorStateQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterFilterCondition> lowercaseEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lowercase',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
       QAfterFilterCondition> quantityEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -8358,6 +8508,16 @@ extension LatinLetterGeneratorStateQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterFilterCondition> skipAnimationEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'skipAnimation',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
       QAfterFilterCondition> uppercaseEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -8405,6 +8565,20 @@ extension LatinLetterGeneratorStateQuerySortBy on QueryBuilder<
   }
 
   QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> sortByLowercase() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lowercase', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> sortByLowercaseDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lowercase', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
       QAfterSortBy> sortByQuantity() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'quantity', Sort.asc);
@@ -8415,6 +8589,20 @@ extension LatinLetterGeneratorStateQuerySortBy on QueryBuilder<
       QAfterSortBy> sortByQuantityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'quantity', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> sortBySkipAnimation() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'skipAnimation', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> sortBySkipAnimationDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'skipAnimation', Sort.desc);
     });
   }
 
@@ -8478,6 +8666,20 @@ extension LatinLetterGeneratorStateQuerySortThenBy on QueryBuilder<
   }
 
   QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> thenByLowercase() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lowercase', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> thenByLowercaseDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lowercase', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
       QAfterSortBy> thenByQuantity() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'quantity', Sort.asc);
@@ -8488,6 +8690,20 @@ extension LatinLetterGeneratorStateQuerySortThenBy on QueryBuilder<
       QAfterSortBy> thenByQuantityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'quantity', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> thenBySkipAnimation() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'skipAnimation', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState,
+      QAfterSortBy> thenBySkipAnimationDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'skipAnimation', Sort.desc);
     });
   }
 
@@ -8523,9 +8739,23 @@ extension LatinLetterGeneratorStateQueryWhereDistinct on QueryBuilder<
   }
 
   QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState, QDistinct>
+      distinctByLowercase() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lowercase');
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState, QDistinct>
       distinctByQuantity() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'quantity');
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, LatinLetterGeneratorState, QDistinct>
+      distinctBySkipAnimation() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'skipAnimation');
     });
   }
 
@@ -8559,10 +8789,24 @@ extension LatinLetterGeneratorStateQueryProperty on QueryBuilder<
     });
   }
 
+  QueryBuilder<LatinLetterGeneratorState, bool, QQueryOperations>
+      lowercaseProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lowercase');
+    });
+  }
+
   QueryBuilder<LatinLetterGeneratorState, int, QQueryOperations>
       quantityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'quantity');
+    });
+  }
+
+  QueryBuilder<LatinLetterGeneratorState, bool, QQueryOperations>
+      skipAnimationProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'skipAnimation');
     });
   }
 

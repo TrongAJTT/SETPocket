@@ -1,7 +1,7 @@
 import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'converter_service_base.dart';
 import 'currency_service.dart';
-import 'currency_cache_service.dart';
+import 'currency_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
 
@@ -176,17 +176,41 @@ class CurrencyConverterService implements ConverterServiceBase {
   @override
   Future<void> refreshData() async {
     try {
+      // Add rate limiting check before fetching
+      final isAllowed = await CurrencyUnifiedService.isManualFetchAllowed();
+      if (!isAllowed) {
+        final remaining =
+            await CurrencyUnifiedService.getManualFetchCooldownRemaining();
+        final remainingMinutes = (remaining.inMinutes).ceil();
+        final message =
+            'Please wait $remainingMinutes minutes before fetching again.';
+        logInfo(
+            'CurrencyConverterService: Manual fetch denied. Cooldown: $remaining');
+        throw Exception(message); // Throw exception to be caught by UI
+      }
+
       logInfo('CurrencyConverterService: Refreshing currency data');
 
-      // Use existing currency cache service
-      final rates = await CurrencyCacheService.forceRefresh();
-      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      // Fetch fresh rates directly from CurrencyService
+      final newRates = await CurrencyService.fetchLiveRates();
 
-      // Update CurrencyService with fresh rates
-      CurrencyService.updateCurrentRates(rates);
+      if (newRates.isNotEmpty) {
+        // Update CurrencyService with fresh rates
+        CurrencyService.updateCurrentRates(newRates);
 
-      _lastUpdated = cacheInfo?.lastUpdated;
-      _isUsingLiveData = cacheInfo != null && cacheInfo.isValid;
+        // Save the rates to unified service cache for persistence
+        await CurrencyUnifiedService.saveRates(newRates);
+
+        _lastUpdated = DateTime.now();
+        _isUsingLiveData = true;
+
+        logInfo(
+            'CurrencyConverterService: Successfully fetched and saved ${newRates.length} currency rates');
+      } else {
+        _isUsingLiveData = false;
+        logInfo(
+            'CurrencyConverterService: No new rates fetched, using existing rates');
+      }
 
       logInfo('CurrencyConverterService: Currency data refreshed successfully');
     } catch (e) {
@@ -227,13 +251,20 @@ class CurrencyConverterService implements ConverterServiceBase {
       _initializeCache();
 
       // Initialize existing currency services
-      final rates = await CurrencyCacheService.getRates();
-      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      final rates = await CurrencyUnifiedService.getRates();
+      final cacheInfo = await CurrencyUnifiedService.getCacheInfo();
 
-      CurrencyService.updateCurrentRates(rates);
+      if (rates != null) {
+        final convertedRates =
+            rates.map((key, value) => MapEntry(key, (value as num).toDouble()));
+        CurrencyService.updateCurrentRates(convertedRates);
+      }
 
-      _lastUpdated = cacheInfo?.lastUpdated;
-      _isUsingLiveData = cacheInfo != null && cacheInfo.isValid;
+      final lastUpdatedStr = cacheInfo?['lastUpdated'] as String?;
+      _lastUpdated =
+          lastUpdatedStr != null ? DateTime.parse(lastUpdatedStr) : null;
+      _isUsingLiveData =
+          (cacheInfo?.isNotEmpty ?? false) && _lastUpdated != null;
 
       logInfo(
           'CurrencyConverterService: Currency converter service initialized');

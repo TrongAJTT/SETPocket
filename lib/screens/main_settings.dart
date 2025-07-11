@@ -6,22 +6,21 @@ import 'package:setpocket/widgets/cache_details_dialog.dart';
 import 'package:setpocket/widgets/settings/tool_visibility_dialog.dart';
 import 'package:setpocket/widgets/settings/quick_actions_dialog.dart';
 import 'package:setpocket/services/cache_service.dart';
-import 'package:setpocket/services/generation_history_service.dart';
-import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/settings_models_service.dart';
 
-import 'package:setpocket/services/graphing_calculator_service.dart';
 import 'package:setpocket/screens/log_viewer_screen.dart';
 import 'package:setpocket/layouts/section_sidebar_scrolling_layout.dart';
 import 'package:setpocket/widgets/generic/section_item.dart';
-import 'package:setpocket/widgets/generic/option_list_picker.dart';
-import 'package:setpocket/widgets/generic/option_grid_picker.dart' as grid;
 import 'package:setpocket/widgets/generic/option_item.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 import 'package:setpocket/widgets/generic/option_card.dart';
-import 'package:setpocket/models/converter_models/currency_cache_model.dart';
+import 'package:setpocket/widgets/generic/option_grid_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:setpocket/main.dart';
+import 'package:setpocket/utils/generic_settings_utils.dart';
+import 'package:setpocket/utils/function_type_utils.dart';
+import 'package:setpocket/services/p2p_settings_adapter.dart';
 
 class MainSettingsScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -44,15 +43,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   late String _language = settingsController.locale.languageCode;
   String _cacheInfo = '';
   bool _loading = true;
-  bool _historyEnabled = false;
   bool _rememberCalculationHistory = true;
   bool _featureStateSavingEnabled = true;
   bool _askBeforeLoadingHistory = true;
-  bool _saveRandomToolsState = true;
-
-  CurrencyFetchMode _currencyFetchMode = CurrencyFetchMode.manual;
-  int _fetchTimeoutSeconds = 10;
-  int _fetchRetryTimes = 1;
 
   // Static decorator for settings
   late final OptionSwitchDecorator switchDecorator;
@@ -86,34 +79,19 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     final themeIndex = prefs.getInt('themeMode');
     final lang = prefs.getString('language');
-    final historyEnabled = await GenerationHistoryService.isHistoryEnabled();
-    final featureStateSavingEnabled =
-        await SettingsService.getFeatureStateSaving();
-    final currencyFetchMode = await SettingsService.getCurrencyFetchMode();
-    final fetchTimeout = await SettingsService.getFetchTimeout();
-    final fetchRetryTimes = await SettingsService.getFetchRetryTimes();
-    final logRetentionDays = await SettingsService.getLogRetentionDays();
-    final askBeforeLoadingHistory =
-        await GraphingCalculatorService.getAskBeforeLoading();
-    final rememberCalculationHistory =
-        await GraphingCalculatorService.getRememberHistory();
-    final saveRandomToolsState =
-        await SettingsService.getSaveRandomToolsState();
+    final globalSettings = await ExtensibleSettingsService.getGlobalSettings();
+    final calculatorSettings =
+        await ExtensibleSettingsService.getCalculatorToolsSettings();
 
     setState(() {
       _themeMode = themeIndex != null
           ? ThemeMode.values[themeIndex]
           : settingsController.themeMode;
       _language = lang ?? settingsController.locale.languageCode;
-      _historyEnabled = historyEnabled;
-      _rememberCalculationHistory = rememberCalculationHistory;
-      _featureStateSavingEnabled = featureStateSavingEnabled;
-      _currencyFetchMode = currencyFetchMode;
-      _fetchTimeoutSeconds = fetchTimeout;
-      _fetchRetryTimes = fetchRetryTimes;
-      _logRetentionDays = logRetentionDays;
-      _askBeforeLoadingHistory = askBeforeLoadingHistory;
-      _saveRandomToolsState = saveRandomToolsState;
+      _featureStateSavingEnabled = globalSettings.featureStateSavingEnabled;
+      _logRetentionDays = globalSettings.logRetentionDays;
+      _rememberCalculationHistory = calculatorSettings.rememberHistory;
+      _askBeforeLoadingHistory = calculatorSettings.askBeforeLoadingHistory;
 
       _loading = false;
     });
@@ -184,42 +162,35 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     }
   }
 
-  void _onHistoryEnabledChanged(bool enabled) async {
-    setState(() => _historyEnabled = enabled);
-    await GenerationHistoryService.setHistoryEnabled(enabled);
-  }
-
   void _onFeatureStateSavingChanged(bool enabled) async {
     setState(() => _featureStateSavingEnabled = enabled);
-    await SettingsService.updateFeatureStateSaving(enabled);
-  }
 
-  void _onCurrencyFetchModeChanged(CurrencyFetchMode mode) async {
-    setState(() => _currencyFetchMode = mode);
-    await SettingsService.updateCurrencyFetchMode(mode);
-  }
-
-  void _onFetchTimeoutChanged(int timeoutSeconds) async {
-    setState(() => _fetchTimeoutSeconds = timeoutSeconds);
-    await SettingsService.updateFetchTimeout(timeoutSeconds);
-  }
-
-  void _onFetchRetryTimesChanged(int retryTimes) async {
-    setState(() => _fetchRetryTimes = retryTimes);
-    await SettingsService.updateFetchRetryTimes(retryTimes);
+    // Update global settings
+    final currentSettings = await ExtensibleSettingsService.getGlobalSettings();
+    final updatedSettings = currentSettings.copyWith(
+      featureStateSavingEnabled: enabled,
+    );
+    await ExtensibleSettingsService.updateGlobalSettings(updatedSettings);
   }
 
   void _onRememberCalculationHistoryChanged(bool enabled) async {
     setState(() {
       _rememberCalculationHistory = enabled;
+      if (!enabled) {
+        _askBeforeLoadingHistory = false;
+      }
     });
 
-    await GraphingCalculatorService.setRememberHistory(enabled);
-  }
-
-  void _onSaveRandomToolsStateChanged(bool enabled) async {
-    setState(() => _saveRandomToolsState = enabled);
-    await SettingsService.updateSaveRandomToolsState(enabled);
+    // Save the setting change
+    final currentSettings =
+        await ExtensibleSettingsService.getCalculatorToolsSettings();
+    final updatedSettings = currentSettings.copyWith(
+      rememberHistory: enabled,
+      bookmarkFunctionsBeforeLoading:
+          enabled ? (_askBeforeLoadingHistory ? null : false) : false,
+    );
+    await ExtensibleSettingsService.updateCalculatorToolsSettings(
+        updatedSettings);
   }
 
   void _showToolVisibilityDialog() async {
@@ -297,28 +268,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         content: _buildToolsShortcutsSection(loc),
       ),
       SectionItem(
-        id: 'random_tools',
-        title: 'Random Tools',
-        subtitle: 'Generation history settings',
+        id: 'tools_settings',
+        title: 'Tools Settings',
+        subtitle: 'Random tools and state management',
         icon: Icons.casino,
         iconColor: Colors.purple,
-        content: _buildRandomToolsSection(loc),
-      ),
-      SectionItem(
-        id: 'calculator_tools',
-        title: loc.calculatorTools,
-        subtitle: 'History and computation settings',
-        icon: Icons.calculate,
-        iconColor: Colors.green,
-        content: _buildCalculatorToolsSection(loc),
-      ),
-      SectionItem(
-        id: 'converter_tools',
-        title: loc.converterTools,
-        subtitle: 'Currency and network settings',
-        icon: Icons.transform,
-        iconColor: Colors.teal,
-        content: _buildConverterToolsSection(loc),
+        content: _buildToolsSettingsSection(loc),
       ),
       SectionItem(
         id: 'data_management',
@@ -349,103 +304,105 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         _buildToolVisibilitySettings(loc),
         const SizedBox(height: 16),
         _buildQuickActionsSettings(loc),
+      ],
+    );
+  }
+
+  Widget _buildToolsSettingsSection(AppLocalizations loc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildRandomToolsSettingsCard(loc),
         const SizedBox(height: 16),
-        _buildFeatureStateSaving(loc),
-      ],
-    );
-  }
-
-  Widget _buildConverterToolsSection(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          loc.currencyFetchMode,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          loc.currencyFetchModeDesc,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
+        _buildConverterToolsSettingsCard(loc),
         const SizedBox(height: 16),
-        OptionListPicker<CurrencyFetchMode>(
-          options: CurrencyFetchMode.values
-              .map((mode) => OptionItem(
-                    value: mode,
-                    label: mode.displayName(loc),
-                    subtitle: mode.description(loc),
-                  ))
-              .toList(),
-          selectedValue: _currencyFetchMode,
-          onChanged: (value) {
-            if (value != null) {
-              _onCurrencyFetchModeChanged(value);
-            }
-          },
-          isCompact: true,
-          showSelectionControl: false,
-        ),
-        VerticalSpacingDivider.both(6),
-        OptionSlider<int>(
-          label: loc.fetchTimeout,
-          subtitle: loc.fetchTimeoutDesc,
-          icon: Icons.timer_outlined,
-          currentValue: _fetchTimeoutSeconds,
-          options: List.generate(
-            16,
-            (i) => SliderOption(
-              value: i + 5,
-              label: loc.fetchTimeoutSeconds(i + 5),
-            ),
-          ),
-          onChanged: _onFetchTimeoutChanged,
-          layout: OptionSliderLayout.none,
-        ),
-        VerticalSpacingDivider.both(6),
-        OptionSlider<int>(
-          label: loc.fetchRetryIncomplete,
-          subtitle: loc.fetchRetryIncompleteDesc,
-          icon: Icons.replay_outlined,
-          currentValue: _fetchRetryTimes,
-          options: List.generate(
-            4,
-            (i) => SliderOption(
-              value: i,
-              label: loc.fetchRetryTimes(i),
-            ),
-          ),
-          onChanged: _onFetchRetryTimesChanged,
-          layout: OptionSliderLayout.none,
-        ),
+        _buildCalculatorToolsSettingsCard(loc),
+        const SizedBox(height: 16),
+        _buildP2PTransferSettingsCard(loc),
       ],
     );
   }
 
-  Widget _buildRandomToolsSection(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildHistorySettings(loc),
-        VerticalSpacingDivider.both(6),
-        _buildSaveRandomToolsStateSettings(loc),
-      ],
+  Widget _buildRandomToolsSettingsCard(AppLocalizations loc) {
+    return OptionCard(
+      onTap: _showRandomToolsSettings,
+      option: OptionItem.withIcon(
+        value: null,
+        label: 'Random Tools Settings',
+        subtitle: 'Configure generation history and state saving',
+        iconData: Icons.casino,
+        iconSize: 20,
+        iconColor: Theme.of(context).colorScheme.primary,
+      ),
+      decorator: const CardDecorator(),
     );
   }
 
-  Widget _buildCalculatorToolsSection(AppLocalizations loc) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildRememberCalculationHistory(loc),
-        VerticalSpacingDivider.both(6),
-        _buildAskToLoadGraphingHistory(loc),
-      ],
+  Widget _buildConverterToolsSettingsCard(AppLocalizations loc) {
+    return OptionCard(
+      onTap: _showConverterToolsSettings,
+      option: OptionItem.withIcon(
+        value: null,
+        label: 'Converter Tools Settings',
+        subtitle: 'Configure currency fetching and state saving',
+        iconData: Icons.transform,
+        iconSize: 20,
+        iconColor: Theme.of(context).colorScheme.primary,
+      ),
+      decorator: const CardDecorator(),
     );
+  }
+
+  Widget _buildCalculatorToolsSettingsCard(AppLocalizations loc) {
+    return OptionCard(
+      onTap: _showCalculatorToolsSettings,
+      option: OptionItem.withIcon(
+        value: null,
+        label: loc.calculatorTools,
+        subtitle: 'History and computation settings',
+        iconData: Icons.calculate,
+        iconSize: 20,
+        iconColor: Theme.of(context).colorScheme.primary,
+      ),
+      decorator: const CardDecorator(),
+    );
+  }
+
+  Widget _buildP2PTransferSettingsCard(AppLocalizations loc) {
+    return OptionCard(
+      onTap: _showP2PTransferSettings,
+      option: OptionItem.withIcon(
+        value: null,
+        label: 'P2P Transfer Settings',
+        subtitle: 'File transfer and network configuration',
+        iconData: Icons.share,
+        iconSize: 20,
+        iconColor: Theme.of(context).colorScheme.primary,
+      ),
+      decorator: const CardDecorator(),
+    );
+  }
+
+  void _showRandomToolsSettings() {
+    GenericSettingsUtils.quickOpenRandomToolsSettings(
+      context,
+      showSuccessMessage: false, // No need for success message in main settings
+    );
+  }
+
+  void _showConverterToolsSettings() {
+    GenericSettingsUtils.quickOpenConverterToolsSettings(
+      context,
+      showSuccessMessage: false, // No need for success message in main settings
+    );
+  }
+
+  void _showCalculatorToolsSettings() {
+    GenericSettingsUtils.quickOpenCalculatorToolsSettings(context);
+  }
+
+  void _showP2PTransferSettings() {
+    GenericSettingsUtils.quickOpenP2PTransferSettings(context);
   }
 
   Widget _buildDataSection(AppLocalizations loc) {
@@ -460,7 +417,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
   }
 
   Widget _buildThemeSettings(AppLocalizations loc) {
-    return grid.AutoScaleOptionGridPicker<ThemeMode>(
+    return AutoScaleOptionGridPicker<ThemeMode>(
       title: loc.theme,
       options: [
         OptionItem.withIcon(
@@ -487,17 +444,17 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       minCellWidth: 200,
       maxCellWidth: 300,
       fixedCellHeight: 50,
-      decorator: const grid.OptionGridDecorator(
-        iconAlign: grid.IconAlign.leftOfTitle,
+      decorator: const OptionGridDecorator(
+        iconAlign: IconAlign.leftOfTitle,
         iconSpacing: 12,
-        labelAlign: grid.LabelAlign.left,
+        labelAlign: LabelAlign.left,
         padding: EdgeInsets.zero,
       ),
     );
   }
 
   Widget _buildLanguageSettings(AppLocalizations loc) {
-    return grid.AutoScaleOptionGridPicker<String>(
+    return AutoScaleOptionGridPicker<String>(
       title: loc.language,
       options: [
         OptionItem.withEmoji(
@@ -516,22 +473,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       minCellWidth: 200,
       maxCellWidth: 300,
       fixedCellHeight: 50,
-      decorator: const grid.OptionGridDecorator(
-        iconAlign: grid.IconAlign.leftOfTitle,
+      decorator: const OptionGridDecorator(
+        iconAlign: IconAlign.leftOfTitle,
         iconSpacing: 12,
-        labelAlign: grid.LabelAlign.left,
+        labelAlign: LabelAlign.left,
         padding: EdgeInsets.zero,
       ),
-    );
-  }
-
-  Widget _buildHistorySettings(AppLocalizations loc) {
-    return OptionSwitch(
-      title: loc.saveGenerationHistory,
-      subtitle: loc.saveGenerationHistoryDesc,
-      value: _historyEnabled,
-      onChanged: _onHistoryEnabledChanged,
-      decorator: switchDecorator,
     );
   }
 
@@ -554,32 +501,17 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         setState(() {
           _askBeforeLoadingHistory = value;
         });
-        await GraphingCalculatorService.setAskBeforeLoading(value);
-        if (value) {
-          await GraphingCalculatorService.setSaveDialogPreference('ask');
-        }
+
+        // Save the setting change
+        final currentSettings =
+            await ExtensibleSettingsService.getCalculatorToolsSettings();
+        final updatedSettings = currentSettings.copyWith(
+          bookmarkFunctionsBeforeLoading: value ? null : false,
+        );
+        await ExtensibleSettingsService.updateCalculatorToolsSettings(
+            updatedSettings);
       },
-      isDisabled: !_rememberCalculationHistory || _askBeforeLoadingHistory,
-      decorator: switchDecorator,
-    );
-  }
-
-  Widget _buildFeatureStateSaving(AppLocalizations loc) {
-    return OptionSwitch(
-      title: loc.saveFeatureState,
-      subtitle: loc.saveFeatureStateDesc,
-      value: _featureStateSavingEnabled,
-      onChanged: _onFeatureStateSavingChanged,
-      decorator: switchDecorator,
-    );
-  }
-
-  Widget _buildSaveRandomToolsStateSettings(AppLocalizations loc) {
-    return OptionSwitch(
-      title: loc.saveRandomToolsState,
-      subtitle: loc.saveRandomToolsStateDesc,
-      value: _saveRandomToolsState,
-      onChanged: _onSaveRandomToolsStateChanged,
+      isDisabled: !_rememberCalculationHistory,
       decorator: switchDecorator,
     );
   }
@@ -816,7 +748,13 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     setState(() {
       _logRetentionDays = days;
     });
-    await SettingsService.updateLogRetentionDays(days);
+
+    // Update global settings
+    final currentSettings = await ExtensibleSettingsService.getGlobalSettings();
+    final updatedSettings = currentSettings.copyWith(
+      logRetentionDays: days,
+    );
+    await ExtensibleSettingsService.updateGlobalSettings(updatedSettings);
   }
 
   Future<void> _forceCleanupLogs() async {

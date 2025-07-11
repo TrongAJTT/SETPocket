@@ -3,13 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/utils/size_utils.dart';
 
 class TimeGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -30,7 +32,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
   List<int> _generatedSeconds = []; // Store seconds separately
   bool _copied = false;
   late AnimationController _animationController;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
   bool _includeSeconds = false;
 
@@ -53,7 +55,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
 
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getTimeGeneratorState();
+      final state = await UnifiedRandomStateService.getTimeGeneratorState();
       if (mounted) {
         setState(() {
           _startTime =
@@ -61,6 +63,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
           _endTime = TimeOfDay(hour: state.endHour, minute: state.endMinute);
           _timeCount = state.timeCount;
           _allowDuplicates = state.allowDuplicates;
+          _includeSeconds = state.includeSeconds;
         });
       }
     } catch (e) {
@@ -77,8 +80,9 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
         ..endMinute = _endTime.minute
         ..timeCount = _timeCount
         ..allowDuplicates = _allowDuplicates
+        ..includeSeconds = _includeSeconds
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveTimeGeneratorState(state);
+      await UnifiedRandomStateService.saveTimeGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -128,8 +132,11 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
                 _generatedTimes[entry.key], _generatedSeconds[entry.key]))
             .join(', ');
         GenerationHistoryService.addHistoryItem(
-          timesText,
-          'time',
+          UnifiedHistoryData(
+            value: timesText,
+            type: 'time',
+            timestamp: DateTime.now(),
+          ),
         ).then((_) => _loadHistory()); // Refresh history
       }
     } catch (e) {
@@ -245,8 +252,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
       _buildTimeField(loc.startTime, _startTime, true),
       _buildTimeField(loc.endTime, _endTime, false),
       minWidth: 250,
-      horizontalSpacing: 20,
-      verticalSpacing: 8,
+      spacing: TwoDimSpacing.specific(horizontal: 20, vertical: 8),
     );
   }
 
@@ -291,8 +297,7 @@ class _TimeGeneratorScreenState extends State<TimeGeneratorScreen>
         decorator: OptionSwitchDecorator.compact(context),
       ),
       minWidth: 350,
-      horizontalSpacing: 20,
-      verticalSpacing: 8,
+      spacing: TwoDimSpacing.specific(horizontal: 20, vertical: 8),
     );
   }
 

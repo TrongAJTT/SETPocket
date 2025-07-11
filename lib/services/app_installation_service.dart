@@ -21,6 +21,7 @@ class AppInstallationService {
 
   Future<AppInstallation> _getInstallationData() async {
     final isar = IsarService.isar;
+
     AppInstallation? installation =
         await isar.appInstallations.where().findFirst();
     if (installation == null) {
@@ -38,8 +39,13 @@ class AppInstallationService {
     if (_isInitialized) return false;
 
     try {
+      logDebug('AppInstallationService: Starting initialization...');
+
       final isar = IsarService.isar;
+      logDebug('AppInstallationService: Got Isar instance');
+
       final installation = await _getInstallationData();
+      logDebug('AppInstallationService: Got installation data');
 
       // Check if this is first time setup
       final isFirstTime = installation.firstTimeSetupCompleted != true ||
@@ -62,14 +68,14 @@ class AppInstallationService {
         // Load existing IDs
         await getAppInstallationId();
         await getAppInstallationWordId();
-        logInfo('AppInstallationService: Existing installation loaded');
+        logDebug('AppInstallationService: Existing installation loaded');
       }
 
       _isInitialized = true;
       logInfo('AppInstallationService initialized successfully');
       return isFirstTime;
-    } catch (e) {
-      logError('Failed to initialize AppInstallationService: $e');
+    } catch (e, stackTrace) {
+      logError('Failed to initialize AppInstallationService', e, stackTrace);
       rethrow;
     }
   }
@@ -81,7 +87,7 @@ class AppInstallationService {
       return installation.firstTimeSetupCompleted != true ||
           installation.installationId == null;
     } catch (e) {
-      logError('Failed to check first time setup: $e');
+      logError('Failed to check first time setup', e);
       return true; // Assume first time if error
     }
   }
@@ -97,7 +103,7 @@ class AppInstallationService {
       });
       logInfo('First time setup marked as completed');
     } catch (e) {
-      logError('Failed to mark first time setup completed: $e');
+      logError('Failed to mark first time setup completed', e);
     }
   }
 

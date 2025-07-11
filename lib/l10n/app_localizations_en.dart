@@ -51,13 +51,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewCacheDetails => 'View Details';
 
   @override
-  String get cacheSize => 'Cache size';
+  String get cacheSize => 'Cache Size';
 
   @override
   String get cacheItems => 'Items';
 
   @override
   String get clearAllCache => 'Clear All Cache';
+
+  @override
+  String get clearStorageSettings => 'Clear Storage Settings';
+
+  @override
+  String get clearStorageSettingsTitle => 'Clear Storage Settings';
+
+  @override
+  String get clearStorageSettingsDescription => 'Are you sure you want to clear ALL cached data? This will remove all saved templates but preserve your settings.';
+
+  @override
+  String get clearStorageSettingsConfirm => 'Clear All';
+
+  @override
+  String get clearStorageSettingsCancel => 'Cancel';
+
+  @override
+  String get clearStorageSettingsConfirmation => 'This action will permanently delete all cached data including templates, history, and temporary files. Your app settings will be preserved.';
+
+  @override
+  String get clearStorageSettingsSuccess => 'Storage settings cleared successfully';
+
+  @override
+  String clearStorageSettingsError(String error) {
+    return 'Error clearing storage settings: $error';
+  }
+
+  @override
+  String get settingsStorage => 'Settings Storage';
+
+  @override
+  String get clearSettingsStorage => 'Clear Settings Storage';
+
+  @override
+  String get settingsStorageDetails => 'Settings and preferences storage';
+
+  @override
+  String get viewSettingsStorageDetails => 'View Settings Storage Details';
+
+  @override
+  String get settingsStorageSize => 'Settings Storage Size';
+
+  @override
+  String get settingsStorageItems => 'Settings Items';
+
+  @override
+  String get clearAllSettingsStorage => 'Clear All Settings Storage';
 
   @override
   String get logs => 'Application Logs';
@@ -153,6 +200,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saved => 'Saved';
+
+  @override
+  String get savedDate => 'Saved date';
+
+  @override
+  String savedOnDate(String date) {
+    return 'Saved on $date';
+  }
 
   @override
   String get saveToHistory => 'Save to History';
@@ -307,7 +362,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateStructureOverview => 'View an overview of fields and loops in your template.';
 
   @override
-  String get textTemplatesTitle => 'Templates';
+  String get textTemplatesTitle => 'Text Templates';
 
   @override
   String get addNewTemplate => 'Add new template';
@@ -579,8 +634,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get longPressToSelect => 'Long press to select templates';
 
   @override
-  String selectedTemplates(Object count) {
-    return '$count selected';
+  String selectedTemplates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count templates selected',
+      one: '1 template selected',
+      zero: 'No templates selected',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -736,6 +798,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearCalculationHistory => 'Clear History';
+
+  @override
+  String get bookmark => 'Bookmark';
+
+  @override
+  String get bookmarks => 'Bookmarks';
 
   @override
   String get bookmarkResult => 'Bookmark Result';
@@ -1202,7 +1270,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmResetLayout => 'Confirm Reset Layout';
 
   @override
-  String get confirmResetLayoutMessage => 'Are you sure you want to reset the layout? This will remove all cards and restore default settings.';
+  String get confirmResetLayoutMessage => 'This will reset all cards and visible units to the default state. This action cannot be undone.';
 
   @override
   String get confirm => 'Confirm';
@@ -2686,6 +2754,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextChunk => 'Next Chunk';
 
   @override
+  String get load => 'Load';
+
+  @override
   String get loadAll => 'Load All';
 
   @override
@@ -3001,6 +3072,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveRandomToolsStateDesc => 'Automatically save tool settings when generating results';
+
+  @override
+  String get saveConverterToolsState => 'Save Converter Tools State';
+
+  @override
+  String get saveConverterToolsStateDesc => 'Automatically save converter settings and preferences';
 
   @override
   String get focusModeDisabled => 'Focus mode disabled';
@@ -3915,9 +3992,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get drafts => 'Drafts';
-
-  @override
-  String get noDraftsYet => 'No drafts yet';
 
   @override
   String get createDraftsHint => 'Drafts are temporary saves of your work. They\'re automatically created when you exit editing without saving.';
@@ -6219,4 +6293,169 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorFormat => 'Color Format';
+
+  @override
+  String get addElement => 'Add Element';
+
+  @override
+  String get dataFields => 'Data Fields';
+
+  @override
+  String get templatesTabTitle => 'Templates';
+
+  @override
+  String get noCompletedTemplates => 'You have no completed templates yet.';
+
+  @override
+  String get noDrafts => 'You have no drafts.';
+
+  @override
+  String get confirmDeleteTitle => 'Confirm Deletion';
+
+  @override
+  String confirmDeleteMessage(String name) {
+    return 'Are you sure you want to delete the template \'\'$name\'\'? This action cannot be undone.';
+  }
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String get deleteTemplateTitle => 'Delete Template';
+
+  @override
+  String deleteTemplateConfirmation(String templateTitle) {
+    return 'Are you sure you want to delete \'\'$templateTitle\'\'?';
+  }
+
+  @override
+  String get moveToTrash => 'Move to Trash';
+
+  @override
+  String get permanentDeleteWarning => 'Permanently delete (cannot be undone)';
+
+  @override
+  String get templateDeletedSuccess => 'Template deleted successfully';
+
+  @override
+  String templateDeleteError(String error) {
+    return 'Error deleting template: $error';
+  }
+
+  @override
+  String get exportTemplateTitle => 'Export Template';
+
+  @override
+  String get fileNameLabel => 'File Name';
+
+  @override
+  String get exportAsJson => 'Export as JSON file';
+
+  @override
+  String get exportAsJsonDescription => 'Save the template as a local JSON file.';
+
+  @override
+  String get shareTemplate => 'Share';
+
+  @override
+  String get shareTemplateDescription => 'Share template with other apps.';
+
+  @override
+  String templateExportedSuccess(String path) {
+    return 'Template exported to $path';
+  }
+
+  @override
+  String templateExportError(String error) {
+    return 'Error exporting template: $error';
+  }
+
+  @override
+  String shareTemplateError(String error) {
+    return 'Error sharing template: $error';
+  }
+
+  @override
+  String get draftsDialogTitle => 'Drafts';
+
+  @override
+  String get trashDialogTitle => 'Trash';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get permanentlyDelete => 'Permanently Delete';
+
+  @override
+  String daysLeft(int days) {
+    return '$days days left';
+  }
+
+  @override
+  String get createManually => 'Create Manually';
+
+  @override
+  String get importFromFile => 'Import from File';
+
+  @override
+  String get duplicate => 'Duplicate';
+
+  @override
+  String get enterNewTemplateName => 'Enter a new name for the duplicated template.';
+
+  @override
+  String areYouSureToDeleteNTemplates(Object count) {
+    return 'Are you sure you want to delete $count templates?';
+  }
+
+  @override
+  String youAreAboutToExportNTemplates(Object count) {
+    return 'You are about to export $count templates.';
+  }
+
+  @override
+  String get ageGroup => 'Age Group';
+
+  @override
+  String get ageUnder18 => 'Under 18';
+
+  @override
+  String get age18Plus => 'Over 18';
+
+  @override
+  String get clearAllBookmarks => 'Clear all bookmarks';
+
+  @override
+  String get clearAllBookmarksConfirm => 'Are you sure you want to permanently delete all history entries? This action cannot be undone.';
+
+  @override
+  String get clearAllBookmarksSuccess => 'All bookmarks cleared successfully';
+
+  @override
+  String get processing => 'Processing...';
+
+  @override
+  String get loadFunctionsFromBookmarks => 'Load functions from bookmarks';
+
+  @override
+  String get loadFunctionsFromBookmarksConfirm => 'Loading from bookmarks will replace your current functions. Do you want to bookmark it before loading?';
+
+  @override
+  String get clearAllFunctions => 'Clear all functions';
+
+  @override
+  String get clearAllFunctionsConfirm => 'Are you sure you want to permanently delete all functions? This action cannot be undone.';
+
+  @override
+  String get clearAllFunctionsSuccess => 'All functions cleared successfully';
+
+  @override
+  String get bookmarkSaved => 'Bookmark content saved';
+
+  @override
+  String get swap => 'Swap';
+
+  @override
+  String get startDateConflixWithEndDateAlarm => 'Start date cannot be greater than or equal to end date';
 }

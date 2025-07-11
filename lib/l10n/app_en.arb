@@ -9,13 +9,36 @@
     "light": "Light",
     "dark": "Dark",
     "english": "English",
-    "vietnamese": "Vietnamese",    "cache": "Cache",
+    "vietnamese": "Vietnamese",    
+    "cache": "Cache",
     "clearCache": "Clear Cache",
     "cacheDetails": "Cache Details",
     "viewCacheDetails": "View Details",
     "cacheSize": "Cache Size",
     "cacheItems": "Items",
     "clearAllCache": "Clear All Cache",
+    "clearStorageSettings": "Clear Storage Settings",
+    "clearStorageSettingsTitle": "Clear Storage Settings",
+    "clearStorageSettingsDescription": "Are you sure you want to clear ALL cached data? This will remove all saved templates but preserve your settings.",
+    "clearStorageSettingsConfirm": "Clear All",
+    "clearStorageSettingsCancel": "Cancel",
+    "clearStorageSettingsConfirmation": "This action will permanently delete all cached data including templates, history, and temporary files. Your app settings will be preserved.",
+    "clearStorageSettingsSuccess": "Storage settings cleared successfully",
+    "clearStorageSettingsError": "Error clearing storage settings: {error}",
+    "@clearStorageSettingsError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsStorage": "Settings Storage",
+    "clearSettingsStorage": "Clear Settings Storage",
+    "settingsStorageDetails": "Settings and preferences storage",
+    "viewSettingsStorageDetails": "View Settings Storage Details",
+    "settingsStorageSize": "Settings Storage Size",
+    "settingsStorageItems": "Settings Items",
+    "clearAllSettingsStorage": "Clear All Settings Storage",
     "logs": "Application Logs",
     "viewLogs": "View Logs",
     "clearLogs": "Clear Logs",    
@@ -55,6 +78,15 @@
     "add": "Add",
     "save": "Save",
     "saved": "Saved",
+    "savedDate": "Saved date",
+    "savedOnDate": "Saved on {date}",
+    "@savedOnDate": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
     "saveToHistory": "Save to history",
     "edit": "Edit",
     "copy": "Copy",
@@ -183,7 +215,14 @@
     "characterCount": "{count} characters",
     "fieldsAndLoops": "{fields} fields, {loops} loops",
     "longPressToSelect": "Long press to select templates",
-    "selectedTemplates": "{count} selected",
+    "selectedTemplates": "{count, plural, =0{No templates selected} =1{1 template selected} other{{count} templates selected}}",
+    "@selectedTemplates": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "batchExport": "Export Selected",
@@ -245,6 +284,8 @@
     "allCalculations": "All Calculations",
     "filterByType": "Filter by type",
     "clearCalculationHistory": "Clear History",
+    "bookmark": "Bookmark",
+    "bookmarks": "Bookmarks",
     "bookmarkResult": "Bookmark Result",
     "resultBookmarked": "Result bookmarked to history",
     "clearTabData": "Clear Data",
@@ -449,7 +490,7 @@
     "refreshRates": "Refresh rates",
     "resetLayout": "Reset Layout",
     "confirmResetLayout": "Confirm Reset Layout",
-    "confirmResetLayoutMessage": "Are you sure you want to reset the layout? This will remove all cards and restore default settings.",
+    "confirmResetLayoutMessage": "This will reset all cards and visible units to the default state. This action cannot be undone.",
     "confirm": "Confirm",
     "addCard": "Add Card",
     "addRow": "Add Row", 
@@ -1175,6 +1216,7 @@
   "logApplication": "Log Application",
   "previousChunk": "Previous Chunk",
   "nextChunk": "Next Chunk",
+  "load": "Load",
   "loadAll": "Load All",
   "firstPart": "First Part",
   "lastPart": "Last Part",
@@ -1373,6 +1415,14 @@
     "saveRandomToolsStateDesc": "Automatically save tool settings when generating results",
     "@saveRandomToolsStateDesc": {
         "description": "Save random tools state setting description"
+    },
+    "saveConverterToolsState": "Save Converter Tools State",
+    "@saveConverterToolsState": {
+        "description": "Save converter tools state setting label"
+    },
+    "saveConverterToolsStateDesc": "Automatically save converter settings and preferences",
+    "@saveConverterToolsStateDesc": {
+        "description": "Save converter tools state setting description"
     },
     "focusModeDisabled": "Focus mode disabled", 
     "enableFocusMode": "Enable Focus Mode",
@@ -1719,7 +1769,6 @@
     "holdToClearCacheInstruction": "Hold the clear button for 10 seconds to confirm",
     
     "drafts": "Drafts",
-    "noDraftsYet": "No drafts yet",
     "createDraftsHint": "Drafts are temporary saves of your work. They're automatically created when you exit editing without saving.",
     "draftSaved": "Draft saved",
     "draftDeleted": "Draft deleted",
@@ -3249,11 +3298,6 @@
     "connectionStatus": "Connection Status",
     "thisDevice": "This Device",
     "loadingDeviceInfo": "Loading device information...",
-    "fileCache": "File Cache",
-    "reload": "Reload",
-    "clear": "Clear",
-    "cacheSize": "Cache size",
-    "calculating": "Calculating...",
     "tempFilesDescription": "Temporary files from P2Lan file transfers",
     "debug": "Debug",
     "networkDebugCompleted": "Network debug completed. Check logs for details.",
@@ -3561,5 +3605,113 @@
     "emptyFolder": "Empty folder",
     "file": "file",
     "quickAccess": "Quick Access",
-    "colorFormat": "Color Format"
+    "colorFormat": "Color Format",
+    "addElement": "Add Element",
+    "dataFields": "Data Fields",
+    "dataLoops": "Data Loops",
+    "templatesTabTitle": "Templates",
+    "noCompletedTemplates": "You have no completed templates yet.",
+    "noDrafts": "You have no drafts.",
+    "confirmDeleteTitle": "Confirm Deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete the template ''{name}''? This action cannot be undone.",
+    "@confirmDeleteMessage": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "textTemplatesTitle": "Text Templates",
+    "viewDrafts": "View Drafts",
+    "export": "Export",
+    "deleteTemplateTitle": "Delete Template",
+    "deleteTemplateConfirmation": "Are you sure you want to delete ''{templateTitle}''?",
+    "@deleteTemplateConfirmation": {
+        "placeholders": {
+            "templateTitle": {
+                "type": "String"
+            }
+        }
+    },
+    "moveToTrash": "Move to Trash",
+    "permanentDeleteWarning": "If unchecked, the template will be deleted permanently.",
+    "templateDeletedSuccess": "Template deleted successfully",
+    "templateDeleteError": "Error deleting template: {error}",
+    "@templateDeleteError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "exportTemplateTitle": "Export Template",
+    "fileNameLabel": "File Name",
+    "exportAsJson": "Export as JSON file",
+    "exportAsJsonDescription": "Save the template as a local JSON file.",
+    "shareTemplate": "Share",
+    "shareTemplateDescription": "Share template with other apps.",
+    "templateExportedSuccess": "Template exported to {path}",
+    "@templateExportedSuccess": {
+        "placeholders": {
+            "path": {
+                "type": "String"
+            }
+        }
+    },
+    "templateExportError": "Error exporting template: {error}",
+    "@templateExportError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "shareTemplateError": "Error sharing template: {error}",
+    "@shareTemplateError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+
+    "passwordGenerator": "Password Generator",
+    "passwordGeneratorDesc": "Generate secure random passwords",
+    "numCharacters": "Number of characters",
+    "draftsDialogTitle": "Drafts",
+    "trashDialogTitle": "Trash",
+    "restore": "Restore",
+    "permanentlyDelete": "Permanently Delete",
+    "daysLeft": "{days} days left",
+    "@daysLeft": {
+        "placeholders": {
+            "days": {"type": "int"}
+        }
+    },
+    "createManually": "Create Manually",
+    "importFromFile": "Import from File",
+    "duplicate": "Duplicate",
+    "enterNewTemplateName": "Enter a new name for the duplicated template.",
+    "apply": "Apply",
+    "areYouSureToDeleteNTemplates": "Are you sure you want to delete {count} templates?",
+    "youAreAboutToExportNTemplates": "You are about to export {count} templates.",
+    "export": "Export",
+    "moveToTrash": "Move to Trash",
+    "permanentDeleteWarning": "Permanently delete (cannot be undone)",
+    "personalInfo": "Personal Information",
+    "ageGroup": "Age Group",
+    "ageUnder18": "Under 18",
+    "age18Plus": "Over 18",
+    "clearAllBookmarks": "Clear all bookmarks",
+    "clearAllBookmarksConfirm": "Are you sure you want to permanently delete all history entries? This action cannot be undone.",
+    "clearAllBookmarksSuccess": "All bookmarks cleared successfully",
+    "processing": "Processing...",
+    "loadFunctionsFromBookmarks": "Load functions from bookmarks",
+    "loadFunctionsFromBookmarksConfirm": "Loading from bookmarks will replace your current functions. Do you want to bookmark it before loading?",
+    "clearAllFunctions": "Clear all functions",
+    "clearAllFunctionsConfirm": "Are you sure you want to permanently delete all functions? This action cannot be undone.",
+    "clearAllFunctionsSuccess": "All functions cleared successfully",
+    "bookmarkSaved": "Bookmark content saved",
+    "swap": "Swap",
+    "startDateConflixWithEndDateAlarm": "Start date cannot be greater than or equal to end date"
   }

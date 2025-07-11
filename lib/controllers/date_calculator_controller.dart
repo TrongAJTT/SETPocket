@@ -1,827 +1,511 @@
-import 'package:flutter/material.dart';
-import 'package:setpocket/models/date_calculator_models.dart';
-import 'package:setpocket/services/date_calculator_service.dart';
-import 'dart:math' as math;
+import 'package:get/get.dart';
+import 'dart:convert';
+import 'package:isar/isar.dart';
+import 'package:setpocket/l10n/app_localizations.dart';
+import 'package:setpocket/services/calculator_services/date_calculator_service.dart';
+import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
+import 'package:setpocket/services/calculator_services/calculator_tools_service.dart';
+import 'package:setpocket/models/calculator_models/calculator_tools_data.dart';
+import 'package:setpocket/services/settings_models_service.dart';
 
-class DateCalculatorController with ChangeNotifier {
-  final DateCalculatorService _dateCalculatorService;
-  DateCalculationType activeTab = DateCalculationType.dateInfo;
+class DateCalculatorController extends GetxController {
+  // --- UI State ---
+  var activeTab = DateCalculationType.addSubtract.obs;
+  var history = <UnifiedHistoryData>[].obs;
+  var saveStateEnabled = true.obs;
+  var historyEnabled = true.obs;
+  final isDateConflict = false.obs;
 
-  // Tab states
-  late DateDifferenceState _dateDifferenceState;
-  late AddSubtractState _addSubtractState;
-  late AgeCalculatorState _ageState;
-  late WorkingDaysState _workingDaysState;
-  late TimezoneState _timezoneState;
-  late RecurringDatesState _recurringState;
-  late CountdownState _countdownState;
-  late TimeUnitState _timeUnitState;
-  late DateInfoState _dateInfoState;
+  // --- Add/Subtract Tab State ---
+  var startDate = DateTime.now().obs;
+  var addSubtractYears = 0.obs;
+  var addSubtractMonths = 0.obs;
+  var addSubtractDays = 0.obs;
+  var isAdding = true.obs;
+  var addSubtractResultDate = ''.obs;
+  var addSubtractResultDayOfWeek = ''.obs;
 
-  // Additional states for simpler tabs
-  int _nthWeekdayYear = DateTime.now().year;
-  int _nthWeekdayMonth = DateTime.now().month;
-  int _nthWeekdayWeekday = 1; // Monday
-  int _nthWeekdayOccurrence = 1; // First
+  // --- Difference Tab State ---
+  var fromDate = DateTime.now().obs;
+  var toDate = DateTime.now().add(const Duration(days: 1)).obs;
+  var diffYears = 0.obs;
+  var diffMonths = 0.obs;
+  var diffDays = 0.obs;
+  var diffTotalWeeks = 0.obs;
+  var diffTotalDays = 0.obs;
 
-  // Results
-  Map<String, dynamic>? _currentResult;
-  Map<String, dynamic>? get currentResult => _currentResult;
+  // --- Age Calculator Tab State ---
+  var birthDate = DateTime(1990, 1, 1).obs;
+  var currentAge = ''.obs;
+  var nextBirthday = ''.obs;
+  var daysUntilBirthday = 0.obs;
+  var totalDaysLived = 0.obs;
 
-  // History
-  List<DateCalculationHistory> _history = [];
-  List<DateCalculationHistory> get history => _history;
+  // --- Date Info Tab State ---
+  var selectedDate = DateTime.now().obs;
+  var dayOfWeek = ''.obs;
+  var dayInMonth = 0.obs;
+  var dayInYear = 0.obs;
+  var weekInMonth = 0.obs;
+  var weekInYear = 0.obs;
+  var monthOfYear = ''.obs;
+  var yearValue = 0.obs;
+  var quarterOfYear = 0.obs;
+  var isLeapYear = false.obs;
+  var daysInMonth = 0.obs;
+  var daysInYear = 0.obs;
 
-  // Loading states
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  static const _toolId = CalculatorToolCodes.dateCalculator;
 
-  bool _isCalculating = false;
-  bool get isCalculating => _isCalculating;
-
-  bool _isDataConstraintEnabled = false;
-
-  // State getters
-  DateDifferenceState get dateDifferenceState => _dateDifferenceState;
-  AddSubtractState get addSubtractState => _addSubtractState;
-  AgeCalculatorState get ageState => _ageState;
-  WorkingDaysState get workingDaysState => _workingDaysState;
-  TimezoneState get timezoneState => _timezoneState;
-  RecurringDatesState get recurringState => _recurringState;
-  CountdownState get countdownState => _countdownState;
-  TimeUnitState get timeUnitState => _timeUnitState;
-  DateInfoState get dateInfoState => _dateInfoState;
-  int get nthWeekdayYear => _nthWeekdayYear;
-  int get nthWeekdayMonth => _nthWeekdayMonth;
-  int get nthWeekdayWeekday => _nthWeekdayWeekday;
-  int get nthWeekdayOccurrence => _nthWeekdayOccurrence;
-  bool get isDataConstraintEnabled => _isDataConstraintEnabled;
-
-  DateCalculatorController(
-      {required DateCalculatorService dateCalculatorService})
-      : _dateCalculatorService = dateCalculatorService {
-    _initializeStates();
+  @override
+  void onInit() {
+    super.onInit();
     _loadState();
     _loadHistory();
+    checkDateConflict();
   }
 
-  void _initializeStates() {
+  void onTabChanged(DateCalculationType newTab) {
+    activeTab.value = newTab;
+    calculate();
+  }
+
+  // --- Calculation ---
+  void calculate() {
+    switch (activeTab.value) {
+      case DateCalculationType.addSubtract:
+        _calculateAddSubtract();
+        break;
+      case DateCalculationType.difference:
+        _calculateDifference();
+        break;
+      case DateCalculationType.age:
+        _calculateAge();
+        break;
+      case DateCalculationType.dateInfo:
+        _calculateDateInfo();
+        break;
+    }
+    _saveState();
+  }
+
+  void _calculateAddSubtract() {
+    final result = DateCalculatorService.calculateDate(
+      startDate.value,
+      addSubtractYears.value,
+      addSubtractMonths.value,
+      addSubtractDays.value,
+      isAdding.value,
+    );
+    addSubtractResultDate.value =
+        result.resultDate.toLocal().toString().split(' ')[0];
+    addSubtractResultDayOfWeek.value =
+        _getDayOfWeekName(result.resultDate.weekday);
+  }
+
+  void _calculateDifference() {
+    final difference = toDate.value.difference(fromDate.value);
+    diffTotalDays.value = difference.inDays;
+    diffTotalWeeks.value = (difference.inDays / 7).floor();
+
+    // Calculate difference in years, months, days
+    int dYears = toDate.value.year - fromDate.value.year;
+    int dMonths = toDate.value.month - fromDate.value.month;
+    int dDays = toDate.value.day - fromDate.value.day;
+
+    if (dDays < 0) {
+      dMonths--;
+      // Get the number of days in the previous month of toDate
+      final daysInPrevMonth =
+          DateTime(toDate.value.year, toDate.value.month, 0).day;
+      dDays += daysInPrevMonth;
+    }
+    if (dMonths < 0) {
+      dYears--;
+      dMonths += 12;
+    }
+
+    diffYears.value = dYears;
+    diffMonths.value = dMonths;
+    diffDays.value = dDays;
+  }
+
+  void _calculateAge() {
     final now = DateTime.now();
+    final age = now.difference(birthDate.value);
 
-    _dateDifferenceState = DateDifferenceState(
-      startDate: now,
-      endDate: now.add(const Duration(days: 30)),
-    );
+    // Calculate years, months, days
+    var years = now.year - birthDate.value.year;
+    var months = now.month - birthDate.value.month;
+    var days = now.day - birthDate.value.day;
 
-    _addSubtractState = AddSubtractState(
-      baseDate: now,
-      years: 0,
-      months: 0,
-      days: 0,
-    );
+    if (days < 0) {
+      months--;
+      days += DateTime(now.year, now.month, 0).day;
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
 
-    _ageState = AgeCalculatorState(
-      birthDate: now.subtract(const Duration(days: 365 * 25)),
-    );
+    currentAge.value = '$years years, $months months, $days days';
+    totalDaysLived.value = age.inDays;
 
-    _workingDaysState = WorkingDaysState(
-      startDate: now,
-      endDate: now.add(const Duration(days: 30)),
-    );
+    // Calculate next birthday
+    var nextBDay =
+        DateTime(now.year, birthDate.value.month, birthDate.value.day);
+    if (nextBDay.isBefore(now)) {
+      nextBDay =
+          DateTime(now.year + 1, birthDate.value.month, birthDate.value.day);
+    }
 
-    _timezoneState = TimezoneState(
-      dateTime: now,
-      fromTimezone: 'UTC',
-      toTimezone: 'UTC',
-    );
-
-    _recurringState = RecurringDatesState(
-      startDate: now,
-      pattern: RecurringPattern.weekly,
-    );
-
-    _countdownState = CountdownState(
-      targetDate: now.add(const Duration(days: 365)),
-      eventName: 'New Year',
-    );
-
-    _timeUnitState = TimeUnitState(
-      value: 1.0,
-      fromUnit: TimeUnit.hours,
-      toUnit: TimeUnit.minutes,
-    );
-
-    _dateInfoState = DateInfoState(
-      selectedDate: now,
-    );
+    nextBirthday.value = nextBDay.toString().split(' ')[0];
+    daysUntilBirthday.value = nextBDay.difference(now).inDays;
   }
 
-  void _loadState() async {
-    _isLoading = true;
-    notifyListeners();
+  void _calculateDateInfo() {
+    final date = selectedDate.value;
 
-    try {
-      final state = await _dateCalculatorService.getCurrentState();
-      if (state != null) {
-        activeTab = state.activeTab;
+    // Basic info
+    dayOfWeek.value = _getDayOfWeekName(date.weekday);
+    dayInMonth.value = date.day;
+    dayInYear.value = date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+    monthOfYear.value = _getMonthName(date.month);
+    yearValue.value = date.year;
+    quarterOfYear.value = ((date.month - 1) ~/ 3) + 1;
 
-        // Load individual tab states
-        if (state.tabStates.containsKey('dateDifference')) {
-          _dateDifferenceState = DateDifferenceState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['dateDifference']));
+    // Advanced info
+    isLeapYear.value = _isLeapYear(date.year);
+    daysInMonth.value = DateTime(date.year, date.month + 1, 0).day;
+    daysInYear.value = _isLeapYear(date.year) ? 366 : 365;
+
+    // Week calculations
+    weekInMonth.value = ((date.day - 1) ~/ 7) + 1;
+    final firstDayOfYear = DateTime(date.year, 1, 1);
+    weekInYear.value = ((date.difference(firstDayOfYear).inDays) ~/ 7) + 1;
+  }
+
+  String _getDayOfWeekName(int weekday) {
+    const days = [
+      '',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+    return days[weekday];
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      '',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return months[month];
+  }
+
+  bool _isLeapYear(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+  }
+
+  // --- State Management ---
+  Future<void> _loadState() async {
+    // Check if feature state saving is enabled
+    final settings = await ExtensibleSettingsService.getCalculatorToolsSettings();
+    if (!settings.saveFeatureState) {
+      // When state saving is disabled, don't load saved state (use defaults)
+      return;
+    }
+
+    final state = await CalculatorToolsService.getToolState(_toolId);
+    if (state != null) {
+      try {
+        // Add/Subtract state
+        if (state.containsKey('startDate')) {
+          startDate.value = DateTime.parse(state['startDate']);
+        }
+        addSubtractYears.value = state['addSubtractYears'] ?? 0;
+        addSubtractMonths.value = state['addSubtractMonths'] ?? 0;
+        addSubtractDays.value = state['addSubtractDays'] ?? 0;
+        isAdding.value = state['isAdding'] ?? true;
+
+        // Difference state
+        if (state.containsKey('fromDate')) {
+          fromDate.value = DateTime.parse(state['fromDate']);
+        }
+        if (state.containsKey('toDate')) {
+          toDate.value = DateTime.parse(state['toDate']);
+        }
+        if (state.containsKey('diffYears')) {
+          diffYears.value = state['diffYears'] ?? 0;
+        }
+        if (state.containsKey('diffMonths')) {
+          diffMonths.value = state['diffMonths'] ?? 0;
+        }
+        if (state.containsKey('diffDays')) {
+          diffDays.value = state['diffDays'] ?? 0;
+        }
+        if (state.containsKey('diffTotalWeeks')) {
+          diffTotalWeeks.value = state['diffTotalWeeks'] ?? 0;
+        }
+        if (state.containsKey('diffTotalDays')) {
+          diffTotalDays.value = state['diffTotalDays'] ?? 0;
         }
 
-        if (state.tabStates.containsKey('addSubtract')) {
-          _addSubtractState = AddSubtractState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['addSubtract']));
+        // Age state
+        if (state.containsKey('birthDate')) {
+          birthDate.value = DateTime.parse(state['birthDate']);
         }
 
-        if (state.tabStates.containsKey('age')) {
-          _ageState = AgeCalculatorState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['age']));
+        // Date Info state
+        if (state.containsKey('selectedDate')) {
+          selectedDate.value = DateTime.parse(state['selectedDate']);
         }
 
-        if (state.tabStates.containsKey('workingDays')) {
-          _workingDaysState = WorkingDaysState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['workingDays']));
+        // Active tab
+        if (state.containsKey('activeTab')) {
+          final tabName = state['activeTab'];
+          try {
+            activeTab.value = DateCalculationType.values
+                .firstWhere((e) => e.toString() == tabName);
+          } catch (e) {
+            activeTab.value = DateCalculationType.addSubtract;
+          }
         }
-
-        if (state.tabStates.containsKey('timezone')) {
-          _timezoneState = TimezoneState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['timezone']));
-        }
-
-        if (state.tabStates.containsKey('recurring')) {
-          _recurringState = RecurringDatesState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['recurring']));
-        }
-
-        if (state.tabStates.containsKey('countdown')) {
-          _countdownState = CountdownState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['countdown']));
-        }
-
-        if (state.tabStates.containsKey('timeUnit')) {
-          _timeUnitState = TimeUnitState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['timeUnit']));
-        }
-
-        // Load simple states
-        if (state.tabStates.containsKey('dateInfo')) {
-          _dateInfoState = DateInfoState.fromJson(
-              Map<String, dynamic>.from(state.tabStates['dateInfo']));
-        }
-
-        if (state.tabStates.containsKey('nthWeekday')) {
-          final nthData =
-              Map<String, dynamic>.from(state.tabStates['nthWeekday']);
-          _nthWeekdayYear = nthData['year'] ?? DateTime.now().year;
-          _nthWeekdayMonth = nthData['month'] ?? DateTime.now().month;
-          _nthWeekdayWeekday = nthData['weekday'] ?? 1;
-          _nthWeekdayOccurrence = nthData['occurrence'] ?? 1;
-        }
-
-        _isDataConstraintEnabled = state.isDataConstraintEnabled;
+      } catch (e) {
+        // Ignore corrupted state
       }
-    } catch (e) {
-      // Handle error silently
-    }
-
-    _isLoading = false;
-    notifyListeners();
-
-    // Calculate initial result for current tab
-    await calculate();
-  }
-
-  void _loadHistory() async {
-    try {
-      _history = await _dateCalculatorService.getHistory();
-      notifyListeners();
-    } catch (e) {
-      // Handle error silently
     }
   }
 
-  // Tab management
-  void setActiveTab(DateCalculationType tab) {
-    if (activeTab != tab) {
-      activeTab = tab;
-      notifyListeners();
-      _saveState();
-      calculate();
-    }
+  Future<void> _saveState() async {
+    // Check if feature state saving is enabled
+    final settings = await ExtensibleSettingsService.getCalculatorToolsSettings();
+    if (!settings.saveFeatureState) return;
+
+    final state = {
+      'activeTab': activeTab.value.toString(),
+      // Add/Subtract
+      'startDate': startDate.value.toIso8601String(),
+      'addSubtractYears': addSubtractYears.value,
+      'addSubtractMonths': addSubtractMonths.value,
+      'addSubtractDays': addSubtractDays.value,
+      'isAdding': isAdding.value,
+      // Difference
+      'fromDate': fromDate.value.toIso8601String(),
+      'toDate': toDate.value.toIso8601String(),
+      // Age
+      'birthDate': birthDate.value.toIso8601String(),
+      // Date Info
+      'selectedDate': selectedDate.value.toIso8601String(),
+    };
+    await CalculatorToolsService.saveToolState(_toolId, state);
   }
 
-  // State setters
-  void updateDateDifferenceState({DateTime? startDate, DateTime? endDate}) {
-    _dateDifferenceState = DateDifferenceState(
-      startDate: startDate ?? _dateDifferenceState.startDate,
-      endDate: endDate ?? _dateDifferenceState.endDate,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.dateDifference) {
-      calculate();
-    }
+  // --- History Management ---
+  Future<void> _loadHistory() async {
+    history.value = await DateCalculatorService.getHistory();
   }
 
-  void updateAddSubtractState({
-    DateTime? baseDate,
-    int? years,
-    int? months,
-    int? days,
-  }) {
-    _addSubtractState = AddSubtractState(
-      baseDate: baseDate ?? _addSubtractState.baseDate,
-      years: years ?? _addSubtractState.years,
-      months: months ?? _addSubtractState.months,
-      days: days ?? _addSubtractState.days,
-    );
+  Future<void> saveCurrentCalculationToHistory(AppLocalizations l10n) async {
+    String title = activeTab.value.toString();
+    String displayTitle;
+    Map<String, dynamic> inputsData;
+    Map<String, dynamic> resultsData;
 
-    if (_isDataConstraintEnabled) {
-      _normalizeAddSubtractState();
-    }
-
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.addSubtract) {
-      calculate();
-    }
-  }
-
-  void updateAgeState({DateTime? birthDate}) {
-    _ageState = AgeCalculatorState(
-      birthDate: birthDate ?? _ageState.birthDate,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.age) {
-      calculate();
-    }
-  }
-
-  void updateWorkingDaysState({
-    DateTime? startDate,
-    DateTime? endDate,
-    List<int>? excludedWeekdays,
-    List<DateTime>? excludedDates,
-  }) {
-    _workingDaysState = WorkingDaysState(
-      startDate: startDate ?? _workingDaysState.startDate,
-      endDate: endDate ?? _workingDaysState.endDate,
-      excludedWeekdays: excludedWeekdays ?? _workingDaysState.excludedWeekdays,
-      excludedDates: excludedDates ?? _workingDaysState.excludedDates,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.workingDays) {
-      calculate();
-    }
-  }
-
-  void updateTimezoneState({
-    DateTime? dateTime,
-    String? fromTimezone,
-    String? toTimezone,
-  }) {
-    _timezoneState = TimezoneState(
-      dateTime: dateTime ?? _timezoneState.dateTime,
-      fromTimezone: fromTimezone ?? _timezoneState.fromTimezone,
-      toTimezone: toTimezone ?? _timezoneState.toTimezone,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.timezone) {
-      calculate();
-    }
-  }
-
-  void updateRecurringState({
-    DateTime? startDate,
-    RecurringPattern? pattern,
-    int? interval,
-    int? occurrences,
-  }) {
-    _recurringState = RecurringDatesState(
-      startDate: startDate ?? _recurringState.startDate,
-      pattern: pattern ?? _recurringState.pattern,
-      interval: interval ?? _recurringState.interval,
-      occurrences: occurrences ?? _recurringState.occurrences,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.recurring) {
-      calculate();
-    }
-  }
-
-  void updateCountdownState({
-    DateTime? targetDate,
-    String? eventName,
-  }) {
-    _countdownState = CountdownState(
-      targetDate: targetDate ?? _countdownState.targetDate,
-      eventName: eventName ?? _countdownState.eventName,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.countdown) {
-      calculate();
-    }
-  }
-
-  void updateTimeUnitState({
-    double? value,
-    TimeUnit? fromUnit,
-    TimeUnit? toUnit,
-  }) {
-    _timeUnitState = TimeUnitState(
-      value: value ?? _timeUnitState.value,
-      fromUnit: fromUnit ?? _timeUnitState.fromUnit,
-      toUnit: toUnit ?? _timeUnitState.toUnit,
-    );
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.timeUnit) {
-      calculate();
-    }
-  }
-
-  void updateDateInfo(DateTime date) {
-    _dateInfoState = DateInfoState(selectedDate: date);
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.dateInfo) {
-      calculate();
-    }
-  }
-
-  void updateNthWeekdayState({
-    int? year,
-    int? month,
-    int? weekday,
-    int? occurrence,
-  }) {
-    _nthWeekdayYear = year ?? _nthWeekdayYear;
-    _nthWeekdayMonth = month ?? _nthWeekdayMonth;
-    _nthWeekdayWeekday = weekday ?? _nthWeekdayWeekday;
-    _nthWeekdayOccurrence = occurrence ?? _nthWeekdayOccurrence;
-    notifyListeners();
-    _saveState();
-    if (activeTab == DateCalculationType.nthWeekday) {
-      calculate();
-    }
-  }
-
-  void setDataConstraint(bool enabled) {
-    if (_isDataConstraintEnabled != enabled) {
-      _isDataConstraintEnabled = enabled;
-      if (enabled) {
-        _normalizeAddSubtractState();
-      }
-      notifyListeners();
-      _saveState();
-    }
-  }
-
-  void _normalizeAddSubtractState() {
-    if (!_isDataConstraintEnabled) return;
-
-    int y = _addSubtractState.years;
-    int m = _addSubtractState.months;
-    int d = _addSubtractState.days;
-
-    // Normalize for increment (carry over)
-    if (d > 30) {
-      m += (d / 31).floor();
-      d %= 31;
-    }
-    if (m > 11) {
-      y += (m / 12).floor();
-      m %= 12;
-    }
-
-    // Normalize for decrement (borrow)
-    if (d < 0) {
-      int monthsToBorrow = ((-d - 1) / 31).floor() + 1;
-      m -= monthsToBorrow;
-      d += monthsToBorrow * 31;
-    }
-    if (m < 0) {
-      int yearsToBorrow = ((-m - 1) / 12).floor() + 1;
-      y -= yearsToBorrow;
-      m += yearsToBorrow * 12;
-    }
-
-    // Recursively normalize in case borrowing from months made it negative
-    if (m < 0) {
-      _normalizeAddSubtractState();
-    }
-
-    if (y != _addSubtractState.years ||
-        m != _addSubtractState.months ||
-        d != _addSubtractState.days) {
-      _addSubtractState = AddSubtractState(
-        baseDate: _addSubtractState.baseDate,
-        years: y,
-        months: m,
-        days: d,
-      );
-    }
-  }
-
-  // Calculation
-  Future<void> calculate() async {
-    if (_isCalculating) return;
-
-    _isCalculating = true;
-    notifyListeners();
-
-    try {
-      switch (activeTab) {
-        case DateCalculationType.dateDifference:
-          _currentResult = _dateCalculatorService.calculateDateDifference(
-            _dateDifferenceState.startDate,
-            _dateDifferenceState.endDate,
-          );
-          break;
-
-        case DateCalculationType.addSubtract:
-          _currentResult = _dateCalculatorService.calculateAddSubtractDate(
-            _addSubtractState.baseDate,
-            _addSubtractState.years,
-            _addSubtractState.months,
-            _addSubtractState.days,
-          );
-          break;
-
-        case DateCalculationType.age:
-          final ageResult =
-              _dateCalculatorService.calculateAge(_ageState.birthDate);
-          _currentResult = ageResult;
-          break;
-
-        case DateCalculationType.workingDays:
-          final workingDays = _dateCalculatorService.calculateWorkingDays(
-            _workingDaysState.startDate,
-            _workingDaysState.endDate,
-            excludedWeekdays: _workingDaysState.excludedWeekdays,
-            excludedDates: _workingDaysState.excludedDates,
-          );
-          _currentResult = {'workingDays': workingDays};
-          break;
-
-        case DateCalculationType.timezone:
-          // For now, just return the same time (would need timezone library for real conversion)
-          _currentResult = {
-            'convertedDateTime': _timezoneState.dateTime.toIso8601String(),
-          };
-          break;
-
-        case DateCalculationType.recurring:
-          final dates = _dateCalculatorService.generateRecurringDates(
-            _recurringState.startDate,
-            _recurringState.pattern,
-            _recurringState.interval,
-            _recurringState.occurrences,
-          );
-          _currentResult = {
-            'dates': dates.map((d) => d.toIso8601String()).toList(),
-          };
-          break;
-
-        case DateCalculationType.countdown:
-          _currentResult = _dateCalculatorService
-              .calculateCountdown(_countdownState.targetDate);
-          break;
-
-        case DateCalculationType.dateInfo:
-          _currentResult = _dateCalculatorService
-              .calculateDateInfo(_dateInfoState.selectedDate);
-          break;
-
-        case DateCalculationType.timeUnit:
-          final converted = _dateCalculatorService.convertTimeUnit(
-            _timeUnitState.value,
-            _timeUnitState.fromUnit,
-            _timeUnitState.toUnit,
-          );
-          _currentResult = {'convertedValue': converted};
-          break;
-
-        case DateCalculationType.nthWeekday:
-          final date = _dateCalculatorService.findNthWeekdayInMonth(
-            _nthWeekdayYear,
-            _nthWeekdayMonth,
-            _nthWeekdayWeekday,
-            _nthWeekdayOccurrence,
-          );
-          _currentResult = {
-            'date': date?.toIso8601String(),
-            'found': date != null,
-          };
-          break;
-      }
-    } catch (e) {
-      _currentResult = {'error': e.toString()};
-    }
-
-    _isCalculating = false;
-    notifyListeners();
-
-    _saveState();
-  }
-
-  void _saveState() {
-    final state = DateCalculatorState.fromData(
-      activeTab: activeTab,
-      tabStates: {
-        'dateDifference': _dateDifferenceState.toJson(),
-        'addSubtract': _addSubtractState.toJson(),
-        'age': _ageState.toJson(),
-        'workingDays': _workingDaysState.toJson(),
-        'timezone': _timezoneState.toJson(),
-        'recurring': _recurringState.toJson(),
-        'countdown': _countdownState.toJson(),
-        'timeUnit': _timeUnitState.toJson(),
-        'dateInfo': _dateInfoState.toJson(),
-        'nthWeekday': {
-          'year': _nthWeekdayYear,
-          'month': _nthWeekdayMonth,
-          'weekday': _nthWeekdayWeekday,
-          'occurrence': _nthWeekdayOccurrence,
-        },
-      },
-      lastUpdated: DateTime.now(),
-      isDataConstraintEnabled: _isDataConstraintEnabled,
-    );
-    _dateCalculatorService.saveCurrentState(state);
-  }
-
-  String _generateId() {
-    // Simple ID generation
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final random = math.Random().nextInt(1000);
-    return '${timestamp}_$random';
-  }
-
-  Map<String, dynamic> _getInputsForCurrentTab() {
-    switch (activeTab) {
-      case DateCalculationType.dateDifference:
-        return {
-          'startDate': _dateDifferenceState.startDate.toIso8601String(),
-          'endDate': _dateDifferenceState.endDate.toIso8601String(),
-        };
+    switch (activeTab.value) {
       case DateCalculationType.addSubtract:
-        return {
-          'baseDate': _addSubtractState.baseDate.toIso8601String(),
-          'years': _addSubtractState.years,
-          'months': _addSubtractState.months,
-          'days': _addSubtractState.days,
+        title = title;
+        String postFix = _getAddSubtractPostFix(addSubtractYears.value, 'y') +
+            _getAddSubtractPostFix(addSubtractMonths.value, 'm') +
+            _getAddSubtractPostFix(addSubtractDays.value, 'd');
+        displayTitle = '${startDate.value.toString().split(' ')[0]} $postFix';
+        inputsData = {
+          'startDate': startDate.value.toIso8601String(),
+          'years': addSubtractYears.value,
+          'months': addSubtractMonths.value,
+          'days': addSubtractDays.value,
         };
+        resultsData = {
+          'resultDate': addSubtractResultDate.value,
+          'dayOfWeek': addSubtractResultDayOfWeek.value,
+        };
+        break;
+      case DateCalculationType.difference:
+        title = title;
+        displayTitle =
+            '${fromDate.value.toString().split(' ')[0]} -> ${toDate.value.toString().split(' ')[0]}';
+        inputsData = {
+          'fromDate': fromDate.value.toIso8601String(),
+          'toDate': toDate.value.toIso8601String(),
+        };
+        resultsData = {
+          'years': diffYears.value,
+          'months': diffMonths.value,
+          'days': diffDays.value,
+          'totalWeeks': diffTotalWeeks.value,
+          'totalDays': diffTotalDays.value,
+        };
+        break;
       case DateCalculationType.age:
-        return {
-          'birthDate': _ageState.birthDate.toIso8601String(),
+        title = title;
+        displayTitle = birthDate.value.toString().split(' ')[0];
+        inputsData = {
+          'birthDate': birthDate.value.toIso8601String(),
         };
-      case DateCalculationType.workingDays:
-        return {
-          'startDate': _workingDaysState.startDate.toIso8601String(),
-          'endDate': _workingDaysState.endDate.toIso8601String(),
-          'excludedWeekdays': _workingDaysState.excludedWeekdays,
-          'excludedDates': _workingDaysState.excludedDates
-              .map((d) => d.toIso8601String())
-              .toList(),
+        resultsData = {
+          'currentAge': currentAge.value,
+          'totalDaysLived': totalDaysLived.value,
+          'daysUntilBirthday': daysUntilBirthday.value,
+          'nextBirthday': nextBirthday.value,
         };
-      case DateCalculationType.timezone:
-        return {
-          'dateTime': _timezoneState.dateTime.toIso8601String(),
-          'fromTimezone': _timezoneState.fromTimezone,
-          'toTimezone': _timezoneState.toTimezone,
-        };
-      case DateCalculationType.recurring:
-        return {
-          'startDate': _recurringState.startDate.toIso8601String(),
-          'pattern': _recurringState.pattern.name,
-          'interval': _recurringState.interval,
-          'occurrences': _recurringState.occurrences,
-        };
-      case DateCalculationType.countdown:
-        return {
-          'targetDate': _countdownState.targetDate.toIso8601String(),
-          'eventName': _countdownState.eventName,
-        };
+        break;
       case DateCalculationType.dateInfo:
-        return {
-          'selectedDate': _dateInfoState.selectedDate.toIso8601String(),
+        title = title;
+        displayTitle = selectedDate.value.toString().split(' ')[0];
+        inputsData = {
+          'selectedDate': selectedDate.value.toIso8601String(),
         };
-      case DateCalculationType.timeUnit:
-        return {
-          'value': _timeUnitState.value,
-          'fromUnit': _timeUnitState.fromUnit.name,
-          'toUnit': _timeUnitState.toUnit.name,
+        resultsData = {
+          'dayOfWeek': dayOfWeek.value,
+          'dayInMonth': dayInMonth.value,
+          'dayInYear': dayInYear.value,
+          'weekInMonth': weekInMonth.value,
+          'weekInYear': weekInYear.value,
+          'monthOfYear': monthOfYear.value,
+          'year': yearValue.value,
+          'quarter': quarterOfYear.value,
+          'isLeapYear': isLeapYear.value,
+          'daysInMonth': daysInMonth.value,
+          'daysInYear': daysInYear.value,
         };
-      case DateCalculationType.nthWeekday:
-        return {
-          'year': _nthWeekdayYear,
-          'month': _nthWeekdayMonth,
-          'weekday': _nthWeekdayWeekday,
-          'occurrence': _nthWeekdayOccurrence,
-        };
+        break;
+    }
+
+    // Follow Financial Calculator format: embed inputsData and resultsData inside 'value' field
+    final valueData = {
+      'inputsData': inputsData,
+      'resultsData': resultsData,
+    };
+
+    final newHistoryItem = UnifiedHistoryData(
+      type: _toolId,
+      title: title,
+      value: jsonEncode(valueData), // Save as JSON string in value field
+      timestamp: DateTime.now(),
+      subType: activeTab.value.name,
+      displayTitle: displayTitle,
+    );
+
+    await GenerationHistoryService.addHistoryItem(newHistoryItem);
+    _loadHistory(); // Refresh history list
+  }
+
+  String _getAddSubtractPostFix(int value, String postFixChar) {
+    if (value == 0) {
+      return '';
+    } else if (value > 0) {
+      return ' +$value$postFixChar';
+    } else {
+      return ' $value$postFixChar';
     }
   }
 
-  String _getDisplayTitleForCurrentTab() {
-    String formatDate(DateTime date) =>
-        '${date.day}/${date.month}/${date.year}';
-
-    switch (activeTab) {
-      case DateCalculationType.dateDifference:
-        final startDate = _dateDifferenceState.startDate;
-        final endDate = _dateDifferenceState.endDate;
-        return 'Diff: ${formatDate(startDate)} → ${formatDate(endDate)}';
-
-      case DateCalculationType.addSubtract:
-        final state = _addSubtractState;
-        String operation = '';
-        if (state.years != 0) {
-          operation += '${state.years > 0 ? "+" : ""}${state.years}Y ';
-        }
-        if (state.months != 0) {
-          operation += '${state.months > 0 ? "+" : ""}${state.months}M ';
-        }
-        if (state.days != 0) {
-          operation += '${state.days > 0 ? "+" : ""}${state.days}D';
-        }
-        operation = operation.trim();
-        if (operation.startsWith('+')) operation = operation.substring(1);
-        if (operation.isEmpty) operation = 'No change';
-
-        return 'From ${formatDate(state.baseDate)}: $operation';
-
-      case DateCalculationType.age:
-        return 'Age since ${formatDate(_ageState.birthDate)}';
-
-      case DateCalculationType.dateInfo:
-        return 'Info for ${formatDate(_dateInfoState.selectedDate)}';
-
-      // Other cases can be simple strings
-      case DateCalculationType.workingDays:
-        return 'Working Days';
-      case DateCalculationType.timezone:
-        return 'Timezone Conversion';
-      case DateCalculationType.recurring:
-        return 'Recurring Dates';
-      case DateCalculationType.countdown:
-        return 'Countdown';
-      case DateCalculationType.timeUnit:
-        return 'Time Unit Conversion';
-      case DateCalculationType.nthWeekday:
-        return 'Nth Weekday';
-    }
+  void checkDateConflict() {
+    isDateConflict.value = !toDate.value.isAfter(fromDate.value);
   }
 
-  Future<void> removeFromHistory(String id) async {
-    await _dateCalculatorService.removeFromHistory(id);
+  void swapDifferenceDates() {
+    final temp = fromDate.value;
+    fromDate.value = toDate.value;
+    toDate.value = temp;
+    checkDateConflict();
+  }
+
+  Future<void> deleteHistoryItem(Id id) async {
+    await GenerationHistoryService.deleteHistoryItem(id);
     _loadHistory();
   }
 
   Future<void> clearHistory() async {
-    await _dateCalculatorService.clearHistory();
+    await DateCalculatorService.clearHistory();
     _loadHistory();
   }
 
-  Future<void> clearCurrentTabData() async {
-    switch (activeTab) {
-      case DateCalculationType.dateDifference:
-        _dateDifferenceState = DateDifferenceState(
-          startDate: DateTime.now(),
-          endDate: DateTime.now().add(const Duration(days: 30)),
-        );
-        break;
-      case DateCalculationType.addSubtract:
-        _addSubtractState = AddSubtractState(
-          baseDate: DateTime.now(),
-          years: 0,
-          months: 0,
-          days: 0,
-        );
-        break;
-      case DateCalculationType.age:
-        _ageState = AgeCalculatorState(
-          birthDate: DateTime.now().subtract(const Duration(days: 365 * 25)),
-        );
-        break;
-      case DateCalculationType.workingDays:
-        _workingDaysState = WorkingDaysState(
-          startDate: DateTime.now(),
-          endDate: DateTime.now().add(const Duration(days: 30)),
-        );
-        break;
-      case DateCalculationType.timezone:
-        _timezoneState = TimezoneState(
-          dateTime: DateTime.now(),
-          fromTimezone: 'UTC',
-          toTimezone: 'UTC',
-        );
-        break;
-      case DateCalculationType.recurring:
-        _recurringState = RecurringDatesState(
-          startDate: DateTime.now(),
-          pattern: RecurringPattern.weekly,
-        );
-        break;
-      case DateCalculationType.countdown:
-        _countdownState = CountdownState(
-          targetDate: DateTime.now().add(const Duration(days: 365)),
-          eventName: 'New Year',
-        );
-        break;
-      case DateCalculationType.dateInfo:
-        _dateInfoState = DateInfoState(selectedDate: DateTime.now());
-        break;
-      case DateCalculationType.timeUnit:
-        _timeUnitState = TimeUnitState(
-          value: 1.0,
-          fromUnit: TimeUnit.hours,
-          toUnit: TimeUnit.minutes,
-        );
-        break;
-      case DateCalculationType.nthWeekday:
-        final now = DateTime.now();
-        _nthWeekdayYear = now.year;
-        _nthWeekdayMonth = now.month;
-        _nthWeekdayWeekday = 1;
-        _nthWeekdayOccurrence = 1;
-        break;
-    }
-
-    _currentResult = null;
-    notifyListeners();
-    _saveState();
-    await calculate();
-  }
-
-  void loadFromHistory(DateCalculationHistory item) {
-    // Set active tab first
-    setActiveTab(item.type);
-
-    // Load the inputs based on type
-    final inputs = item.inputs;
-
-    switch (item.type) {
-      case DateCalculationType.dateInfo:
-        if (inputs.containsKey('selectedDate')) {
-          final selectedDate = DateTime.parse(inputs['selectedDate']);
-          updateDateInfo(selectedDate);
-        }
-        break;
-      case DateCalculationType.dateDifference:
-        if (inputs.containsKey('startDate') && inputs.containsKey('endDate')) {
-          final startDate = DateTime.parse(inputs['startDate']);
-          final endDate = DateTime.parse(inputs['endDate']);
-          updateDateDifferenceState(startDate: startDate, endDate: endDate);
-        }
-        break;
-      case DateCalculationType.addSubtract:
-        if (inputs.containsKey('baseDate')) {
-          final baseDate = DateTime.parse(inputs['baseDate']);
-          final years = inputs['years'] ?? 0;
-          final months = inputs['months'] ?? 0;
-          final days = inputs['days'] ?? 0;
-          updateAddSubtractState(
-            baseDate: baseDate,
-            years: years,
-            months: months,
-            days: days,
-          );
-        }
-        break;
-      case DateCalculationType.age:
-        if (inputs.containsKey('birthDate')) {
-          final birthDate = DateTime.parse(inputs['birthDate']);
-          updateAgeState(birthDate: birthDate);
-        }
-        break;
-      // Add other cases as needed
+  String getL10nNameFromTypeString(String typeString, AppLocalizations l10n) {
+    switch (typeString) {
+      case 'DateCalculationType.addSubtract':
+        return l10n.addSubtractDate;
+      case 'DateCalculationType.difference':
+        return l10n.dateDifference;
+      case 'DateCalculationType.age':
+        return l10n.ageCalculator;
+      case 'DateCalculationType.dateInfo':
+        return l10n.dateInfo;
       default:
-        break;
+        return l10n.dateCalculator;
     }
   }
 
-  Future<void> saveToHistory() async {
-    if (_currentResult == null || _currentResult!.containsKey('error')) return;
-
-    final historyItem = DateCalculationHistory.fromData(
-      id: _generateId(),
-      type: activeTab,
-      timestamp: DateTime.now(),
-      inputs: _getInputsForCurrentTab(),
-      results: _currentResult!,
-      displayTitle: _getDisplayTitleForCurrentTab(),
-    );
-
-    await _dateCalculatorService.saveToHistory(historyItem);
-    _loadHistory();
+  // --- Utility Methods ---
+  void clearCurrentTabData() async {
+    switch (activeTab.value) {
+      case DateCalculationType.addSubtract:
+        startDate.value = DateTime.now();
+        addSubtractYears.value = 0;
+        addSubtractMonths.value = 0;
+        addSubtractDays.value = 0;
+        isAdding.value = true;
+        addSubtractResultDate.value = '';
+        addSubtractResultDayOfWeek.value = '';
+        break;
+      case DateCalculationType.difference:
+        fromDate.value = DateTime.now();
+        toDate.value = DateTime.now().add(const Duration(days: 1));
+        diffYears.value = 0;
+        diffMonths.value = 0;
+        diffDays.value = 0;
+        diffTotalWeeks.value = 0;
+        diffTotalDays.value = 0;
+        checkDateConflict();
+        break;
+      case DateCalculationType.age:
+        birthDate.value = DateTime(1990, 1, 1);
+        currentAge.value = '';
+        nextBirthday.value = '';
+        daysUntilBirthday.value = 0;
+        totalDaysLived.value = 0;
+        break;
+      case DateCalculationType.dateInfo:
+        selectedDate.value = DateTime.now();
+        dayOfWeek.value = '';
+        dayInMonth.value = 0;
+        dayInYear.value = 0;
+        weekInMonth.value = 0;
+        weekInYear.value = 0;
+        monthOfYear.value = '';
+        yearValue.value = 0;
+        quarterOfYear.value = 0;
+        isLeapYear.value = false;
+        daysInMonth.value = 0;
+        daysInYear.value = 0;
+        break;
+    }
+    calculate();
   }
 }

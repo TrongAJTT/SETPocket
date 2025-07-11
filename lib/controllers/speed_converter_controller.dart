@@ -1,24 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/speed_converter_service.dart';
-import 'package:setpocket/services/converter_services/speed_state_adapter.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/speed_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class SpeedConverterController extends ConverterController {
   SpeedConverterController()
       : super(
           converterService: SpeedConverterService(),
-          stateService: SpeedStateAdapter(),
-        ) {
-    logInfo(
-        'SpeedConverterController: Initialized with SpeedConverterService and SpeedStateAdapter');
-  }
+          stateService: UnifiedStateAdapter('speed'),
+        );
 
-  // Generic Preset functionality using new GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Speed Preset functionality using SpeedUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('speed');
+      return await SpeedUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading speed presets: $e');
       return [];
@@ -27,8 +23,7 @@ class SpeedConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'speed',
+      await SpeedUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -41,7 +36,7 @@ class SpeedConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('speed', id);
+      await SpeedUnifiedService.deletePreset(id);
       logInfo('Deleted speed preset: $id');
     } catch (e) {
       logError('Error deleting speed preset: $e');
@@ -51,7 +46,7 @@ class SpeedConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('speed', name);
+      return await SpeedUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -60,7 +55,7 @@ class SpeedConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('speed', id, newName);
+      await SpeedUnifiedService.renamePreset(id, newName);
       logInfo('Renamed speed preset: $id to $newName');
     } catch (e) {
       logError('Error renaming speed preset: $e');
@@ -68,12 +63,13 @@ class SpeedConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
       // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      final units = List<String>.from(preset['units'] ?? []);
+      await updateGlobalVisibleUnits(units.toSet());
 
-      logInfo('Applied speed preset: ${preset.name}');
+      logInfo('Applied speed preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying speed preset: $e');
       rethrow;

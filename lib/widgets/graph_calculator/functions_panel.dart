@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/graphing_function.dart';
-import 'package:setpocket/widgets/color_picker_dialog.dart';
+import 'package:setpocket/models/calculator_models/graphing_function.dart';
+import 'package:setpocket/widgets/generic/generic_dialog.dart';
+import 'package:setpocket/widgets/generic/option_grid_picker.dart';
+import 'package:setpocket/widgets/generic/option_item.dart';
 import 'dart:math' as math;
+import 'package:setpocket/utils/size_utils.dart';
+import 'package:setpocket/utils/icon_utils.dart';
 
 class FunctionsPanel extends StatefulWidget {
   final TextEditingController functionController;
@@ -37,6 +41,14 @@ class FunctionsPanel extends StatefulWidget {
 }
 
 class _FunctionsPanelState extends State<FunctionsPanel> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   bool _validateFunction(String expression) {
     // Simplified validation - you might want to use the actual validation logic
     return expression.trim().isNotEmpty;
@@ -46,163 +58,247 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
     // This would be handled by parent widget
   }
 
-  Future<void> _showColorPicker(GraphingFunction function) async {
-    final l10n = AppLocalizations.of(context)!;
+  void _insertFunctionText(
+      String textToInsert, TextEditingController controller) {
+    final currentText = controller.text;
+    final selection = controller.selection;
 
-    final selectedColor = await showDialog<Color>(
-      context: context,
-      builder: (BuildContext context) {
-        return ColorPickerDialog(
-          initialColor: function.color,
-          title: l10n.editFunctionColor,
-          subtitle: '${l10n.graphingFunction}${function.expression}',
-        );
-      },
-    );
-
-    if (selectedColor != null) {
-      widget.onUpdateColor(function.id, selectedColor);
+    if (!selection.isValid) {
+      // If selection is invalid, append the text.
+      final newText = currentText + textToInsert;
+      controller.value = controller.value.copyWith(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newText.length),
+      );
+    } else {
+      // Otherwise, replace the current selection or insert at the cursor.
+      final newText = currentText.replaceRange(
+        selection.start,
+        selection.end,
+        textToInsert,
+      );
+      controller.value = controller.value.copyWith(
+        text: newText,
+        selection: TextSelection.collapsed(
+          offset: selection.start + textToInsert.length,
+        ),
+      );
     }
   }
 
-  void _showFunctionInputHelp() {
+  Future<String?> _showFunctionInputHelp(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    showDialog(
+    final List<Map<String, dynamic>> helpSections = [
+      {
+        'title': l10n.basicOperations,
+        'functions': [
+          {'f': 'x + 2', 'd': 'Addition'},
+          {'f': 'x - 3', 'd': 'Subtraction'},
+          {'f': 'x * 4', 'd': 'Multiplication'},
+          {'f': 'x / 2', 'd': 'Division'},
+          {'f': 'x^2', 'd': 'Power'},
+          {'f': 'x^(1/2)', 'd': 'Square root'},
+        ],
+      },
+      {
+        'title': l10n.polynomialFunctions,
+        'functions': [
+          {'f': 'x^2', 'd': 'Quadratic'},
+          {'f': 'x^3 - 2*x + 1', 'd': 'Cubic'},
+          {'f': '2*x^4 - x^2 + 3', 'd': 'Quartic'},
+          {'f': 'abs(x)', 'd': 'Absolute value'},
+        ],
+      },
+      {
+        'title': l10n.trigonometricFunctions,
+        'functions': [
+          {'f': 'sin(x)', 'd': 'Sine'},
+          {'f': 'cos(x)', 'd': 'Cosine'},
+          {'f': 'tan(x)', 'd': 'Tangent'},
+          {'f': 'sin(x) + cos(x)', 'd': 'Combined trig'},
+        ],
+      },
+      {
+        'title': l10n.logarithmicFunctions,
+        'functions': [
+          {'f': 'log(x)', 'd': 'Natural logarithm'},
+          {'f': 'log(abs(x))', 'd': 'Log of absolute'},
+          {'f': 'e^x', 'd': 'Exponential'},
+          {'f': '2^x', 'd': 'Power of 2'},
+        ],
+      },
+      {
+        'title': l10n.advancedFunctions,
+        'functions': [
+          {'f': '1/x', 'd': 'Hyperbola'},
+          {'f': 'sqrt(x)', 'd': 'Square root'},
+          {'f': 'sin(x)/x', 'd': 'Sinc function'},
+          {'f': 'x*sin(1/x)', 'd': 'Complex oscillation'},
+        ],
+      },
+    ];
+
+    return showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: 700,
-              maxHeight: MediaQuery.of(context).size.height * 0.8,
-            ),
-            child: Container(
-              width: MediaQuery.of(context).size.width < 700
-                  ? MediaQuery.of(context).size.width * 0.9
-                  : 700,
-              padding: const EdgeInsets.all(24),
+      builder: (context) {
+        return GenericDialog(
+          decorator: GenericDialogDecorator(
+            width: DynamicDimension.flexibilityMax(90, 600),
+            displayTopDivider: true,
+          ),
+          header: GenericDialogHeader(
+            icon: GenericIcon.icon(Icons.help_outline),
+            title: l10n.functionInputHelp,
+            subtitle: 'Get help with mathematical function syntax',
+            displayExitButton: true,
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.help_outline,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        l10n.functionInputHelp,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                mainAxisSize: MainAxisSize.min,
+                children: helpSections.map((section) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          section['title'],
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.functionInputHelpDesc,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildFunctionCategory(
-                            l10n.basicOperations,
-                            [
-                              ('x + 2', 'Addition'),
-                              ('x - 3', 'Subtraction'),
-                              ('x * 4', 'Multiplication'),
-                              ('x / 2', 'Division'),
-                              ('x^2', 'Power'),
-                              ('x^(1/2)', 'Square root'),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildFunctionCategory(
-                            l10n.polynomialFunctions,
-                            [
-                              ('x^2', 'Quadratic'),
-                              ('x^3 - 2*x + 1', 'Cubic'),
-                              ('2*x^4 - x^2 + 3', 'Quartic'),
-                              ('abs(x)', 'Absolute value'),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildFunctionCategory(
-                            l10n.trigonometricFunctions,
-                            [
-                              ('sin(x)', 'Sine'),
-                              ('cos(x)', 'Cosine'),
-                              ('tan(x)', 'Tangent'),
-                              ('sin(x) + cos(x)', 'Combined trig'),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildFunctionCategory(
-                            l10n.logarithmicFunctions,
-                            [
-                              ('log(x)', 'Natural logarithm'),
-                              ('log(abs(x))', 'Log of absolute'),
-                              ('e^x', 'Exponential'),
-                              ('2^x', 'Power of 2'),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildFunctionCategory(
-                            l10n.advancedFunctions,
-                            [
-                              ('1/x', 'Hyperbola'),
-                              ('sqrt(x)', 'Square root'),
-                              ('sin(x)/x', 'Sinc function'),
-                              ('x*sin(1/x)', 'Complex oscillation'),
-                            ],
-                          ),
-                        ],
-                      ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: (section['functions']
+                                  as List<Map<String, String>>)
+                              .map((func) {
+                            return ActionChip(
+                              onPressed: () {
+                                Navigator.of(context).pop(func['f']!);
+                              },
+                              label: Column(
+                                children: [
+                                  Text(
+                                    func['f']!,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(func['d']!),
+                                ],
+                              ),
+                              tooltip: '${l10n.insertFunction}: ${func['f']!}',
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
             ),
           ),
+          footer: GenericDialogFooter.empty(),
         );
       },
     );
   }
 
-  Widget _buildFunctionCategory(
-      String title, List<(String, String)> functions) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: functions.map((func) {
-            return _buildFunctionChip(func.$1, func.$2);
-          }).toList(),
-        ),
-      ],
+  void _showColorPickerDialog(
+      BuildContext context, GraphingFunction function) async {
+    Color pickerColor = function.color;
+    final l10n = AppLocalizations.of(context)!;
+    int selectedSegment = 0; // 0 for Predefined, 1 for Custom
+
+    final List<Color> predefinedColors = [
+      ...Colors.primaries,
+      ...Colors.accents,
+      Colors.black,
+      Colors.white,
+      Colors.grey,
+      Colors.blueGrey,
+      Colors.brown,
+    ];
+
+    final colorOptions = predefinedColors
+        .map((color) => OptionItem<Color>(
+              value: color,
+              label: '', // Label is not needed for color swatches
+              backgroundColor: color, // Use the color for the background
+            ))
+        .toList();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setDialogState) {
+          return GenericDialog(
+            decorator: GenericDialogDecorator(
+                width: DynamicDimension.flexibilityMax(90, 450),
+                displayTopDivider: true),
+            header: GenericDialogHeader(
+              icon: GenericIcon.icon(Icons.color_lens_outlined),
+              title: l10n.editFunctionColor,
+              subtitle: 'f(x) = ${function.expression}',
+              displayExitButton: true,
+            ),
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+                Container(
+                  height: 60,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: pickerColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      l10n.selectedColor,
+                      style: TextStyle(
+                        color: pickerColor.computeLuminance() > 0.5
+                            ? Colors.black
+                            : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                // const SizedBox(height: 16),
+                AutoScaleOptionGridPicker<Color>(
+                  title: '', // No title needed here
+                  options: colorOptions,
+                  selectedValue: pickerColor,
+                  onSelectionChanged: (newColor) {
+                    setDialogState(() {
+                      pickerColor = newColor;
+                    });
+                  },
+                  minCellWidth: 40,
+                  maxCellWidth: 40,
+                  fixedCellHeight: 40, // Make cells square
+                  decorator: const OptionGridDecorator(
+                    padding: EdgeInsets.zero,
+                  ),
+                )
+              ],
+            ),
+            footer: GenericDialogFooter.cancelSave(
+              onCancel: () => Navigator.of(context).pop(),
+              onSave: () {
+                widget.onUpdateColor(function.id, pickerColor);
+                Navigator.of(context).pop();
+              },
+              cancelText: l10n.cancel,
+              saveText: l10n.select,
+            ),
+          );
+        });
+      },
     );
   }
 
@@ -319,7 +415,12 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
 
               // Help button
               IconButton(
-                onPressed: _showFunctionInputHelp,
+                onPressed: () async {
+                  final result = await _showFunctionInputHelp(context);
+                  if (result != null) {
+                    _insertFunctionText(result, widget.functionController);
+                  }
+                },
                 icon: const Icon(Icons.help_outline),
                 tooltip: l10n.functionInputHelp,
                 style: IconButton.styleFrom(
@@ -433,7 +534,8 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
                               horizontal: 8, vertical: 4),
                           child: ListTile(
                             leading: GestureDetector(
-                              onTap: () => _showColorPicker(function),
+                              onTap: () =>
+                                  _showColorPickerDialog(context, function),
                               child: Container(
                                 width: 20,
                                 height: 20,
@@ -490,7 +592,8 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
                                           widget.onRemoveFunction(function.id);
                                           break;
                                         case 'color':
-                                          _showColorPicker(function);
+                                          _showColorPickerDialog(
+                                              context, function);
                                           break;
                                       }
                                     },
@@ -570,7 +673,8 @@ class _FunctionsPanelState extends State<FunctionsPanel> {
                                       ),
                                     ],
                                   ),
-                            onTap: () => _showColorPicker(function),
+                            onTap: () =>
+                                _showColorPickerDialog(context, function),
                           ),
                         );
                       },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:setpocket/services/cache_service.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -318,6 +319,75 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
     }
 
     return buffer.toString().trim();
+  }
+
+  Future<void> _deleteStorageAndExit() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning, color: Colors.orange.shade700),
+            const SizedBox(width: 8),
+            const Text('Delete Storage & Exit'),
+          ],
+        ),
+        content: const Text(
+          'This will permanently delete ALL data stored in the app (settings, cache, history, etc.) '
+          'and exit the application.\n\n'
+          'This action cannot be undone!\n\n'
+          'DEBUG MODE ONLY - Are you sure?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete & Exit'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        // Show loading dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Text('Deleting storage and exiting...'),
+              ],
+            ),
+          ),
+        );
+
+        // Call the cache service method to delete storage and exit
+        await CacheService.deleteStorageAndExit();
+      } catch (e) {
+        // Close loading dialog if still open
+        if (mounted) Navigator.of(context).pop();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error deleting storage: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   Widget _buildCacheSection(String cacheType, CacheInfo info) {
@@ -741,20 +811,47 @@ class _CacheDetailsDialogState extends State<CacheDetailsDialog> {
                               ),
                             ),
                           ),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: FilledButton.icon(
-                              onPressed: totalItems > 0 ? _clearAllCache : null,
-                              icon: const Icon(Icons.delete_sweep),
-                              label: Text(loc.clearAllCache),
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.red.shade700,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: isDesktop ? 16 : 14,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Debug-only Delete Storage & Exit button
+                              if (kDebugMode) ...[
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: FilledButton.icon(
+                                    onPressed: _deleteStorageAndExit,
+                                    icon: const Icon(Icons.warning),
+                                    label: const Text(
+                                        'Delete Storage & Exit (DEBUG)'),
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.orange.shade700,
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: isDesktop ? 12 : 10,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: isDesktop ? 12 : 8),
+                              ],
+                              // Clear All Cache button
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton.icon(
+                                  onPressed:
+                                      totalItems > 0 ? _clearAllCache : null,
+                                  icon: const Icon(Icons.delete_sweep),
+                                  label: Text(loc.clearAllCache),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: Colors.red.shade700,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: isDesktop ? 16 : 14,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ],

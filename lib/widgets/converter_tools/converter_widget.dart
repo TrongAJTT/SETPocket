@@ -4,7 +4,7 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/converter_models/converter_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/converter_services/currency_service.dart';
-import 'package:setpocket/services/converter_services/currency_cache_service.dart';
+import 'package:setpocket/services/converter_services/currency_unified_service.dart';
 import 'package:setpocket/services/number_format_service.dart';
 
 enum ConverterViewMode { table, list }
@@ -70,17 +70,20 @@ class _ConverterWidgetState extends State<ConverterWidget> {
         _isLoadingRates = true;
       });
       try {
-        // Use CurrencyCacheService.getRates() which handles all logic internally
+        // Use CurrencyUnifiedService.getRates() which handles all logic internally
         // This respects the user's fetch mode settings
-        await CurrencyCacheService.getRates();
+        await CurrencyUnifiedService.getRates();
 
         // Get cache info for display
-        final cacheInfo = await CurrencyCacheService.getCacheInfo();
+        final cacheInfo = await CurrencyUnifiedService.getCacheInfo();
 
         if (mounted) {
           setState(() {
-            _lastUpdated = cacheInfo?.lastUpdated;
-            _isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+            final lastUpdatedStr = cacheInfo?['lastUpdated'] as String?;
+            _lastUpdated =
+                lastUpdatedStr != null ? DateTime.parse(lastUpdatedStr) : null;
+            _isUsingLiveRates =
+                (cacheInfo?.isNotEmpty ?? false) && _lastUpdated != null;
           });
         }
 
@@ -113,15 +116,18 @@ class _ConverterWidgetState extends State<ConverterWidget> {
 
     try {
       // Force refresh using cache service
-      await CurrencyCacheService.forceRefresh();
+      await CurrencyUnifiedService.forceRefresh();
 
       // Get updated cache info
-      final cacheInfo = await CurrencyCacheService.getCacheInfo();
+      final cacheInfo = await CurrencyUnifiedService.getCacheInfo();
 
       if (mounted) {
         setState(() {
-          _lastUpdated = cacheInfo?.lastUpdated;
-          _isUsingLiveRates = cacheInfo != null && cacheInfo.isValid;
+          final lastUpdatedStr = cacheInfo?['lastUpdated'] as String?;
+          _lastUpdated =
+              lastUpdatedStr != null ? DateTime.parse(lastUpdatedStr) : null;
+          _isUsingLiveRates =
+              (cacheInfo?.isNotEmpty ?? false) && _lastUpdated != null;
         });
       }
 

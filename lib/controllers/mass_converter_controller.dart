@@ -1,22 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/mass_converter_service.dart';
-import 'package:setpocket/services/converter_services/mass_state_adapter.dart';
-import 'package:setpocket/services/converter_services/mass_state_service_isar.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/mass_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class MassConverterController extends ConverterController {
   MassConverterController()
       : super(
           converterService: MassConverterService(),
-          stateService: MassStateAdapter(),
+          stateService: UnifiedStateAdapter('mass'),
         );
 
-  // Generic Preset functionality using GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Mass Preset functionality using MassUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('mass');
+      return await MassUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading mass presets: $e');
       return [];
@@ -25,8 +23,7 @@ class MassConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'mass',
+      await MassUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -39,7 +36,7 @@ class MassConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('mass', id);
+      await MassUnifiedService.deletePreset(id);
       logInfo('Deleted mass preset: $id');
     } catch (e) {
       logError('Error deleting mass preset: $e');
@@ -49,7 +46,7 @@ class MassConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('mass', name);
+      return await MassUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -58,7 +55,7 @@ class MassConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('mass', id, newName);
+      await MassUnifiedService.renamePreset(id, newName);
       logInfo('Renamed mass preset: $id to $newName');
     } catch (e) {
       logError('Error renaming mass preset: $e');
@@ -66,12 +63,13 @@ class MassConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
       // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      final units = List<String>.from(preset['units'] ?? []);
+      await updateGlobalVisibleUnits(units.toSet());
 
-      logInfo('Applied mass preset: ${preset.name}');
+      logInfo('Applied mass preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying mass preset: $e');
       rethrow;
@@ -83,13 +81,12 @@ class MassConverterController extends ConverterController {
     try {
       logInfo('MassConverterController: Force clearing all cache data');
 
-      // Clear state service cache
-      final massStateService = MassStateServiceIsar();
-      await massStateService.clearState();
+      // Clear unified service state and presets
+      await MassUnifiedService.clearAllData();
 
-      // Clear controller state through state service adapter
-      final adapter = MassStateAdapter();
-      await adapter.clearState('mass');
+      // Clear controller state through generic state service
+      final stateService = UnifiedStateAdapter('mass');
+      await stateService.clearState('mass');
 
       // Clear performance caches from service
       MassConverterService.clearCaches();

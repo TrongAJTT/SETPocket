@@ -4,7 +4,7 @@ import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'package:setpocket/services/converter_services/converter_service_base.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
-import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/settings_models_service.dart';
 
 class ConverterController extends ChangeNotifier {
   final ConverterServiceBase _converterService;
@@ -44,7 +44,8 @@ class ConverterController extends ChangeNotifier {
   bool get requiresRealTimeData => _converterService.requiresRealTimeData;
 
   // Debounced notify listeners
-  void _notifyListenersDebounced() {
+  @protected
+  void notifyListenersDebounced() {
     _notifyTimer?.cancel();
     _notifyTimer = Timer(const Duration(milliseconds: 50), () {
       if (!_isUpdatingControllers) {
@@ -58,85 +59,284 @@ class ConverterController extends ChangeNotifier {
         'Initializing ${_converterService.converterType} converter controller');
 
     try {
+      // Ensure converter service is properly initialized
+      final units = _converterService.units;
+      logInfo(
+          'ConverterController: Converter service has ${units.length} units available');
+
+      if (units.isEmpty) {
+        logError(
+            'ConverterController: Converter service has no units available');
+        throw Exception(
+            'Converter service not properly initialized - no units available');
+      }
+
       // Load saved state
-      await _loadState();
+      await loadState();
 
       // If no saved state, create default
       if (_state.cards.isEmpty) {
-        _createDefaultState();
+        createDefaultState();
       }
 
       // Initialize text controllers
-      _initializeControllers();
+      initializeControllers();
 
       // Perform conversions for loaded state to populate all unit values
       for (int i = 0; i < _state.cards.length; i++) {
         final card = _state.cards[i];
-        _updateCardConversions(i, card.baseUnitId, card.baseValue);
+        updateCardConversions(i, card.baseUnitId, card.baseValue);
       }
 
       // Refresh data if needed
       if (_converterService.requiresRealTimeData) {
-        await _refreshData();
+        await refreshData();
       }
 
-      _notifyListenersDebounced();
+      notifyListenersDebounced();
     } catch (e) {
       logError('Error initializing converter controller: $e');
-      _createDefaultState();
-      _initializeControllers();
-      _notifyListenersDebounced();
+      createDefaultState();
+      initializeControllers();
+      notifyListenersDebounced();
     }
   }
 
-  Future<void> _loadState() async {
+  @protected
+  Future<void> loadState() async {
     try {
       logInfo(
           'ConverterController: Loading state for ${_converterService.converterType}');
 
-      // Debug: check if feature state saving is enabled
-      try {
-        final settings = await SettingsService.getSettings();
-        logInfo(
-            'ConverterController: Feature state saving enabled: ${settings.featureStateSavingEnabled}');
-      } catch (e) {
-        logError('ConverterController: Error checking settings: $e');
-      }
-
-      final loadedState =
-          await _stateService.loadState(_converterService.converterType);
-      _state = loadedState;
+      // Check if feature state saving is enabled
+      final settings = await ExtensibleSettingsService.getGlobalSettings();
       logInfo(
-          'ConverterController: Loaded state with ${_state.cards.length} cards, focus: ${_state.isFocusMode}, view: ${_state.viewMode.name}');
+          'ConverterController: Feature state saving enabled: ${settings.featureStateSavingEnabled}');
+
+      if (settings.featureStateSavingEnabled) {
+        // Load saved state when state saving is enabled
+        final loadedState =
+            await _stateService.loadState(_converterService.converterType);
+
+        // Validate and fix the loaded state
+        final validatedState = _validateAndFixState(loadedState);
+        _state = validatedState;
+
+        logInfo(
+            'ConverterController: Loaded and validated state with ${_state.cards.length} cards, focus: ${_state.isFocusMode}, view: ${_state.viewMode.name}');
+      } else {
+        // Create default state when state saving is disabled
+        logInfo(
+            'ConverterController: State saving disabled, creating default state');
+        createDefaultState();
+      }
     } catch (e) {
       logError('ConverterController: Error loading state: $e');
-      _createDefaultState();
+      createDefaultState();
     }
   }
 
-  void _createDefaultState() {
-    final defaultUnits = _converterService.defaultVisibleUnits;
-    final firstUnit = defaultUnits.first;
+  /// Validates loaded state and fixes invalid unit IDs
+  ConverterState _validateAndFixState(ConverterState loadedState) {
+    try {
+      // Get valid unit IDs from the converter service
+      final availableUnits = _converterService.units;
+      final validUnitIds = availableUnits.map((u) => u.id).toSet();
+      final defaultUnits = _converterService.defaultVisibleUnits;
 
-    final defaultCard = ConverterCardState(
-      name: 'Card 1', // Will be localized in UI
-      baseUnitId: firstUnit,
-      baseValue: 1.0,
-      visibleUnits: defaultUnits.toList(),
-      values: {
-        for (String unit in defaultUnits) unit: unit == firstUnit ? 1.0 : 0.0
-      },
-    );
+      logInfo(
+          'ConverterController: Validating state with ${validUnitIds.length} available units: ${validUnitIds.take(5).join(', ')}...');
 
-    _state = ConverterState(
-      cards: [defaultCard],
-      globalVisibleUnits: defaultUnits,
-      isFocusMode: false,
-      viewMode: ConverterViewMode.cards,
-    );
+      // If state is empty or invalid, create default state
+      if (loadedState.cards.isEmpty && loadedState.globalVisibleUnits.isEmpty) {
+        logInfo('ConverterController: Empty loaded state, creating default');
+        createDefaultState();
+        return _state;
+      }
+
+      // Validate and fix global visible units
+      final validGlobalUnits = loadedState.globalVisibleUnits
+          .where((unitId) => validUnitIds.contains(unitId))
+          .toSet();
+
+      final invalidGlobalUnits = loadedState.globalVisibleUnits
+          .where((unitId) => !validUnitIds.contains(unitId))
+          .toSet();
+
+      if (invalidGlobalUnits.isNotEmpty) {
+        logError(
+            'ConverterController: Found invalid global units: ${invalidGlobalUnits.join(', ')}');
+      }
+
+      if (validGlobalUnits.isEmpty) {
+        logError(
+            'ConverterController: No valid global units found in saved state, using defaults');
+        validGlobalUnits.addAll(defaultUnits);
+      }
+
+      // Validate and fix cards
+      final validCards = <ConverterCardState>[];
+
+      for (int cardIndex = 0;
+          cardIndex < loadedState.cards.length;
+          cardIndex++) {
+        final card = loadedState.cards[cardIndex];
+
+        // Filter valid visible units for this card
+        final validVisibleUnits = card.visibleUnits
+            .where((unitId) => validUnitIds.contains(unitId))
+            .toList();
+
+        final invalidVisibleUnits = card.visibleUnits
+            .where((unitId) => !validUnitIds.contains(unitId))
+            .toList();
+
+        if (invalidVisibleUnits.isNotEmpty) {
+          logError(
+              'ConverterController: Card "${card.name}" has invalid units: ${invalidVisibleUnits.join(', ')}');
+        }
+
+        // If no valid units, use default units
+        if (validVisibleUnits.isEmpty) {
+          logError(
+              'ConverterController: Card "${card.name}" has no valid units, using defaults');
+          validVisibleUnits.addAll(defaultUnits);
+        }
+
+        // Validate base unit ID
+        String validBaseUnitId = card.baseUnitId;
+        if (!validUnitIds.contains(card.baseUnitId)) {
+          logError(
+              'ConverterController: Invalid baseUnitId "${card.baseUnitId}" in card "${card.name}", using first valid unit');
+          validBaseUnitId = validVisibleUnits.isNotEmpty
+              ? validVisibleUnits.first
+              : defaultUnits.first;
+        }
+
+        // Filter valid values
+        final validValues = <String, double>{};
+        for (final entry in card.values.entries) {
+          if (validUnitIds.contains(entry.key)) {
+            validValues[entry.key] = entry.value;
+          }
+        }
+
+        // Create validated card
+        final validatedCard = ConverterCardState(
+          name: card.name,
+          baseUnitId: validBaseUnitId,
+          baseValue: card.baseValue,
+          visibleUnits: validVisibleUnits,
+          values: validValues,
+        );
+
+        validCards.add(validatedCard);
+      }
+
+      // If no valid cards, create default card
+      if (validCards.isEmpty) {
+        logError('ConverterController: No valid cards found, creating default');
+        createDefaultState();
+        return _state;
+      }
+
+      logInfo(
+          'ConverterController: Validation complete: ${validCards.length} cards, ${validGlobalUnits.length} global units');
+
+      return ConverterState(
+        cards: validCards,
+        globalVisibleUnits: validGlobalUnits,
+        isFocusMode: loadedState.isFocusMode,
+        viewMode: loadedState.viewMode,
+      );
+    } catch (e) {
+      logError('ConverterController: Error validating state: $e');
+      createDefaultState();
+      return _state;
+    }
   }
 
-  void _initializeControllers() {
+  @protected
+  void createDefaultState() {
+    try {
+      final defaultUnits = _converterService.defaultVisibleUnits;
+      logInfo(
+          'ConverterController: Creating default state with units: ${defaultUnits.toList()}');
+
+      if (defaultUnits.isEmpty) {
+        logError(
+            'ConverterController: No default visible units found for ${_converterService.converterType}');
+        throw Exception('No default visible units available');
+      }
+
+      final firstUnit = defaultUnits.first;
+
+      // Validate that the first unit exists in the converter service
+      final firstUnitObject = _converterService.getUnit(firstUnit);
+      if (firstUnitObject == null) {
+        logError(
+            'ConverterController: First unit $firstUnit not found in converter service');
+        throw Exception('Default unit not found in converter service');
+      }
+
+      final defaultCard = ConverterCardState(
+        name: 'Card 1', // Will be localized in UI
+        baseUnitId: firstUnit,
+        baseValue: 1.0,
+        visibleUnits: defaultUnits.toList(),
+        values: {
+          for (String unit in defaultUnits) unit: unit == firstUnit ? 1.0 : 0.0
+        },
+      );
+
+      _state = ConverterState(
+        cards: [defaultCard],
+        globalVisibleUnits: defaultUnits,
+        isFocusMode: false,
+        viewMode: ConverterViewMode.cards,
+      );
+
+      logInfo(
+          'ConverterController: Default state created successfully with ${defaultUnits.length} units');
+    } catch (e) {
+      logError('ConverterController: Error creating default state: $e');
+
+      // Fallback: Create a minimal state with available units
+      final allUnits = _converterService.units;
+      if (allUnits.isNotEmpty) {
+        final fallbackUnits = allUnits.take(3).map((u) => u.id).toSet();
+        final firstUnit = fallbackUnits.first;
+
+        logInfo(
+            'ConverterController: Using fallback units: ${fallbackUnits.toList()}');
+
+        final defaultCard = ConverterCardState(
+          name: 'Card 1',
+          baseUnitId: firstUnit,
+          baseValue: 1.0,
+          visibleUnits: fallbackUnits.toList(),
+          values: {
+            for (String unit in fallbackUnits)
+              unit: unit == firstUnit ? 1.0 : 0.0
+          },
+        );
+
+        _state = ConverterState(
+          cards: [defaultCard],
+          globalVisibleUnits: fallbackUnits,
+          isFocusMode: false,
+          viewMode: ConverterViewMode.cards,
+        );
+      } else {
+        logError(
+            'ConverterController: No units available in converter service');
+        rethrow;
+      }
+    }
+  }
+
+  @protected
+  void initializeControllers() {
     _disposeControllers();
 
     for (int i = 0; i < _state.cards.length; i++) {
@@ -169,18 +369,24 @@ class ConverterController extends ChangeNotifier {
 
   Future<void> _saveState() async {
     try {
-      await _stateService.saveState(_converterService.converterType, _state);
-      logInfo('Saved state with ${_state.cards.length} cards');
+      // Check if feature state saving is enabled before saving
+      final settings = await ExtensibleSettingsService.getGlobalSettings();
+      if (settings.featureStateSavingEnabled) {
+        await _stateService.saveState(_converterService.converterType, _state);
+        logInfo('Saved state with ${_state.cards.length} cards');
+      } else {
+        logInfo('State saving disabled - skipping save');
+      }
     } catch (e) {
       logError('Error saving state: $e');
     }
   }
 
-  Future<void> _refreshData() async {
+  Future<void> refreshData() async {
     if (!_converterService.requiresRealTimeData) return;
 
     _state = _state.copyWith(isLoading: true);
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
 
     try {
       await _converterService.refreshData();
@@ -188,7 +394,7 @@ class ConverterController extends ChangeNotifier {
       // Update all conversions in batch
       _isUpdatingControllers = true;
       for (int i = 0; i < _state.cards.length; i++) {
-        _updateCardConversions(
+        updateCardConversions(
             i, _state.cards[i].baseUnitId, _state.cards[i].baseValue);
       }
       _isUpdatingControllers = false;
@@ -202,7 +408,7 @@ class ConverterController extends ChangeNotifier {
       _state = _state.copyWith(isLoading: false);
     }
 
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   // Public methods
@@ -237,9 +443,9 @@ class ConverterController extends ChangeNotifier {
     }
     _cardControllers[cardIndex] = controllers;
 
-    _updateCardConversions(cardIndex, defaultUnit, 1.0);
+    updateCardConversions(cardIndex, defaultUnit, 1.0);
     await _saveState();
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   Future<void> removeCard(int cardIndex) async {
@@ -269,7 +475,7 @@ class ConverterController extends ChangeNotifier {
     _state = _state.copyWith(cards: newCards);
 
     await _saveState();
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   Future<void> updateCardName(int cardIndex, String newName) async {
@@ -281,7 +487,7 @@ class ConverterController extends ChangeNotifier {
 
     _state = _state.copyWith(cards: newCards);
     await _saveState();
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   Future<void> updateCardUnits(int cardIndex, Set<String> newUnits) async {
@@ -320,16 +526,16 @@ class ConverterController extends ChangeNotifier {
     }
     _cardControllers[cardIndex] = controllers;
 
-    _updateCardConversions(cardIndex, baseUnit, updatedCard.baseValue);
+    updateCardConversions(cardIndex, baseUnit, updatedCard.baseValue);
     await _saveState();
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   void onValueChanged(int cardIndex, String unitId, String valueText) {
     if (cardIndex >= _state.cards.length) return;
 
     final value = double.tryParse(valueText) ?? 0.0;
-    _updateCardConversions(cardIndex, unitId, value);
+    updateCardConversions(cardIndex, unitId, value);
 
     // Save state after value changes to ensure persistence (async but don't block UI)
     _saveState().catchError((e) {
@@ -337,7 +543,8 @@ class ConverterController extends ChangeNotifier {
     });
   }
 
-  void _updateCardConversions(
+  @protected
+  void updateCardConversions(
       int cardIndex, String baseUnitId, double baseValue) {
     if (cardIndex >= _state.cards.length) return;
 
@@ -393,7 +600,7 @@ class ConverterController extends ChangeNotifier {
     _state = _state.copyWith(cards: newCards);
 
     _isUpdatingControllers = false;
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   Future<void> updateGlobalVisibleUnits(Set<String> newUnits) async {
@@ -403,14 +610,14 @@ class ConverterController extends ChangeNotifier {
     // This depends on your UX preference
 
     await _saveState();
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   Future<void> setViewMode(ConverterViewMode mode) async {
     if (_state.viewMode != mode) {
       _state = _state.copyWith(viewMode: mode);
       await _saveState();
-      _notifyListenersDebounced();
+      notifyListenersDebounced();
     }
   }
 
@@ -444,7 +651,7 @@ class ConverterController extends ChangeNotifier {
 
     _state = _state.copyWith(cards: cards);
     await _saveState();
-    _notifyListenersDebounced();
+    notifyListenersDebounced();
   }
 
   // New methods for mobile card movement
@@ -476,32 +683,45 @@ class ConverterController extends ChangeNotifier {
     return MediaQuery.of(context).size.width < 600;
   }
 
-  Future<void> resetLayout() async {
-    _disposeControllers();
-    _createDefaultState();
-    _initializeControllers();
-    await _saveState();
-    _notifyListenersDebounced();
-  }
-
-  Future<void> refreshData() async {
-    await _refreshData();
-  }
-
-  /// Toggle focus mode on/off
-  Future<void> toggleFocusMode() async {
-    _state = _state.copyWith(isFocusMode: !_state.isFocusMode);
-    await _saveState();
-    _notifyListenersDebounced();
-  }
-
-  /// Set focus mode state
-  Future<void> setFocusMode(bool enabled) async {
+  void setFocusMode(bool enabled) {
     if (_state.isFocusMode != enabled) {
       _state = _state.copyWith(isFocusMode: enabled);
-      await _saveState();
-      _notifyListenersDebounced();
+      _saveState();
+      notifyListenersDebounced();
     }
+  }
+
+  void resetLayout() {
+    _disposeControllers();
+    createDefaultState();
+    initializeControllers();
+    _saveState();
+    notifyListenersDebounced();
+  }
+
+  Future<void> clearSavedState() async {
+    try {
+      logInfo(
+          'ConverterController: Clearing saved state for ${_converterService.converterType}');
+      await _stateService.clearState(_converterService.converterType);
+
+      // Reset to default state
+      _disposeControllers();
+      createDefaultState();
+      initializeControllers();
+      notifyListenersDebounced();
+
+      logInfo(
+          'ConverterController: Successfully cleared saved state and reset to default');
+    } catch (e) {
+      logError('ConverterController: Error clearing saved state: $e');
+    }
+  }
+
+  void toggleFocusMode() {
+    _state = _state.copyWith(isFocusMode: !_state.isFocusMode);
+    _saveState();
+    notifyListenersDebounced();
   }
 
   @override

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/bmi_models.dart';
+import 'package:setpocket/models/calculator_models/bmi_models.dart';
 import 'package:setpocket/services/calculator_services/bmi_service.dart';
+import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/widgets/generic/number_stepper.dart';
 
 /// BMI Calculator content widget - separated from main screen for better organization
 class BmiCalculatorContent extends StatefulWidget {
@@ -23,7 +25,9 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
   // Form controllers
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
+
+  // Age group instead of exact age
+  AgeGroup _ageGroup = AgeGroup.adult18Plus;
 
   // State variables
   UnitSystem _unitSystem = UnitSystem.metric;
@@ -42,34 +46,55 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
   void dispose() {
     _heightController.dispose();
     _weightController.dispose();
-    _ageController.dispose();
     super.dispose();
   }
 
   Future<void> _loadPreferences() async {
     final prefs = await BmiService.getPreferences();
+    final savedState = await BmiService.getCalculatorState();
+
     if (!mounted) return;
 
     setState(() {
       _unitSystem = UnitSystem.values[prefs['unitSystem'] ?? 0];
-      _autoSaveToHistory = prefs['autoSaveToHistory'] ?? true;
+      _autoSaveToHistory = prefs['autoSaveToHistory'] ?? false;
       _rememberLastValues = prefs['rememberLastValues'] ?? true;
     });
 
-    if (_rememberLastValues) {
+    // Load from saved state if available and remember last values is enabled
+    if (_rememberLastValues && savedState != null) {
+      final height = savedState['height'];
+      final weight = savedState['weight'];
+      final ageGroup = savedState['ageGroup'];
+      final gender = savedState['gender'];
+
+      if (height != null) _heightController.text = height.toString();
+      if (weight != null) _weightController.text = weight.toString();
+      if (ageGroup != null) _ageGroup = AgeGroup.values[ageGroup];
+      if (gender != null) _gender = Gender.values[gender];
+
+      // Also load unit system and auto-calculate if we have values
+      if (savedState['unitSystem'] != null) {
+        _unitSystem = UnitSystem.values[savedState['unitSystem']];
+      }
+
+      // Auto-calculate if we have saved height and weight
+      if (height != null && weight != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _calculateBmi();
+        });
+      }
+    } else if (_rememberLastValues) {
+      // Fallback to preferences if no saved state
       final height = prefs['lastHeight'];
       final weight = prefs['lastWeight'];
-      final age = prefs['lastAge'];
+      final ageGroup = prefs['lastAgeGroup'];
       final gender = prefs['lastGender'];
 
       if (height != null) _heightController.text = height.toString();
       if (weight != null) _weightController.text = weight.toString();
-      if (age != null) _ageController.text = age.toString();
+      if (ageGroup != null) _ageGroup = AgeGroup.values[ageGroup];
       if (gender != null) _gender = Gender.values[gender];
-
-      if (height != null && weight != null && age != null) {
-        _calculateBmi();
-      }
     }
   }
 
@@ -82,45 +107,52 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
 
     if (_rememberLastValues &&
         _heightController.text.isNotEmpty &&
-        _weightController.text.isNotEmpty &&
-        _ageController.text.isNotEmpty) {
+        _weightController.text.isNotEmpty) {
       final height = double.tryParse(_heightController.text);
       final weight = double.tryParse(_weightController.text);
-      final age = int.tryParse(_ageController.text);
       if (height != null) prefs['lastHeight'] = height;
       if (weight != null) prefs['lastWeight'] = weight;
-      if (age != null) prefs['lastAge'] = age;
+      prefs['lastAgeGroup'] = _ageGroup.index;
       prefs['lastGender'] = _gender.index;
     }
 
     await BmiService.savePreferences(prefs);
   }
 
+  Future<void> _saveCalculatorState() async {
+    try {
+      final height = double.tryParse(_heightController.text);
+      final weight = double.tryParse(_weightController.text);
+
+      await BmiService.saveCalculatorState(
+        height: height,
+        weight: weight,
+        ageGroup: _ageGroup,
+        unitSystem: _unitSystem,
+        gender: _gender,
+        lastCalculation: _currentCalculation,
+      );
+    } catch (e) {
+      debugPrint('Error saving calculator state: $e');
+    }
+  }
+
   void _calculateBmi() {
     final heightText = _heightController.text.trim();
     final weightText = _weightController.text.trim();
-    final ageText = _ageController.text.trim();
 
-    if (heightText.isEmpty || weightText.isEmpty || ageText.isEmpty) {
+    if (heightText.isEmpty || weightText.isEmpty) {
       if (!mounted) return;
       setState(() {
         _currentCalculation = null;
       });
-      widget.onCalculationChanged?.call(_currentCalculation!);
       return;
     }
 
     final height = double.tryParse(heightText);
     final weight = double.tryParse(weightText);
-    final age = int.tryParse(ageText);
 
-    if (height == null ||
-        weight == null ||
-        age == null ||
-        height <= 0 ||
-        weight <= 0 ||
-        age <= 0 ||
-        age > 150) {
+    if (height == null || weight == null || height <= 0 || weight <= 0) {
       if (!mounted) return;
       setState(() {
         _currentCalculation = null;
@@ -130,30 +162,66 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
 
     final l10n = AppLocalizations.of(context)!;
     final calculation = BmiService.calculateBmi(
-        height, weight, age, _gender, _unitSystem, l10n);
+        height, weight, _ageGroup, _gender, _unitSystem, l10n);
 
     if (!mounted) return;
     setState(() {
       _currentCalculation = calculation;
     });
+  }
 
-    widget.onCalculationChanged?.call(calculation);
+  void _onBookmarkPressed() {
+    if (_currentCalculation == null) return;
+
+    final heightText = _heightController.text.trim();
+    final weightText = _weightController.text.trim();
+    final height = double.tryParse(heightText);
+    final weight = double.tryParse(weightText);
+
+    if (height == null || weight == null) return;
+
+    final bmiData = BmiData.create(
+      height: height,
+      weight: weight,
+      ageGroup: _ageGroup,
+      unitSystem: _unitSystem,
+      gender: _gender,
+      calculatedAt: DateTime.now(),
+    );
+
+    widget.onSaveToHistory?.call(bmiData, _currentCalculation!);
+  }
+
+  void _onCalculatePressed() {
+    // Hide keyboard
+    FocusScope.of(context).unfocus();
+
+    _calculateBmi();
+
+    // Save both preferences and state when the user explicitly calculates.
     _savePreferences();
+    _saveCalculatorState();
 
-    // // Auto-save to history if enabled
-    // if (_autoSaveToHistory && widget.onSaveToHistory != null) {
-    //   widget.onSaveToHistory!(
-    //     BmiData(
-    //       height: height,
-    //       weight: weight,
-    //       age: age,
-    //       gender: _gender,
-    //       unitSystem: _unitSystem,
-    //       calculatedAt: DateTime.now(),
-    //     ),
-    //     calculation,
-    //   );
-    // }
+    if (_currentCalculation != null) {
+      widget.onCalculationChanged?.call(_currentCalculation!);
+
+      // Auto-save to history if enabled
+      if (_autoSaveToHistory) {
+        final height = double.tryParse(_heightController.text);
+        final weight = double.tryParse(_weightController.text);
+        if (height != null && weight != null) {
+          final bmiData = BmiData.create(
+            height: height,
+            weight: weight,
+            ageGroup: _ageGroup,
+            gender: _gender,
+            unitSystem: _unitSystem,
+            calculatedAt: DateTime.now(),
+          );
+          widget.onSaveToHistory?.call(bmiData, _currentCalculation!);
+        }
+      }
+    }
   }
 
   void _toggleUnitSystem() {
@@ -197,7 +265,6 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
         _unitSystem = UnitSystem.metric;
       }
     });
-    _calculateBmi();
   }
 
   String _getCategoryName(BmiCategory category, AppLocalizations l10n) {
@@ -220,27 +287,15 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
   }
 
   String _getCurrentBmiRangeTitle(AppLocalizations l10n) {
-    final ageText = _ageController.text.trim();
-    if (ageText.isEmpty) return l10n.bmiAdultTitle;
-
-    final age = int.tryParse(ageText) ?? 18;
-    return BmiService.getBmiRangeTitle(l10n, age);
+    return BmiService.getBmiRangeTitle(l10n, _ageGroup);
   }
 
   String _getCurrentBmiRangeNote(AppLocalizations l10n) {
-    final ageText = _ageController.text.trim();
-    if (ageText.isEmpty) return BmiService.getBmiRangeNote(l10n, 18);
-
-    final age = int.tryParse(ageText) ?? 18;
-    return BmiService.getBmiRangeNote(l10n, age);
+    return BmiService.getBmiRangeNote(l10n, _ageGroup);
   }
 
   List<Map<String, dynamic>> _getCurrentBmiRanges(AppLocalizations l10n) {
-    final ageText = _ageController.text.trim();
-    if (ageText.isEmpty) return BmiService.getBmiRanges(l10n);
-
-    final age = int.tryParse(ageText) ?? 18;
-    return BmiService.getBmiRangesForAge(l10n, age);
+    return BmiService.getBmiRangesForAgeGroup(l10n, _ageGroup);
   }
 
   Widget _buildBMIScaleItem(String category, String range, Color color) {
@@ -293,7 +348,6 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
     final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -301,14 +355,19 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
+              child: WidgetLayoutRenderHelper.twoEqualWidthInRow(
+                // Left side - Units label
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
                     l10n.units,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  SegmentedButton<UnitSystem>(
+                ),
+                // Right side - SegmentedButton spanning full width
+                SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<UnitSystem>(
                     segments: [
                       ButtonSegment(
                         value: UnitSystem.metric,
@@ -324,7 +383,8 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                       _toggleUnitSystem();
                     },
                   ),
-                ],
+                ),
+                minWidth: 300,
               ),
             ),
           ),
@@ -344,139 +404,71 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Gender and Age row - responsive layout
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWideScreen = constraints.maxWidth > 300;
-
-                      if (isWideScreen) {
-                        return Row(
-                          children: [
-                            // Gender section (fixed width)
-                            SizedBox(
-                              width: 200,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.gender,
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  SegmentedButton<Gender>(
-                                    segments: [
-                                      ButtonSegment(
-                                        value: Gender.male,
-                                        label: Text(l10n.male),
-                                        icon: const Icon(Icons.male),
-                                      ),
-                                      ButtonSegment(
-                                        value: Gender.female,
-                                        label: Text(l10n.female),
-                                        icon: const Icon(Icons.female),
-                                      ),
-                                    ],
-                                    selected: {_gender},
-                                    onSelectionChanged:
-                                        (Set<Gender> selection) {
-                                      if (!mounted) return;
-                                      setState(() {
-                                        _gender = selection.first;
-                                      });
-                                      _calculateBmi();
-                                    },
-                                  ),
-                                ],
-                              ),
+                  // Gender and Age row using TwoInARow layout
+                  WidgetLayoutRenderHelper.twoEqualWidthInRow(
+                    // Gender section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          l10n.gender,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        SegmentedButton<Gender>(
+                          segments: [
+                            ButtonSegment(
+                              value: Gender.male,
+                              label: Text(l10n.male),
+                              icon: const Icon(Icons.male),
                             ),
-
-                            const SizedBox(width: 16),
-
-                            // Age section (expanded)
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.ageYears,
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  TextField(
-                                    controller: _ageController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(3),
-                                    ],
-                                    decoration: InputDecoration(
-                                      border: const OutlineInputBorder(),
-                                      suffixText: l10n.age.toLowerCase(),
-                                    ),
-                                    onChanged: (_) => _calculateBmi(),
-                                  ),
-                                ],
-                              ),
+                            ButtonSegment(
+                              value: Gender.female,
+                              label: Text(l10n.female),
+                              icon: const Icon(Icons.female),
                             ),
                           ],
-                        );
-                      } else {
-                        // Narrow screen - stack vertically
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Gender selection
-                            Text(
-                              l10n.gender,
-                              style: Theme.of(context).textTheme.titleSmall,
+                          selected: {_gender},
+                          onSelectionChanged: (Set<Gender> selection) {
+                            if (!mounted) return;
+                            setState(() {
+                              _gender = selection.first;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    // Age section using SegmentedButton
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          l10n.ageGroup,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        SegmentedButton<AgeGroup>(
+                          segments: [
+                            ButtonSegment(
+                              value: AgeGroup.under18,
+                              label: Text(l10n.ageUnder18),
                             ),
-                            const SizedBox(height: 8),
-                            SegmentedButton<Gender>(
-                              segments: [
-                                ButtonSegment(
-                                  value: Gender.male,
-                                  label: Text(l10n.male),
-                                  icon: const Icon(Icons.male),
-                                ),
-                                ButtonSegment(
-                                  value: Gender.female,
-                                  label: Text(l10n.female),
-                                  icon: const Icon(Icons.female),
-                                ),
-                              ],
-                              selected: {_gender},
-                              onSelectionChanged: (Set<Gender> selection) {
-                                if (!mounted) return;
-                                setState(() {
-                                  _gender = selection.first;
-                                });
-                                _calculateBmi();
-                              },
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Age field
-                            TextField(
-                              controller: _ageController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(3),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: l10n.ageYears,
-                                border: const OutlineInputBorder(),
-                                suffixText: l10n.age.toLowerCase(),
-                              ),
-                              onChanged: (_) => _calculateBmi(),
+                            ButtonSegment(
+                              value: AgeGroup.adult18Plus,
+                              label: Text(l10n.age18Plus),
                             ),
                           ],
-                        );
-                      }
-                    },
+                          selected: {_ageGroup},
+                          onSelectionChanged: (Set<AgeGroup> selection) {
+                            if (!mounted) return;
+                            setState(() {
+                              _ageGroup = selection.first;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    minWidth: 500,
                   ),
                 ],
               ),
@@ -498,116 +490,93 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Height and Weight row - responsive layout
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWideScreen = constraints.maxWidth > 300;
-
-                      if (isWideScreen) {
-                        return Row(
-                          children: [
-                            // Height field (1:1 ratio)
-                            Expanded(
-                              child: TextField(
-                                controller: _heightController,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'[0-9.]')),
-                                ],
-                                decoration: InputDecoration(
-                                  labelText: _unitSystem == UnitSystem.metric
-                                      ? l10n.heightCm
-                                      : l10n.heightInches,
-                                  border: const OutlineInputBorder(),
-                                  suffixText: _unitSystem == UnitSystem.metric
-                                      ? 'cm'
-                                      : 'in',
-                                ),
-                                onChanged: (_) => _calculateBmi(),
-                              ),
-                            ),
-
-                            const SizedBox(width: 16),
-
-                            // Weight field (1:1 ratio)
-                            Expanded(
-                              child: TextField(
-                                controller: _weightController,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'[0-9.]')),
-                                ],
-                                decoration: InputDecoration(
-                                  labelText: _unitSystem == UnitSystem.metric
-                                      ? l10n.weightKg
-                                      : l10n.weightPounds,
-                                  border: const OutlineInputBorder(),
-                                  suffixText: _unitSystem == UnitSystem.metric
-                                      ? 'kg'
-                                      : 'lbs',
-                                ),
-                                onChanged: (_) => _calculateBmi(),
-                              ),
-                            ),
+                  // Height and Weight input
+                  WidgetLayoutRenderHelper.twoEqualWidthInRow(
+                    // Height input
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _unitSystem == UnitSystem.metric
+                              ? l10n.heightCm
+                              : l10n.heightInches,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _heightController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d*')),
                           ],
-                        );
-                      } else {
-                        // Narrow screen - stack vertically
-                        return Column(
-                          children: [
-                            TextField(
-                              controller: _heightController,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9.]')),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: _unitSystem == UnitSystem.metric
-                                    ? l10n.heightCm
-                                    : l10n.heightInches,
-                                border: const OutlineInputBorder(),
-                                suffixText: _unitSystem == UnitSystem.metric
-                                    ? 'cm'
-                                    : 'in',
-                              ),
-                              onChanged: (_) => _calculateBmi(),
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _weightController,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9.]')),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: _unitSystem == UnitSystem.metric
-                                    ? l10n.weightKg
-                                    : l10n.weightPounds,
-                                border: const OutlineInputBorder(),
-                                suffixText: _unitSystem == UnitSystem.metric
-                                    ? 'kg'
-                                    : 'lbs',
-                              ),
-                              onChanged: (_) => _calculateBmi(),
-                            ),
+                          decoration: InputDecoration(
+                            hintText:
+                                _unitSystem == UnitSystem.metric ? '170' : '67',
+                            border: const OutlineInputBorder(),
+                            suffixText:
+                                _unitSystem == UnitSystem.metric ? 'cm' : 'in',
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Weight input
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _unitSystem == UnitSystem.metric
+                              ? l10n.weightKg
+                              : l10n.weightPounds,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _weightController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d*')),
                           ],
-                        );
-                      }
-                    },
+                          decoration: InputDecoration(
+                            hintText:
+                                _unitSystem == UnitSystem.metric ? '70' : '154',
+                            border: const OutlineInputBorder(),
+                            suffixText:
+                                _unitSystem == UnitSystem.metric ? 'kg' : 'lbs',
+                          ),
+                        ),
+                      ],
+                    ),
+                    minWidth: 500,
                   ),
                 ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Calculate button
+          SizedBox(
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _onCalculatePressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                l10n.calculate,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
             ),
           ),
@@ -631,32 +600,14 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                         ),
                         // Manual save button
                         if (widget.onSaveToHistory != null)
-                          IconButton(
-                            onPressed: () {
-                              final height =
-                                  double.tryParse(_heightController.text);
-                              final weight =
-                                  double.tryParse(_weightController.text);
-                              final age = int.tryParse(_ageController.text);
-
-                              if (height != null &&
-                                  weight != null &&
-                                  age != null) {
-                                widget.onSaveToHistory!(
-                                  BmiData(
-                                    height: height,
-                                    weight: weight,
-                                    age: age,
-                                    gender: _gender,
-                                    unitSystem: _unitSystem,
-                                    calculatedAt: DateTime.now(),
-                                  ),
-                                  _currentCalculation!,
-                                );
-                              }
-                            },
-                            icon: const Icon(Icons.add),
-                            tooltip: l10n.saveToHistory,
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, left: 12.0),
+                            child: TextButton.icon(
+                              icon: const Icon(Icons.bookmark_add_outlined),
+                              label: Text(l10n.bookmark),
+                              onPressed: _onBookmarkPressed,
+                            ),
                           ),
                       ],
                     ),
@@ -720,10 +671,13 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.fiber_manual_record,
-                              size: 8,
-                              color: _currentCalculation!.categoryColor,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Icon(
+                                Icons.fiber_manual_record,
+                                size: 8,
+                                color: _currentCalculation!.categoryColor,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(

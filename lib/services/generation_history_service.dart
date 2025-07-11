@@ -1,38 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:setpocket/models/generation_history.dart';
+import 'package:isar/isar.dart';
 import 'package:setpocket/services/generation_history_service_isar.dart';
-import 'hive_service.dart';
-
-// Legacy class for backward compatibility - now uses Isar internally
-class GenerationHistoryItem {
-  final String value;
-  final DateTime timestamp;
-  final String type; // 'password', 'number', 'date', 'color', etc.
-
-  GenerationHistoryItem({
-    required this.value,
-    required this.timestamp,
-    required this.type,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'value': value,
-      'timestamp': timestamp.toIso8601String(),
-      'type': type,
-    };
-  }
-
-  factory GenerationHistoryItem.fromJson(Map<String, dynamic> json) {
-    return GenerationHistoryItem(
-      value: json['value'],
-      timestamp: DateTime.parse(json['timestamp']),
-      type: json['type'],
-    );
-  }
-}
+import 'package:setpocket/models/unified_history_data.dart';
+import 'package:setpocket/services/isar_service.dart';
 
 class GenerationHistoryService {
   static const String _historyEnabledKey = 'generation_history_enabled';
@@ -47,37 +18,9 @@ class GenerationHistoryService {
   // Migration helper - run once to migrate from Hive to Isar
   static Future<void> _ensureMigration() async {
     if (_migrationCompleted) return;
-
-    try {
-      // Check if there's any data in Hive to migrate
-      final hiveHistory = await _getHistoryFromHive();
-
-      if (hiveHistory.isNotEmpty) {
-        // Migrate each type to Isar
-        for (final type in hiveHistory.keys) {
-          final items = hiveHistory[type] ?? [];
-          for (final item in items) {
-            await GenerationHistoryServiceIsar.addHistoryItem(
-                item.value, item.type);
-          }
-        }
-      }
-
-      _migrationCompleted = true;
-    } catch (e) {
-      // If migration fails, continue with Isar anyway
-      _migrationCompleted = true;
-    }
-  }
-
-  static Future<Map<String, List<GenerationHistoryItem>>>
-      _getHistoryFromHive() async {
-    try {
-      // Hive access disabled during migration
-      return {};
-    } catch (e) {
-      return {};
-    }
+    // Since this is a one-time migration, we assume it has been completed
+    // and the old Hive data is no longer relevant.
+    _migrationCompleted = true;
   }
 
   /// Simple encryption using base64 and key rotation
@@ -124,24 +67,15 @@ class GenerationHistoryService {
   }
 
   /// Add a new item to history
-  static Future<void> addHistoryItem(String value, String type) async {
+  static Future<void> addHistoryItem(UnifiedHistoryData item) async {
     await _ensureMigration();
-    return await GenerationHistoryServiceIsar.addHistoryItem(value, type);
+    return await GenerationHistoryServiceIsar.addHistoryItem(item);
   }
 
   /// Get history items for a specific type
-  static Future<List<GenerationHistoryItem>> getHistory(String type) async {
+  static Future<List<UnifiedHistoryData>> getHistory(String type) async {
     await _ensureMigration();
-    final isarItems = await GenerationHistoryServiceIsar.getHistory(type);
-
-    // Convert Isar models to legacy models for compatibility
-    return isarItems
-        .map((item) => GenerationHistoryItem(
-              value: item.value,
-              timestamp: item.timestamp,
-              type: item.type,
-            ))
-        .toList();
+    return await GenerationHistoryServiceIsar.getHistory(type);
   }
 
   /// Clear history for a specific type
@@ -154,6 +88,12 @@ class GenerationHistoryService {
   static Future<void> clearAllHistory() async {
     await _ensureMigration();
     return await GenerationHistoryServiceIsar.clearAllHistory();
+  }
+
+  /// Delete a specific history item by its ID
+  static Future<void> deleteHistoryItem(Id id) async {
+    await _ensureMigration();
+    return await GenerationHistoryServiceIsar.deleteHistoryItem(id);
   }
 
   /// Get all unique history types
@@ -183,5 +123,12 @@ class GenerationHistoryService {
   static Future<int> getHistoryDataSize() async {
     await _ensureMigration();
     return await GenerationHistoryServiceIsar.getHistoryDataSize();
+  }
+
+  static Future<void> deleteHistoryItemById(int id) async {
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.unifiedHistoryDatas.delete(id);
+    });
   }
 }

@@ -110,7 +110,7 @@ class _ToolVisibilityDialogState extends State<ToolVisibilityDialog> {
 
     return GenericDialog(
       decorator: GenericDialogDecorator(
-        width: DynamicDimension.flexibility(90, 600),
+        width: DynamicDimension.flexibilityMax(90, 600),
         headerBackColor: backColor.withValues(alpha: 0.5),
         bodyBackColor: backColor,
         footerBackColor: backColor,

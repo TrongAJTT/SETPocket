@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
@@ -29,7 +30,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
   bool _includeSpecial = true;
   String _generatedPassword = '';
   bool _copied = false;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -41,7 +42,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
 
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getPasswordGeneratorState();
+      final state = await UnifiedRandomStateService.getPasswordGeneratorState();
       if (mounted) {
         setState(() {
           _passwordLength = state.passwordLength;
@@ -65,7 +66,7 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
         ..includeNumbers = _includeNumbers
         ..includeSpecial = _includeSpecial
         ..lastUpdated = DateTime.now();
-      await RandomStateService.savePasswordGeneratorState(state);
+      await UnifiedRandomStateService.savePasswordGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -108,8 +109,11 @@ class _PasswordGeneratorScreenState extends State<PasswordGeneratorScreen> {
     // Save to history if enabled
     if (_historyEnabled && _generatedPassword.isNotEmpty) {
       await GenerationHistoryService.addHistoryItem(
-        _generatedPassword,
-        'password',
+        UnifiedHistoryData(
+          value: _generatedPassword,
+          type: 'password',
+          timestamp: DateTime.now(),
+        ),
       );
       await _loadHistory(); // Refresh history
     }

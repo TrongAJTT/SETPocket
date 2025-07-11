@@ -4,13 +4,15 @@ import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/utils/size_utils.dart';
 
 class DateTimeGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -36,7 +38,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   List<DateTime> _generatedDateTimes = [];
   bool _copied = false;
   late AnimationController _animationController;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -57,16 +59,21 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
   }
 
   void _loadState() async {
-    final state = await RandomStateService.getDateTimeGeneratorState();
-    if (state != null) {
-      setState(() {
-        _startDateTime = state.startDateTime ??
-            DateTime.now().subtract(const Duration(days: 365));
-        _endDateTime =
-            state.endDateTime ?? DateTime.now().add(const Duration(days: 365));
-        _dateTimeCount = state.dateTimeCount;
-        _allowDuplicates = state.allowDuplicates;
-      });
+    try {
+      final state = await UnifiedRandomStateService.getDateTimeGeneratorState();
+      if (mounted) {
+        setState(() {
+          _startDateTime = state.startDateTime ??
+              DateTime.now().subtract(const Duration(days: 365));
+          _endDateTime = state.endDateTime ??
+              DateTime.now().add(const Duration(days: 365));
+          _dateTimeCount = state.dateTimeCount;
+          _allowDuplicates = state.allowDuplicates;
+          _includeSeconds = state.includeSeconds;
+        });
+      }
+    } catch (e) {
+      // Error is already logged in service
     }
   }
 
@@ -77,8 +84,9 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         ..endDateTime = _endDateTime
         ..dateTimeCount = _dateTimeCount
         ..allowDuplicates = _allowDuplicates
+        ..includeSeconds = _includeSeconds
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveDateTimeGeneratorState(state);
+      await UnifiedRandomStateService.saveDateTimeGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -119,8 +127,11 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
             .map((dateTime) => dateTimeFormat.format(dateTime))
             .toList();
         GenerationHistoryService.addHistoryItem(
-          dateTimeStrings.join(', '),
-          'date_time',
+          UnifiedHistoryData(
+            value: dateTimeStrings.join(', '),
+            type: 'date_time',
+            timestamp: DateTime.now(),
+          ),
         ).then((_) => _loadHistory());
       }
     } catch (e) {
@@ -314,8 +325,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         _selectEndDateTime,
       ),
       minWidth: 360,
-      horizontalSpacing: 20,
-      verticalSpacing: 8,
+      spacing: TwoDimSpacing.specific(horizontal: 20, vertical: 8),
     );
   }
 
@@ -363,8 +373,7 @@ class _DateTimeGeneratorScreenState extends State<DateTimeGeneratorScreen>
         decorator: OptionSwitchDecorator.compact(context),
       ),
       minWidth: 350,
-      horizontalSpacing: 20,
-      verticalSpacing: 8,
+      spacing: TwoDimSpacing.specific(horizontal: 20, vertical: 8),
     );
   }
 

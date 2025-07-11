@@ -1,9 +1,148 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
+import 'package:setpocket/services/converter_services/length_unified_service.dart';
+import 'package:setpocket/services/converter_services/mass_unified_service.dart';
+import 'package:setpocket/services/converter_services/weight_unified_service.dart';
+import 'package:setpocket/services/converter_services/area_unified_service.dart';
+import 'package:setpocket/services/converter_services/time_unified_service.dart';
+import 'package:setpocket/services/converter_services/volume_unified_service.dart';
+import 'package:setpocket/services/converter_services/number_system_unified_service.dart';
+import 'package:setpocket/services/converter_services/speed_unified_service.dart';
+import 'package:setpocket/services/converter_services/temperature_unified_service.dart';
+import 'package:setpocket/services/converter_services/data_unified_service.dart';
+import 'package:setpocket/services/converter_services/currency_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
+
+// Helper functions to work with unified services based on preset type
+class _UnifiedServiceHelper {
+  static Future<List<Map<String, dynamic>>> loadPresets(
+      String presetType) async {
+    switch (presetType) {
+      case 'currency':
+        return await CurrencyUnifiedService.loadPresets();
+      case 'length':
+        return await LengthUnifiedService.loadPresets();
+      case 'mass':
+        return await MassUnifiedService.loadPresets();
+      case 'weight':
+        return await WeightUnifiedService.loadPresets();
+      case 'area':
+        return await AreaUnifiedService.loadPresets();
+      case 'time':
+        return await TimeUnifiedService.loadPresets();
+      case 'volume':
+        return await VolumeUnifiedService.loadPresets();
+      case 'number_system':
+        return await NumberSystemUnifiedService.loadPresets();
+      case 'speed':
+        return await SpeedUnifiedService.loadPresets();
+      case 'temperature':
+        return await TemperatureUnifiedService.loadPresets();
+      case 'data_storage':
+        return await DataUnifiedService.loadPresets();
+      default:
+        logError('Unknown preset type: $presetType');
+        return [];
+    }
+  }
+
+  static Future<String> savePreset(String presetType,
+      {required String name, required List<String> units}) async {
+    switch (presetType) {
+      case 'currency':
+        return await CurrencyUnifiedService.savePreset(
+            name: name, units: units);
+      case 'length':
+        return await LengthUnifiedService.savePreset(name: name, units: units);
+      case 'mass':
+        return await MassUnifiedService.savePreset(name: name, units: units);
+      case 'weight':
+        return await WeightUnifiedService.savePreset(name: name, units: units);
+      case 'area':
+        return await AreaUnifiedService.savePreset(name: name, units: units);
+      case 'time':
+        return await TimeUnifiedService.savePreset(name: name, units: units);
+      case 'volume':
+        return await VolumeUnifiedService.savePreset(name: name, units: units);
+      case 'number_system':
+        return await NumberSystemUnifiedService.savePreset(
+            name: name, units: units);
+      case 'speed':
+        return await SpeedUnifiedService.savePreset(name: name, units: units);
+      case 'temperature':
+        return await TemperatureUnifiedService.savePreset(
+            name: name, units: units);
+      case 'data_storage':
+        return await DataUnifiedService.savePreset(name: name, units: units);
+      default:
+        logError('Unknown preset type: $presetType');
+        throw Exception('Unknown preset type: $presetType');
+    }
+  }
+
+  static Future<void> deletePreset(String presetType, String id) async {
+    switch (presetType) {
+      case 'currency':
+        return await CurrencyUnifiedService.deletePreset(id);
+      case 'length':
+        return await LengthUnifiedService.deletePreset(id);
+      case 'mass':
+        return await MassUnifiedService.deletePreset(id);
+      case 'weight':
+        return await WeightUnifiedService.deletePreset(id);
+      case 'area':
+        return await AreaUnifiedService.deletePreset(id);
+      case 'time':
+        return await TimeUnifiedService.deletePreset(id);
+      case 'volume':
+        return await VolumeUnifiedService.deletePreset(id);
+      case 'number_system':
+        return await NumberSystemUnifiedService.deletePreset(id);
+      case 'speed':
+        return await SpeedUnifiedService.deletePreset(id);
+      case 'temperature':
+        return await TemperatureUnifiedService.deletePreset(id);
+      case 'data_storage':
+        return await DataUnifiedService.deletePreset(id);
+      default:
+        logError('Unknown preset type: $presetType');
+        throw Exception('Unknown preset type: $presetType');
+    }
+  }
+
+  static Future<void> renamePreset(
+      String presetType, String id, String newName) async {
+    switch (presetType) {
+      case 'currency':
+        return await CurrencyUnifiedService.renamePreset(id, newName);
+      case 'length':
+        return await LengthUnifiedService.renamePreset(id, newName);
+      case 'mass':
+        return await MassUnifiedService.renamePreset(id, newName);
+      case 'weight':
+        return await WeightUnifiedService.renamePreset(id, newName);
+      case 'area':
+        return await AreaUnifiedService.renamePreset(id, newName);
+      case 'time':
+        return await TimeUnifiedService.renamePreset(id, newName);
+      case 'volume':
+        return await VolumeUnifiedService.renamePreset(id, newName);
+      case 'number_system':
+        return await NumberSystemUnifiedService.renamePreset(id, newName);
+      case 'speed':
+        return await SpeedUnifiedService.renamePreset(id, newName);
+      case 'temperature':
+        return await TemperatureUnifiedService.renamePreset(id, newName);
+      case 'data_storage':
+        return await DataUnifiedService.renamePreset(id, newName);
+      default:
+        logError('Unknown preset type: $presetType');
+        throw Exception('Unknown preset type: $presetType');
+    }
+  }
+}
 
 // Generic Unit Item (replaces UnitItem and LengthUnitItem)
 class GenericUnitItem {
@@ -29,6 +168,10 @@ class EnhancedGenericUnitCustomizationDialog extends StatefulWidget {
   final int minSelection;
   final bool showPresetOptions;
   final String presetType; // 'currency', 'length', 'weight', etc.
+  final bool
+      displaySyncButton; // Whether to show sync preset button (for component cards)
+  final Set<String>?
+      globalVisibleUnits; // Global visible units to sync with (for component cards)
 
   const EnhancedGenericUnitCustomizationDialog({
     super.key,
@@ -40,6 +183,8 @@ class EnhancedGenericUnitCustomizationDialog extends StatefulWidget {
     this.minSelection = 2,
     this.showPresetOptions = true,
     required this.presetType,
+    this.displaySyncButton = false, // Default to false for main dialog
+    this.globalVisibleUnits, // Only needed when displaySyncButton is true
   });
 
   @override
@@ -105,29 +250,21 @@ class _EnhancedGenericUnitCustomizationDialogState
 
     if (name != null && mounted) {
       try {
-        await GenericPresetService.savePreset(
-          presetType: widget.presetType,
+        await _UnifiedServiceHelper.savePreset(
+          widget.presetType,
           name: name,
           units: _tempVisible.toList(),
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.presetSaved),
-              backgroundColor: Colors.green,
-            ),
-          );
+          SnackbarUtils.showTyped(
+              context, l10n.presetSaved, SnackBarType.success);
         }
       } catch (e) {
         logError('Error saving ${widget.presetType} preset: $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.errorSavingPreset(e.toString())),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackbarUtils.showTyped(context, l10n.errorSavingPreset(e.toString()),
+              SnackBarType.error);
         }
       }
     }
@@ -136,7 +273,8 @@ class _EnhancedGenericUnitCustomizationDialogState
   Future<void> _showLoadPresetDialog() async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      final presets = await GenericPresetService.loadPresets(widget.presetType);
+      final presets =
+          await _UnifiedServiceHelper.loadPresets(widget.presetType);
 
       if (mounted) {
         final result = await showDialog<Map<String, dynamic>>(
@@ -149,31 +287,70 @@ class _EnhancedGenericUnitCustomizationDialogState
 
         if (result != null && mounted) {
           final action = result['action'] as String;
-          final units = result['units'] as List<String>?;
+          final rawUnits = result['units'];
 
-          if (action == 'load' && units != null) {
+          // Safe type conversion from List<dynamic> to List<String>
+          List<String>? units;
+          if (rawUnits is List) {
+            units = rawUnits.cast<String>();
+          }
+
+          if (action == 'load' && units != null && units.isNotEmpty) {
             setState(() {
-              _tempVisible = units.toSet();
+              _tempVisible = units!.toSet();
             });
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.presetLoaded),
-                backgroundColor: Colors.green,
-              ),
-            );
+            SnackbarUtils.showTyped(
+                context, l10n.presetLoaded, SnackBarType.success);
           }
         }
       }
     } catch (e) {
       logError('Error loading ${widget.presetType} presets: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.errorLoadingPresets(e.toString())),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackbarUtils.showTyped(context, l10n.errorLoadingPresets(e.toString()),
+            SnackBarType.error);
+      }
+    }
+  }
+
+  Future<void> _syncWithGlobalPreset() async {
+    try {
+      // Sync with global visible units from the main function settings
+      if (widget.globalVisibleUnits != null &&
+          widget.globalVisibleUnits!.isNotEmpty) {
+        final globalUnits = widget.globalVisibleUnits!;
+
+        // Filter out any units that don't exist in available units
+        final availableUnitIds = widget.availableUnits.map((u) => u.id).toSet();
+        final validGlobalUnits = globalUnits
+            .where((unitId) => availableUnitIds.contains(unitId))
+            .toSet();
+
+        setState(() {
+          _tempVisible = validGlobalUnits;
+        });
+
+        if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          SnackbarUtils.showTyped(
+              context,
+              'Synced ${validGlobalUnits.length} units with global settings',
+              SnackBarType.success);
+        }
+      } else {
+        if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          SnackbarUtils.showTyped(context,
+              'No global settings available to sync', SnackBarType.warning);
+        }
+      }
+    } catch (e) {
+      logError('Error syncing with global settings: $e');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        SnackbarUtils.showTyped(
+            context, 'Error syncing: ${e.toString()}', SnackBarType.error);
       }
     }
   }
@@ -354,6 +531,29 @@ class _EnhancedGenericUnitCustomizationDialogState
                             ),
                           ),
                         ),
+                        // Sync button for component cards
+                        if (widget.displaySyncButton) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              onPressed: () => _syncWithGlobalPreset(),
+                              icon: const Icon(Icons.sync),
+                              tooltip: 'Sync Preset',
+                              style: IconButton.styleFrom(
+                                padding: const EdgeInsets.all(12),
+                                minimumSize: const Size(48, 48),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ],
                   ),
@@ -665,7 +865,7 @@ class _SavePresetDialogState extends State<_SavePresetDialog> {
 }
 
 class _LoadPresetDialog extends StatefulWidget {
-  final List<GenericPresetModel> presets;
+  final List<Map<String, dynamic>> presets;
   final String presetType;
 
   const _LoadPresetDialog({
@@ -678,8 +878,8 @@ class _LoadPresetDialog extends StatefulWidget {
 }
 
 class _LoadPresetDialogState extends State<_LoadPresetDialog> {
-  GenericPresetModel? _selectedPreset;
-  late List<GenericPresetModel> _presets;
+  Map<String, dynamic>? _selectedPreset;
+  late List<Map<String, dynamic>> _presets;
 
   @override
   void initState() {
@@ -687,8 +887,8 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
     _presets = List.from(widget.presets);
   }
 
-  Future<void> _showRenameDialog(GenericPresetModel preset) async {
-    final nameController = TextEditingController(text: preset.name);
+  Future<void> _showRenameDialog(Map<String, dynamic> preset) async {
+    final nameController = TextEditingController(text: preset['name'] ?? '');
 
     final newName = await showDialog<String>(
       context: context,
@@ -710,7 +910,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
           ElevatedButton(
             onPressed: () {
               final name = nameController.text.trim();
-              if (name.isNotEmpty && name != preset.name) {
+              if (name.isNotEmpty && name != preset['name']) {
                 Navigator.of(context).pop(name);
               }
             },
@@ -722,47 +922,39 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
 
     if (newName != null && mounted) {
       try {
-        await GenericPresetService.renamePreset(
+        await _UnifiedServiceHelper.renamePreset(
           widget.presetType,
-          preset.id,
+          preset['id'],
           newName,
         );
 
         // Refresh presets list
         final updatedPresets =
-            await GenericPresetService.loadPresets(widget.presetType);
+            await _UnifiedServiceHelper.loadPresets(widget.presetType);
         setState(() {
           _presets = updatedPresets;
         });
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Preset renamed to "$newName"'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          SnackbarUtils.showTyped(
+              context, 'Preset renamed to "$newName"', SnackBarType.success);
         }
       } catch (e) {
         logError('Error renaming preset: $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error renaming preset: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackbarUtils.showTyped(
+              context, 'Error renaming preset: $e', SnackBarType.error);
         }
       }
     }
   }
 
-  Future<void> _showDeleteDialog(GenericPresetModel preset) async {
+  Future<void> _showDeleteDialog(Map<String, dynamic> preset) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Preset'),
-        content: Text('Are you sure you want to delete "${preset.name}"?'),
+        content: Text('Are you sure you want to delete "${preset['name']}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -782,35 +974,28 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
 
     if (confirmed == true && mounted) {
       try {
-        await GenericPresetService.deletePreset(widget.presetType, preset.id);
+        await _UnifiedServiceHelper.deletePreset(
+            widget.presetType, preset['id']);
 
         // Refresh presets list
         final updatedPresets =
-            await GenericPresetService.loadPresets(widget.presetType);
+            await _UnifiedServiceHelper.loadPresets(widget.presetType);
         setState(() {
           _presets = updatedPresets;
-          if (_selectedPreset?.id == preset.id) {
+          if (_selectedPreset?['id'] == preset['id']) {
             _selectedPreset = null;
           }
         });
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Preset "${preset.name}" deleted'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          SnackbarUtils.showTyped(context, 'Preset "${preset['name']}" deleted',
+              SnackBarType.success);
         }
       } catch (e) {
         logError('Error deleting preset: $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error deleting preset: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackbarUtils.showTyped(
+              context, 'Error deleting preset: $e', SnackBarType.error);
         }
       }
     }
@@ -850,7 +1035,8 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                       itemCount: _presets.length,
                       itemBuilder: (context, index) {
                         final preset = _presets[index];
-                        final isSelected = _selectedPreset?.id == preset.id;
+                        final isSelected =
+                            _selectedPreset?['id'] == preset['id'];
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
@@ -867,9 +1053,9 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                             ),
                           ),
                           child: ListTile(
-                            title: Text(preset.name),
+                            title: Text(preset['name'] ?? 'Unnamed'),
                             subtitle: Text(
-                              '${preset.units.length} units • ${DateFormat('MM/dd/yyyy').format(preset.createdAt)}',
+                              '${(preset['units'] as List).length} units • ${DateFormat('MM/dd/yyyy').format(DateTime.tryParse(preset['createdAt'] ?? '') ?? DateTime.now())}',
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -889,7 +1075,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                             onTap: () {
                               setState(() {
                                 _selectedPreset =
-                                    _selectedPreset?.id == preset.id
+                                    _selectedPreset?['id'] == preset['id']
                                         ? null
                                         : preset;
                               });
@@ -914,7 +1100,7 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
                     onPressed: _selectedPreset != null
                         ? () => Navigator.of(context).pop({
                               'action': 'load',
-                              'units': _selectedPreset!.units,
+                              'units': _selectedPreset!['units'],
                             })
                         : null,
                     child: Text(l10n.select),

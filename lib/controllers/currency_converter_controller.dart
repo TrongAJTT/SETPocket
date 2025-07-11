@@ -1,31 +1,54 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/currency_converter_service.dart';
-import 'package:setpocket/services/converter_services/currency_state_adapter.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/currency_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class CurrencyConverterController extends ConverterController {
   CurrencyConverterController()
       : super(
           converterService: CurrencyConverterService(),
-          stateService: CurrencyStateAdapter(),
+          stateService: UnifiedStateAdapter('currency'),
         );
 
   // Override initialize to initialize currency service
   @override
   Future<void> initialize() async {
     try {
-      // Initialize the currency converter service
+      // Initialize the currency converter service, which loads rates from cache
       final currencyService = converterService as CurrencyConverterService;
       await currencyService.initialize();
 
-      // Call parent initialize to setup state
-      await super.initialize();
+      // Manually call only the necessary parts from the parent's initialize method.
+      // We are deliberately skipping the parent's `_refreshData()` call, which
+      // would force a network fetch and ignore the cache on startup.
 
-      logInfo('Currency converter controller initialized');
+      // Load UI state (cards, view mode, etc.)
+      await loadState();
+
+      // If no state was loaded, create a default layout
+      if (state.cards.isEmpty) {
+        createDefaultState();
+      }
+
+      // Initialize text controllers for the UI
+      initializeControllers();
+
+      // Perform initial conversions for the loaded state
+      for (int i = 0; i < state.cards.length; i++) {
+        final card = state.cards[i];
+        updateCardConversions(i, card.baseUnitId, card.baseValue);
+      }
+
+      notifyListenersDebounced();
+
+      logInfo('Currency converter controller initialized correctly');
     } catch (e) {
       logError('Error initializing currency converter controller: $e');
+      // Attempt to create a default state on error to prevent a crash
+      createDefaultState();
+      initializeControllers();
+      notifyListenersDebounced();
       rethrow;
     }
   }
@@ -45,10 +68,10 @@ class CurrencyConverterController extends ConverterController {
     }
   }
 
-  // Generic Preset functionality using GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Currency Preset functionality using CurrencyUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('currency');
+      return await CurrencyUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading currency presets: $e');
       return [];
@@ -57,8 +80,7 @@ class CurrencyConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'currency',
+      await CurrencyUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -71,7 +93,7 @@ class CurrencyConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('currency', id);
+      await CurrencyUnifiedService.deletePreset(id);
       logInfo('Deleted currency preset: $id');
     } catch (e) {
       logError('Error deleting currency preset: $e');
@@ -81,7 +103,7 @@ class CurrencyConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('currency', name);
+      return await CurrencyUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -90,7 +112,7 @@ class CurrencyConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('currency', id, newName);
+      await CurrencyUnifiedService.renamePreset(id, newName);
       logInfo('Renamed currency preset: $id to $newName');
     } catch (e) {
       logError('Error renaming currency preset: $e');
@@ -98,12 +120,16 @@ class CurrencyConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
-      // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      // Get currencies from preset
+      final currencies = preset['currencies'] as List?;
+      if (currencies != null) {
+        // Use inherited method to update global visible units
+        await updateGlobalVisibleUnits(currencies.cast<String>().toSet());
+      }
 
-      logInfo('Applied currency preset: ${preset.name}');
+      logInfo('Applied currency preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying currency preset: $e');
       rethrow;

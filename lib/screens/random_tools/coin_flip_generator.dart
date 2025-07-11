@@ -4,9 +4,10 @@ import 'dart:math' as math;
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class CoinFlipGeneratorScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
   late AnimationController _flipController;
   late Animation<double> _flipAnimation;
   late AnimationController _scaleController;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -72,7 +73,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
 
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getCoinFlipGeneratorState();
+      final state = await UnifiedRandomStateService.getCoinFlipGeneratorState();
       if (mounted) {
         setState(() {
           _skipAnimation = state.skipAnimation;
@@ -88,7 +89,7 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       final state = SimpleGeneratorState()
         ..skipAnimation = _skipAnimation
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveCoinFlipGeneratorState(state);
+      await UnifiedRandomStateService.saveCoinFlipGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -152,8 +153,11 @@ class _CoinFlipGeneratorScreenState extends State<CoinFlipGeneratorScreen>
       final loc = AppLocalizations.of(context)!;
       String resultText = _finalResult! ? loc.heads : loc.tails;
       GenerationHistoryService.addHistoryItem(
-        resultText,
-        'coin_flip',
+        UnifiedHistoryData(
+          value: resultText,
+          type: 'coin_flip',
+          timestamp: DateTime.now(),
+        ),
       ).then((_) => _loadHistory());
     }
   }

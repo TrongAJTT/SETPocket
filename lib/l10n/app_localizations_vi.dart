@@ -60,6 +60,53 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearAllCache => 'Xóa tất cả bộ nhớ đệm';
 
   @override
+  String get clearStorageSettings => 'Xóa Cài Đặt Lưu Trữ';
+
+  @override
+  String get clearStorageSettingsTitle => 'Xóa Cài Đặt Lưu Trữ';
+
+  @override
+  String get clearStorageSettingsDescription => 'Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu trong bộ nhớ đệm không? Thao tác này sẽ xóa tất cả các mẫu đã lưu nhưng vẫn giữ lại cài đặt của bạn.';
+
+  @override
+  String get clearStorageSettingsConfirm => 'Xóa Tất Cả';
+
+  @override
+  String get clearStorageSettingsCancel => 'Hủy';
+
+  @override
+  String get clearStorageSettingsConfirmation => 'Thao tác này sẽ xóa vĩnh viễn tất cả dữ liệu đã lưu trữ bao gồm mẫu, lịch sử và tệp tạm thời. Cài đặt ứng dụng sẽ được giữ lại.';
+
+  @override
+  String get clearStorageSettingsSuccess => 'Đã xóa cài đặt lưu trữ thành công';
+
+  @override
+  String clearStorageSettingsError(String error) {
+    return 'Lỗi khi xóa cài đặt lưu trữ: $error';
+  }
+
+  @override
+  String get settingsStorage => 'Kho lưu trữ cài đặt';
+
+  @override
+  String get clearSettingsStorage => 'Xóa kho lưu trữ cài đặt';
+
+  @override
+  String get settingsStorageDetails => 'Kho lưu trữ cài đặt và tùy chọn';
+
+  @override
+  String get viewSettingsStorageDetails => 'Xem chi tiết kho lưu trữ cài đặt';
+
+  @override
+  String get settingsStorageSize => 'Kích thước kho lưu trữ cài đặt';
+
+  @override
+  String get settingsStorageItems => 'Mục cài đặt';
+
+  @override
+  String get clearAllSettingsStorage => 'Xóa tất cả kho lưu trữ cài đặt';
+
+  @override
   String get logs => 'Nhật ký ứng dụng';
 
   @override
@@ -153,6 +200,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get saved => 'Đã lưu';
+
+  @override
+  String get savedDate => 'Ngày lưu';
+
+  @override
+  String savedOnDate(String date) {
+    return 'Lưu vào $date';
+  }
 
   @override
   String get saveToHistory => 'Lưu vào lịch sử';
@@ -307,7 +362,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get templateStructureOverview => 'Xem tổng quan các trường và vòng lặp trong mẫu.';
 
   @override
-  String get textTemplatesTitle => 'Các mẫu văn bản';
+  String get textTemplatesTitle => 'Mẫu văn bản';
 
   @override
   String get addNewTemplate => 'Thêm mẫu mới';
@@ -579,7 +634,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get longPressToSelect => 'Nhấn giữ để chọn mẫu';
 
   @override
-  String selectedTemplates(Object count) {
+  String selectedTemplates(int count) {
     return 'Đã chọn $count';
   }
 
@@ -639,7 +694,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get passwordGenerator => 'Tạo mật khẩu';
 
   @override
-  String get passwordGeneratorDesc => 'Tạo mật khẩu ngẫu nhiên an toàn';
+  String get passwordGeneratorDesc => 'Tạo mật khẩu ngẫu nhiên';
 
   @override
   String get numCharacters => 'Số ký tự';
@@ -738,13 +793,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearCalculationHistory => 'Clear History';
 
   @override
-  String get bookmarkResult => 'Bookmark Result';
+  String get bookmark => 'Đánh dấu';
 
   @override
-  String get resultBookmarked => 'Result bookmarked to history';
+  String get bookmarks => 'Đánh dấu';
 
   @override
-  String get clearTabData => 'Clear Data';
+  String get bookmarkResult => 'Kết quả đánh dấu';
+
+  @override
+  String get resultBookmarked => 'Kết quả đã được đánh dấu';
+
+  @override
+  String get clearTabData => 'Xóa dữ liệu';
 
   @override
   String get tabDataCleared => 'Data cleared for current tab';
@@ -1202,7 +1263,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get confirmResetLayout => 'Xác nhận đặt lại bố cục';
 
   @override
-  String get confirmResetLayoutMessage => 'Bạn có chắc chắn muốn đặt lại bố cục? Điều này sẽ xóa tất cả thẻ và khôi phục cài đặt mặc định.';
+  String get confirmResetLayoutMessage => 'Thao tác này sẽ đặt lại tất cả các thẻ và các đơn vị hiển thị về trạng thái mặc định. Không thể hoàn tác hành động này.';
 
   @override
   String get confirm => 'Xác nhận';
@@ -1220,7 +1281,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cards => 'Thẻ';
 
   @override
-  String get rows => 'Dòng';
+  String get rows => 'Hàng';
 
   @override
   String get converter => 'Bộ chuyển đổi';
@@ -2496,7 +2557,7 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get personalInfo => 'Personal Information';
+  String get personalInfo => 'Thông tin cá nhân';
 
   @override
   String get measurements => 'Measurements';
@@ -2684,6 +2745,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get nextChunk => 'Phần sau';
+
+  @override
+  String get load => 'Tải';
 
   @override
   String get loadAll => 'Tải tất cả';
@@ -3001,6 +3065,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get saveRandomToolsStateDesc => 'Tự động lưu cài đặt công cụ khi tạo kết quả';
+
+  @override
+  String get saveConverterToolsState => 'Lưu trạng thái Công cụ Chuyển đổi';
+
+  @override
+  String get saveConverterToolsStateDesc => 'Tự động lưu cài đặt công cụ chuyển đổi khi tạo kết quả';
 
   @override
   String get focusModeDisabled => 'Đã tắt chế độ tập trung';
@@ -3917,9 +3987,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get drafts => 'Bản nháp';
 
   @override
-  String get noDraftsYet => 'Chưa có bản nháp nào';
-
-  @override
   String get createDraftsHint => 'Bản nháp là bản lưu tạm thời công việc của bạn. Chúng được tạo tự động khi bạn thoát khỏi chế độ chỉnh sửa mà không lưu.';
 
   @override
@@ -3981,7 +4048,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get autoSaved => 'Tự động lưu';
 
   @override
-  String get viewDrafts => 'Xem nháp';
+  String get viewDrafts => 'Xem bản nháp';
 
   @override
   String get manageDrafts => 'Quản lý nháp';
@@ -6219,4 +6286,169 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get colorFormat => 'Định dạng màu';
+
+  @override
+  String get addElement => 'Add Element';
+
+  @override
+  String get dataFields => 'Data Fields';
+
+  @override
+  String get templatesTabTitle => 'Mẫu';
+
+  @override
+  String get noCompletedTemplates => 'Bạn chưa có mẫu nào đã hoàn thành.';
+
+  @override
+  String get noDrafts => 'Bạn chưa có bản nháp nào.';
+
+  @override
+  String get confirmDeleteTitle => 'Xác nhận xóa';
+
+  @override
+  String confirmDeleteMessage(String name) {
+    return 'Bạn có chắc muốn xóa mẫu \'\'$name\'\'? Thao tác này không thể hoàn tác.';
+  }
+
+  @override
+  String get export => 'Xuất';
+
+  @override
+  String get deleteTemplateTitle => 'Xóa mẫu';
+
+  @override
+  String deleteTemplateConfirmation(String templateTitle) {
+    return 'Bạn có chắc muốn xóa \'\'$templateTitle\'\'?';
+  }
+
+  @override
+  String get moveToTrash => 'Di chuyển đến thùng rác';
+
+  @override
+  String get permanentDeleteWarning => 'Nếu không chọn, mẫu sẽ bị xóa vĩnh viễn.';
+
+  @override
+  String get templateDeletedSuccess => 'Mẫu đã được xóa thành công';
+
+  @override
+  String templateDeleteError(String error) {
+    return 'Lỗi khi xóa mẫu: $error';
+  }
+
+  @override
+  String get exportTemplateTitle => 'Xuất mẫu';
+
+  @override
+  String get fileNameLabel => 'Tên tệp';
+
+  @override
+  String get exportAsJson => 'Xuất dưới dạng tệp JSON';
+
+  @override
+  String get exportAsJsonDescription => 'Lưu mẫu dưới dạng tệp JSON.';
+
+  @override
+  String get shareTemplate => 'Chia sẻ';
+
+  @override
+  String get shareTemplateDescription => 'Chia sẻ mẫu với các ứng dụng khác.';
+
+  @override
+  String templateExportedSuccess(String path) {
+    return 'Mẫu đã được xuất thành công vào $path';
+  }
+
+  @override
+  String templateExportError(String error) {
+    return 'Lỗi khi xuất mẫu: $error';
+  }
+
+  @override
+  String shareTemplateError(String error) {
+    return 'Lỗi khi chia sẻ mẫu: $error';
+  }
+
+  @override
+  String get draftsDialogTitle => 'Bản nháp';
+
+  @override
+  String get trashDialogTitle => 'Thùng rác';
+
+  @override
+  String get restore => 'Khôi phục';
+
+  @override
+  String get permanentlyDelete => 'Xóa vĩnh viễn';
+
+  @override
+  String daysLeft(int days) {
+    return 'Còn $days ngày';
+  }
+
+  @override
+  String get createManually => 'Create Manually';
+
+  @override
+  String get importFromFile => 'Nhập từ file';
+
+  @override
+  String get duplicate => 'Nhân bản';
+
+  @override
+  String get enterNewTemplateName => 'Nhập tên mới cho mẫu nhân bản.';
+
+  @override
+  String areYouSureToDeleteNTemplates(Object count) {
+    return 'Bạn có chắc muốn xóa $count mẫu?';
+  }
+
+  @override
+  String youAreAboutToExportNTemplates(Object count) {
+    return 'Bạn sẽ xuất $count mẫu.';
+  }
+
+  @override
+  String get ageGroup => 'Nhóm tuổi';
+
+  @override
+  String get ageUnder18 => 'Dưới 18';
+
+  @override
+  String get age18Plus => 'Trên 18';
+
+  @override
+  String get clearAllBookmarks => 'Xóa các mục đánh dấu';
+
+  @override
+  String get clearAllBookmarksConfirm => 'Bạn có chắc muốn xóa các mục đã được đánh dấu trước giờ? Hành động này sẽ không thể hoàn tác.';
+
+  @override
+  String get clearAllBookmarksSuccess => 'Đã xóa các mục đánh dấu thành công';
+
+  @override
+  String get processing => 'Đang xử lý...';
+
+  @override
+  String get loadFunctionsFromBookmarks => 'Tải các hàm từ mục đánh dấu';
+
+  @override
+  String get loadFunctionsFromBookmarksConfirm => 'Tải từ mục đánh dấu sẽ thay thế các hàm hiện tại của bạn. Bạn có muốn đánh dấu trước khi tải không?';
+
+  @override
+  String get clearAllFunctions => 'Xóa tất cả các hàm';
+
+  @override
+  String get clearAllFunctionsConfirm => 'Bạn có chắc muốn xóa tất cả các hàm? Hành động này sẽ không thể hoàn tác.';
+
+  @override
+  String get clearAllFunctionsSuccess => 'Đã xóa tất cả các hàm thành công';
+
+  @override
+  String get bookmarkSaved => 'Đã lưu kết quả vào mục đánh dấu';
+
+  @override
+  String get swap => 'Hoán đổi';
+
+  @override
+  String get startDateConflixWithEndDateAlarm => 'Ngày bắt đầu không thể lớn hơn hoặc trùng với ngày kết thúc';
 }

@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/utils/size_utils.dart';
 import 'package:setpocket/widgets/generic/option_grid_picker.dart' as grid;
 import 'package:setpocket/widgets/generic/option_item.dart';
 
@@ -25,7 +27,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
   bool _withAlpha = false;
   late AnimationController _controller;
   late Animation<double> _animation;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -45,7 +47,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
 
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getColorGeneratorState();
+      final state = await UnifiedRandomStateService.getColorGeneratorState();
       if (mounted) {
         setState(() {
           _withAlpha = state.withAlpha;
@@ -61,7 +63,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
       final state = ColorGeneratorState()
         ..withAlpha = _withAlpha
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveColorGeneratorState(state);
+      await UnifiedRandomStateService.saveColorGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -97,8 +99,11 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
     if (_historyEnabled) {
       String colorText = _getHexColor();
       GenerationHistoryService.addHistoryItem(
-        colorText,
-        'color',
+        UnifiedHistoryData(
+          value: colorText,
+          type: 'color',
+          timestamp: DateTime.now(),
+        ),
       ).then((_) => _loadHistory());
     }
   }
@@ -303,8 +308,7 @@ class _ColorGeneratorScreenState extends State<ColorGeneratorScreen>
               onTap: () => _copyToClipboard(_getRgbColor()),
             ),
             minWidth: 300,
-            horizontalSpacing: 16,
-            verticalSpacing: 8),
+            spacing: TwoDimSpacing.specific(horizontal: 16, vertical: 8)),
 
         const SizedBox(height: 16),
 

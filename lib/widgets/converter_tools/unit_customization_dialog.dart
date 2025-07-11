@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/services/converter_services/currency_preset_service.dart';
-import 'package:setpocket/models/converter_models/currency_preset_model.dart';
+import 'package:setpocket/services/converter_services/currency_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class UnitItem {
@@ -113,9 +112,9 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
     if (result != null && result.isNotEmpty) {
       try {
         // Only work for currency converters for now
-        await CurrencyPresetService.savePreset(
+        await CurrencyUnifiedService.savePreset(
           name: result,
-          currencies: _tempVisible.toList(),
+          units: _tempVisible.toList(),
         );
 
         if (mounted) {
@@ -147,7 +146,7 @@ class _UnitCustomizationDialogState extends State<UnitCustomizationDialog>
     }
 
     try {
-      final presets = await CurrencyPresetService.loadPresets();
+      final presets = await CurrencyUnifiedService.loadPresets();
 
       if (!mounted) {
         return;
@@ -751,7 +750,7 @@ class _SavePresetDialogState extends State<_SavePresetDialog> {
 }
 
 class _LoadPresetDialog extends StatefulWidget {
-  final List<CurrencyPresetModel> presets;
+  final List<Map<String, dynamic>> presets;
 
   const _LoadPresetDialog({required this.presets});
 
@@ -774,14 +773,16 @@ class _LoadPresetDialogState extends State<_LoadPresetDialog> {
           itemBuilder: (context, index) {
             final preset = widget.presets[index];
             return ListTile(
-              title: Text(preset.name),
-              subtitle: Text('${preset.currencies.length} units'),
-              onTap: () => Navigator.of(context).pop(preset.currencies),
+              title: Text(preset['name'] ?? ''),
+              subtitle:
+                  Text('${(preset['currencies'] as List?)?.length ?? 0} units'),
+              onTap: () => Navigator.of(context).pop(preset['currencies']),
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () async {
                   try {
-                    await CurrencyPresetService.deletePreset(preset.id);
+                    await CurrencyUnifiedService.deletePreset(
+                        preset['id'] ?? '');
                     if (mounted) {
                       if (mounted) {
                         // ignore: use_build_context_synchronously

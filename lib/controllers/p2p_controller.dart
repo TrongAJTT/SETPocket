@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/services/network_security_service.dart';
-import 'package:setpocket/services/p2p_service.dart';
+import 'package:setpocket/services/p2p_services/p2p_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 
@@ -673,8 +673,8 @@ class P2PController with ChangeNotifier {
       _p2pService.lastDiscoveryTime =
           DateTime.now(); // Update time after discovery runs
 
-      // Add a short cooldown to prevent spamming
-      await Future.delayed(const Duration(seconds: 60));
+      // 🔥 FIXED: Spinner chỉ xoay 10 giây thay vì 60 giây
+      await Future.delayed(const Duration(seconds: 10));
     } catch (e) {
       _errorMessage = 'Discovery failed: $e';
     } finally {

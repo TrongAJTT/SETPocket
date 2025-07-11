@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/p2p_models.dart';
 import 'package:setpocket/models/tool_config.dart';
 import 'package:setpocket/widgets/tool_card.dart';
 import 'package:setpocket/widgets/cache_details_dialog.dart';
@@ -11,26 +10,23 @@ import 'package:setpocket/services/tool_visibility_service.dart';
 import 'package:setpocket/services/quick_actions_service.dart';
 import 'package:setpocket/services/hive_service.dart';
 import 'package:setpocket/services/isar_service.dart';
-import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/converter_services/converter_tools_data_service.dart';
+import 'package:setpocket/services/settings_models_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
-import 'package:setpocket/services/draft_service.dart';
-import 'package:setpocket/services/graphing_calculator_service.dart';
-import 'package:setpocket/services/p2p_service.dart';
 import 'package:setpocket/services/app_installation_service.dart';
-import 'package:setpocket/services/p2p_navigation_service.dart';
-// Removed unused import - random state models now use Isar
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
-import 'screens/text_template/text_template_gen_list_screen.dart';
+import 'screens/text_template/text_template_list_screen.dart';
 import 'screens/main_settings.dart';
 import 'screens/random_tools_screen.dart';
 import 'screens/converter_tools_screen.dart';
 import 'screens/calculator_tools_screen.dart';
-import 'screens/p2lan/p2lan_transfer_screen.dart';
+import 'screens/p2lan_transfer/p2lan_transfer_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:io';
+import 'package:setpocket/services/app_cleanup_service.dart';
 
 // Global navigation key for deep linking
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -101,33 +97,84 @@ Future<void> main() async {
     WidgetsBinding.instance.ensureSemantics();
   }
 
-  // Initialize Hive database first (needed for migration)
-  await HiveService.initialize();
+  // Initialize core databases first
+  try {
+    logInfo('Initializing databases...');
 
-  // Initialize Isar database
-  await IsarService.init();
+    // Initialize Hive database first (needed for migration)
+    await HiveService.initialize();
+    logInfo('Hive initialized');
 
-  // Random state models now use Isar instead of Hive
+    // Initialize Isar database
+    await IsarService.init();
+    logInfo('Isar initialized');
 
-  // Initialize App Installation Service immediately after Hive
-  _isFirstTimeSetup = await AppInstallationService.instance.initialize();
+    // Clean up expired drafts and deleted templates
+    await AppCleanupService.cleanStartUp();
+    logInfo('AppCleanupService cleanStartUp completed');
 
-  // Initialize settings service
-  await SettingsService.initialize();
+    // Wait a bit to ensure Isar is fully initialized
+    await Future.delayed(const Duration(milliseconds: 100));
 
-  // Initialize AppLogger service (depends on settings)
-  await AppLogger.instance.initialize();
+    // Initialize ConverterToolsDataService
+    final converterDataService = ConverterToolsDataService();
+    await converterDataService.initialize();
+    logInfo('ConverterToolsDataService initialized');
 
-  // Initialize GraphingCalculatorService
-  await GraphingCalculatorService.initialize();
+    // Initialize App Installation Service immediately after Isar
+    _isFirstTimeSetup = await AppInstallationService.instance.initialize();
+    logInfo(
+        'AppInstallationService initialized, first time setup: $_isFirstTimeSetup');
 
-  // Initialize settings controller and load saved settings
-  await settingsController.loadSettings();
+    // These services no longer have an init() method or are initialized elsewhere
+    // await TemplateService.init();
+    // await UnifiedRandomStateService.init();
+  } catch (e) {
+    // Log the error but don't crash the app
+    logError('Error during database initialization', e);
+    _isFirstTimeSetup = true; // Assume first time setup on error
+  }
 
-  // Initialize quick actions
-  await _initializeQuickActions();
+  // Initialize other services in background after UI starts
+  _initializeServicesInBackground();
 
   runApp(const MainApp());
+}
+
+// Initialize non-critical services in background
+void _initializeServicesInBackground() {
+  Future.microtask(() async {
+    try {
+      logDebug('Initializing background services...');
+
+      // Initialize settings service
+      await ExtensibleSettingsService.initialize();
+      logDebug('ExtensibleSettingsService initialized');
+
+      // Initialize AppLogger service (depends on settings)
+      await AppLogger.instance.initialize();
+      logDebug('AppLogger initialized');
+
+      // UnifiedRandomStateService is initialized on demand now
+      // await UnifiedRandomStateService.initialize();
+
+      // GraphingCalculatorService is no longer a separate service
+      // await GraphingCalculatorService.initialize();
+
+      // Initialize settings controller and load saved settings
+      await settingsController.loadSettings();
+      logDebug('Settings loaded');
+
+      // Initialize quick actions
+      await _initializeQuickActions();
+      logDebug('Quick actions initialized');
+
+      logInfo('All background services initialized successfully');
+    } catch (e) {
+      // Log initialization errors but continue
+      logError('Error during background service initialization', e);
+    }
+  });
 }
 
 Future<void> _initializeQuickActions() async {
@@ -239,113 +286,14 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    // On Android & iOS, when the app is terminated (swiped from recents),
-    // this lifecycle event is triggered. We use it to gracefully shut down
-    // the P2P networking service.
-    if (state == AppLifecycleState.detached &&
+
+    if (state == AppLifecycleState.resumed) {
+      // ...
+    } else if (state == AppLifecycleState.paused) {
+      // ...
+    } else if (state == AppLifecycleState.detached &&
         (Platform.isAndroid || Platform.isIOS)) {
-      final p2pService = P2PService.instance;
-      // Check if the service is actually running before trying to stop it.
-      if (p2pService.isEnabled) {
-        p2pService.stopNetworking();
-        AppLogger.instance.logInfo(
-            'App detached, stopping P2P networking to clean up services.');
-      }
-    }
-  }
-
-  Future<void> _handleAppTermination() async {
-    logInfo(
-      '🚨 App termination detected - sending emergency disconnect signals',
-    );
-    await _sendEmergencyDisconnectSignals();
-  }
-
-  Future<void> _handleAppPaused() async {
-    logInfo('⏸️ App paused - preparing for potential termination');
-    // Don't immediately disconnect on pause as user might switch back
-    // Instead, set a flag that we're potentially closing
-  }
-
-  Future<void> _handleAppResumed() async {
-    logInfo('▶️ App resumed');
-    // Cancel any pending emergency disconnect if app resumes quickly
-  }
-
-  Future<void> _sendEmergencyDisconnectSignals() async {
-    try {
-      final p2pService = P2PService.instance;
-
-      if (!p2pService.isEnabled || p2pService.currentUser == null) {
-        return;
-      }
-
-      // Get all connected/paired users
-      final connectedUsers = p2pService.discoveredUsers
-          .where((user) => user.isPaired && user.isOnline)
-          .toList();
-
-      if (connectedUsers.isEmpty) {
-        logInfo('No connected users to notify');
-        return;
-      }
-
-      logInfo('Sending emergency disconnect to ${connectedUsers.length} users');
-
-      // Send disconnect message to all connected users simultaneously
-      final disconnectFutures = connectedUsers.map((user) async {
-        try {
-          final message = P2PMessage(
-            type: P2PMessageTypes.disconnect,
-            fromUserId: p2pService.currentUser!.id,
-            toUserId: user.id,
-            data: {
-              'reason': 'app_termination',
-              'message': 'App is closing',
-              'fromUserName': p2pService.currentUser!.displayName,
-              'emergency': true,
-            },
-          );
-
-          // Send emergency disconnect message
-          await _sendEmergencyMessage(p2pService, user, message);
-
-          logInfo('✅ Emergency disconnect sent to ${user.displayName}');
-        } catch (e) {
-          logWarning(
-            '❌ Failed to send emergency disconnect to ${user.displayName}: $e',
-          );
-        }
-      });
-
-      // Wait for all disconnect messages with a maximum timeout
-      await Future.wait(disconnectFutures).timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          logWarning(
-            'Emergency disconnect timeout - some messages may not have been sent',
-          );
-          return [];
-        },
-      );
-
-      logInfo('Emergency disconnect sequence completed');
-    } catch (e) {
-      logError('Error during emergency disconnect: $e');
-    }
-  }
-
-  Future<bool> _sendEmergencyMessage(
-    P2PService p2pService,
-    P2PUser user,
-    P2PMessage message,
-  ) async {
-    try {
-      // Try to send emergency disconnect with short timeout
-      return await p2pService.sendEmergencyDisconnect(user, message);
-    } catch (e) {
-      logError('Failed to send emergency message to ${user.displayName}: $e');
-      return false;
+      // P2P service logic was here, now removed.
     }
   }
 
@@ -394,7 +342,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           ],
           builder: (context, child) {
             // Set navigation context for P2P services
-            P2PNavigationService.instance.setContext(context);
+            // P2PNavigationService.instance.setContext(context);
             return child!;
           },
         );
@@ -455,9 +403,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
     );
 
     // Log for debugging
-    AppLogger.instance.info(
-      'First time setup detected - showed installation progress snackbar',
-    );
+    logInfo(
+        'First time setup detected - showed installation progress snackbar');
   }
 
   @override
@@ -469,7 +416,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   @override
   void onWindowClose() async {
     // Trigger emergency save before window closes
-    DraftService.triggerEmergencySave();
+    await _clearAllDrafts();
 
     // Send emergency disconnect signals
     await _sendEmergencyP2PDisconnect();
@@ -479,13 +426,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   Future<void> _sendEmergencyP2PDisconnect() async {
-    try {
-      final p2pService = P2PService.instance;
-      await p2pService.sendEmergencyDisconnectToAll();
-      logInfo('Window close: Emergency P2P disconnect signals sent');
-    } catch (e) {
-      logError('Error sending emergency P2P disconnect on window close: $e');
-    }
+    // This method is no longer needed as P2PService is removed/refactored.
   }
 
   @override
@@ -1034,8 +975,8 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
             parentCategory: parentCategory ?? 'TemplateListScreen',
             icon: icon,
           ),
-          onRegisterUnsavedChangesCallback:
-              widget.onRegisterUnsavedChangesCallback,
+          // onRegisterUnsavedChangesCallback:
+          //     widget.onRegisterUnsavedChangesCallback,
         );
       case 'randomTools':
         return RandomToolsScreen(
@@ -1518,7 +1459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          Text('${loc.cache}: $_cacheInfo'),
+          Text('${loc.storage}: $_cacheInfo'),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -1531,7 +1472,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.delete),
-                  label: Text(loc.clearCache),
+                  label: Text(loc.clearSettingsStorage),
                   onPressed: _clearing ? null : _clearCache,
                 ),
               ),
@@ -1549,4 +1490,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+}
+
+Future<void> _clearAllDrafts() async {
+  // Clearing drafts is no longer necessary as they are part of the main text template data
+  // with a 'draft' status. This can be handled by the TemplateService if needed.
 }

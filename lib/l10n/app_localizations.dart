@@ -182,7 +182,7 @@ abstract class AppLocalizations {
   /// No description provided for @cacheSize.
   ///
   /// In en, this message translates to:
-  /// **'Cache size'**
+  /// **'Cache Size'**
   String get cacheSize;
 
   /// No description provided for @cacheItems.
@@ -196,6 +196,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear All Cache'**
   String get clearAllCache;
+
+  /// No description provided for @clearStorageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Storage Settings'**
+  String get clearStorageSettings;
+
+  /// No description provided for @clearStorageSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Storage Settings'**
+  String get clearStorageSettingsTitle;
+
+  /// No description provided for @clearStorageSettingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear ALL cached data? This will remove all saved templates but preserve your settings.'**
+  String get clearStorageSettingsDescription;
+
+  /// No description provided for @clearStorageSettingsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearStorageSettingsConfirm;
+
+  /// No description provided for @clearStorageSettingsCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get clearStorageSettingsCancel;
+
+  /// No description provided for @clearStorageSettingsConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This action will permanently delete all cached data including templates, history, and temporary files. Your app settings will be preserved.'**
+  String get clearStorageSettingsConfirmation;
+
+  /// No description provided for @clearStorageSettingsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage settings cleared successfully'**
+  String get clearStorageSettingsSuccess;
+
+  /// No description provided for @clearStorageSettingsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error clearing storage settings: {error}'**
+  String clearStorageSettingsError(String error);
+
+  /// No description provided for @settingsStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings Storage'**
+  String get settingsStorage;
+
+  /// No description provided for @clearSettingsStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Settings Storage'**
+  String get clearSettingsStorage;
+
+  /// No description provided for @settingsStorageDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings and preferences storage'**
+  String get settingsStorageDetails;
+
+  /// No description provided for @viewSettingsStorageDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View Settings Storage Details'**
+  String get viewSettingsStorageDetails;
+
+  /// No description provided for @settingsStorageSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings Storage Size'**
+  String get settingsStorageSize;
+
+  /// No description provided for @settingsStorageItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings Items'**
+  String get settingsStorageItems;
+
+  /// No description provided for @clearAllSettingsStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Settings Storage'**
+  String get clearAllSettingsStorage;
 
   /// No description provided for @logs.
   ///
@@ -370,6 +460,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved'**
   String get saved;
+
+  /// No description provided for @savedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved date'**
+  String get savedDate;
+
+  /// No description provided for @savedOnDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on {date}'**
+  String savedOnDate(String date);
 
   /// No description provided for @saveToHistory.
   ///
@@ -674,7 +776,7 @@ abstract class AppLocalizations {
   /// No description provided for @textTemplatesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Templates'**
+  /// **'Text Templates'**
   String get textTemplatesTitle;
 
   /// No description provided for @addNewTemplate.
@@ -1130,8 +1232,8 @@ abstract class AppLocalizations {
   /// No description provided for @selectedTemplates.
   ///
   /// In en, this message translates to:
-  /// **'{count} selected'**
-  String selectedTemplates(Object count);
+  /// **'{count, plural, =0{No templates selected} =1{1 template selected} other{{count} templates selected}}'**
+  String selectedTemplates(int count);
 
   /// No description provided for @selectAll.
   ///
@@ -1420,6 +1522,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear History'**
   String get clearCalculationHistory;
+
+  /// No description provided for @bookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark'**
+  String get bookmark;
+
+  /// No description provided for @bookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get bookmarks;
 
   /// No description provided for @bookmarkResult.
   ///
@@ -2336,7 +2450,7 @@ abstract class AppLocalizations {
   /// No description provided for @confirmResetLayoutMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to reset the layout? This will remove all cards and restore default settings.'**
+  /// **'This will reset all cards and visible units to the default state. This action cannot be undone.'**
   String get confirmResetLayoutMessage;
 
   /// No description provided for @confirm.
@@ -5189,6 +5303,12 @@ abstract class AppLocalizations {
   /// **'Next Chunk'**
   String get nextChunk;
 
+  /// No description provided for @load.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get load;
+
   /// No description provided for @loadAll.
   ///
   /// In en, this message translates to:
@@ -5782,6 +5902,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Automatically save tool settings when generating results'**
   String get saveRandomToolsStateDesc;
+
+  /// Save converter tools state setting label
+  ///
+  /// In en, this message translates to:
+  /// **'Save Converter Tools State'**
+  String get saveConverterToolsState;
+
+  /// Save converter tools state setting description
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically save converter settings and preferences'**
+  String get saveConverterToolsStateDesc;
 
   /// No description provided for @focusModeDisabled.
   ///
@@ -7606,12 +7738,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drafts'**
   String get drafts;
-
-  /// No description provided for @noDraftsYet.
-  ///
-  /// In en, this message translates to:
-  /// **'No drafts yet'**
-  String get noDraftsYet;
 
   /// No description provided for @createDraftsHint.
   ///
@@ -12034,6 +12160,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Color Format'**
   String get colorFormat;
+
+  /// No description provided for @addElement.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Element'**
+  String get addElement;
+
+  /// No description provided for @dataFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Fields'**
+  String get dataFields;
+
+  /// No description provided for @templatesTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Templates'**
+  String get templatesTabTitle;
+
+  /// No description provided for @noCompletedTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no completed templates yet.'**
+  String get noCompletedTemplates;
+
+  /// No description provided for @noDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no drafts.'**
+  String get noDrafts;
+
+  /// No description provided for @confirmDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Deletion'**
+  String get confirmDeleteTitle;
+
+  /// No description provided for @confirmDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the template \'\'{name}\'\'? This action cannot be undone.'**
+  String confirmDeleteMessage(String name);
+
+  /// No description provided for @export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get export;
+
+  /// No description provided for @deleteTemplateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Template'**
+  String get deleteTemplateTitle;
+
+  /// No description provided for @deleteTemplateConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \'\'{templateTitle}\'\'?'**
+  String deleteTemplateConfirmation(String templateTitle);
+
+  /// No description provided for @moveToTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Trash'**
+  String get moveToTrash;
+
+  /// No description provided for @permanentDeleteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete (cannot be undone)'**
+  String get permanentDeleteWarning;
+
+  /// No description provided for @templateDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Template deleted successfully'**
+  String get templateDeletedSuccess;
+
+  /// No description provided for @templateDeleteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting template: {error}'**
+  String templateDeleteError(String error);
+
+  /// No description provided for @exportTemplateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Template'**
+  String get exportTemplateTitle;
+
+  /// No description provided for @fileNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get fileNameLabel;
+
+  /// No description provided for @exportAsJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as JSON file'**
+  String get exportAsJson;
+
+  /// No description provided for @exportAsJsonDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the template as a local JSON file.'**
+  String get exportAsJsonDescription;
+
+  /// No description provided for @shareTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareTemplate;
+
+  /// No description provided for @shareTemplateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Share template with other apps.'**
+  String get shareTemplateDescription;
+
+  /// No description provided for @templateExportedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Template exported to {path}'**
+  String templateExportedSuccess(String path);
+
+  /// No description provided for @templateExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error exporting template: {error}'**
+  String templateExportError(String error);
+
+  /// No description provided for @shareTemplateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error sharing template: {error}'**
+  String shareTemplateError(String error);
+
+  /// No description provided for @draftsDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get draftsDialogTitle;
+
+  /// No description provided for @trashDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash'**
+  String get trashDialogTitle;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @permanentlyDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently Delete'**
+  String get permanentlyDelete;
+
+  /// No description provided for @daysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String daysLeft(int days);
+
+  /// No description provided for @createManually.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Manually'**
+  String get createManually;
+
+  /// No description provided for @importFromFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from File'**
+  String get importFromFile;
+
+  /// No description provided for @duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get duplicate;
+
+  /// No description provided for @enterNewTemplateName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new name for the duplicated template.'**
+  String get enterNewTemplateName;
+
+  /// No description provided for @areYouSureToDeleteNTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {count} templates?'**
+  String areYouSureToDeleteNTemplates(Object count);
+
+  /// No description provided for @youAreAboutToExportNTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'You are about to export {count} templates.'**
+  String youAreAboutToExportNTemplates(Object count);
+
+  /// No description provided for @ageGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Age Group'**
+  String get ageGroup;
+
+  /// No description provided for @ageUnder18.
+  ///
+  /// In en, this message translates to:
+  /// **'Under 18'**
+  String get ageUnder18;
+
+  /// No description provided for @age18Plus.
+  ///
+  /// In en, this message translates to:
+  /// **'Over 18'**
+  String get age18Plus;
+
+  /// No description provided for @clearAllBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all bookmarks'**
+  String get clearAllBookmarks;
+
+  /// No description provided for @clearAllBookmarksConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete all history entries? This action cannot be undone.'**
+  String get clearAllBookmarksConfirm;
+
+  /// No description provided for @clearAllBookmarksSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All bookmarks cleared successfully'**
+  String get clearAllBookmarksSuccess;
+
+  /// No description provided for @processing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing...'**
+  String get processing;
+
+  /// No description provided for @loadFunctionsFromBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Load functions from bookmarks'**
+  String get loadFunctionsFromBookmarks;
+
+  /// No description provided for @loadFunctionsFromBookmarksConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading from bookmarks will replace your current functions. Do you want to bookmark it before loading?'**
+  String get loadFunctionsFromBookmarksConfirm;
+
+  /// No description provided for @clearAllFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all functions'**
+  String get clearAllFunctions;
+
+  /// No description provided for @clearAllFunctionsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete all functions? This action cannot be undone.'**
+  String get clearAllFunctionsConfirm;
+
+  /// No description provided for @clearAllFunctionsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All functions cleared successfully'**
+  String get clearAllFunctionsSuccess;
+
+  /// No description provided for @bookmarkSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark content saved'**
+  String get bookmarkSaved;
+
+  /// No description provided for @swap.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get swap;
+
+  /// No description provided for @startDateConflixWithEndDateAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date cannot be greater than or equal to end date'**
+  String get startDateConflixWithEndDateAlarm;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -15,6 +15,8 @@ import 'package:setpocket/screens/random_tools/date_time_generator.dart';
 import 'package:setpocket/widgets/generic/section_item.dart';
 import 'package:setpocket/widgets/generic/section_list_view.dart';
 import 'package:setpocket/widgets/generic/section_grid_view.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
+import 'package:setpocket/utils/generic_settings_utils.dart';
 
 class RandomToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -145,6 +147,20 @@ class RandomToolsScreen extends StatelessWidget {
     }
   }
 
+  void _openSettings(BuildContext context, AppLocalizations loc) {
+    GenericSettingsUtils.quickOpenRandomToolsSettings(
+      context,
+      onSettingsChanged: (settings) {
+        // Show confirmation using SnackbarUtils
+        SnackbarUtils.showTyped(
+          context,
+          loc.saved,
+          SnackBarType.success,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -177,12 +193,33 @@ class RandomToolsScreen extends StatelessWidget {
     }
 
     if (isEmbedded) {
-      return content;
+      return Stack(
+        children: [
+          content,
+          // Settings FAB for embedded/desktop mode
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton.small(
+              onPressed: () => _openSettings(context, loc),
+              tooltip: loc.settings,
+              child: const Icon(Icons.settings),
+            ),
+          ),
+        ],
+      );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(loc.random),
           elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => _openSettings(context, loc),
+              tooltip: loc.settings,
+            ),
+          ],
         ),
         body: content,
       );

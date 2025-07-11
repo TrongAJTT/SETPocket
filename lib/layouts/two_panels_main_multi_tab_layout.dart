@@ -1,5 +1,52 @@
 import 'package:flutter/material.dart';
 
+/// Decorator for customizing the switch tab buttons between main and secondary tabs
+class SwitchTabButtonDecorator {
+  final Widget Function(Widget child, int tabIndex, bool isSelected)?
+      customButtonBuilder;
+  final EdgeInsetsGeometry? buttonPadding;
+  final Color? selectedColor;
+  final Color? unselectedColor;
+  final double? buttonRadius;
+  final double? spacing;
+
+  const SwitchTabButtonDecorator({
+    this.customButtonBuilder,
+    this.buttonPadding,
+    this.selectedColor,
+    this.unselectedColor,
+    this.buttonRadius,
+    this.spacing,
+  });
+
+  /// Factory constructor for the current default template
+  factory SwitchTabButtonDecorator.defaultTemplate() {
+    return const SwitchTabButtonDecorator(
+      buttonPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      buttonRadius: 8.0,
+      spacing: 8.0,
+    );
+  }
+
+  /// Factory constructor for a minimal template
+  factory SwitchTabButtonDecorator.minimal() {
+    return const SwitchTabButtonDecorator(
+      buttonPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      buttonRadius: 4.0,
+      spacing: 4.0,
+    );
+  }
+
+  /// Factory constructor for a rounded template
+  factory SwitchTabButtonDecorator.rounded() {
+    return const SwitchTabButtonDecorator(
+      buttonPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      buttonRadius: 24.0,
+      spacing: 12.0,
+    );
+  }
+}
+
 class TwoPanelsMainMultiTabLayout extends StatefulWidget {
   /// Main tabs data
   final List<TabData> mainTabs;
@@ -46,6 +93,12 @@ class TwoPanelsMainMultiTabLayout extends StatefulWidget {
   /// Main tab index
   final int mainTabIndex;
 
+  /// Use compact tab layout (text only, no icons)
+  final bool useCompactTabLayout;
+
+  /// Switch tab button decorator for customizing tab switching buttons
+  final SwitchTabButtonDecorator? switchTabButtonDecorator;
+
   const TwoPanelsMainMultiTabLayout({
     super.key,
     required this.mainTabs,
@@ -63,6 +116,8 @@ class TwoPanelsMainMultiTabLayout extends StatefulWidget {
     this.mainPanelTitle,
     this.mainPanelActions,
     this.mainTabIndex = 0,
+    this.useCompactTabLayout = false,
+    this.switchTabButtonDecorator,
   }) : assert(mainTabs.length >= 2, 'Must have at least 2 main tabs');
 
   @override
@@ -234,7 +289,7 @@ class _TwoPanelsMainMultiTabLayoutState
               height: 48, // Fixed height for consistency
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -273,7 +328,7 @@ class _TwoPanelsMainMultiTabLayoutState
           // Main tabs
           Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: widget.mainPanelTitle != null
                   ? null
                   : const BorderRadius.only(
@@ -293,7 +348,9 @@ class _TwoPanelsMainMultiTabLayoutState
               indicatorSize: TabBarIndicatorSize.tab,
               tabs: widget.mainTabs
                   .map((tab) => Tab(
-                        icon: tab.icon != null ? Icon(tab.icon) : null,
+                        icon: widget.useCompactTabLayout
+                            ? null
+                            : (tab.icon != null ? Icon(tab.icon) : null),
                         text: tab.label,
                       ))
                   .toList(),
@@ -383,7 +440,7 @@ class _TwoPanelsMainMultiTabLayoutState
             height: 48, // Fixed height to match main panel
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -463,7 +520,11 @@ class _TwoPanelsMainMultiTabLayoutState
             isScrollable: allTabs.length >= 5,
             tabs: allTabs
                 .map((tab) => Tab(
-                      icon: tab.icon != null ? Icon(tab.icon, size: 20) : null,
+                      icon: widget.useCompactTabLayout
+                          ? null
+                          : (tab.icon != null
+                              ? Icon(tab.icon, size: 20)
+                              : null),
                       text: tab.label,
                     ))
                 .toList(),

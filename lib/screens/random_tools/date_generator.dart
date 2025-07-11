@@ -4,11 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/utils/size_utils.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 
@@ -29,7 +31,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   bool _allowDuplicates = true;
   List<DateTime> _generatedDates = [];
   bool _copied = false;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
   final _dateFormat = DateFormat('yyyy-MM-dd');
 
@@ -41,18 +43,15 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
   }
 
   void _loadState() async {
-    final state = await RandomStateService.getDateGeneratorState();
-    if (state != null) {
-      setState(() {
-        _startDate = state.startDate ??
-            DateTime.now().subtract(const Duration(days: 365));
-        _endDate =
-            state.endDate ?? DateTime.now().add(const Duration(days: 365));
-        _dateCount = state.dateCount;
-        _dateCountSlider = state.dateCount.toDouble();
-        _allowDuplicates = state.allowDuplicates;
-      });
-    }
+    final state = await UnifiedRandomStateService.getDateGeneratorState();
+    setState(() {
+      _startDate =
+          state.startDate ?? DateTime.now().subtract(const Duration(days: 365));
+      _endDate = state.endDate ?? DateTime.now().add(const Duration(days: 365));
+      _dateCount = state.dateCount;
+      _dateCountSlider = state.dateCount.toDouble();
+      _allowDuplicates = state.allowDuplicates;
+    });
   }
 
   Future<void> _saveState() async {
@@ -63,7 +62,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
         ..dateCount = _dateCount
         ..allowDuplicates = _allowDuplicates
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveDateGeneratorState(state);
+      await UnifiedRandomStateService.saveDateGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -108,8 +107,11 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
         final datesText =
             _generatedDates.map((date) => _dateFormat.format(date)).join(', ');
         GenerationHistoryService.addHistoryItem(
-          datesText,
-          'date',
+          UnifiedHistoryData(
+            value: datesText,
+            type: 'date',
+            timestamp: DateTime.now(),
+          ),
         ).then((_) => _loadHistory()); // Refresh history
       }
     } catch (e) {
@@ -228,7 +230,7 @@ class _DateGeneratorScreenState extends State<DateGeneratorScreen> {
       startDateSelector,
       endDateSelector,
       minWidth: 300,
-      horizontalSpacing: 16,
+      spacing: TwoDimSpacing.both(16),
     );
   }
 

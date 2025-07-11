@@ -1,5 +1,4 @@
 import 'package:isar/isar.dart';
-import 'package:logger/logger.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/models/converter_models/unit_template_model.dart';
 import 'package:setpocket/services/isar_service.dart';

@@ -1,53 +1,65 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:setpocket/models/bmi_models.dart';
+import 'package:isar/isar.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/services/hive_service.dart';
+import 'package:setpocket/models/calculator_models/bmi_models.dart';
+import 'package:setpocket/models/unified_history_data.dart';
+import 'package:setpocket/services/calculator_services/calculator_tools_service.dart';
+import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/services/isar_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:setpocket/models/calculator_models/calculator_tools_data.dart';
+import 'package:setpocket/services/settings_models_service.dart';
 
 class BmiService {
   static const String _historyKey = 'bmi_history';
   static const String _preferencesKey = 'bmi_preferences';
+  static const String _toolId = CalculatorToolCodes.bmi;
 
   // BMI calculation based on WHO standards with age and gender considerations
   static BmiCalculation calculateBmi(
     double height,
     double weight,
-    int age,
+    AgeGroup ageGroup,
     Gender gender,
     UnitSystem unitSystem,
     AppLocalizations l10n,
   ) {
+    // Convert AgeGroup to age for internal calculations
+    int age = ageGroup == AgeGroup.under18 ? 16 : 25; // Representative ages
+
     // Convert to metric if needed
-    double heightCm = unitSystem == UnitSystem.metric
-        ? height
-        : convertHeight(height, UnitSystem.imperial, UnitSystem.metric);
-    double weightKg = unitSystem == UnitSystem.metric
-        ? weight
-        : convertWeight(weight, UnitSystem.imperial, UnitSystem.metric);
+    double heightInCm = height;
+    double weightInKg = weight;
+
+    if (unitSystem == UnitSystem.imperial) {
+      heightInCm = height * 2.54; // inches to cm
+      weightInKg = weight * 0.453592; // pounds to kg
+    }
 
     // Calculate BMI
-    double heightM = heightCm / 100;
-    double bmi = weightKg / (heightM * heightM);
+    double bmi = weightInKg / ((heightInCm / 100) * (heightInCm / 100));
 
-    // Use different calculation methods based on age
-    if (age < 18) {
-      return _calculatePediatricBmi(bmi, age, gender, l10n);
+    // Use different calculation methods based on age group
+    if (ageGroup == AgeGroup.under18) {
+      return _calculatePediatricBmi(bmi, ageGroup, gender, l10n);
     } else {
-      return _calculateAdultBmi(bmi, age, gender, l10n);
+      return _calculateAdultBmi(bmi, ageGroup, gender, l10n);
     }
   }
 
   static BmiCalculation _calculateAdultBmi(
-      double bmi, int age, Gender gender, AppLocalizations l10n) {
+      double bmi, AgeGroup ageGroup, Gender gender, AppLocalizations l10n) {
     // Determine category with age considerations
-    BmiCategory category = _getBmiCategory(bmi, age);
+    BmiCategory category = _getBmiCategory(bmi, ageGroup);
     Color categoryColor = _getCategoryColor(category);
 
     // Generate interpretation with detailed context
-    String interpretation = _getInterpretation(category, bmi, age, l10n);
+    String interpretation = _getInterpretation(category, bmi, ageGroup, l10n);
 
     // Generate comprehensive recommendations
-    List<String> recommendations = _getRecommendations(category, age, l10n);
+    List<String> recommendations =
+        _getRecommendations(category, ageGroup, l10n);
 
     return BmiCalculation(
       bmi: bmi,
@@ -59,21 +71,18 @@ class BmiService {
   }
 
   static BmiCalculation _calculatePediatricBmi(
-      double bmi, int age, Gender gender, AppLocalizations l10n) {
-    // Calculate approximate percentile for pediatric BMI
-    double percentile = _calculateBmiPercentile(bmi, age, gender);
-
-    // Determine category based on percentile
-    BmiCategory category = _getPediatricBmiCategory(percentile);
+      double bmi, AgeGroup ageGroup, Gender gender, AppLocalizations l10n) {
+    // For pediatric group, use simplified categorization since we don't have exact age
+    BmiCategory category = _getPediatricBmiCategorySimplified(bmi);
     Color categoryColor = _getCategoryColor(category);
 
     // Generate pediatric-specific interpretation
     String interpretation =
-        _getPediatricInterpretation(percentile, category, age, gender, l10n);
+        _getPediatricInterpretationSimplified(category, ageGroup, gender, l10n);
 
     // Generate pediatric-specific recommendations
-    List<String> recommendations =
-        _getPediatricRecommendations(category, age, gender, l10n);
+    List<String> recommendations = _getPediatricRecommendationsSimplified(
+        category, ageGroup, gender, l10n);
 
     return BmiCalculation(
       bmi: bmi,
@@ -177,7 +186,7 @@ class BmiService {
   }
 
   static List<String> _getPediatricRecommendations(
-      BmiCategory category, int age, Gender gender, AppLocalizations l10n) {
+      BmiCategory category, int age, AppLocalizations l10n) {
     List<String> recommendations = [];
 
     // Age-appropriate recommendations
@@ -186,14 +195,14 @@ class BmiService {
         recommendations.addAll([
           l10n.bmiUnderweightRec1,
           l10n.bmiUnderweightRec2,
-          l10n.bmiGrowthPattern,
+          l10n.bmiUnderweightRec3,
         ]);
         break;
       case BmiCategory.normalWeight:
         recommendations.addAll([
           l10n.bmiNormalRec1,
           l10n.bmiNormalRec2,
-          l10n.bmiYouthRec,
+          l10n.bmiNormalRec3,
         ]);
         break;
       case BmiCategory.overweightI:
@@ -201,7 +210,7 @@ class BmiService {
         recommendations.addAll([
           l10n.bmiOverweightRec1,
           l10n.bmiOverweightRec2,
-          l10n.bmiGrowthPattern,
+          l10n.bmiOverweightRec3,
         ]);
         break;
       case BmiCategory.obeseI:
@@ -210,36 +219,100 @@ class BmiService {
         recommendations.addAll([
           l10n.bmiObeseRec1,
           l10n.bmiObeseRec2,
-          l10n.bmiGrowthPattern,
+          l10n.bmiObeseRec3,
         ]);
         break;
     }
 
-    // Always add consultation recommendation for pediatric
-    recommendations.add(l10n.bmiConsultationRec);
+    return recommendations;
+  }
+
+  // Simplified pediatric BMI category determination since we don't have exact age
+  static BmiCategory _getPediatricBmiCategorySimplified(double bmi) {
+    // Use general thresholds for children/teens
+    if (bmi < 16.0) return BmiCategory.underweight;
+    if (bmi < 22.0) return BmiCategory.normalWeight;
+    if (bmi < 26.0) return BmiCategory.overweightI;
+    return BmiCategory.obeseI;
+  }
+
+  static String _getPediatricInterpretationSimplified(BmiCategory category,
+      AgeGroup ageGroup, Gender gender, AppLocalizations l10n) {
+    String categoryName = _getPediatricCategoryName(category, l10n);
+    // Use general interpretation for pediatric since exact percentile calculation requires specific age
+    String baseInterpretation =
+        'BMI category: $categoryName (Under 18 category)';
+
+    // Add pediatric-specific context
+    String pediatricNote =
+        ' Please consult with healthcare provider for pediatric BMI assessment.';
+
+    return baseInterpretation + pediatricNote;
+  }
+
+  static List<String> _getPediatricRecommendationsSimplified(
+      BmiCategory category,
+      AgeGroup ageGroup,
+      Gender gender,
+      AppLocalizations l10n) {
+    List<String> recommendations = [];
+
+    // General pediatric recommendations since we don't have exact age
+    switch (category) {
+      case BmiCategory.underweight:
+        recommendations.addAll([
+          'Consult with pediatrician about healthy weight gain strategies',
+          'Focus on nutrient-dense foods and appropriate portions',
+          'Ensure adequate physical activity appropriate for age',
+        ]);
+        break;
+      case BmiCategory.normalWeight:
+        recommendations.addAll([
+          'Maintain current healthy habits',
+          'Continue balanced nutrition and regular physical activity',
+          'Regular health check-ups with healthcare provider',
+        ]);
+        break;
+      case BmiCategory.overweightI:
+      case BmiCategory.overweightII:
+        recommendations.addAll([
+          'Consult with pediatrician about healthy weight management',
+          'Focus on family-based lifestyle changes',
+          'Increase physical activity and reduce sedentary time',
+        ]);
+        break;
+      case BmiCategory.obeseI:
+      case BmiCategory.obeseII:
+      case BmiCategory.obeseIII:
+        recommendations.addAll([
+          'Seek professional medical guidance immediately',
+          'Consider structured weight management program',
+          'Family-based approach to lifestyle modifications',
+        ]);
+        break;
+    }
+
+    // Always add consultation note for pediatric
+    recommendations.add(
+        'Professional medical consultation is recommended for all pediatric BMI assessments.');
 
     return recommendations;
   }
 
-  static BmiCategory _getBmiCategory(double bmi, int age) {
-    // Special considerations for elderly (65+)
-    if (age >= 65) {
-      if (bmi < 22.0) return BmiCategory.underweight;
-      if (bmi <= 27.0) return BmiCategory.normalWeight;
-      if (bmi <= 30.0) return BmiCategory.overweightI;
-      if (bmi <= 35.0) return BmiCategory.obeseI;
-      if (bmi <= 40.0) return BmiCategory.obeseII;
-      return BmiCategory.obeseIII;
+  static BmiCategory _getBmiCategory(double bmi, AgeGroup ageGroup) {
+    // Use standard WHO classifications for adults
+    if (ageGroup == AgeGroup.adult18Plus) {
+      if (bmi < 18.5) return BmiCategory.underweight;
+      if (bmi < 25.0) return BmiCategory.normalWeight;
+      if (bmi < 27.5) return BmiCategory.overweightI; // 25.0-27.4
+      if (bmi < 30.0) return BmiCategory.overweightII; // 27.5-29.9
+      if (bmi < 35.0) return BmiCategory.obeseI; // 30.0-34.9
+      if (bmi < 40.0) return BmiCategory.obeseII; // 35.0-39.9
+      return BmiCategory.obeseIII; // ≥ 40.0
+    } else {
+      // For pediatric group, use simplified thresholds
+      return _getPediatricBmiCategorySimplified(bmi);
     }
-
-    // Detailed WHO classifications for adults (18-64)
-    if (bmi < 18.5) return BmiCategory.underweight;
-    if (bmi < 25.0) return BmiCategory.normalWeight;
-    if (bmi < 27.5) return BmiCategory.overweightI; // 25.0-27.4
-    if (bmi < 30.0) return BmiCategory.overweightII; // 27.5-29.9
-    if (bmi < 35.0) return BmiCategory.obeseI; // 30.0-34.9
-    if (bmi < 40.0) return BmiCategory.obeseII; // 35.0-39.9
-    return BmiCategory.obeseIII; // ≥ 40.0
   }
 
   static Color _getCategoryColor(BmiCategory category) {
@@ -261,18 +334,16 @@ class BmiService {
     }
   }
 
-  static String _getInterpretation(
-      BmiCategory category, double bmi, int age, AppLocalizations l10n) {
+  static String _getInterpretation(BmiCategory category, double bmi,
+      AgeGroup ageGroup, AppLocalizations l10n) {
     final bmiText = bmi.toStringAsFixed(1);
     String baseInterpretation;
 
-    // Base interpretations based on age considerations
-    if (age < 18) {
-      // Pediatric interpretations
-      final percentile = _calculatePediatricBmiPercentile(bmi, age);
-      baseInterpretation = l10n.bmiPediatricInterpretation(
-          percentile.toStringAsFixed(1),
-          _getDetailedCategoryName(category, l10n));
+    // Base interpretations based on age group
+    if (ageGroup == AgeGroup.under18) {
+      // Pediatric interpretations - simplified since we don't have exact age
+      String categoryName = _getDetailedCategoryName(category, l10n);
+      baseInterpretation = 'BMI category: $categoryName (Under 18 category)';
     } else {
       // Adult interpretations - consolidate similar categories for messaging
       switch (category) {
@@ -294,11 +365,8 @@ class BmiService {
       }
     }
 
-    // Add age-specific considerations
-    if (age >= 65) {
-      return '$baseInterpretation ${l10n.bmiElderlyNote}';
-    }
-    if (age < 25) {
+    // Add age group-specific considerations
+    if (ageGroup == AgeGroup.under18) {
       return '$baseInterpretation ${l10n.bmiYouthNote}';
     }
 
@@ -332,11 +400,11 @@ class BmiService {
   }
 
   static List<String> _getRecommendations(
-      BmiCategory category, int age, AppLocalizations l10n) {
+      BmiCategory category, AgeGroup ageGroup, AppLocalizations l10n) {
     List<String> recommendations = [];
 
-    // Age-specific introductions
-    if (age < 18) {
+    // Age group-specific introductions
+    if (ageGroup == AgeGroup.under18) {
       recommendations.add(l10n.bmiGrowthPattern);
     }
 
@@ -375,14 +443,24 @@ class BmiService {
         break;
     }
 
+    // Add age group-specific recommendations
+    if (ageGroup == AgeGroup.under18) {
+      recommendations.add(
+          'Professional medical consultation is recommended for pediatric BMI assessment.');
+    }
+
     return recommendations;
   }
 
-  // History management
-  static Future<List<BmiHistoryEntry>> getHistory() async {
+  // History management - Updated to use only UnifiedHistoryData like other calculators
+  static Future<List<UnifiedHistoryData>> getHistory() async {
     try {
-      // TODO: Implement Isar-based BMI history storage
-      return [];
+      final isar = IsarService.isar;
+      return await isar.unifiedHistoryDatas
+          .filter()
+          .typeEqualTo('bmi_calculator')
+          .sortByTimestampDesc()
+          .findAll();
     } catch (e) {
       debugPrint('Error loading BMI history: $e');
       return [];
@@ -391,57 +469,132 @@ class BmiService {
 
   static Future<void> saveToHistory(BmiHistoryEntry entry) async {
     try {
-      // TODO: Implement Isar-based BMI history storage
+      // Check if history is enabled
+      final settings =
+          await ExtensibleSettingsService.getCalculatorToolsSettings();
+      if (!settings.rememberHistory) return;
+
+      // Create input and result data following the unified format
+      final inputsData = {
+        'height': entry.data.height,
+        'weight': entry.data.weight,
+        'ageGroup': entry.data.ageGroup.name,
+        'gender': entry.data.gender.name,
+        'unitSystem': entry.data.unitSystem.name,
+      };
+
+      final resultsData = {
+        'bmi': entry.calculationData.bmi,
+        'category': entry.calculationData.category.name,
+        'interpretation': entry.calculationData.interpretation,
+        'recommendations': entry.calculationData.recommendations,
+      };
+
+      // Follow Financial/Discount Calculator format: embed inputsData and resultsData inside 'value' field
+      final valueData = {
+        'inputsData': inputsData,
+        'resultsData': resultsData,
+      };
+
+      final historyData = UnifiedHistoryData(
+        type: 'bmi_calculator',
+        title:
+            'BMI ${entry.calculationData.bmi.toStringAsFixed(1)} - ${entry.calculationData.category.name}',
+        value: jsonEncode(valueData),
+        timestamp: entry.data.calculatedAt,
+        subType: 'bmi',
+        displayTitle:
+            'BMI ${entry.calculationData.bmi.toStringAsFixed(1)} - ${entry.calculationData.category.name}',
+        inputsData: inputsData,
+        resultsData: resultsData,
+      );
+
+      await GenerationHistoryService.addHistoryItem(historyData);
     } catch (e) {
       debugPrint('Error saving BMI history: $e');
+      rethrow;
     }
   }
 
   static Future<void> removeFromHistory(String id) async {
     try {
-      // TODO: Implement Isar-based BMI history storage
+      final isar = IsarService.isar;
+      final entryId = int.tryParse(id);
+      if (entryId != null) {
+        await isar.writeTxn(() async {
+          await isar.unifiedHistoryDatas.delete(entryId);
+        });
+      }
     } catch (e) {
       debugPrint('Error removing BMI history: $e');
+      rethrow;
     }
   }
 
   static Future<void> clearHistory() async {
     try {
-      // TODO: Implement Isar-based BMI history storage
+      await GenerationHistoryService.clearHistory('bmi_calculator');
     } catch (e) {
       debugPrint('Error clearing BMI history: $e');
+      rethrow;
     }
   }
 
-  // Preferences management
+  // Preferences management (This is now the single source of truth)
   static Future<Map<String, dynamic>> getPreferences() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
       return {
-        'unitSystem': UnitSystem.metric.index,
-        'rememberLastValues': true,
-        'autoSaveToHistory': true,
+        'unitSystem': prefs.getInt('bmi_unitSystem') ?? UnitSystem.metric.index,
+        'autoSaveToHistory': prefs.getBool('bmi_autoSaveToHistory') ?? false,
+        'rememberLastValues': prefs.getBool('bmi_rememberLastValues') ?? true,
+        'lastHeight': prefs.getDouble('bmi_lastHeight'),
+        'lastWeight': prefs.getDouble('bmi_lastWeight'),
+        'lastAgeGroup': prefs.getInt('bmi_lastAgeGroup'),
+        'lastGender': prefs.getInt('bmi_lastGender'),
       };
     } catch (e) {
       debugPrint('Error loading BMI preferences: $e');
       return {
         'unitSystem': UnitSystem.metric.index,
         'rememberLastValues': true,
-        'autoSaveToHistory': true,
+        'autoSaveToHistory': false,
       };
     }
   }
 
   static Future<void> savePreferences(Map<String, dynamic> preferences) async {
     try {
-      // TODO: Implement Isar-based BMI preferences storage
+      final prefs = await SharedPreferences.getInstance();
+
+      for (final entry in preferences.entries) {
+        final value = entry.value;
+        if (value is int) {
+          await prefs.setInt('bmi_${entry.key}', value);
+        } else if (value is double) {
+          await prefs.setDouble('bmi_${entry.key}', value);
+        } else if (value is bool) {
+          await prefs.setBool('bmi_${entry.key}', value);
+        } else if (value is String) {
+          await prefs.setString('bmi_${entry.key}', value);
+        }
+      }
     } catch (e) {
       debugPrint('Error saving BMI preferences: $e');
+      rethrow;
     }
   }
 
   static Future<void> clearPreferences() async {
     try {
-      // TODO: Implement Isar-based BMI preferences storage
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('bmi_unitSystem');
+      await prefs.remove('bmi_autoSaveToHistory');
+      await prefs.remove('bmi_rememberLastValues');
+      await prefs.remove('bmi_lastHeight');
+      await prefs.remove('bmi_lastWeight');
+      await prefs.remove('bmi_lastAgeGroup');
+      await prefs.remove('bmi_lastGender');
     } catch (e) {
       debugPrint('Error clearing BMI preferences: $e');
     }
@@ -507,14 +660,67 @@ class BmiService {
     }
   }
 
-  // BMI info and educational content
-  static List<Map<String, dynamic>> getBmiRanges(AppLocalizations l10n) {
-    return getBmiRangesForAge(l10n, 18); // Default to adult
+  // State management for calculator inputs
+  static Future<Map<String, dynamic>?> getCalculatorState() async {
+    try {
+      final state = await CalculatorToolsService.getToolState(_toolId);
+      return state;
+    } catch (e) {
+      debugPrint('Error loading BMI calculator state: $e');
+      return null;
+    }
   }
 
-  static List<Map<String, dynamic>> getBmiRangesForAge(
-      AppLocalizations l10n, int age) {
-    if (age < 18) {
+  static Future<void> saveCalculatorState({
+    required double? height,
+    required double? weight,
+    required AgeGroup ageGroup,
+    required UnitSystem unitSystem,
+    required Gender gender,
+    BmiCalculation? lastCalculation,
+  }) async {
+    try {
+      final state = {
+        'height': height,
+        'weight': weight,
+        'ageGroup': ageGroup.index,
+        'unitSystem': unitSystem.index,
+        'gender': gender.index,
+        'lastCalculation': lastCalculation != null
+            ? {
+                'bmi': lastCalculation.bmi,
+                'category': lastCalculation.category.index,
+                'interpretation': lastCalculation.interpretation,
+              }
+            : null,
+        'lastUpdated': DateTime.now().millisecondsSinceEpoch,
+      };
+
+      await CalculatorToolsService.saveToolState(_toolId, state);
+    } catch (e) {
+      debugPrint('Error saving BMI calculator state: $e');
+      rethrow;
+    }
+  }
+
+  static Future<void> clearCalculatorState() async {
+    try {
+      await CalculatorToolsService.clearToolState(_toolId);
+    } catch (e) {
+      debugPrint('Error clearing BMI calculator state: $e');
+      rethrow;
+    }
+  }
+
+  // BMI info and educational content
+  static List<Map<String, dynamic>> getBmiRanges(AppLocalizations l10n) {
+    return getBmiRangesForAgeGroup(
+        l10n, AgeGroup.adult18Plus); // Default to adult
+  }
+
+  static List<Map<String, dynamic>> getBmiRangesForAgeGroup(
+      AppLocalizations l10n, AgeGroup ageGroup) {
+    if (ageGroup == AgeGroup.under18) {
       return _getPediatricBmiRanges(l10n);
     } else {
       return _getAdultBmiRanges(l10n);
@@ -598,14 +804,16 @@ class BmiService {
     ];
   }
 
-  static String getBmiRangeTitle(AppLocalizations l10n, int age) {
-    return age < 18 ? l10n.bmiPediatricTitle : l10n.bmiAdultTitle;
+  static String getBmiRangeTitle(AppLocalizations l10n, AgeGroup ageGroup) {
+    return ageGroup == AgeGroup.under18
+        ? l10n.bmiPediatricTitle
+        : l10n.bmiAdultTitle;
   }
 
-  static String getBmiRangeNote(AppLocalizations l10n, int age) {
-    return age < 18
+  static String getBmiRangeNote(AppLocalizations l10n, AgeGroup ageGroup) {
+    return ageGroup == AgeGroup.under18
         ? l10n.bmiPercentileNote
-        : 'Tiêu chuẩn WHO cho người trưởng thành (18-64 tuổi)';
+        : 'Tiêu chuẩn WHO cho người trưởng thành (18+ tuổi)';
   }
 
   // Add detailed BMI information for different age groups

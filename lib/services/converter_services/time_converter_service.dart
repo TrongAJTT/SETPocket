@@ -3,7 +3,7 @@ import 'package:setpocket/services/converter_services/converter_service_base.dar
 import 'package:setpocket/services/converter_services/time_units_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
-class TimeConverterService implements ConverterServiceBase {
+class TimeConverterService extends ConverterServiceBase {
   // Performance optimization: Static caches for singleton pattern
   static final Map<String, TimeUnit> _unitsCache = <String, TimeUnit>{};
   static final Map<String, double> _conversionCache = <String, double>{};

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/text_template.dart';
+import 'package:setpocket/models/text_template/text_templates_data.dart';
 
 class BatchExportDialog extends StatefulWidget {
-  final List<Template> templates;
+  final List<TextTemplatesData> templates;
   final Map<String, String> initialFilenames;
   final Function(Map<String, String>) onExport;
 
   const BatchExportDialog({
-    Key? key,
+    super.key,
     required this.templates,
     required this.initialFilenames,
     required this.onExport,
-  }) : super(key: key);
+  });
 
   @override
   State<BatchExportDialog> createState() => _BatchExportDialogState();
@@ -29,12 +29,12 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
 
     for (final template in widget.templates) {
       // Remove .json extension for editing, keep only the filename part
-      final fullFilename = _filenames[template.templateId] ?? '';
+      final fullFilename = _filenames[template.id] ?? '';
       final filenameWithoutExtension = fullFilename.endsWith('.json')
           ? fullFilename.substring(0, fullFilename.length - 5)
           : fullFilename;
 
-      _controllers[template.templateId] = TextEditingController(
+      _controllers[template.id] = TextEditingController(
         text: filenameWithoutExtension,
       );
     }
@@ -68,7 +68,7 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
                 itemCount: widget.templates.length,
                 itemBuilder: (context, index) {
                   final template = widget.templates[index];
-                  final controller = _controllers[template.templateId]!;
+                  final controller = _controllers[template.id]!;
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -88,7 +88,7 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
                           ),
                           onChanged: (value) {
                             // Always append .json extension, user cannot modify it
-                            _filenames[template.templateId] = '${value.trim()}.json';
+                            _filenames[template.id] = '${value.trim()}.json';
                           },
                         ),
                       ],
@@ -109,11 +109,11 @@ class _BatchExportDialogState extends State<BatchExportDialog> {
           onPressed: () {
             // Update filenames from controllers
             for (final template in widget.templates) {
-              final controller = _controllers[template.templateId]!;
+              final controller = _controllers[template.id]!;
               final filename = controller.text.trim();
               if (filename.isNotEmpty) {
                 // Always use .json extension, no other extension allowed
-                _filenames[template.templateId] = '$filename.json';
+                _filenames[template.id] = '$filename.json';
               }
             }
 

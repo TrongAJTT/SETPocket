@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:setpocket/services/app_logger.dart';
-import 'package:setpocket/services/settings_service.dart';
+import 'package:setpocket/services/settings_models_service.dart';
 
 enum CurrencyStatus {
   success,
@@ -496,7 +496,9 @@ class CurrencyService {
             }
             try {
               // Get timeout from settings service
-              final timeoutSeconds = await SettingsService.getFetchTimeout();
+              final converterSettings =
+                  await ExtensibleSettingsService.getConverterToolsSettings();
+              final timeoutSeconds = converterSettings.fetchTimeoutSeconds;
               final result =
                   await entry.value.timeout(Duration(seconds: timeoutSeconds));
 
@@ -761,7 +763,7 @@ class CurrencyService {
     // Check if recently updated (within 1 hour)
     final now = DateTime.now();
     final difference = now.difference(fetchTime);
-    if (difference.inHours < 1) {
+    if (difference.inHours < 6) {
       return CurrencyValueStatus.recentlyUpdated;
     }
 
@@ -788,9 +790,9 @@ class CurrencyService {
     final valueStatus = getCurrencyValueStatus(currencyCode);
     switch (valueStatus) {
       case CurrencyValueStatus.recentlyUpdated:
-        return 'Cập nhật trong vòng 1 giờ qua';
+        return 'Cập nhật trong vòng 6 giờ qua';
       case CurrencyValueStatus.updated:
-        return 'Có dữ liệu trực tuyến nhưng cũ hơn 1 giờ';
+        return 'Có dữ liệu trực tuyến nhưng cũ hơn 6 giờ';
       case CurrencyValueStatus.static:
         return 'Sử dụng tỷ giá tĩnh';
     }
@@ -821,7 +823,7 @@ class CurrencyService {
           // Check if it's been more than 1 hour
           if (fetchTime != null) {
             final difference = now.difference(fetchTime);
-            if (difference.inHours >= 1) {
+            if (difference.inHours >= 6) {
               _currencyStatus[currencyCode] = CurrencyStatus.staticRate;
             }
           }
@@ -861,10 +863,10 @@ class CurrencyService {
           // Check if it's been more than 1 hour since fetch
           if (fetchTime != null) {
             final difference = now.difference(fetchTime);
-            if (difference.inHours >= 1) {
+            if (difference.inHours >= 6) {
               _currencyStatus[currencyCode] = CurrencyStatus.staticRate;
               logInfo(
-                  'CurrencyService: Updated $currencyCode from fetchedRecently to staticRate (>1hr old)');
+                  'CurrencyService: Updated $currencyCode from fetchedRecently to staticRate (>6hr old)');
             }
           }
           break;

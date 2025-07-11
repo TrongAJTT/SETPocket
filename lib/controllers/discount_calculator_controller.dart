@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/models/discount_calculator_models.dart';
-import 'package:setpocket/services/discount_calculator_service.dart';
+import 'package:setpocket/models/calculator_models/discount_calculator_models.dart';
+import 'package:setpocket/services/calculator_services/discount_calculator_service.dart';
 
 class DiscountCalculatorController with ChangeNotifier {
   DiscountCalculationType _activeTab = DiscountCalculationType.discount;
@@ -23,6 +23,7 @@ class DiscountCalculatorController with ChangeNotifier {
   DiscountCalculatorController() {
     _loadHistory();
     _loadFormState();
+    _loadCurrentState();
   }
 
   // Getters
@@ -39,6 +40,7 @@ class DiscountCalculatorController with ChangeNotifier {
   void setActiveTab(DiscountCalculationType tab) {
     if (_activeTab != tab) {
       _activeTab = tab;
+      _saveCurrentState(); // Save state when tab changes
       notifyListeners();
     }
   }
@@ -61,6 +63,7 @@ class DiscountCalculatorController with ChangeNotifier {
       );
 
       _discountResult = result;
+      _saveCurrentState(); // Save state after calculation
       notifyListeners();
     } finally {
       _isLoading = false;
@@ -88,6 +91,7 @@ class DiscountCalculatorController with ChangeNotifier {
       );
 
       _tipResult = result;
+      _saveCurrentState(); // Save state after calculation
       notifyListeners();
     } finally {
       _isLoading = false;
@@ -113,6 +117,7 @@ class DiscountCalculatorController with ChangeNotifier {
       );
 
       _taxResult = result;
+      _saveCurrentState(); // Save state after calculation
       notifyListeners();
     } finally {
       _isLoading = false;
@@ -138,6 +143,7 @@ class DiscountCalculatorController with ChangeNotifier {
       );
 
       _markupResult = result;
+      _saveCurrentState(); // Save state after calculation
       notifyListeners();
     } finally {
       _isLoading = false;
@@ -251,6 +257,7 @@ class DiscountCalculatorController with ChangeNotifier {
     _tipResult = null;
     _taxResult = null;
     _markupResult = null;
+    _saveCurrentState(); // Save cleared state
     notifyListeners();
   }
 
@@ -262,6 +269,103 @@ class DiscountCalculatorController with ChangeNotifier {
       // Handle error silently - start with empty history
       _history = [];
     }
+  }
+
+  // Current state management (save/load calculation results and active tab)
+  Future<void> _loadCurrentState() async {
+    try {
+      final state = await DiscountCalculatorService.getCurrentState();
+      if (state != null) {
+        _activeTab = DiscountCalculationType.values[state.activeTabIndex];
+
+        // Load discount results
+        if (state.discountResults != null) {
+          final data = state.discountResults!;
+          _discountResult = DiscountCalculationResult(
+            originalAmount: data['originalAmount']?.toDouble() ?? 0.0,
+            discountPercent: data['discountPercent']?.toDouble() ?? 0.0,
+            discountAmount: data['discountAmount']?.toDouble() ?? 0.0,
+            finalAmount: data['finalAmount']?.toDouble() ?? 0.0,
+            savedAmount: data['savedAmount']?.toDouble() ?? 0.0,
+          );
+        }
+
+        // Load tip results
+        if (state.tipResults != null) {
+          final data = state.tipResults!;
+          _tipResult = TipCalculationResult(
+            billAmount: data['billAmount']?.toDouble() ?? 0.0,
+            tipPercent: data['tipPercent']?.toDouble() ?? 0.0,
+            numberOfPeople: data['numberOfPeople']?.toInt() ?? 1,
+            tipAmount: data['tipAmount']?.toDouble() ?? 0.0,
+            totalBill: data['totalBill']?.toDouble() ?? 0.0,
+            perPersonAmount: data['perPersonAmount']?.toDouble() ?? 0.0,
+          );
+        }
+
+        // Load tax results
+        if (state.taxResults != null) {
+          final data = state.taxResults!;
+          _taxResult = TaxCalculationResult(
+            priceBeforeTax: data['priceBeforeTax']?.toDouble() ?? 0.0,
+            taxRate: data['taxRate']?.toDouble() ?? 0.0,
+            taxAmount: data['taxAmount']?.toDouble() ?? 0.0,
+            priceAfterTax: data['priceAfterTax']?.toDouble() ?? 0.0,
+          );
+        }
+
+        // Load markup results
+        if (state.markupResults != null) {
+          final data = state.markupResults!;
+          _markupResult = MarkupCalculationResult(
+            costPrice: data['costPrice']?.toDouble() ?? 0.0,
+            markupPercent: data['markupPercent']?.toDouble() ?? 0.0,
+            markupAmount: data['markupAmount']?.toDouble() ?? 0.0,
+            sellingPrice: data['sellingPrice']?.toDouble() ?? 0.0,
+            profitMargin: data['profitMargin']?.toDouble() ?? 0.0,
+          );
+        }
+
+        notifyListeners();
+      }
+    } catch (e) {
+      // Handle error silently - use defaults
+    }
+  }
+
+  Future<void> _saveCurrentState() async {
+    try {
+      final state = DiscountCalculatorState(
+        activeTabIndex: _activeTab.index,
+        discountInputs: _extractInputsForTab(DiscountCalculationType.discount),
+        tipInputs: _extractInputsForTab(DiscountCalculationType.tip),
+        taxInputs: _extractInputsForTab(DiscountCalculationType.tax),
+        markupInputs: _extractInputsForTab(DiscountCalculationType.markup),
+        discountResults: _discountResult?.toMap(),
+        tipResults: _tipResult?.toMap(),
+        taxResults: _taxResult?.toMap(),
+        markupResults: _markupResult?.toMap(),
+        lastModified: DateTime.now(),
+      );
+
+      await DiscountCalculatorService.saveCurrentState(state);
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
+  Map<String, String> _extractInputsForTab(DiscountCalculationType type) {
+    final prefix = type.name;
+    final inputs = <String, String>{};
+
+    for (final entry in _formState.entries) {
+      if (entry.key.startsWith('${prefix}_')) {
+        final key = entry.key.substring('${prefix}_'.length);
+        inputs[key] = entry.value;
+      }
+    }
+
+    return inputs;
   }
 
   // Form state methods

@@ -1,24 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/temperature_converter_service.dart';
-import 'package:setpocket/services/converter_services/temperature_state_adapter.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/temperature_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class TemperatureConverterController extends ConverterController {
   TemperatureConverterController()
       : super(
           converterService: TemperatureConverterService(),
-          stateService: TemperatureStateAdapter(),
-        ) {
-    logInfo(
-        'TemperatureConverterController: Initialized with TemperatureConverterService and TemperatureStateAdapter');
-  }
+          stateService: UnifiedStateAdapter('temperature'),
+        );
 
-  // Generic Preset functionality using new GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Temperature Preset functionality using TemperatureUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('temperature');
+      return await TemperatureUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading temperature presets: $e');
       return [];
@@ -27,8 +23,7 @@ class TemperatureConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'temperature',
+      await TemperatureUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -41,7 +36,7 @@ class TemperatureConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('temperature', id);
+      await TemperatureUnifiedService.deletePreset(id);
       logInfo('Deleted temperature preset: $id');
     } catch (e) {
       logError('Error deleting temperature preset: $e');
@@ -51,7 +46,7 @@ class TemperatureConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('temperature', name);
+      return await TemperatureUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -60,7 +55,7 @@ class TemperatureConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('temperature', id, newName);
+      await TemperatureUnifiedService.renamePreset(id, newName);
       logInfo('Renamed temperature preset: $id to $newName');
     } catch (e) {
       logError('Error renaming temperature preset: $e');
@@ -68,12 +63,10 @@ class TemperatureConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
-      // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
-
-      logInfo('Applied temperature preset: ${preset.name}');
+      // Units are handled by the preset system itself
+      logInfo('Applied temperature preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying temperature preset: $e');
       rethrow;

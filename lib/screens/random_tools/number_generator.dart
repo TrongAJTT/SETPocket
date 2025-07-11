@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/utils/size_utils.dart';
 import 'package:setpocket/widgets/generic/option_grid_picker.dart' as grid;
 import 'package:setpocket/widgets/generic/option_item.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
@@ -30,7 +32,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   bool _allowDuplicates = true;
   List<num> _generatedNumbers = [];
   bool _copied = false;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   final TextEditingController _minValueController =
@@ -58,7 +60,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
   // Load saved state from storage
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getNumberGeneratorState();
+      final state = await UnifiedRandomStateService.getNumberGeneratorState();
       if (!mounted) return;
       setState(() {
         _isInteger = state.isInteger;
@@ -87,7 +89,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
         ..quantity = _quantity
         ..allowDuplicates = _allowDuplicates
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveNumberGeneratorState(state);
+      await UnifiedRandomStateService.saveNumberGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -144,8 +146,11 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
         }).join(', ');
 
         GenerationHistoryService.addHistoryItem(
-          numbersText,
-          'number',
+          UnifiedHistoryData(
+            value: numbersText,
+            type: 'number',
+            timestamp: DateTime.now(),
+          ),
         ).then((_) => _loadHistory()); // Refresh history
       }
     } catch (e) {
@@ -277,7 +282,7 @@ class _NumberGeneratorScreenState extends State<NumberGeneratorScreen> {
                       _maxValue = double.tryParse(value) ?? _maxValue;
                     },
                   ),
-                  horizontalSpacing: 16,
+                  spacing: TwoDimSpacing.both(16),
                   minWidth: 300,
                 ),
                 const SizedBox(height: 8),

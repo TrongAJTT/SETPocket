@@ -1,22 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/time_converter_service.dart';
-import 'package:setpocket/services/converter_services/time_state_adapter.dart';
-import 'package:setpocket/services/converter_services/time_state_service.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/time_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class TimeConverterController extends ConverterController {
   TimeConverterController()
       : super(
           converterService: TimeConverterService(),
-          stateService: TimeStateAdapter(),
+          stateService: UnifiedStateAdapter('time'),
         );
 
-  // Generic Preset functionality using GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // time Preset functionality using TimeUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('time');
+      return await TimeUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading time presets: $e');
       return [];
@@ -25,8 +23,7 @@ class TimeConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'time',
+      await TimeUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -39,7 +36,7 @@ class TimeConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('time', id);
+      await TimeUnifiedService.deletePreset(id);
       logInfo('Deleted time preset: $id');
     } catch (e) {
       logError('Error deleting time preset: $e');
@@ -49,7 +46,7 @@ class TimeConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('time', name);
+      return await TimeUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -58,7 +55,7 @@ class TimeConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('time', id, newName);
+      await TimeUnifiedService.renamePreset(id, newName);
       logInfo('Renamed time preset: $id to $newName');
     } catch (e) {
       logError('Error renaming time preset: $e');
@@ -66,12 +63,13 @@ class TimeConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
       // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      final units = List<String>.from(preset['units'] ?? []);
+      await updateGlobalVisibleUnits(units.toSet());
 
-      logInfo('Applied time preset: ${preset.name}');
+      logInfo('Applied time preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying time preset: $e');
       rethrow;
@@ -83,12 +81,12 @@ class TimeConverterController extends ConverterController {
     try {
       logInfo('TimeConverterController: Force clearing all cache data');
 
-      // Clear state service cache
-      await TimeStateService.forceClearAllCache();
+      // Clear unified service state and presets
+      await TimeUnifiedService.clearAllData();
 
-      // Clear controller state through state service adapter
-      final adapter = TimeStateAdapter();
-      await adapter.clearState('time');
+      // Clear controller state through generic state service
+      final stateService = UnifiedStateAdapter('time');
+      await stateService.clearState('time');
 
       logInfo('TimeConverterController: All cache data cleared successfully');
     } catch (e) {

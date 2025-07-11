@@ -1,28 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:setpocket/models/settings_model.dart';
-import 'package:setpocket/models/text_template.dart';
-import 'package:setpocket/models/generation_history.dart';
+// import 'package:setpocket/models/settings_model.dart'; // REMOVED: Legacy settings for internal beta 0.5.0
+import 'package:setpocket/models/settings_models.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p_cache_models.dart';
 import 'package:setpocket/models/converter_models/unit_template_model.dart';
-import 'package:setpocket/models/converter_models/area_state_model.dart';
-import 'package:setpocket/models/converter_models/currency_cache_model.dart';
-import 'package:setpocket/models/converter_models/currency_preset_model.dart';
-import 'package:setpocket/models/converter_models/currency_state_model.dart';
-import 'package:setpocket/models/converter_models/data_state_model.dart';
-import 'package:setpocket/models/converter_models/length_state_model.dart';
-import 'package:setpocket/models/converter_models/length_preset_model.dart';
-import 'package:setpocket/models/converter_models/mass_state_model.dart';
-import 'package:setpocket/models/converter_models/number_system_state_model.dart';
-import 'package:setpocket/models/converter_models/time_state_model.dart';
-import 'package:setpocket/models/converter_models/weight_state_model.dart';
-import 'package:setpocket/models/converter_models/volume_state_model.dart';
-import 'package:setpocket/models/converter_models/temperature_state_model.dart';
-import 'package:setpocket/models/converter_models/speed_state_model.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
-import 'package:setpocket/models/random_models/random_state_models.dart';
+import 'package:setpocket/models/converter_models/converter_tools_data.dart';
+import 'package:setpocket/models/random_models/unified_random_state.dart';
+import 'package:setpocket/models/app_installation.dart';
+import 'package:setpocket/models/text_template/text_templates_data.dart';
+import 'package:setpocket/models/calculator_models/calculator_tools_data.dart';
 
+/// Isar database service for SetPocket
+/// Internal beta v0.5.0 - Clean architecture without legacy migrations
 class IsarService {
   static late Isar isar;
 
@@ -31,44 +23,22 @@ class IsarService {
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     final schemas = [
-      SettingsModelSchema,
-      TemplateSchema,
-      GenerationHistoryItemSchema,
+      // SettingsModelSchema, // REMOVED: Legacy schema for internal beta v0.5.0
+      ExtensibleSettingsSchema, // New extensible settings architecture
+      TextTemplatesDataSchema, // NEW: Unified schema for text templates
+      UnifiedHistoryDataSchema,
       UnitTemplateModelSchema,
       P2PUserSchema,
-      PairingRequestSchema,
-      DataTransferTaskSchema,
-      FileTransferRequestSchema,
-      P2PDataTransferSettingsSchema,
-      P2PFileStorageSettingsSchema,
-      AreaStateModelSchema,
-      CurrencyCacheModelSchema,
-      CurrencyPresetModelSchema,
-      CurrencyStateModelSchema,
-      DataStateModelSchema,
-      LengthStateModelSchema,
-      LengthPresetModelSchema,
-      MassStateModelSchema,
-      NumberSystemStateModelSchema,
-      TimeStateModelSchema,
-      WeightStateModelSchema,
-      VolumeStateModelSchema,
-      TemperatureStateModelSchema,
-      SpeedStateModelSchema,
-      GenericPresetModelSchema,
-      NumberGeneratorStateSchema,
-      PasswordGeneratorStateSchema,
-      DateGeneratorStateSchema,
-      ColorGeneratorStateSchema,
-      DateTimeGeneratorStateSchema,
-      TimeGeneratorStateSchema,
-      SimpleGeneratorStateSchema,
-      UuidGeneratorStateSchema,
-      StringGeneratorStateSchema,
-      ListGeneratorStateSchema,
-      DiceRollGeneratorStateSchema,
-      LatinLetterGeneratorStateSchema,
-      PlayingCardGeneratorStateSchema,
+      P2PDataCacheSchema, // NEW: Unified P2P data cache schema
+      PairingRequestSchema, // DEPRECATED: Will be migrated to P2PDataCache
+      DataTransferTaskSchema, // DEPRECATED: Will be migrated to P2PDataCache
+      FileTransferRequestSchema, // DEPRECATED: Will be migrated to P2PDataCache
+      // P2PDataTransferSettingsSchema, // REMOVED: Merged into ExtensibleSettings
+      // P2PFileStorageSettingsSchema, // REMOVED: Merged into ExtensibleSettings
+      ConverterToolsDataSchema, // Unified converter tools data - ALL converter data goes here
+      CalculatorToolsDataSchema, // Unified calculator tools data
+      UnifiedRandomStateSchema,
+      AppInstallationSchema,
     ];
 
     if (kDebugMode) {
@@ -77,6 +47,8 @@ class IsarService {
         directory: dir.path,
         inspector: true,
       );
+      print('Isar initialized in debug mode with inspector enabled');
+      print('Isar directory: ${dir.path}');
     } else {
       isar = await Isar.open(
         schemas,
@@ -88,4 +60,6 @@ class IsarService {
   static Future<void> close() async {
     await isar.close();
   }
+
+  static bool get isReady => isar != null;
 }

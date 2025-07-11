@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
 import 'package:setpocket/models/random_generator.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
+import 'package:setpocket/utils/size_utils.dart';
 
 class PlayingCardGeneratorScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -30,7 +32,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
   bool _copied = false;
   late AnimationController _controller;
   late Animation<double> _animation;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -56,7 +58,8 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
 
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getPlayingCardGeneratorState();
+      final state =
+          await UnifiedRandomStateService.getPlayingCardGeneratorState();
       if (mounted) {
         setState(() {
           _includeJokers = state.includeJokers;
@@ -76,7 +79,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
         ..quantity = _cardCount
         ..allowDuplicates = _allowDuplicates
         ..lastUpdated = DateTime.now();
-      await RandomStateService.savePlayingCardGeneratorState(state);
+      await UnifiedRandomStateService.savePlayingCardGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -113,8 +116,11 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
       if (_historyEnabled && cards.isNotEmpty) {
         final cardStrings = cards.map((card) => card.toString()).toList();
         GenerationHistoryService.addHistoryItem(
-          cardStrings.join(', '),
-          'playing_cards',
+          UnifiedHistoryData(
+            value: cardStrings.join(', '),
+            type: 'playing_cards',
+            timestamp: DateTime.now(),
+          ),
         ).then((_) => _loadHistory());
       }
     } catch (e) {
@@ -215,8 +221,7 @@ class _PlayingCardGeneratorScreenState extends State<PlayingCardGeneratorScreen>
                   decorator: OptionSwitchDecorator.compact(context),
                 ),
                 minWidth: 340,
-                horizontalSpacing: 20,
-                verticalSpacing: 8),
+                spacing: TwoDimSpacing.specific(horizontal: 20, vertical: 8)),
             VerticalSpacingDivider.specific(top: 6, bottom: 12),
             // Generate button
             SizedBox(

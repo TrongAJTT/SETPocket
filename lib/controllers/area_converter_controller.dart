@@ -1,22 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/area_converter_service.dart';
-import 'package:setpocket/services/converter_services/area_state_adapter.dart';
-import 'package:setpocket/services/converter_services/area_state_service.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/area_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class AreaConverterController extends ConverterController {
   AreaConverterController()
       : super(
           converterService: AreaConverterService(),
-          stateService: AreaStateAdapter(),
+          stateService: UnifiedStateAdapter('area'),
         );
 
-  // Generic Preset functionality using GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Area Preset functionality using AreaUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('area');
+      return await AreaUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading area presets: $e');
       return [];
@@ -25,8 +23,7 @@ class AreaConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'area',
+      await AreaUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -39,7 +36,7 @@ class AreaConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('area', id);
+      await AreaUnifiedService.deletePreset(id);
       logInfo('Deleted area preset: $id');
     } catch (e) {
       logError('Error deleting area preset: $e');
@@ -49,7 +46,7 @@ class AreaConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('area', name);
+      return await AreaUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -58,7 +55,7 @@ class AreaConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('area', id, newName);
+      await AreaUnifiedService.renamePreset(id, newName);
       logInfo('Renamed area preset: $id to $newName');
     } catch (e) {
       logError('Error renaming area preset: $e');
@@ -66,12 +63,13 @@ class AreaConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
       // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      final units = List<String>.from(preset['units'] ?? []);
+      await updateGlobalVisibleUnits(units.toSet());
 
-      logInfo('Applied area preset: ${preset.name}');
+      logInfo('Applied area preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying area preset: $e');
       rethrow;
@@ -83,12 +81,12 @@ class AreaConverterController extends ConverterController {
     try {
       logInfo('AreaConverterController: Force clearing all cache data');
 
-      // Clear state service cache
-      await AreaStateService.forceClearAllCache();
+      // Clear unified service state and presets
+      await AreaUnifiedService.clearAllData();
 
-      // Clear controller state through state service adapter
-      final adapter = AreaStateAdapter();
-      await adapter.clearState('area');
+      // Clear controller state through generic state service
+      final stateService = UnifiedStateAdapter('area');
+      await stateService.clearState('area');
 
       // Clear performance caches from service
       AreaConverterService.clearCaches();

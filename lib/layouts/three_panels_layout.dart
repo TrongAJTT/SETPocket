@@ -5,7 +5,9 @@ class ThreePanelLayout extends StatefulWidget {
   final Widget topRightPanel;
   final Widget? bottomRightPanel;
   final String? mainPanelTitle;
+  final IconData? mainPanelIcon;
   final String? topRightPanelTitle;
+  final IconData? topRightPanelIcon;
   final String? bottomRightPanelTitle;
   final bool isEmbedded;
   final String? title;
@@ -13,6 +15,8 @@ class ThreePanelLayout extends StatefulWidget {
   final List<Widget>? mainPanelActions;
   final List<Widget>? topRightPanelActions;
   final List<Widget>? bottomRightPanelActions;
+  final Widget? mainPanelTitleBar;
+  final EdgeInsets? mainPanelPadding;
 
   const ThreePanelLayout({
     super.key,
@@ -20,7 +24,9 @@ class ThreePanelLayout extends StatefulWidget {
     required this.topRightPanel,
     this.bottomRightPanel,
     this.mainPanelTitle,
+    this.mainPanelIcon,
     this.topRightPanelTitle,
+    this.topRightPanelIcon,
     this.bottomRightPanelTitle,
     this.isEmbedded = false,
     this.title,
@@ -28,6 +34,8 @@ class ThreePanelLayout extends StatefulWidget {
     this.mainPanelActions,
     this.topRightPanelActions,
     this.bottomRightPanelActions,
+    this.mainPanelTitleBar,
+    this.mainPanelPadding,
   });
 
   @override
@@ -122,21 +130,24 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
     bool isMainPanel = false,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      height: 65,
+      padding: const EdgeInsets.all(12),
+      height: 52, // Reduced height from 65
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainer, // Use surfaceContainer for background
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
           ),
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             icon,
@@ -190,15 +201,23 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.mainPanelTitle != null)
+                  if (widget.mainPanelTitleBar != null)
+                    widget.mainPanelTitleBar!
+                  else if (widget.mainPanelTitle != null)
                     _buildPanelHeader(
                       title: widget.mainPanelTitle!,
-                      icon: Icons.show_chart,
+                      icon: widget.mainPanelIcon ?? Icons.show_chart,
                       iconColor: Theme.of(context).colorScheme.primary,
                       actions: widget.mainPanelActions,
                       isMainPanel: true,
                     ),
-                  Expanded(child: widget.mainPanel),
+                  Expanded(
+                    child: Padding(
+                      padding:
+                          widget.mainPanelPadding ?? const EdgeInsets.all(16),
+                      child: widget.mainPanel,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -226,15 +245,23 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.mainPanelTitle != null)
+                if (widget.mainPanelTitleBar != null)
+                  widget.mainPanelTitleBar!
+                else if (widget.mainPanelTitle != null)
                   _buildPanelHeader(
                     title: widget.mainPanelTitle!,
-                    icon: Icons.show_chart,
+                    icon: widget.mainPanelIcon ?? Icons.show_chart,
                     iconColor: Theme.of(context).colorScheme.primary,
                     actions: widget.mainPanelActions,
                     isMainPanel: true,
                   ),
-                Expanded(child: widget.mainPanel),
+                Expanded(
+                  child: Padding(
+                    padding:
+                        widget.mainPanelPadding ?? const EdgeInsets.all(16),
+                    child: widget.mainPanel,
+                  ),
+                ),
               ],
             ),
           ),
@@ -261,7 +288,7 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
                       if (widget.topRightPanelTitle != null)
                         _buildPanelHeader(
                           title: widget.topRightPanelTitle!,
-                          icon: Icons.functions,
+                          icon: widget.topRightPanelIcon ?? Icons.functions,
                           iconColor: Theme.of(context).colorScheme.secondary,
                           actions: widget.topRightPanelActions,
                         ),
@@ -292,7 +319,8 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
                             if (widget.topRightPanelTitle != null)
                               _buildPanelHeader(
                                 title: widget.topRightPanelTitle!,
-                                icon: Icons.functions,
+                                icon:
+                                    widget.topRightPanelIcon ?? Icons.functions,
                                 iconColor:
                                     Theme.of(context).colorScheme.secondary,
                                 actions: widget.topRightPanelActions,
@@ -487,9 +515,20 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
           child: TabBarView(
             controller: _tabController,
             children: [
-              widget.mainPanel,
-              if (hasTopRightPanel) widget.topRightPanel,
-              if (hasBottomRightPanel) widget.bottomRightPanel!,
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: widget.mainPanel,
+              ),
+              if (hasTopRightPanel)
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: widget.topRightPanel,
+                ),
+              if (hasBottomRightPanel)
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: widget.bottomRightPanel!,
+                ),
             ],
           ),
         ),

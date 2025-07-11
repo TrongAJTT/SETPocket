@@ -901,6 +901,9 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
         minSelection: 2,
         presetType: controller.converterService.converterType,
         showPresetOptions: true, // Enable presets for card level too
+        displaySyncButton: true, // Enable sync button for component cards
+        globalVisibleUnits:
+            controller.state.globalVisibleUnits, // Pass global units for sync
       ),
     );
   }

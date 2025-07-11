@@ -650,26 +650,24 @@ class P2PMessageTypes {
 // Workmanager task constants
 const String p2pKeepAliveTask = "p2pKeepAliveTask";
 
-@Collection()
+// REMOVED: P2PFileStorageSettings - Merged into ExtensibleSettings as P2PTransferSettingsData
+
+// REMOVED: P2PDataTransferSettings - Merged into ExtensibleSettings as P2PTransferSettingsData
+
+// Backward compatibility aliases - these will be populated by P2PSettingsAdapter
 class P2PFileStorageSettings {
-  Id id = 2; // Fixed ID for singleton
-
   String downloadPath;
-
   bool askBeforeDownload;
-
   bool createDateFolders;
-
   int maxFileSize; // in MB
-
   int maxConcurrentTasks;
 
   P2PFileStorageSettings({
     required this.downloadPath,
     this.askBeforeDownload = true,
     this.createDateFolders = false,
-    this.maxFileSize = 100, // 100MB default
-    this.maxConcurrentTasks = 3, // 3 concurrent tasks default
+    this.maxFileSize = 100,
+    this.maxConcurrentTasks = 3,
   });
 
   Map<String, dynamic> toJson() => {
@@ -677,6 +675,7 @@ class P2PFileStorageSettings {
         'askBeforeDownload': askBeforeDownload,
         'createDateFolders': createDateFolders,
         'maxFileSize': maxFileSize,
+        'maxConcurrentTasks': maxConcurrentTasks,
       };
 
   factory P2PFileStorageSettings.fromJson(Map<String, dynamic> json) =>
@@ -685,39 +684,21 @@ class P2PFileStorageSettings {
         askBeforeDownload: json['askBeforeDownload'] ?? true,
         createDateFolders: json['createDateFolders'] ?? false,
         maxFileSize: json['maxFileSize'] ?? 100,
+        maxConcurrentTasks: json['maxConcurrentTasks'] ?? 3,
       );
 }
 
-@Collection()
 class P2PDataTransferSettings {
-  Id id = 3; // Fixed ID for singleton
-
   String downloadPath;
-
   bool createDateFolders;
-
-  /// Create folders by sender name instead of date
   bool createSenderFolders;
-
   int maxReceiveFileSize; // In bytes
-
-  int maxConcurrentTasks;
-
-  String sendProtocol; // e.g., 'TCP', 'UDP'
-
   int maxTotalReceiveSize; // In bytes
-
-  /// Maximum chunk size for sending files in KILOBYTES.
-  int maxChunkSize;
-
-  /// Custom display name for this device (optional)
+  int maxConcurrentTasks;
+  String sendProtocol;
+  int maxChunkSize; // In kilobytes
   String? customDisplayName;
-
-  /// UI refresh rate in seconds for transfer progress updates
-  /// 0 = immediate, 1-5 = update every N seconds
   int uiRefreshRateSeconds;
-
-  /// Enable notifications for transfer events
   bool enableNotifications;
 
   P2PDataTransferSettings({
@@ -729,15 +710,13 @@ class P2PDataTransferSettings {
     required this.sendProtocol,
     required this.maxChunkSize,
     this.customDisplayName,
-    this.uiRefreshRateSeconds = 0, // Default value for backward compatibility
+    this.uiRefreshRateSeconds = 0,
     this.enableNotifications = true,
     this.createSenderFolders = false,
   });
 
   // Helper getters for UI display
-  @ignore
   double get maxReceiveFileSizeInMB => maxReceiveFileSize / (1024 * 1024);
-  @ignore
   double get maxTotalReceiveSizeInGB =>
       maxTotalReceiveSize / (1024 * 1024 * 1024);
 
@@ -773,6 +752,7 @@ class P2PDataTransferSettings {
     return {
       'downloadPath': downloadPath,
       'createDateFolders': createDateFolders,
+      'createSenderFolders': createSenderFolders,
       'maxReceiveFileSize': maxReceiveFileSize,
       'maxTotalReceiveSize': maxTotalReceiveSize,
       'maxConcurrentTasks': maxConcurrentTasks,
@@ -781,7 +761,6 @@ class P2PDataTransferSettings {
       'customDisplayName': customDisplayName,
       'uiRefreshRateSeconds': uiRefreshRateSeconds,
       'enableNotifications': enableNotifications,
-      'createSenderFolders': createSenderFolders,
     };
   }
 

@@ -515,6 +515,9 @@ class ConverterTableWidget extends StatelessWidget {
         minSelection: 2,
         presetType: controller.converterService.converterType,
         showPresetOptions: true, // Enable presets for table level too
+        displaySyncButton: true, // Show sync button for component tables
+        globalVisibleUnits:
+            controller.state.globalVisibleUnits, // Pass global units for sync
       ),
     );
   }

@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'dart:math' as math;
 import 'package:setpocket/widgets/generic/option_slider.dart';
@@ -27,7 +28,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
   List<int> _results = [];
   late AnimationController _rollController;
   late Animation<double> _rollAnimation;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   final List<int> _availableSides = [
@@ -66,7 +67,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
 
   Future<void> _loadState() async {
     try {
-      final state = await RandomStateService.getDiceRollGeneratorState();
+      final state = await UnifiedRandomStateService.getDiceRollGeneratorState();
       if (mounted) {
         setState(() {
           _diceCount = state.diceCount;
@@ -84,7 +85,7 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
         ..diceCount = _diceCount
         ..diceSides = _diceSides
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveDiceRollGeneratorState(state);
+      await UnifiedRandomStateService.saveDiceRollGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -125,8 +126,11 @@ class _DiceRollGeneratorScreenState extends State<DiceRollGeneratorScreen>
           ? 'd$_diceSides: ${_results[0]}'
           : '${_results.length}d$_diceSides: ${_results.join(", ")} (Total: ${_getTotal()})';
       GenerationHistoryService.addHistoryItem(
-        resultText,
-        'dice_roll',
+        UnifiedHistoryData(
+          value: resultText,
+          type: 'dice_roll',
+          timestamp: DateTime.now(),
+        ),
       ).then((_) => _loadHistory());
     }
   }

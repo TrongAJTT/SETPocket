@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/utils/widget_layout_decor_utils.dart';
 import 'package:setpocket/widgets/p2p/quantity_selector.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
@@ -33,7 +34,7 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
   bool _copied = false;
   late AnimationController _controller;
   late Animation<double> _animation;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -53,13 +54,15 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
 
   void _loadState() async {
     try {
-      final state = await RandomStateService.getLatinLetterGeneratorState();
+      final state =
+          await UnifiedRandomStateService.getLatinLetterGeneratorState();
       if (mounted) {
         setState(() {
           _includeUppercase = state.uppercase;
+          _includeLowercase = state.lowercase;
           _letterCount = state.quantity;
           _allowDuplicates = state.allowDuplicates;
-          // _includeLowercase and _skipAnimation are not in the state model
+          _skipAnimation = state.skipAnimation;
         });
       }
     } catch (e) {
@@ -71,10 +74,12 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
     try {
       final state = LatinLetterGeneratorState()
         ..uppercase = _includeUppercase
+        ..lowercase = _includeLowercase
         ..quantity = _letterCount
         ..allowDuplicates = _allowDuplicates
+        ..skipAnimation = _skipAnimation
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveLatinLetterGeneratorState(state);
+      await UnifiedRandomStateService.saveLatinLetterGeneratorState(state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -119,8 +124,11 @@ class _LatinLetterGeneratorScreenState extends State<LatinLetterGeneratorScreen>
       // Save to history if enabled
       if (_historyEnabled && _generatedLetters.isNotEmpty) {
         GenerationHistoryService.addHistoryItem(
-          _generatedLetters.join(''),
-          'latin_letter',
+          UnifiedHistoryData(
+            value: _generatedLetters.join(''),
+            type: 'latin_letter',
+            timestamp: DateTime.now(),
+          ),
         ).then((_) => _loadHistory()); // Refresh history
       }
     } on ArgumentError {

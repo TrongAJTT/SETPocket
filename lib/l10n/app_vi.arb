@@ -48,6 +48,15 @@
     "add": "Thêm",
     "save": "Lưu",
     "saved": "Đã lưu",
+    "savedDate": "Ngày lưu",
+    "savedOnDate": "Lưu vào {date}",
+    "@savedOnDate": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
     "edit": "Chỉnh sửa",
     "copy": "Sao chép",
     "move": "Di chuyển",
@@ -250,14 +259,14 @@
     "refreshRates": "Làm mới tỷ giá",
     "resetLayout": "Đặt lại bố cục",
     "confirmResetLayout": "Xác nhận đặt lại bố cục",
-    "confirmResetLayoutMessage": "Bạn có chắc chắn muốn đặt lại bố cục? Điều này sẽ xóa tất cả thẻ và khôi phục cài đặt mặc định.",
+    "confirmResetLayoutMessage": "Thao tác này sẽ đặt lại tất cả các thẻ và các đơn vị hiển thị về trạng thái mặc định. Không thể hoàn tác hành động này.",
     "confirm": "Xác nhận",
     "customizeCurrencies": "Tùy chỉnh loại tiền",
     "addCard": "Thêm thẻ",
     "addRow": "Thêm dòng",
     "cardView": "Chế độ thẻ",
     "cards": "Thẻ",
-    "rows": "Dòng",
+    "rows": "Hàng",
     "converter": "Bộ chuyển đổi",
     "amount": "Số tiền",
     "quantity": "Số lượng",
@@ -381,6 +390,13 @@
     "cacheSize": "Kích thước bộ nhớ đệm",
     "cacheItems": "Mục",
     "clearAllCache": "Xóa tất cả bộ nhớ đệm",
+    "settingsStorage": "Kho lưu trữ cài đặt",
+    "clearSettingsStorage": "Xóa kho lưu trữ cài đặt",
+    "settingsStorageDetails": "Kho lưu trữ cài đặt và tùy chọn",
+    "viewSettingsStorageDetails": "Xem chi tiết kho lưu trữ cài đặt",
+    "settingsStorageSize": "Kích thước kho lưu trữ cài đặt",
+    "settingsStorageItems": "Mục cài đặt",
+    "clearAllSettingsStorage": "Xóa tất cả kho lưu trữ cài đặt",
     "confirmClearCache": "Bạn có chắc chắn muốn xóa bộ nhớ đệm \"{cacheName}\"?",
     "confirmClearAllCache": "Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu trong bộ nhớ đệm không? Thao tác này sẽ xóa tất cả các mẫu đã lưu nhưng vẫn giữ lại cài đặt của bạn.",
     "cannotClearFollowingCaches": "Không thể xóa các bộ nhớ đệm sau vì chúng đang được sử dụng:",
@@ -1285,6 +1301,7 @@
   "logApplication": "Nhật ký Ứng dụng",
   "previousChunk": "Phần trước",
   "nextChunk": "Phần sau",
+  "load": "Tải",
   "loadAll": "Tải tất cả",
   "firstPart": "Phần đầu",
   "lastPart": "Phần cuối",
@@ -1443,6 +1460,14 @@
     "saveRandomToolsStateDesc": "Tự động lưu cài đặt công cụ khi tạo kết quả",
     "@saveRandomToolsStateDesc": {
         "description": "Save random tools state setting description"
+    },
+    "saveConverterToolsState": "Lưu trạng thái Công cụ Chuyển đổi",
+    "@saveConverterToolsState": {
+        "description": "Save converter tools state setting label"
+    },
+    "saveConverterToolsStateDesc": "Tự động lưu cài đặt công cụ chuyển đổi khi tạo kết quả",
+    "@saveConverterToolsStateDesc": {
+        "description": "Save converter tools state setting description"
     },
     "focusModeDisabled": "Đã tắt chế độ tập trung",
     "enableFocusMode": "Bật chế độ tập trung",
@@ -1767,7 +1792,6 @@
     "holdToClearCacheInstruction": "Nhấn giữ nút xóa trong 10 giây để xác nhận",
     
     "drafts": "Bản nháp",
-    "noDraftsYet": "Chưa có bản nháp nào",
     "createDraftsHint": "Bản nháp là bản lưu tạm thời công việc của bạn. Chúng được tạo tự động khi bạn thoát khỏi chế độ chỉnh sửa mà không lưu.",
     "draftSaved": "Đã lưu bản nháp",
     "draftDeleted": "Đã xóa bản nháp",
@@ -2697,5 +2721,139 @@
     "emptyFolder": "Thư mục trống",
     "file": "tệp",
     "quickAccess": "Truy cập nhanh",
-    "colorFormat": "Định dạng màu"
-  }
+    "colorFormat": "Định dạng màu",
+    "clearAllCache": "Xóa tất cả bộ nhớ đệm",
+    "clearStorageSettings": "Xóa Cài Đặt Lưu Trữ",
+    "clearStorageSettingsTitle": "Xóa Cài Đặt Lưu Trữ",
+    "clearStorageSettingsDescription": "Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu trong bộ nhớ đệm không? Thao tác này sẽ xóa tất cả các mẫu đã lưu nhưng vẫn giữ lại cài đặt của bạn.",
+    "clearStorageSettingsConfirm": "Xóa Tất Cả",
+    "clearStorageSettingsCancel": "Hủy",
+    "clearStorageSettingsConfirmation": "Thao tác này sẽ xóa vĩnh viễn tất cả dữ liệu đã lưu trữ bao gồm mẫu, lịch sử và tệp tạm thời. Cài đặt ứng dụng sẽ được giữ lại.",
+    "clearStorageSettingsSuccess": "Đã xóa cài đặt lưu trữ thành công",
+    "clearStorageSettingsError": "Lỗi khi xóa cài đặt lưu trữ: {error}",
+    "@clearStorageSettingsError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "templatesTabTitle": "Mẫu",
+    "noCompletedTemplates": "Bạn chưa có mẫu nào đã hoàn thành.",
+    "noDrafts": "Bạn chưa có bản nháp nào.",
+    "confirmDeleteTitle": "Xác nhận xóa",
+    "confirmDeleteMessage": "Bạn có chắc muốn xóa mẫu ''{name}''? Thao tác này không thể hoàn tác.",
+    "@confirmDeleteMessage": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "textTemplatesTitle": "Mẫu văn bản",
+    "viewDrafts": "Xem bản nháp",
+    "export": "Xuất",
+    "deleteTemplateTitle": "Xóa mẫu",
+    "deleteTemplateConfirmation": "Bạn có chắc muốn xóa ''{templateTitle}''?",
+    "@deleteTemplateConfirmation": {
+        "placeholders": {
+            "templateTitle": {
+                "type": "String"
+            }
+        }
+    },
+    "moveToTrash": "Di chuyển đến thùng rác",
+    "permanentDeleteWarning": "Nếu không chọn, mẫu sẽ bị xóa vĩnh viễn.",
+    "templateDeletedSuccess": "Mẫu đã được xóa thành công",
+    "templateDeleteError": "Lỗi khi xóa mẫu: {error}",
+    "@templateDeleteError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "exportTemplateTitle": "Xuất mẫu",
+    "fileNameLabel": "Tên tệp",
+    "exportAsJson": "Xuất dưới dạng tệp JSON",
+    "exportAsJsonDescription": "Lưu mẫu dưới dạng tệp JSON.",
+    "shareTemplate": "Chia sẻ",
+    "shareTemplateDescription": "Chia sẻ mẫu với các ứng dụng khác.",
+    "templateExportedSuccess": "Mẫu đã được xuất thành công vào {path}",
+    "@templateExportedSuccess": {
+        "placeholders": {
+            "path": {
+                "type": "String"
+            }
+        }
+    },
+    "templateExportError": "Lỗi khi xuất mẫu: {error}",
+    "@templateExportError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "shareTemplateError": "Lỗi khi chia sẻ mẫu: {error}",
+    "@shareTemplateError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "passwordGenerator": "Tạo mật khẩu",
+    "passwordGeneratorDesc": "Tạo mật khẩu ngẫu nhiên",
+    "numCharacters": "Số ký tự",
+    "draftsDialogTitle": "Bản nháp",
+    "trashDialogTitle": "Thùng rác",
+    "restore": "Khôi phục",
+    "permanentlyDelete": "Xóa vĩnh viễn",
+    "daysLeft": "Còn {days} ngày",
+    "@daysLeft": {
+        "placeholders": {
+            "days": {"type": "int"}
+        }
+    },
+    "duplicate": "Nhân bản",
+    "enterNewTemplateName": "Nhập tên mới cho mẫu nhân bản.",
+    "apply": "Áp dụng",
+    "importFromFile": "Nhập từ file",
+    "areYouSureToDeleteNTemplates": "Bạn có chắc muốn xóa {count} mẫu?",
+    "youAreAboutToExportNTemplates": "Bạn sẽ xuất {count} mẫu.",
+    "export": "Xuất",
+    "moveToTrash": "Di chuyển đến thùng rác",
+    "permanentDeleteWarning": "Nếu không chọn, mẫu sẽ bị xóa vĩnh viễn.",
+    "personalInfo": "Thông tin cá nhân",
+    "ageGroup": "Nhóm tuổi", 
+    "ageUnder18": "Dưới 18",
+    "age18Plus": "Trên 18",
+    "bookmark": "Đánh dấu",
+    "bookmarks": "Đánh dấu",
+    "bookmarkResult": "Kết quả đánh dấu",
+    "resultBookmarked": "Kết quả đã được đánh dấu",
+    "clearTabData": "Xóa dữ liệu",
+    "clearTabDataConfirm": "Bạn có chắc muốn xóa dữ liệu trong tab này không?",
+    "clearTabDataSuccess": "Đã xóa dữ liệu trong tab thành công",
+    "clearTabDataError": "Lỗi khi xóa dữ liệu trong tab: {error}",
+    "@clearTabDataError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "clearAllBookmarks": "Xóa các mục đánh dấu",
+    "clearAllBookmarksConfirm": "Bạn có chắc muốn xóa các mục đã được đánh dấu trước giờ? Hành động này sẽ không thể hoàn tác.",
+    "clearAllBookmarksSuccess": "Đã xóa các mục đánh dấu thành công",
+    "processing": "Đang xử lý...",
+    "loadFunctionsFromBookmarks": "Tải các hàm từ mục đánh dấu",
+    "loadFunctionsFromBookmarksConfirm": "Tải từ mục đánh dấu sẽ thay thế các hàm hiện tại của bạn. Bạn có muốn đánh dấu trước khi tải không?",
+    "clearAllFunctions": "Xóa tất cả các hàm",
+    "clearAllFunctionsConfirm": "Bạn có chắc muốn xóa tất cả các hàm? Hành động này sẽ không thể hoàn tác.",
+    "clearAllFunctionsSuccess": "Đã xóa tất cả các hàm thành công",
+    "bookmarkSaved": "Đã lưu kết quả vào mục đánh dấu",
+    "swap": "Hoán đổi",
+    "startDateConflixWithEndDateAlarm": "Ngày bắt đầu không thể lớn hơn hoặc trùng với ngày kết thúc"
+}

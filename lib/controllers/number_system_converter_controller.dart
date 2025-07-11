@@ -1,8 +1,7 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/number_system_converter_service.dart';
-import 'package:setpocket/services/converter_services/number_system_state_adapter.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/number_system_unified_service.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:flutter/services.dart';
 
@@ -12,16 +11,16 @@ class NumberSystemConverterController extends ConverterController {
   NumberSystemConverterController()
       : super(
           converterService: NumberSystemConverterService(),
-          stateService: NumberSystemStateAdapter(),
+          stateService: UnifiedStateAdapter('number_system'),
         ) {
     logInfo(
-        'NumberSystemConverterController: Initialized with NumberSystemConverterService and NumberSystemStateAdapter');
+        'NumberSystemConverterController: Initialized with NumberSystemConverterService and UnifiedStateAdapter');
   }
 
-  // Generic Preset functionality using new GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Number System Preset functionality using NumberSystemUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('number_system');
+      return await NumberSystemUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading number system presets: $e');
       return [];
@@ -30,8 +29,7 @@ class NumberSystemConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'number_system',
+      await NumberSystemUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -44,7 +42,7 @@ class NumberSystemConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('number_system', id);
+      await NumberSystemUnifiedService.deletePreset(id);
       logInfo('Deleted number system preset: $id');
     } catch (e) {
       logError('Error deleting number system preset: $e');
@@ -54,7 +52,7 @@ class NumberSystemConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('number_system', name);
+      return await NumberSystemUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -63,7 +61,7 @@ class NumberSystemConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('number_system', id, newName);
+      await NumberSystemUnifiedService.renamePreset(id, newName);
       logInfo('Renamed number system preset: $id to $newName');
     } catch (e) {
       logError('Error renaming number system preset: $e');
@@ -71,12 +69,13 @@ class NumberSystemConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
       // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      final units = List<String>.from(preset['units'] ?? []);
+      await updateGlobalVisibleUnits(units.toSet());
 
-      logInfo('Applied number system preset: ${preset.name}');
+      logInfo('Applied number system preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying number system preset: $e');
       rethrow;

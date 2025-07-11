@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:setpocket/models/generation_history.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/services/isar_service.dart';
 
 class GenerationHistoryServiceIsar {
@@ -20,7 +20,7 @@ class GenerationHistoryServiceIsar {
   }
 
   /// Add a new item to the history
-  static Future<void> addHistoryItem(String value, String type) async {
+  static Future<void> addHistoryItem(UnifiedHistoryData newItem) async {
     if (!await isHistoryEnabled()) return;
 
     try {
@@ -28,30 +28,25 @@ class GenerationHistoryServiceIsar {
 
       await isar.writeTxn(() async {
         // Add new item
-        final newItem = GenerationHistoryItem(
-          value: value,
-          timestamp: DateTime.now(),
-          type: type,
-        );
-        await isar.generationHistoryItems.put(newItem);
+        await isar.unifiedHistoryDatas.put(newItem);
 
         // Cleanup old items if we exceed the limit
-        final count = await isar.generationHistoryItems
+        final count = await isar.unifiedHistoryDatas
             .filter()
-            .typeEqualTo(type)
+            .typeEqualTo(newItem.type)
             .count();
 
         if (count > maxHistoryItems) {
           // Get oldest items to delete
-          final oldItems = await isar.generationHistoryItems
+          final oldItems = await isar.unifiedHistoryDatas
               .filter()
-              .typeEqualTo(type)
+              .typeEqualTo(newItem.type)
               .sortByTimestamp()
               .limit(count - maxHistoryItems)
               .findAll();
 
           for (final item in oldItems) {
-            await isar.generationHistoryItems.delete(item.id);
+            await isar.unifiedHistoryDatas.delete(item.id);
           }
         }
       });
@@ -61,10 +56,10 @@ class GenerationHistoryServiceIsar {
   }
 
   /// Get history items for a specific type
-  static Future<List<GenerationHistoryItem>> getHistory(String type) async {
+  static Future<List<UnifiedHistoryData>> getHistory(String type) async {
     try {
       final isar = IsarService.isar;
-      return await isar.generationHistoryItems
+      return await isar.unifiedHistoryDatas
           .filter()
           .typeEqualTo(type)
           .sortByTimestampDesc()
@@ -79,10 +74,7 @@ class GenerationHistoryServiceIsar {
     try {
       final isar = IsarService.isar;
       await isar.writeTxn(() async {
-        await isar.generationHistoryItems
-            .filter()
-            .typeEqualTo(type)
-            .deleteAll();
+        await isar.unifiedHistoryDatas.filter().typeEqualTo(type).deleteAll();
       });
     } catch (e) {
       throw Exception('Failed to clear history: $e');
@@ -94,7 +86,7 @@ class GenerationHistoryServiceIsar {
     try {
       final isar = IsarService.isar;
       await isar.writeTxn(() async {
-        await isar.generationHistoryItems.clear();
+        await isar.unifiedHistoryDatas.clear();
       });
     } catch (e) {
       throw Exception('Failed to clear all history: $e');
@@ -106,7 +98,7 @@ class GenerationHistoryServiceIsar {
     try {
       final isar = IsarService.isar;
       final items =
-          await isar.generationHistoryItems.where().distinctByType().findAll();
+          await isar.unifiedHistoryDatas.where().distinctByType().findAll();
       return items.map((item) => item.type).toList();
     } catch (e) {
       return [];
@@ -117,10 +109,7 @@ class GenerationHistoryServiceIsar {
   static Future<int> getHistoryCount(String type) async {
     try {
       final isar = IsarService.isar;
-      return await isar.generationHistoryItems
-          .filter()
-          .typeEqualTo(type)
-          .count();
+      return await isar.unifiedHistoryDatas.filter().typeEqualTo(type).count();
     } catch (e) {
       return 0;
     }
@@ -130,13 +119,13 @@ class GenerationHistoryServiceIsar {
   static Future<int> getHistoryDataSize() async {
     try {
       final isar = IsarService.isar;
-      final items = await isar.generationHistoryItems.where().findAll();
+      final items = await isar.unifiedHistoryDatas.where().findAll();
 
       int totalSize = 0;
       for (final item in items) {
         // Estimate size: value + type + timestamp overhead
-        totalSize += item.value.length * 2; // UTF-16 encoding
-        totalSize += item.type.length * 2;
+        totalSize += (item.value.length * 2); // UTF-16 encoding
+        totalSize += (item.type.length * 2);
         totalSize += 8; // timestamp (int64)
         totalSize += 16; // object overhead
       }
@@ -145,5 +134,12 @@ class GenerationHistoryServiceIsar {
     } catch (e) {
       return 0;
     }
+  }
+
+  static Future<void> deleteHistoryItem(Id id) async {
+    final isar = IsarService.isar;
+    await isar.writeTxn(() async {
+      await isar.unifiedHistoryDatas.delete(id);
+    });
   }
 }

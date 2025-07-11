@@ -240,6 +240,7 @@ class DateTimeGeneratorState {
   DateTime? endDateTime;
   int dateTimeCount = 5;
   bool allowDuplicates = true;
+  bool includeSeconds = false;
   DateTime? lastUpdated;
 
   DateTimeGeneratorState();
@@ -251,6 +252,7 @@ class DateTimeGeneratorState {
       ..endDateTime = now.add(const Duration(days: 365))
       ..dateTimeCount = 5
       ..allowDuplicates = true
+      ..includeSeconds = false
       ..lastUpdated = DateTime.now();
   }
 
@@ -260,6 +262,7 @@ class DateTimeGeneratorState {
       'endDateTime': endDateTime?.toIso8601String(),
       'dateTimeCount': dateTimeCount,
       'allowDuplicates': allowDuplicates,
+      'includeSeconds': includeSeconds,
       'lastUpdated': lastUpdated?.toIso8601String(),
     };
   }
@@ -275,6 +278,7 @@ class DateTimeGeneratorState {
           : now.add(const Duration(days: 365))
       ..dateTimeCount = json['dateTimeCount'] ?? 5
       ..allowDuplicates = json['allowDuplicates'] ?? true
+      ..includeSeconds = json['includeSeconds'] ?? false
       ..lastUpdated = json['lastUpdated'] != null
           ? DateTime.parse(json['lastUpdated'])
           : DateTime.now();
@@ -285,12 +289,14 @@ class DateTimeGeneratorState {
     DateTime? endDateTime,
     int? dateTimeCount,
     bool? allowDuplicates,
+    bool? includeSeconds,
   }) {
     return DateTimeGeneratorState()
       ..startDateTime = startDateTime ?? this.startDateTime
       ..endDateTime = endDateTime ?? this.endDateTime
       ..dateTimeCount = dateTimeCount ?? this.dateTimeCount
       ..allowDuplicates = allowDuplicates ?? this.allowDuplicates
+      ..includeSeconds = includeSeconds ?? this.includeSeconds
       ..lastUpdated = DateTime.now();
   }
 }
@@ -306,6 +312,7 @@ class TimeGeneratorState {
   int endMinute = 59;
   int timeCount = 5;
   bool allowDuplicates = true;
+  bool includeSeconds = false;
   DateTime? lastUpdated;
 
   TimeGeneratorState();
@@ -318,6 +325,7 @@ class TimeGeneratorState {
       ..endMinute = 59
       ..timeCount = 5
       ..allowDuplicates = true
+      ..includeSeconds = false
       ..lastUpdated = DateTime.now();
   }
 
@@ -329,6 +337,7 @@ class TimeGeneratorState {
       'endMinute': endMinute,
       'timeCount': timeCount,
       'allowDuplicates': allowDuplicates,
+      'includeSeconds': includeSeconds,
       'lastUpdated': lastUpdated?.toIso8601String(),
     };
   }
@@ -341,6 +350,7 @@ class TimeGeneratorState {
       ..endMinute = json['endMinute'] ?? 59
       ..timeCount = json['timeCount'] ?? 5
       ..allowDuplicates = json['allowDuplicates'] ?? true
+      ..includeSeconds = json['includeSeconds'] ?? false
       ..lastUpdated = json['lastUpdated'] != null
           ? DateTime.parse(json['lastUpdated'])
           : DateTime.now();
@@ -353,6 +363,7 @@ class TimeGeneratorState {
     int? endMinute,
     int? timeCount,
     bool? allowDuplicates,
+    bool? includeSeconds,
   }) {
     return TimeGeneratorState()
       ..startHour = startHour ?? this.startHour
@@ -361,6 +372,7 @@ class TimeGeneratorState {
       ..endMinute = endMinute ?? this.endMinute
       ..timeCount = timeCount ?? this.timeCount
       ..allowDuplicates = allowDuplicates ?? this.allowDuplicates
+      ..includeSeconds = includeSeconds ?? this.includeSeconds
       ..lastUpdated = DateTime.now();
   }
 }
@@ -643,8 +655,10 @@ class LatinLetterGeneratorState {
   Id id = Isar.autoIncrement;
 
   bool uppercase = false;
+  bool lowercase = true;
   int quantity = 5;
   bool allowDuplicates = true;
+  bool skipAnimation = false;
   DateTime? lastUpdated;
 
   LatinLetterGeneratorState();
@@ -652,16 +666,20 @@ class LatinLetterGeneratorState {
   static LatinLetterGeneratorState createDefault() {
     return LatinLetterGeneratorState()
       ..uppercase = false
+      ..lowercase = true
       ..quantity = 5
       ..allowDuplicates = true
+      ..skipAnimation = false
       ..lastUpdated = DateTime.now();
   }
 
   Map<String, dynamic> toJson() {
     return {
       'uppercase': uppercase,
+      'lowercase': lowercase,
       'quantity': quantity,
       'allowDuplicates': allowDuplicates,
+      'skipAnimation': skipAnimation,
       'lastUpdated': lastUpdated?.toIso8601String(),
     };
   }
@@ -669,8 +687,10 @@ class LatinLetterGeneratorState {
   factory LatinLetterGeneratorState.fromJson(Map<String, dynamic> json) {
     return LatinLetterGeneratorState()
       ..uppercase = json['uppercase'] ?? false
+      ..lowercase = json['lowercase'] ?? true
       ..quantity = json['quantity'] ?? 5
       ..allowDuplicates = json['allowDuplicates'] ?? true
+      ..skipAnimation = json['skipAnimation'] ?? false
       ..lastUpdated = json['lastUpdated'] != null
           ? DateTime.parse(json['lastUpdated'])
           : DateTime.now();
@@ -678,13 +698,17 @@ class LatinLetterGeneratorState {
 
   LatinLetterGeneratorState copyWith({
     bool? uppercase,
+    bool? lowercase,
     int? quantity,
     bool? allowDuplicates,
+    bool? skipAnimation,
   }) {
     return LatinLetterGeneratorState()
       ..uppercase = uppercase ?? this.uppercase
+      ..lowercase = lowercase ?? this.lowercase
       ..quantity = quantity ?? this.quantity
       ..allowDuplicates = allowDuplicates ?? this.allowDuplicates
+      ..skipAnimation = skipAnimation ?? this.skipAnimation
       ..lastUpdated = DateTime.now();
   }
 }

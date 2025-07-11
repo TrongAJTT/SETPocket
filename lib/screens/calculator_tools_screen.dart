@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/screens/calculators/date_calculator_screen.dart';
-import 'calculators/bmi_calculator_screen.dart';
-import 'calculators/financial_calculator_screen.dart';
-import 'calculators/discount_calculator_screen.dart';
-import 'calculators/scientific_calculator_screen.dart';
-import 'calculators/graphing_calculator_screen.dart';
+import 'package:setpocket/screens/calculator_tools/date_calculator_screen.dart';
+import 'calculator_tools/bmi_calculator_screen.dart';
+import 'calculator_tools/financial_calculator_screen.dart';
+import 'calculator_tools/discount_calculator_screen.dart';
+import 'calculator_tools/scientific_calculator_screen.dart';
+import 'calculator_tools/graphing_calculator_screen.dart';
 import 'package:setpocket/widgets/generic/section_item.dart';
 import 'package:setpocket/widgets/generic/section_list_view.dart';
 import 'package:setpocket/widgets/generic/section_grid_view.dart';
+import 'package:setpocket/utils/generic_settings_utils.dart';
 
 class CalculatorToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -124,11 +125,36 @@ class CalculatorToolsScreen extends StatelessWidget {
     }
 
     if (isEmbedded) {
-      return content;
+      return Stack(
+        children: [
+          content,
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton.small(
+              heroTag: 'calculator_tools_settings',
+              onPressed: () {
+                GenericSettingsUtils.quickOpenCalculatorToolsSettings(context);
+              },
+              tooltip: loc.settings,
+              child: const Icon(Icons.settings_outlined),
+            ),
+          ),
+        ],
+      );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(loc.calculatorTools),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () {
+                GenericSettingsUtils.quickOpenCalculatorToolsSettings(context);
+              },
+              tooltip: loc.settings,
+            ),
+          ],
         ),
         body: content,
       );

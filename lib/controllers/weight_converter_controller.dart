@@ -1,22 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/weight_converter_service.dart';
-import 'package:setpocket/services/converter_services/weight_state_adapter.dart';
-import 'package:setpocket/services/converter_services/weight_state_service.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/weight_unified_service.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class WeightConverterController extends ConverterController {
   WeightConverterController()
       : super(
           converterService: WeightConverterService(),
-          stateService: WeightStateAdapter(),
+          stateService: UnifiedStateAdapter('weight'),
         );
 
-  // Generic Preset functionality using GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // weight Preset functionality using WeightUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('weight');
+      return await WeightUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading weight presets: $e');
       return [];
@@ -25,8 +23,7 @@ class WeightConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'weight',
+      await WeightUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -39,7 +36,7 @@ class WeightConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('weight', id);
+      await WeightUnifiedService.deletePreset(id);
       logInfo('Deleted weight preset: $id');
     } catch (e) {
       logError('Error deleting weight preset: $e');
@@ -49,7 +46,7 @@ class WeightConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('weight', name);
+      return await WeightUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -58,7 +55,7 @@ class WeightConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('weight', id, newName);
+      await WeightUnifiedService.renamePreset(id, newName);
       logInfo('Renamed weight preset: $id to $newName');
     } catch (e) {
       logError('Error renaming weight preset: $e');
@@ -66,12 +63,13 @@ class WeightConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
       // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
+      final units = List<String>.from(preset['units'] ?? []);
+      await updateGlobalVisibleUnits(units.toSet());
 
-      logInfo('Applied weight preset: ${preset.name}');
+      logInfo('Applied weight preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying weight preset: $e');
       rethrow;
@@ -83,12 +81,12 @@ class WeightConverterController extends ConverterController {
     try {
       logInfo('WeightConverterController: Force clearing all cache data');
 
-      // Clear state service cache
-      await WeightStateService.forceClearAllCache();
+      // Clear unified service state and presets
+      await WeightUnifiedService.clearAllData();
 
-      // Clear controller state through state service adapter
-      final adapter = WeightStateAdapter();
-      await adapter.clearState('weight');
+      // Clear controller state through generic state service
+      final stateService = UnifiedStateAdapter('weight');
+      await stateService.clearState('weight');
 
       // Clear performance caches from service
       WeightConverterService.clearCaches();

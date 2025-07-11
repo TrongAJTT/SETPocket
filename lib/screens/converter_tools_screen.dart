@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/screens/converters/currency_converter_screen.dart';
-import 'package:setpocket/screens/converters/length_converter_screen.dart';
-import 'package:setpocket/screens/converters/mass_converter_screen.dart';
-import 'package:setpocket/screens/converters/weight_converter_screen.dart';
-import 'package:setpocket/screens/converters/area_converter_screen.dart';
-import 'package:setpocket/screens/converters/volume_converter_screen.dart';
-import 'package:setpocket/screens/converters/number_system_converter_screen.dart';
-import 'package:setpocket/screens/converters/speed_converter_screen.dart';
-import 'package:setpocket/screens/converters/temperature_converter_screen.dart';
-import 'package:setpocket/screens/converters/data_converter_screen.dart';
-import 'converters/time_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/currency_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/length_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/mass_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/weight_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/area_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/volume_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/number_system_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/speed_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/temperature_converter_screen.dart';
+import 'package:setpocket/screens/converter_tools/data_converter_screen.dart';
+import 'converter_tools/time_converter_screen.dart';
 import 'package:setpocket/widgets/generic/section_item.dart';
 import 'package:setpocket/widgets/generic/section_list_view.dart';
 import 'package:setpocket/widgets/generic/section_grid_view.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
+import 'package:setpocket/utils/generic_settings_utils.dart';
 
 class ConverterToolsScreen extends StatelessWidget {
   final bool isEmbedded;
@@ -134,6 +136,20 @@ class ConverterToolsScreen extends StatelessWidget {
     }
   }
 
+  void _openSettings(BuildContext context, AppLocalizations loc) {
+    GenericSettingsUtils.quickOpenConverterToolsSettings(
+      context,
+      onSettingsChanged: (settings) {
+        // Show confirmation using SnackbarUtils
+        SnackbarUtils.showTyped(
+          context,
+          loc.saved,
+          SnackBarType.success,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -166,11 +182,33 @@ class ConverterToolsScreen extends StatelessWidget {
     }
 
     if (isEmbedded) {
-      return content;
+      return Stack(
+        children: [
+          content,
+          // Settings FAB for embedded/desktop mode
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton.small(
+              onPressed: () => _openSettings(context, loc),
+              tooltip: loc.settings,
+              child: const Icon(Icons.settings),
+            ),
+          ),
+        ],
+      );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(loc.converterTools),
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => _openSettings(context, loc),
+              tooltip: loc.settings,
+            ),
+          ],
         ),
         body: content,
       );

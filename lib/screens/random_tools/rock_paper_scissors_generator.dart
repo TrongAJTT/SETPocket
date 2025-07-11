@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/random_generator.dart';
 import 'package:setpocket/services/generation_history_service.dart';
+import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/models/random_models/random_state_models.dart';
-import 'package:setpocket/services/random_services/random_state_service.dart';
-import 'package:setpocket/layouts/random_generator_layout.dart';
+import 'package:setpocket/services/random_services/unified_random_state_service.dart';
+import 'package:setpocket/layouts/two_panels_within_history_layout.dart';
 import 'package:setpocket/widgets/generic/option_switch.dart';
 
 class RockPaperScissorsGeneratorScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _RockPaperScissorsGeneratorScreenState
   bool _skipAnimation = false;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  List<GenerationHistoryItem> _history = [];
+  List<UnifiedHistoryData> _history = [];
   bool _historyEnabled = false;
 
   @override
@@ -55,7 +56,7 @@ class _RockPaperScissorsGeneratorScreenState
   Future<void> _loadState() async {
     try {
       final state =
-          await RandomStateService.getRockPaperScissorsGeneratorState();
+          await UnifiedRandomStateService.getRockPaperScissorsGeneratorState();
       if (mounted) {
         setState(() {
           _skipAnimation = state.skipAnimation;
@@ -71,7 +72,8 @@ class _RockPaperScissorsGeneratorScreenState
       final state = SimpleGeneratorState()
         ..skipAnimation = _skipAnimation
         ..lastUpdated = DateTime.now();
-      await RandomStateService.saveRockPaperScissorsGeneratorState(state);
+      await UnifiedRandomStateService.saveRockPaperScissorsGeneratorState(
+          state);
     } catch (e) {
       // Error is already logged in service
     }
@@ -116,8 +118,11 @@ class _RockPaperScissorsGeneratorScreenState
       final loc = AppLocalizations.of(context)!;
       String resultText = _getResultText(_result!, loc);
       GenerationHistoryService.addHistoryItem(
-        resultText,
-        'rock_paper_scissors',
+        UnifiedHistoryData(
+          value: resultText,
+          type: 'rock_paper_scissors',
+          timestamp: DateTime.now(),
+        ),
       ).then((_) => _loadHistory());
     }
   }

@@ -1,24 +1,20 @@
 import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/services/converter_services/volume_converter_service.dart';
-import 'package:setpocket/services/converter_services/volume_state_adapter.dart';
-import 'package:setpocket/services/converter_services/generic_preset_service.dart';
-import 'package:setpocket/models/converter_models/generic_preset_model.dart';
+import 'package:setpocket/services/converter_services/unified_state_adapter.dart';
+import 'package:setpocket/services/converter_services/volume_unified_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 class VolumeConverterController extends ConverterController {
   VolumeConverterController()
       : super(
           converterService: VolumeConverterService(),
-          stateService: VolumeStateAdapter(),
-        ) {
-    logInfo(
-        'VolumeConverterController: Initialized with VolumeConverterService and VolumeStateAdapter');
-  }
+          stateService: UnifiedStateAdapter('volume'),
+        );
 
-  // Generic Preset functionality using new GenericPresetService
-  Future<List<GenericPresetModel>> getPresets() async {
+  // Volume Preset functionality using VolumeUnifiedService
+  Future<List<Map<String, dynamic>>> getPresets() async {
     try {
-      return await GenericPresetService.loadPresets('volume');
+      return await VolumeUnifiedService.loadPresets();
     } catch (e) {
       logError('Error loading volume presets: $e');
       return [];
@@ -27,8 +23,7 @@ class VolumeConverterController extends ConverterController {
 
   Future<void> savePreset(String name, List<String> units) async {
     try {
-      await GenericPresetService.savePreset(
-        presetType: 'volume',
+      await VolumeUnifiedService.savePreset(
         name: name,
         units: units,
       );
@@ -41,7 +36,7 @@ class VolumeConverterController extends ConverterController {
 
   Future<void> deletePreset(String id) async {
     try {
-      await GenericPresetService.deletePreset('volume', id);
+      await VolumeUnifiedService.deletePreset(id);
       logInfo('Deleted volume preset: $id');
     } catch (e) {
       logError('Error deleting volume preset: $e');
@@ -51,7 +46,7 @@ class VolumeConverterController extends ConverterController {
 
   Future<bool> presetNameExists(String name) async {
     try {
-      return await GenericPresetService.presetNameExists('volume', name);
+      return await VolumeUnifiedService.presetNameExists(name);
     } catch (e) {
       logError('Error checking preset name existence: $e');
       return false;
@@ -60,7 +55,7 @@ class VolumeConverterController extends ConverterController {
 
   Future<void> renamePreset(String id, String newName) async {
     try {
-      await GenericPresetService.renamePreset('volume', id, newName);
+      await VolumeUnifiedService.renamePreset(id, newName);
       logInfo('Renamed volume preset: $id to $newName');
     } catch (e) {
       logError('Error renaming volume preset: $e');
@@ -68,12 +63,10 @@ class VolumeConverterController extends ConverterController {
     }
   }
 
-  Future<void> applyPreset(GenericPresetModel preset) async {
+  Future<void> applyPreset(Map<String, dynamic> preset) async {
     try {
-      // Use inherited method to update global visible units
-      await updateGlobalVisibleUnits(preset.units.toSet());
-
-      logInfo('Applied volume preset: ${preset.name}');
+      // Units are handled by the preset system itself
+      logInfo('Applied volume preset: ${preset['name']}');
     } catch (e) {
       logError('Error applying volume preset: $e');
       rethrow;

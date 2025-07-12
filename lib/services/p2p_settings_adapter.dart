@@ -125,7 +125,8 @@ class P2PSettingsAdapter {
       maxChunkSize: 1024, // 1MB in KB
       customDisplayName: null,
       uiRefreshRateSeconds: 0,
-      enableNotifications: true,
+      enableNotifications:
+          false, // Default to false to reduce notification spam
       rememberBatchExpandState: false, // Default to false for performance
       encryptionType: EncryptionType.none, // Default to no encryption
     );

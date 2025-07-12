@@ -5569,9 +5569,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sentTime => 'Sent Time';
 
   @override
-  String get wantsSaveConnection => 'This person wants to save the connection';
-
-  @override
   String get trustThisUser => 'Trust this user';
 
   @override
@@ -6496,7 +6493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get security => 'Security';
 
   @override
-  String get p2lanOptionEncryptionNoneDesc => 'NoneNo encryption (fastest transfer)';
+  String get p2lanOptionEncryptionNoneDesc => 'No encryption (fastest transfer)';
 
   @override
   String get p2lanOptionEncryptionAesGcmDesc => 'Strong encryption, best for high-end devices with hardware acceleration';

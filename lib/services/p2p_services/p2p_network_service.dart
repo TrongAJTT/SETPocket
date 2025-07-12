@@ -39,7 +39,6 @@ class P2PNetworkService extends ChangeNotifier {
   static const int _basePort = 8080;
   static const int _maxPort = 8090;
   static const Duration _heartbeatInterval = Duration(seconds: 60);
-  static const Duration _cleanupInterval = Duration(seconds: 5);
 
   // Getters
   bool get isEnabled => _isEnabled;
@@ -399,16 +398,6 @@ class P2PNetworkService extends ChangeNotifier {
     logInfo('P2PNetworkService: Heartbeat tick');
   }
 
-  void _performCleanup() {
-    // This will be implemented by services that use this network service
-    logInfo('P2PNetworkService: Cleanup tick');
-  }
-
-  void _performMemoryCleanup() {
-    // This will be implemented by services that use this network service
-    logInfo('P2PNetworkService: Memory cleanup tick');
-  }
-
   Future<void> _registerBackgroundTask() async {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       try {
@@ -417,8 +406,15 @@ class P2PNetworkService extends ChangeNotifier {
           "p2pKeepAliveTask",
           frequency: const Duration(minutes: 15),
           constraints: Constraints(networkType: NetworkType.connected),
+          inputData: <String, dynamic>{
+            'showNotification': false, // Explicitly disable notifications
+            'silentMode': true, // Run in silent mode
+          },
+          // Note: Some Android versions may still show system notifications
+          // for background tasks. This is controlled by the OS, not the app.
         );
-        logInfo('P2PNetworkService: Registered background task');
+        logInfo(
+            'P2PNetworkService: Registered background task with notifications disabled');
       } catch (e) {
         logWarning('P2PNetworkService: Failed to register background task: $e');
       }

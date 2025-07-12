@@ -508,7 +508,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         await ExtensibleSettingsService.updateCalculatorToolsSettings(
             updatedSettings);
       },
-      isDisabled: !_rememberCalculationHistory,
+      isEnabled: !_rememberCalculationHistory,
       decorator: switchDecorator,
     );
   }

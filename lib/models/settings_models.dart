@@ -289,7 +289,8 @@ class P2PTransferSettingsData {
     this.maxChunkSize = 1024, // 1MB in KB
     this.customDisplayName,
     this.uiRefreshRateSeconds = 0,
-    this.enableNotifications = true,
+    this.enableNotifications =
+        false, // Default to false to reduce notification spam
     this.rememberBatchExpandState = false,
     this.encryptionType = EncryptionType.none,
   });
@@ -324,7 +325,8 @@ class P2PTransferSettingsData {
       maxChunkSize: json['maxChunkSize'] ?? 1024,
       customDisplayName: json['customDisplayName'],
       uiRefreshRateSeconds: json['uiRefreshRateSeconds'] ?? 0,
-      enableNotifications: json['enableNotifications'] ?? true,
+      enableNotifications:
+          json['enableNotifications'] ?? false, // Default to false
       rememberBatchExpandState: json['rememberBatchExpandState'] ?? false,
       encryptionType: json['encryptionType'] != null
           ? EncryptionType.values.firstWhere(

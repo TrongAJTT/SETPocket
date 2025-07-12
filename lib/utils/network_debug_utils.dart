@@ -6,60 +6,68 @@ class NetworkDebugUtils {
   /// Debug network connectivity and log detailed information
   static Future<void> debugNetworkConnectivity() async {
     try {
-      AppLogger.instance.info('=== Network Debug Started ===');
+      AppLogger.instance.info('🔍 === Network Debug Started ===');
 
       // Test basic connectivity
       final connectivity = Connectivity();
       final results = await connectivity.checkConnectivity();
 
-      AppLogger.instance.info('Connectivity Results: $results');
-
+      String connectionTypes = '';
       for (final result in results) {
-        AppLogger.instance.info('- ${result.toString()}');
-
         switch (result) {
           case ConnectivityResult.wifi:
-            AppLogger.instance.info('  → WiFi connection detected');
+            connectionTypes += 'WiFi ';
             break;
           case ConnectivityResult.mobile:
-            AppLogger.instance.info('  → Mobile data connection detected');
+            connectionTypes += 'Mobile ';
             break;
           case ConnectivityResult.ethernet:
-            AppLogger.instance.info('  → Ethernet connection detected');
+            connectionTypes += 'Ethernet ';
             break;
           case ConnectivityResult.none:
-            AppLogger.instance.info('  → No connection');
+            connectionTypes += 'None ';
             break;
           default:
-            AppLogger.instance.info('  → Other connection type: $result');
+            connectionTypes += 'Other ';
         }
       }
+      AppLogger.instance.info('📡 Connection: $connectionTypes');
 
-      // Test our network security service
-      AppLogger.instance.info('\n=== Testing NetworkSecurityService ===');
+      // Get network info once without verbose logging
+      final networkInfo =
+          await NetworkSecurityService.checkNetworkSecurity(verbose: false);
 
-      final networkInfo = await NetworkSecurityService.checkNetworkSecurity();
+      // Summary format
+      String networkSummary = '';
+      if (networkInfo.isWiFi) {
+        networkSummary =
+            'WiFi - ${networkInfo.isSecure ? "🔒 Secure" : "🔓 Open"}';
+        if (networkInfo.wifiName != null) {
+          networkSummary += ' (${networkInfo.wifiName})';
+        } else if (networkInfo.wifiSSID != null) {
+          networkSummary += ' (SSID: ${networkInfo.wifiSSID})';
+        }
+      } else if (networkInfo.isMobile) {
+        networkSummary = 'Mobile Data - 🔒 Secure';
+      } else {
+        networkSummary = 'Unknown Connection';
+      }
 
-      AppLogger.instance.info('NetworkInfo Results:');
-      AppLogger.instance.info('- isWiFi: ${networkInfo.isWiFi}');
-      AppLogger.instance.info('- isMobile: ${networkInfo.isMobile}');
-      AppLogger.instance.info('- isSecure: ${networkInfo.isSecure}');
-      AppLogger.instance.info('- securityType: ${networkInfo.securityType}');
-      AppLogger.instance.info('- securityLevel: ${networkInfo.securityLevel}');
-      AppLogger.instance.info('- wifiName: ${networkInfo.wifiName}');
-      AppLogger.instance.info('- wifiSSID: ${networkInfo.wifiSSID}');
-      AppLogger.instance.info('- ipAddress: ${networkInfo.ipAddress}');
+      AppLogger.instance.info('🌐 Network: $networkSummary');
+      AppLogger.instance.info('📍 IP: ${networkInfo.ipAddress ?? "Unknown"}');
       AppLogger.instance
-          .info('- gatewayAddress: ${networkInfo.gatewayAddress}');
-      AppLogger.instance
-          .info('- signalStrength: ${networkInfo.signalStrength}');
+          .info('🚪 Gateway: ${networkInfo.gatewayAddress ?? "Unknown"}');
 
-      // Check if suitable for P2P
+      if (networkInfo.signalStrength != null) {
+        AppLogger.instance.info('📶 Signal: ${networkInfo.signalStrength} dBm');
+      }
+
+      // P2P readiness
       final isP2PReady =
           await NetworkSecurityService.isNetworkAvailableForP2P();
-      AppLogger.instance.info('- isP2PReady: $isP2PReady');
+      AppLogger.instance.info('🔗 P2P Ready: ${isP2PReady ? "✅ Yes" : "❌ No"}');
 
-      AppLogger.instance.info('=== Network Debug Completed ===');
+      AppLogger.instance.info('✅ === Network Debug Completed ===');
     } catch (e, stackTrace) {
       AppLogger.instance.error('Error in network debug: $e');
       AppLogger.instance.error('Stack trace: $stackTrace');

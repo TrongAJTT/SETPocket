@@ -5562,9 +5562,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get sentTime => 'Thời gian gửi';
 
   @override
-  String get wantsSaveConnection => 'Người này muốn lưu kết nối';
-
-  @override
   String get trustThisUser => 'Tin tưởng người dùng này';
 
   @override

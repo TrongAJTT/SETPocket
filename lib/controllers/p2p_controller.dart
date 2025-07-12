@@ -508,7 +508,10 @@ class P2PController with ChangeNotifier {
       return l10n.connectedViaMobileData;
     } else if (_networkInfo!.isWiFi) {
       final securityText = _networkInfo!.isSecure ? l10n.secure : l10n.unsecure;
-      final wifiName = _networkInfo!.wifiName ?? l10n.unknownWifi;
+      // Simplify WiFi name display - just show "WiFi" instead of "Unknown WiFi"
+      final wifiName = _networkInfo!.wifiName?.isNotEmpty == true
+          ? _networkInfo!.wifiName!
+          : "WiFi";
       return l10n.connectedToWifi(wifiName, securityText);
     } else if (_networkInfo!.securityType == 'ETHERNET') {
       return l10n.connectedViaEthernet;

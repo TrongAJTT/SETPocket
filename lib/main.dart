@@ -39,8 +39,32 @@ void callbackDispatcher() {
     // This background task is a simple keep-alive.
     // Its purpose is just to wake the app up periodically to prevent the OS
     // from completely killing the process, allowing P2P timers to continue.
-    // No complex logic is needed here.
-    return Future.value(true);
+    //
+    // Note: We check for silentMode to ensure no notifications are shown
+
+    try {
+      final now = DateTime.now();
+      final taskInfo = 'Task: $task, Input: $inputData';
+      final silentMode = inputData?['silentMode'] ?? true;
+      final showNotification = inputData?['showNotification'] ?? false;
+
+      // Only log the execution - no notifications unless explicitly requested
+      if (!silentMode || showNotification) {
+        print('📱 Background KeepAlive: $taskInfo at $now');
+      }
+
+      // Perform minimal work - just prove the app is alive
+      // No network calls, no heavy processing, just a simple heartbeat
+
+      if (!silentMode) {
+        print('✅ Background KeepAlive completed successfully');
+      }
+      return Future.value(true);
+    } catch (e) {
+      // Always log errors regardless of silent mode
+      print('❌ Background KeepAlive failed: $e');
+      return Future.value(false);
+    }
   });
 }
 // --- End Workmanager Setup ---
@@ -68,10 +92,16 @@ Future<void> main() async {
 
   // Initialize workmanager for background tasks on mobile platforms
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: kDebugMode,
-    );
+    try {
+      await Workmanager().initialize(
+        callbackDispatcher,
+        isInDebugMode:
+            false, // Always disable debug mode to prevent notifications
+      );
+      logInfo('WorkManager initialized successfully (notifications disabled)');
+    } catch (e) {
+      logError('Failed to initialize WorkManager: $e');
+    }
   }
 
   // Setup window manager for desktop platforms

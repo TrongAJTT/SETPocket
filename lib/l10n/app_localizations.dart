@@ -10781,12 +10781,6 @@ abstract class AppLocalizations {
   /// **'Sent Time'**
   String get sentTime;
 
-  /// Message when sender wants to save connection
-  ///
-  /// In en, this message translates to:
-  /// **'This person wants to save the connection'**
-  String get wantsSaveConnection;
-
   /// No description provided for @trustThisUser.
   ///
   /// In en, this message translates to:
@@ -12530,7 +12524,7 @@ abstract class AppLocalizations {
   /// No description provided for @p2lanOptionEncryptionNoneDesc.
   ///
   /// In en, this message translates to:
-  /// **'NoneNo encryption (fastest transfer)'**
+  /// **'No encryption (fastest transfer)'**
   String get p2lanOptionEncryptionNoneDesc;
 
   /// No description provided for @p2lanOptionEncryptionAesGcmDesc.

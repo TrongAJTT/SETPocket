@@ -2675,10 +2675,6 @@
     "@sentTime": {
         "description": "Label for when request was sent"
     },
-    "wantsSaveConnection": "This person wants to save the connection",
-    "@wantsSaveConnection": {
-        "description": "Message when sender wants to save connection"
-    },
     "trustThisUser": "Trust this user",
     "allowFileTransfersWithoutConfirmation": "Allow file transfers without confirmation",
     "onlyAcceptFromTrustedDevices": "Only accept pairing from devices you trust.",
@@ -3714,7 +3710,7 @@
     "p2lanOptionEncryptionTransferDesc": "Use secure encryption protocol for file transfers, slower but more secure",
     "securityAndEncryption": "Security & Encryption",
     "security": "Security",
-    "p2lanOptionEncryptionNoneDesc": "NoneNo encryption (fastest transfer)",
+    "p2lanOptionEncryptionNoneDesc": "No encryption (fastest transfer)",
     "p2lanOptionEncryptionAesGcmDesc": "Strong encryption, best for high-end devices with hardware acceleration",
     "p2lanOptionEncryptionChaCha20Desc": "Optimized for mobile devices, better performance",
     "p2lanOptionEncryptionNoneAbout": "Data is transferred without encryption. This provides the fastest transfer speeds but offers no security protection. Only use this on trusted networks.",

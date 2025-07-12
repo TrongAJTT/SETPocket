@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
     <!-- Internet permission for currency fetching -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -21,10 +22,32 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
       <application
         android:label="SETPocket"
-        android:name="${applicationName}"
+        android:name=".MainApplication"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config">
+        
+        <!-- Disable WorkManager notifications by setting up a custom provider -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!-- Disable WorkManager auto-initialization -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+        
+        <!-- Disable notification channels for WorkManager -->
+        <meta-data
+            android:name="androidx.work.impl.workers.ConstraintTrackingWorker.NOTIFICATION_CHANNEL_ID"
+            android:value="" />
+        <meta-data
+            android:name="androidx.work.impl.background.systemjob.SystemJobService.NOTIFICATION_CHANNEL_ID"
+            android:value="" />
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"

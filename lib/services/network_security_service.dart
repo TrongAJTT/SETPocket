@@ -15,22 +15,18 @@ class NetworkSecurityService {
       MethodChannel('com.setpocket.app/network_security');
 
   /// Check current network security level
-  static Future<NetworkInfo> checkNetworkSecurity() async {
+  static Future<NetworkInfo> checkNetworkSecurity({bool verbose = true}) async {
     try {
       final connectivityResult = await Connectivity().checkConnectivity();
 
       if (connectivityResult.contains(ConnectivityResult.mobile)) {
         // Mobile data is considered secure (carrier handles security)
-        return NetworkInfo(
-          isWiFi: false,
-          isMobile: true,
-          isSecure: true,
-          securityLevel: NetworkSecurityLevel.secure,
-        );
+        final mobileInfo = await _getMobileInfo(verbose: verbose);
+        return mobileInfo;
       }
 
       if (connectivityResult.contains(ConnectivityResult.wifi)) {
-        final wifiInfo = await _getWiFiInfo();
+        final wifiInfo = await _getWiFiInfo(verbose: verbose);
         return wifiInfo;
       }
 
@@ -113,23 +109,29 @@ class NetworkSecurityService {
     }
   }
 
-  static Future<NetworkInfo> _getWiFiInfo() async {
+  static Future<NetworkInfo> _getWiFiInfo({bool verbose = true}) async {
     try {
       // Try to get WiFi security info from native platform first (Android)
       bool isSecure = true;
       String securityType = 'UNKNOWN';
+      String? nativeSSID;
 
       if (Platform.isAndroid) {
         try {
           final result = await _channel.invokeMethod('getWifiSecurityInfo');
+          if (verbose) logInfo('Native WiFi result: $result');
           if (result is Map) {
             isSecure = result['isSecure'] as bool? ?? true;
             securityType = result['securityType'] as String? ?? 'UNKNOWN';
-            logInfo(
-                'Native WiFi security check: secure=$isSecure, type=$securityType');
+            nativeSSID = result['ssid'] as String?;
+            if (verbose) {
+              logInfo(
+                  'Native WiFi security check: secure=$isSecure, type=$securityType, ssid=$nativeSSID');
+            }
           }
         } catch (e) {
-          logWarning('Failed to get native WiFi security info: $e');
+          if (verbose)
+            logWarning('Failed to get native WiFi security info: $e');
           // Fallback to assuming secure
           isSecure = true;
         }
@@ -141,8 +143,18 @@ class NetworkSecurityService {
       final ipAddress = await _networkInfo.getWifiIP();
       final gatewayAddress = await _networkInfo.getWifiGatewayIP();
 
+      if (verbose) {
+        logInfo(
+            'Standard WiFi info: name=$wifiName, ssid=$wifiSSID, ip=$ipAddress, gateway=$gatewayAddress');
+      }
+
+      // Use native SSID if available, otherwise fallback to standard WiFi name
+      final finalWifiName =
+          nativeSSID?.isNotEmpty == true ? nativeSSID : wifiName;
+      if (verbose) logInfo('Final WiFi name: $finalWifiName');
+
       return NetworkInfo(
-        wifiName: wifiName,
+        wifiName: finalWifiName,
         wifiSSID: wifiSSID,
         ipAddress: ipAddress,
         gatewayAddress: gatewayAddress,
@@ -161,6 +173,72 @@ class NetworkSecurityService {
         isMobile: false,
         isSecure: false,
         securityLevel: NetworkSecurityLevel.unknown,
+      );
+    }
+  }
+
+  static Future<NetworkInfo> _getMobileInfo({bool verbose = true}) async {
+    try {
+      String? ipAddress;
+      String? gatewayAddress;
+      String? interfaceName;
+      String? networkType = 'mobile';
+
+      // Try to get mobile IP from native platform
+      if (Platform.isAndroid) {
+        try {
+          final result = await _channel.invokeMethod('getMobileIpAddress');
+          if (result is Map && result['success'] == true) {
+            ipAddress = result['ipAddress'] as String?;
+            interfaceName = result['interfaceName'] as String?;
+            networkType = result['type'] as String? ?? 'mobile';
+            if (verbose) {
+              logInfo(
+                  'Native mobile IP check: ip=$ipAddress, interface=$interfaceName, type=$networkType');
+            }
+          } else {
+            if (verbose)
+              logWarning('Failed to get native mobile IP: ${result?['error']}');
+          }
+        } catch (e) {
+          if (verbose) logWarning('Failed to get native mobile IP info: $e');
+        }
+      }
+
+      // Fallback to trying WiFi methods (sometimes works for hotspot scenarios)
+      if (ipAddress == null) {
+        try {
+          ipAddress = await _networkInfo.getWifiIP();
+          gatewayAddress = await _networkInfo.getWifiGatewayIP();
+          if (verbose) {
+            logInfo(
+                'Fallback WiFi methods - IP: $ipAddress, Gateway: $gatewayAddress');
+          }
+        } catch (e) {
+          if (verbose) logWarning('Fallback WiFi methods failed: $e');
+        }
+      }
+
+      return NetworkInfo(
+        ipAddress: ipAddress,
+        gatewayAddress: gatewayAddress,
+        isWiFi: false,
+        isMobile: true,
+        isSecure: true, // Mobile data is secure (carrier handles security)
+        securityLevel: NetworkSecurityLevel.secure,
+        securityType: networkType?.toUpperCase(),
+        // Add interface info for debugging
+        wifiName:
+            interfaceName != null ? 'Mobile Interface: $interfaceName' : null,
+      );
+    } catch (e) {
+      AppLogger.instance.error('Error getting mobile info: $e');
+      return NetworkInfo(
+        isWiFi: false,
+        isMobile: true,
+        isSecure: true, // Default to secure for mobile
+        securityLevel: NetworkSecurityLevel.secure,
+        securityType: 'MOBILE',
       );
     }
   }
@@ -201,19 +279,44 @@ class NetworkSecurityService {
   /// Get local IP address
   static Future<String?> getLocalIpAddress() async {
     try {
-      return await _networkInfo.getWifiIP();
+      // First try the standard WiFi method
+      String? ipAddress = await _networkInfo.getWifiIP();
+
+      // If that fails and we're on mobile, try the native mobile method
+      if (ipAddress == null && Platform.isAndroid) {
+        final connectivityResult = await Connectivity().checkConnectivity();
+        if (connectivityResult.contains(ConnectivityResult.mobile)) {
+          try {
+            final result = await _channel.invokeMethod('getMobileIpAddress');
+            if (result is Map && result['success'] == true) {
+              ipAddress = result['ipAddress'] as String?;
+              logInfo('Got IP from native mobile method: $ipAddress');
+            }
+          } catch (e) {
+            logWarning('Failed to get IP from native mobile method: $e');
+          }
+        }
+      }
+
+      return ipAddress;
     } catch (e) {
       AppLogger.instance.error('Error getting local IP address: $e');
       return null;
     }
   }
 
-  /// Check if network is available for P2P
+  /// Check if network is available for P2P (respects user data usage preferences)
   static Future<bool> isNetworkAvailableForP2P() async {
-    final networkInfo = await checkNetworkSecurity();
-    return networkInfo.isWiFi ||
+    final networkInfo = await checkNetworkSecurity(verbose: false);
+    final isConnectionTypeSupported = networkInfo.isWiFi ||
         networkInfo.isMobile ||
         (networkInfo.securityType == 'ETHERNET');
+
+    if (!isConnectionTypeSupported) {
+      return false;
+    }
+
+    return true;
   }
 
   // Helper methods for logging

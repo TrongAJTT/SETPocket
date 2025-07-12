@@ -2480,7 +2480,6 @@
     "noPairingRequests": "Không có yêu cầu ghép nối",
     "pairingRequestFrom": "Yêu cầu ghép nối từ:",
     "sentTime": "Thời gian gửi",
-    "wantsSaveConnection": "Người này muốn lưu kết nối",
     "trustThisUser": "Tin tưởng người dùng này",
     "allowFileTransfersWithoutConfirmation": "Cho phép truyền file mà không cần xác nhận",
     "onlyAcceptFromTrustedDevices": "Chỉ chấp nhận ghép nối từ các thiết bị tin cậy.",

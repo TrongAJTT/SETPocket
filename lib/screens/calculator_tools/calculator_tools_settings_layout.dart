@@ -136,7 +136,7 @@ class _CalculatorToolsSettingsLayoutState extends BaseSettingsLayoutState<
                 });
                 _checkForChanges();
               },
-              isDisabled: !_rememberCalculationHistory,
+              isEnabled: !_rememberCalculationHistory,
               decorator: switchDecorator,
             ),
           ],

@@ -138,23 +138,8 @@ class _PairingRequestDialogState extends State<PairingRequestDialog> {
                     label: l10n.sentTime,
                     value: _formatTime(request.requestTime),
                   ),
-                  if (request.wantsSaveConnection) ...[
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.save, size: 16, color: Colors.blue),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.wantsSaveConnection,
-                          style: TextStyle(
-                            color: Colors.blue[700],
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  // Note: Removed "wants to save connection" display since
+                  // connection saving is now handled per-device independently
                 ],
               ),
             ),

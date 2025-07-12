@@ -89,7 +89,7 @@ class OptionSwitch extends StatelessWidget {
     this.subtitle,
     required this.value,
     required this.onChanged,
-    this.isDisabled = false,
+    this.isEnabled = true,
     this.decorator,
   });
 
@@ -97,7 +97,7 @@ class OptionSwitch extends StatelessWidget {
   final String? subtitle;
   final bool value;
   final ValueChanged<bool>? onChanged;
-  final bool isDisabled;
+  final bool isEnabled;
   final OptionSwitchDecorator? decorator;
 
   /// Creates OptionSwitch using OptionItem constructor method
@@ -121,7 +121,7 @@ class OptionSwitch extends StatelessWidget {
       subtitle: option.subtitle,
       value: option.value,
       onChanged: onChanged,
-      isDisabled: !option.enabled,
+      isEnabled: option.enabled,
       decorator: decorator,
     );
   }
@@ -129,7 +129,7 @@ class OptionSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool isEffectivelyDisabled = isDisabled || onChanged == null;
+    final bool isEffectivelyDisabled = !isEnabled || onChanged == null;
 
     final defaultTitleStyle = theme.textTheme.titleMedium?.copyWith(
       fontWeight: FontWeight.w500,
@@ -156,30 +156,33 @@ class OptionSwitch extends StatelessWidget {
       );
     }
 
-    return InkWell(
-      onTap: isEffectivelyDisabled ? null : () => onChanged?.call(!value),
-      child: Padding(
-        padding: decorator?.padding ??
-            const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: subtitle != null
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(title, style: titleStyle),
-                        const SizedBox(height: 4),
-                        Text(subtitle!, style: subtitleStyle),
-                      ],
-                    )
-                  : Text(title, style: titleStyle),
-            ),
-            const SizedBox(width: 24),
-            switchWidget,
-          ],
+    return Opacity(
+      opacity: isEffectivelyDisabled ? 0.5 : 1.0,
+      child: InkWell(
+        onTap: isEffectivelyDisabled ? null : () => onChanged?.call(!value),
+        child: Padding(
+          padding: decorator?.padding ??
+              const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: subtitle != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(title, style: titleStyle),
+                          const SizedBox(height: 4),
+                          Text(subtitle!, style: subtitleStyle),
+                        ],
+                      )
+                    : Text(title, style: titleStyle),
+              ),
+              const SizedBox(width: 24),
+              switchWidget,
+            ],
+          ),
         ),
       ),
     );

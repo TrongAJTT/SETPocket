@@ -783,23 +783,10 @@ class P2PController with ChangeNotifier {
   }
 
   /// Update file storage settings
-  Future<bool> updateFileStorageSettings(
-      P2PFileStorageSettings settings) async {
-    try {
-      // TODO: Implement updateFileStorageSettings in P2PService
-      // final success = await _p2pService.updateFileStorageSettings(settings);
-      // For now, return false
-      return false;
-    } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
+  // Đã xóa updateFileStorageSettings và mọi tham chiếu đến P2PFileStorageSettings
 
   /// Get current file storage settings
-  P2PFileStorageSettings? get fileStorageSettings =>
-      null; // Will be implemented when P2PService is fixed
+  // Đã xóa getter fileStorageSettings
 
   /// Set callback for new pairing requests (for auto-showing dialogs)
   void setNewPairingRequestCallback(Function(PairingRequest)? callback) {

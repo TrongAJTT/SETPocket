@@ -3275,6 +3275,12 @@ abstract class AppLocalizations {
   /// **'Reset to Default'**
   String get resetToDefault;
 
+  /// No description provided for @resetToDefaultsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reset all settings to their default values?'**
+  String get resetToDefaultsConfirm;
+
   /// No description provided for @manageQuickActions.
   ///
   /// In en, this message translates to:
@@ -11213,13 +11219,13 @@ abstract class AppLocalizations {
   /// **'User Preferences'**
   String get userPreferences;
 
-  /// Setting to enable notifications
+  /// No description provided for @enableNotifications.
   ///
   /// In en, this message translates to:
   /// **'Enable Notifications'**
   String get enableNotifications;
 
-  /// Section header for UI performance settings
+  /// No description provided for @userInterfacePerformance.
   ///
   /// In en, this message translates to:
   /// **'User Interface Performance'**
@@ -11960,7 +11966,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectDownloadFolder.
   ///
   /// In en, this message translates to:
-  /// **'Select download folder...'**
+  /// **'Select download folder'**
   String get selectDownloadFolder;
 
   /// No description provided for @maxFileSizePerFile.
@@ -12014,7 +12020,7 @@ abstract class AppLocalizations {
   /// No description provided for @enableNotificationsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Get notified about transfer events'**
+  /// **'To receive notifications for pairing and file transfers, you need to enable them in the system settings.'**
   String get enableNotificationsDescription;
 
   /// No description provided for @maxFileSizePerFileDescription.
@@ -12508,6 +12514,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use secure encryption protocol for file transfers, slower but more secure'**
   String get p2lanOptionEncryptionTransferDesc;
+
+  /// No description provided for @securityAndEncryption.
+  ///
+  /// In en, this message translates to:
+  /// **'Security & Encryption'**
+  String get securityAndEncryption;
+
+  /// No description provided for @security.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get security;
+
+  /// No description provided for @p2lanOptionEncryptionNoneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'NoneNo encryption (fastest transfer)'**
+  String get p2lanOptionEncryptionNoneDesc;
+
+  /// No description provided for @p2lanOptionEncryptionAesGcmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong encryption, best for high-end devices with hardware acceleration'**
+  String get p2lanOptionEncryptionAesGcmDesc;
+
+  /// No description provided for @p2lanOptionEncryptionChaCha20Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimized for mobile devices, better performance'**
+  String get p2lanOptionEncryptionChaCha20Desc;
+
+  /// No description provided for @p2lanOptionEncryptionNoneAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'Data is transferred without encryption. This provides the fastest transfer speeds but offers no security protection. Only use this on trusted networks.'**
+  String get p2lanOptionEncryptionNoneAbout;
+
+  /// No description provided for @p2lanOptionEncryptionAesGcmAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'AES-256-GCM is a widely used encryption standard that provides strong security. It is best suited for high-end devices with hardware acceleration, but may be slower on older or low-end Android devices.'**
+  String get p2lanOptionEncryptionAesGcmAbout;
+
+  /// No description provided for @p2lanOptionEncryptionChaCha20About.
+  ///
+  /// In en, this message translates to:
+  /// **'ChaCha20-Poly1305 is a modern encryption algorithm designed for both security and speed, especially on mobile devices.\nIt is recommended for most Android devices because it works efficiently even without hardware acceleration, providing strong protection with better performance than AES on many phones.'**
+  String get p2lanOptionEncryptionChaCha20About;
+
+  /// No description provided for @storagePermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage permission is required to select custom folder'**
+  String get storagePermissionRequired;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

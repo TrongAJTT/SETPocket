@@ -1697,6 +1697,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get resetToDefault => 'Đặt lại mặc định';
 
   @override
+  String get resetToDefaultsConfirm => 'Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định không?';
+
+  @override
   String get manageQuickActions => 'Quản lý Thao tác nhanh';
 
   @override
@@ -6186,7 +6189,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statusOffline => 'Ngoại tuyến';
 
   @override
-  String get selectDownloadFolder => 'Select download folder...';
+  String get selectDownloadFolder => 'Chọn thư mục tải về';
 
   @override
   String get maxFileSizePerFile => 'Kích thước file tối đa (mỗi file)';
@@ -6213,7 +6216,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get noDownloadPathSetDescription => 'Please select a download folder in the Storage tab to see storage information.';
 
   @override
-  String get enableNotificationsDescription => 'Get notified about transfer events';
+  String get enableNotificationsDescription => 'Để nhận thông báo về sự kiện ghép nối và truyền file, bạn cần bật chúng trong cài đặt hệ thống.';
 
   @override
   String get maxFileSizePerFileDescription => 'File lớn hơn sẽ bị từ chối tự động';
@@ -6478,4 +6481,31 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get p2lanOptionEncryptionTransferDesc => 'Sử dụng giao thức mã hóa hơn cho việc truyền file, chậm hơn nhưng an toàn hơn';
+
+  @override
+  String get securityAndEncryption => 'Bảo mật và Mã hóa';
+
+  @override
+  String get security => 'Bảo mật';
+
+  @override
+  String get p2lanOptionEncryptionNoneDesc => 'Không mã hóa (tốc độ nhanh nhất)';
+
+  @override
+  String get p2lanOptionEncryptionAesGcmDesc => 'Mã hóa mạnh, tốt nhất cho thiết bị cao cấp với phần cứng tăng tốc';
+
+  @override
+  String get p2lanOptionEncryptionChaCha20Desc => 'Tối ưu cho thiết bị di động, hiệu suất tốt hơn';
+
+  @override
+  String get p2lanOptionEncryptionNoneAbout => 'Dữ liệu được truyền không được mã hóa, cung cấp tốc độ truyền nhanh nhất nhưng không cung cấp bảo mật. Chỉ sử dụng trên mạng đáng tin cậy.';
+
+  @override
+  String get p2lanOptionEncryptionAesGcmAbout => 'AES-256-GCM là tiêu chuẩn mã hóa phổ biến cung cấp bảo mật mạnh. Phù hợp nhất cho thiết bị cao cấp với phần cứng tăng tốc, nhưng có thể chậm hơn trên thiết bị Android cũ hoặc thấp cấp.';
+
+  @override
+  String get p2lanOptionEncryptionChaCha20About => 'ChaCha20-Poly1305 là một thuật toán mã hóa hiện đại, được thiết kế để đảm bảo cả tính bảo mật cao và tốc độ xử lý nhanh, đặc biệt hiệu quả trên các thiết bị di động.\nKhuyến nghị sử dụng cho hầu hết các thiết bị Android vì khả năng hoạt động hiệu quả ngay cả khi thiết bị không hỗ trợ tăng tốc phần cứng (tức không cần chip chuyên dụng để xử lý mã hóa). Việc này giúp cung cấp khả năng bảo vệ dữ liệu mạnh mẽ với hiệu suất tốt hơn so với thuật toán AES trên nhiều dòng điện thoại.';
+
+  @override
+  String get storagePermissionRequired => 'Cần quyền lưu trữ để chọn thư mục tùy chỉnh';
 }

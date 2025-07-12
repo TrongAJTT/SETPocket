@@ -208,7 +208,7 @@ class MainActivity: FlutterActivity() {
         
         return result
     }
-
+    
     private fun requestNetworkPermissions() {
         val permissions = arrayOf(
             Manifest.permission.ACCESS_WIFI_STATE,

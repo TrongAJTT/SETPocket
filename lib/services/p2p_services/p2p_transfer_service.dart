@@ -17,6 +17,7 @@ import 'package:setpocket/utils/isar_utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:setpocket/services/encryption_service.dart';
+import 'package:setpocket/services/crypto_service.dart';
 
 /// Validation result for file transfer request
 class _FileTransferValidationResult {
@@ -587,7 +588,9 @@ class P2PTransferService extends ChangeNotifier {
     try {
       Uint8List? chunkData;
 
+      // Handle encrypted data
       if (data['enc'] == 'gcm') {
+        // AES-GCM encryption (backward compatibility)
         final ctBase64 = data['ct'] as String?;
         final ivBase64 = data['iv'] as String?;
         final tagBase64 = data['tag'] as String?;
@@ -605,6 +608,33 @@ class P2PTransferService extends ChangeNotifier {
                 'P2PTransferService: GCM decryption failed for task $taskId. Might be a wrong key or tampered data.');
             return;
           }
+        }
+      } else if (data['enc'] == 'aes-gcm' ||
+          data['enc'] == 'chacha20-poly1305') {
+        // New encryption system using CryptoService
+        final encryptionType = data['enc'] == 'aes-gcm'
+            ? EncryptionType.aesGcm
+            : EncryptionType.chaCha20;
+
+        final sessionKey = _getOrCreateSessionKey(message.fromUserId);
+        final encryptedData = <String, dynamic>{};
+
+        if (encryptionType == EncryptionType.aesGcm) {
+          encryptedData['ciphertext'] = base64Decode(data['ct'] as String);
+          encryptedData['iv'] = base64Decode(data['iv'] as String);
+          encryptedData['tag'] = base64Decode(data['tag'] as String);
+        } else {
+          encryptedData['ciphertext'] = base64Decode(data['ct'] as String);
+          encryptedData['nonce'] = base64Decode(data['nonce'] as String);
+          encryptedData['tag'] = base64Decode(data['tag'] as String);
+        }
+
+        chunkData = await CryptoService.decrypt(
+            encryptedData, sessionKey, encryptionType);
+        if (chunkData == null) {
+          logError(
+              'P2PTransferService: ${encryptionType.name} decryption failed for task $taskId. Might be a wrong key or tampered data.');
+          return;
         }
       } else {
         // Fallback for unencrypted data (e.g., from older clients)
@@ -1020,7 +1050,9 @@ class P2PTransferService extends ChangeNotifier {
       _transferPorts[task.id] = receivePort;
 
       // Check if encryption is enabled for this transfer
-      final useEncryption = _transferSettings?.enableEncryption ?? false;
+      final encryptionType =
+          _transferSettings?.encryptionType ?? EncryptionType.none;
+      final useEncryption = encryptionType != EncryptionType.none;
       final sessionKey = useEncryption ? _getSessionKey(targetUser.id) : null;
 
       final isolate = await Isolate.spawn(
@@ -1033,6 +1065,7 @@ class P2PTransferService extends ChangeNotifier {
           'maxChunkSize': chunkSizeBytes,
           'protocol': 'tcp',
           'useEncryption': useEncryption,
+          'encryptionType': encryptionType.name,
           'sessionKey': sessionKey != null ? base64Encode(sessionKey) : null,
         },
       );
@@ -1163,23 +1196,60 @@ class P2PTransferService extends ChangeNotifier {
 
           // Check if encryption is enabled (passed via parameters)
           final useEncryption = params['useEncryption'] as bool? ?? false;
+          final encryptionTypeName =
+              params['encryptionType'] as String? ?? 'none';
 
           if (useEncryption) {
             // Get session key (passed via parameters)
             final sessionKeyBase64 = params['sessionKey'] as String?;
             if (sessionKeyBase64 != null) {
               final sessionKey = base64Decode(sessionKeyBase64);
-              final encryptedGCM =
-                  EncryptionService.encryptGCM(chunk, sessionKey);
 
-              dataPayload = {
-                'taskId': task.id,
-                'ct': base64Encode(encryptedGCM['ciphertext']!),
-                'iv': base64Encode(encryptedGCM['iv']!),
-                'tag': base64Encode(encryptedGCM['tag']!),
-                'enc': 'gcm', // Indicate GCM encryption
-                'isLast': (totalSent + currentChunkSize == totalBytes),
-              };
+              // Determine encryption type
+              EncryptionType encryptionType;
+              switch (encryptionTypeName) {
+                case 'aesGcm':
+                  encryptionType = EncryptionType.aesGcm;
+                  break;
+                case 'chaCha20':
+                  encryptionType = EncryptionType.chaCha20;
+                  break;
+                default:
+                  encryptionType = EncryptionType.none;
+              }
+
+              if (encryptionType != EncryptionType.none) {
+                // Use new CryptoService
+                final encryptedData = await CryptoService.encrypt(
+                    chunk, sessionKey, encryptionType);
+
+                if (encryptionType == EncryptionType.aesGcm) {
+                  dataPayload = {
+                    'taskId': task.id,
+                    'ct': base64Encode(encryptedData['ciphertext']!),
+                    'iv': base64Encode(encryptedData['iv']!),
+                    'tag': base64Encode(encryptedData['tag']!),
+                    'enc': 'aes-gcm',
+                    'isLast': (totalSent + currentChunkSize == totalBytes),
+                  };
+                } else {
+                  dataPayload = {
+                    'taskId': task.id,
+                    'ct': base64Encode(encryptedData['ciphertext']!),
+                    'nonce': base64Encode(encryptedData['nonce']!),
+                    'tag': base64Encode(encryptedData['tag']!),
+                    'enc': 'chacha20-poly1305',
+                    'isLast': (totalSent + currentChunkSize == totalBytes),
+                  };
+                }
+              } else {
+                // Fallback to unencrypted
+                dataPayload = {
+                  'taskId': task.id,
+                  'data': base64Encode(chunk),
+                  'isLast': (totalSent + currentChunkSize == totalBytes),
+                };
+              }
             } else {
               // Fallback to unencrypted if no session key
               dataPayload = {
@@ -1716,7 +1786,7 @@ class P2PTransferService extends ChangeNotifier {
           uiRefreshRateSeconds: 0,
           enableNotifications: true,
           rememberBatchExpandState: false,
-          enableEncryption: false);
+          encryptionType: EncryptionType.none);
     }
   }
 

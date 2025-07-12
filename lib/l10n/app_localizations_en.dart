@@ -1704,6 +1704,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetToDefault => 'Reset to Default';
 
   @override
+  String get resetToDefaultsConfirm => 'Are you sure you want to reset all settings to their default values?';
+
+  @override
   String get manageQuickActions => 'Manage Quick Actions';
 
   @override
@@ -6193,7 +6196,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusOffline => 'Offline';
 
   @override
-  String get selectDownloadFolder => 'Select download folder...';
+  String get selectDownloadFolder => 'Select download folder';
 
   @override
   String get maxFileSizePerFile => 'Maximum file size (per file)';
@@ -6220,7 +6223,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noDownloadPathSetDescription => 'Please select a download folder in the Storage tab to see storage information.';
 
   @override
-  String get enableNotificationsDescription => 'Get notified about transfer events';
+  String get enableNotificationsDescription => 'To receive notifications for pairing and file transfers, you need to enable them in the system settings.';
 
   @override
   String get maxFileSizePerFileDescription => 'Larger files will be automatically rejected';
@@ -6485,4 +6488,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get p2lanOptionEncryptionTransferDesc => 'Use secure encryption protocol for file transfers, slower but more secure';
+
+  @override
+  String get securityAndEncryption => 'Security & Encryption';
+
+  @override
+  String get security => 'Security';
+
+  @override
+  String get p2lanOptionEncryptionNoneDesc => 'NoneNo encryption (fastest transfer)';
+
+  @override
+  String get p2lanOptionEncryptionAesGcmDesc => 'Strong encryption, best for high-end devices with hardware acceleration';
+
+  @override
+  String get p2lanOptionEncryptionChaCha20Desc => 'Optimized for mobile devices, better performance';
+
+  @override
+  String get p2lanOptionEncryptionNoneAbout => 'Data is transferred without encryption. This provides the fastest transfer speeds but offers no security protection. Only use this on trusted networks.';
+
+  @override
+  String get p2lanOptionEncryptionAesGcmAbout => 'AES-256-GCM is a widely used encryption standard that provides strong security. It is best suited for high-end devices with hardware acceleration, but may be slower on older or low-end Android devices.';
+
+  @override
+  String get p2lanOptionEncryptionChaCha20About => 'ChaCha20-Poly1305 is a modern encryption algorithm designed for both security and speed, especially on mobile devices.\nIt is recommended for most Android devices because it works efficiently even without hardware acceleration, providing strong protection with better performance than AES on many phones.';
+
+  @override
+  String get storagePermissionRequired => 'Storage permission is required to select custom folder';
 }

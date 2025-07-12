@@ -14,6 +14,7 @@ import 'package:setpocket/widgets/generic/option_slider.dart';
 import 'package:setpocket/widgets/generic/option_list_picker.dart';
 import 'package:setpocket/widgets/generic/option_item.dart';
 import 'package:setpocket/widgets/generic/permission_info_dialog.dart';
+import 'package:setpocket/screens/p2lan_transfer/encryption_settings_section.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 
 class P2LanTransferSettingsLayout extends StatefulWidget {
@@ -62,7 +63,7 @@ class _P2LanTransferSettingsLayoutState
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _displayNameController = TextEditingController();
     _currentSettings =
         widget.currentSettings?.copyWith() ?? _createDefaultSettings();
@@ -131,6 +132,7 @@ class _P2LanTransferSettingsLayoutState
       enableNotifications: false, // Default to disable notifications
       createSenderFolders: false, // Default to date folders
       rememberBatchExpandState: false, // Default to false to save resources
+      encryptionType: EncryptionType.none, // Default to no encryption
     );
   }
 
@@ -196,16 +198,16 @@ class _P2LanTransferSettingsLayoutState
   }
 
   void _resetToDefaults() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset to Defaults'),
-        content: const Text(
-            'Are you sure you want to reset all settings to their default values?'),
+        title: Text(l10n.resetToDefaults),
+        content: Text(l10n.resetToDefaultsConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -216,7 +218,7 @@ class _P2LanTransferSettingsLayoutState
               });
               _initializeDefaultPath();
             },
-            child: const Text('Reset'),
+            child: Text(l10n.reset),
           ),
         ],
       ),
@@ -250,6 +252,9 @@ class _P2LanTransferSettingsLayoutState
               Tab(
                   text: l10n.settingsTabNetwork,
                   icon: const Icon(Icons.network_check, size: 18)),
+              Tab(
+                  text: l10n.security,
+                  icon: const Icon(Icons.security, size: 18)),
             ],
             labelStyle: TextStyle(fontSize: widget.isCompact ? 12 : 14),
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -264,6 +269,7 @@ class _P2LanTransferSettingsLayoutState
               _buildGenericTab(),
               _buildStorageTab(),
               _buildNetworkTab(),
+              _buildSecurityTab(),
             ],
           ),
         ),
@@ -309,54 +315,10 @@ class _P2LanTransferSettingsLayoutState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader(l10n.deviceProfile, Icons.person),
+          _buildSectionHeader(l10n.deviceName, Icons.person),
           const SizedBox(height: 16),
-
-          // Display name customization
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.displayName,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.displayNameDescription,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _displayNameController,
-                    decoration: InputDecoration(
-                      labelText: l10n.deviceDisplayNameLabel,
-                      hintText: l10n.deviceDisplayNameHint,
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.edit),
-                      helperText: l10n.defaultDisplayName(_currentDeviceName),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _customDisplayName = value;
-                      });
-                      _markChanged();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-
+          _buildDisplayNameField(l10n),
           const SizedBox(height: 24),
-
-          // User Preferences
           _buildSectionHeader(l10n.userPreferences, Icons.settings),
           const SizedBox(height: 16),
 
@@ -397,24 +359,6 @@ class _P2LanTransferSettingsLayoutState
                 _markChanged();
               },
               secondary: const Icon(Icons.expand_more),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Encryption Transfer
-          Card(
-            child: SwitchListTile.adaptive(
-              title: Text(l10n.p2lanOptionEncryptionTransfer),
-              subtitle: Text(l10n.p2lanOptionEncryptionTransferDesc),
-              value: _currentSettings.enableEncryption,
-              onChanged: (value) {
-                setState(() {
-                  _currentSettings.enableEncryption = value;
-                });
-                _markChanged();
-              },
-              secondary: const Icon(Icons.security),
             ),
           ),
 
@@ -519,6 +463,27 @@ class _P2LanTransferSettingsLayoutState
               color: Theme.of(context).colorScheme.secondaryContainer,
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSecurityTab() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(widget.isCompact ? 12 : 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          EncryptionSettingsSection(
+            currentEncryptionType: _currentSettings.encryptionType,
+            onEncryptionTypeChanged: (encryptionType) {
+              setState(() {
+                _currentSettings.encryptionType = encryptionType;
+              });
+              _markChanged();
+            },
+            isCompact: widget.isCompact,
+          ),
         ],
       ),
     );
@@ -915,23 +880,25 @@ class _P2LanTransferSettingsLayoutState
 
   void _selectDownloadPath() async {
     String? path;
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       if (Platform.isAndroid) {
         final androidInfo = await DeviceInfoPlugin().androidInfo;
         if (androidInfo.version.sdkInt >= 30) {
           path = await FilePicker.platform.getDirectoryPath(
-            dialogTitle: 'Select Download Folder',
+            dialogTitle: l10n.selectDownloadFolder,
           );
         } else {
           if (await Permission.storage.request().isGranted) {
             path = await FilePicker.platform.getDirectoryPath(
-              dialogTitle: 'Select Download Folder',
+              dialogTitle: l10n.selectDownloadFolder,
             );
           } else {
             if (mounted) {
               SnackbarUtils.showTyped(
                 context,
-                'Storage permission is required to select custom folder',
+                l10n.storagePermissionRequired,
                 SnackBarType.warning,
               );
             }
@@ -940,7 +907,7 @@ class _P2LanTransferSettingsLayoutState
         }
       } else {
         path = await FilePicker.platform.getDirectoryPath(
-          dialogTitle: 'Select Download Folder',
+          dialogTitle: l10n.selectDownloadFolder,
         );
       }
 
@@ -962,6 +929,7 @@ class _P2LanTransferSettingsLayoutState
   }
 
   Future<void> _handleNotificationToggle(bool enable) async {
+    final l10n = AppLocalizations.of(context)!;
     // Prevent changing the value optimistically in the UI before permission is known
     // The `setState` calls within this function will handle the final state.
     if (enable) {
@@ -982,10 +950,9 @@ class _P2LanTransferSettingsLayoutState
             context: context,
             builder: (BuildContext dialogContext) {
               return PermissionInfoDialog(
-                title: 'Enable Notifications',
-                content:
-                    'To receive notifications for pairing and file transfers, you need to enable them in the system settings.',
-                actionText: 'Open Settings',
+                title: l10n.enableNotifications,
+                content: l10n.enableNotificationsDescription,
+                actionText: l10n.openSettings,
                 onActionPressed: () {
                   P2PNotificationService.instance.openNotificationSettings();
                 },
@@ -1116,5 +1083,48 @@ class _P2LanTransferSettingsLayoutState
       return l10n.unlimited;
     }
     return _currentSettings.maxConcurrentTasks.toString();
+  }
+
+  Widget _buildDisplayNameField(AppLocalizations l10n) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.displayName,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.displayNameDescription,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _displayNameController,
+              decoration: InputDecoration(
+                labelText: l10n.deviceDisplayNameLabel,
+                hintText: l10n.deviceDisplayNameHint,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.edit),
+                helperText: l10n.defaultDisplayName(_currentDeviceName),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _customDisplayName = value;
+                });
+                _markChanged();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

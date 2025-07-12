@@ -636,6 +636,7 @@
     "toolVisibilityChanged": "Tool visibility and order have been updated.",
     "errorMinOneTool": "At least one tool must be visible.",
     "resetToDefault": "Reset to Default",
+    "resetToDefaultsConfirm": "Are you sure you want to reset all settings to their default values?",
     "manageQuickActions": "Manage Quick Actions",
     "manageQuickActionsDesc": "Configure shortcuts for quick access to tools",
     "quickActionsDialogTitle": "Quick Actions",
@@ -3012,13 +3013,7 @@
         "description": "Section header for user preferences"
     },
     "enableNotifications": "Enable notifications",
-    "@enableNotifications": {
-        "description": "Setting to enable notifications"
-    },
     "userInterfacePerformance": "User Interface Performance",
-    "@userInterfacePerformance": {
-        "description": "Section header for UI performance settings"
-    },
     "uiRefreshRate": "UI Refresh Rate",
     "@uiRefreshRate": {
         "description": "Label for UI refresh rate setting"
@@ -3552,7 +3547,7 @@
     "notConnected": "Not connected",
     "downloadLocation": "Download Location",
     "downloadFolder": "Download Folder",
-    "selectDownloadFolder": "Select download folder...",
+    "selectDownloadFolder": "Select download folder",
     "sizeLimits": "Size Limits",
     "maxFileSizePerFile": "Maximum file size (per file)",
     "transferProtocol": "Transfer Protocol",
@@ -3571,7 +3566,7 @@
     "storageInfo": "Storage Information",
     "noDownloadPathSet": "No Download Path Set",
     "noDownloadPathSetDescription": "Please select a download folder in the Storage tab to see storage information.",
-    "enableNotificationsDescription": "Get notified about transfer events",
+    "enableNotificationsDescription": "To receive notifications for pairing and file transfers, you need to enable them in the system settings.",
     "currentConfiguration": "Current Configuration",
     "maxFileSizePerFileDescription": "Larger files will be automatically rejected",
     "maxTotalSize": "Maximum total size (per transfer batch)",
@@ -3716,5 +3711,14 @@
     "p2lanOptionRememberBatchExpandState": "Remember Batch Expand State",
     "p2lanOptionRememberBatchExpandStateDesc": "Remember the expand state of each batch when the app is closed and reopened",
     "p2lanOptionEncryptionTransfer": "Encryption Transfer",
-    "p2lanOptionEncryptionTransferDesc": "Use secure encryption protocol for file transfers, slower but more secure"
+    "p2lanOptionEncryptionTransferDesc": "Use secure encryption protocol for file transfers, slower but more secure",
+    "securityAndEncryption": "Security & Encryption",
+    "security": "Security",
+    "p2lanOptionEncryptionNoneDesc": "NoneNo encryption (fastest transfer)",
+    "p2lanOptionEncryptionAesGcmDesc": "Strong encryption, best for high-end devices with hardware acceleration",
+    "p2lanOptionEncryptionChaCha20Desc": "Optimized for mobile devices, better performance",
+    "p2lanOptionEncryptionNoneAbout": "Data is transferred without encryption. This provides the fastest transfer speeds but offers no security protection. Only use this on trusted networks.",
+    "p2lanOptionEncryptionAesGcmAbout": "AES-256-GCM is a widely used encryption standard that provides strong security. It is best suited for high-end devices with hardware acceleration, but may be slower on older or low-end Android devices.",
+    "p2lanOptionEncryptionChaCha20About": "ChaCha20-Poly1305 is a modern encryption algorithm designed for both security and speed, especially on mobile devices.\nIt is recommended for most Android devices because it works efficiently even without hardware acceleration, providing strong protection with better performance than AES on many phones.",
+    "storagePermissionRequired": "Storage permission is required to select custom folder"
   }

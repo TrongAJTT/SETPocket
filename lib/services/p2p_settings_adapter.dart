@@ -24,7 +24,7 @@ class P2PSettingsAdapter {
       uiRefreshRateSeconds: newSettings.uiRefreshRateSeconds,
       enableNotifications: newSettings.enableNotifications,
       rememberBatchExpandState: newSettings.rememberBatchExpandState,
-      enableEncryption: newSettings.enableEncryption,
+      encryptionType: newSettings.encryptionType,
     );
   }
 
@@ -43,9 +43,8 @@ class P2PSettingsAdapter {
       customDisplayName: oldSettings.customDisplayName,
       uiRefreshRateSeconds: oldSettings.uiRefreshRateSeconds,
       enableNotifications: oldSettings.enableNotifications,
-      askBeforeDownload: true, // Default value for new field
       rememberBatchExpandState: oldSettings.rememberBatchExpandState,
-      enableEncryption: oldSettings.enableEncryption,
+      encryptionType: oldSettings.encryptionType,
     );
   }
 
@@ -128,7 +127,7 @@ class P2PSettingsAdapter {
       uiRefreshRateSeconds: 0,
       enableNotifications: true,
       rememberBatchExpandState: false, // Default to false for performance
-      enableEncryption: false, // Default to false for security
+      encryptionType: EncryptionType.none, // Default to no encryption
     );
   }
 
@@ -153,39 +152,5 @@ class P2PSettingsAdapter {
     } catch (e) {
       return true; // If error, assume migration needed
     }
-  }
-
-  /// Create P2PFileStorageSettings from current settings (backward compatibility)
-  static Future<P2PFileStorageSettings> getFileStorageSettings() async {
-    final newSettings =
-        await ExtensibleSettingsService.getP2PTransferSettings();
-
-    return P2PFileStorageSettings(
-      downloadPath: newSettings.downloadPath,
-      askBeforeDownload: newSettings.askBeforeDownload,
-      createDateFolders: newSettings.createDateFolders,
-      maxFileSize: (newSettings.maxReceiveFileSize / (1024 * 1024))
-          .round(), // Convert to MB
-      maxConcurrentTasks: newSettings.maxConcurrentTasks,
-    );
-  }
-
-  /// Update file storage settings (backward compatibility)
-  static Future<void> updateFileStorageSettings(
-      P2PFileStorageSettings fileSettings) async {
-    // Get current settings and update only the relevant fields
-    final currentSettings =
-        await ExtensibleSettingsService.getP2PTransferSettings();
-
-    final updatedSettings = currentSettings.copyWith(
-      downloadPath: fileSettings.downloadPath,
-      askBeforeDownload: fileSettings.askBeforeDownload,
-      createDateFolders: fileSettings.createDateFolders,
-      maxReceiveFileSize:
-          fileSettings.maxFileSize * 1024 * 1024, // Convert MB to bytes
-      maxConcurrentTasks: fileSettings.maxConcurrentTasks,
-    );
-
-    await ExtensibleSettingsService.updateP2PTransferSettings(updatedSettings);
   }
 }

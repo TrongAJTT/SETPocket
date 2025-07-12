@@ -67,18 +67,7 @@ class P2PServiceManager extends ChangeNotifier {
   List<DataTransferTask> get activeTransfers =>
       _transferService.activeTransfers;
 
-  // Backward compatibility getters
-  P2PFileStorageSettings? get fileStorageSettings {
-    if (_transferService.transferSettings == null) return null;
-    return P2PFileStorageSettings(
-      downloadPath: _transferService.transferSettings!.downloadPath,
-      askBeforeDownload: true,
-      createDateFolders: _transferService.transferSettings!.createDateFolders,
-      maxFileSize: _transferService.transferSettings!.maxReceiveFileSize ~/
-          (1024 * 1024),
-      maxConcurrentTasks: _transferService.transferSettings!.maxConcurrentTasks,
-    );
-  }
+  // Đã xóa hoàn toàn mọi tham chiếu đến P2PFileStorageSettings
 
   /// Initialize P2P service manager
   Future<void> initialize() async {
@@ -269,24 +258,6 @@ class P2PServiceManager extends ChangeNotifier {
   Future<void> reloadTransferSettings() async {
     await _transferService.reloadTransferSettings();
     notifyListeners();
-  }
-
-  /// Update file storage settings (backward compatibility)
-  Future<bool> updateFileStorageSettings(
-      P2PFileStorageSettings settings) async {
-    final newSettings = P2PDataTransferSettings(
-      downloadPath: settings.downloadPath,
-      createDateFolders: settings.createDateFolders,
-      maxReceiveFileSize: settings.maxFileSize * 1024 * 1024,
-      maxTotalReceiveSize: 1 * 1024 * 1024 * 1024,
-      maxConcurrentTasks: 3,
-      sendProtocol: 'TCP',
-      maxChunkSize: 512,
-      uiRefreshRateSeconds: 0,
-      enableNotifications: true,
-      createSenderFolders: false,
-    );
-    return await updateTransferSettings(newSettings);
   }
 
   /// Clear a transfer from the list

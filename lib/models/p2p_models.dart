@@ -45,6 +45,12 @@ enum FileTransferRejectReason {
   unknown,
 }
 
+enum EncryptionType {
+  none,
+  aesGcm,
+  chaCha20,
+}
+
 @Collection()
 class P2PUser {
   Id get isarId => fastHash(id);
@@ -668,38 +674,7 @@ const String p2pKeepAliveTask = "p2pKeepAliveTask";
 // REMOVED: P2PDataTransferSettings - Merged into ExtensibleSettings as P2PTransferSettingsData
 
 // Backward compatibility aliases - these will be populated by P2PSettingsAdapter
-class P2PFileStorageSettings {
-  String downloadPath;
-  bool askBeforeDownload;
-  bool createDateFolders;
-  int maxFileSize; // in MB
-  int maxConcurrentTasks;
-
-  P2PFileStorageSettings({
-    required this.downloadPath,
-    this.askBeforeDownload = true,
-    this.createDateFolders = false,
-    this.maxFileSize = 100,
-    this.maxConcurrentTasks = 3,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'downloadPath': downloadPath,
-        'askBeforeDownload': askBeforeDownload,
-        'createDateFolders': createDateFolders,
-        'maxFileSize': maxFileSize,
-        'maxConcurrentTasks': maxConcurrentTasks,
-      };
-
-  factory P2PFileStorageSettings.fromJson(Map<String, dynamic> json) =>
-      P2PFileStorageSettings(
-        downloadPath: json['downloadPath'],
-        askBeforeDownload: json['askBeforeDownload'] ?? true,
-        createDateFolders: json['createDateFolders'] ?? false,
-        maxFileSize: json['maxFileSize'] ?? 100,
-        maxConcurrentTasks: json['maxConcurrentTasks'] ?? 3,
-      );
-}
+// Đã xóa class P2PFileStorageSettings và mọi tham chiếu đến askBeforeDownload
 
 class P2PDataTransferSettings {
   String downloadPath;
@@ -714,7 +689,7 @@ class P2PDataTransferSettings {
   int uiRefreshRateSeconds;
   bool enableNotifications;
   bool rememberBatchExpandState;
-  bool enableEncryption;
+  EncryptionType encryptionType;
 
   P2PDataTransferSettings({
     required this.downloadPath,
@@ -729,13 +704,16 @@ class P2PDataTransferSettings {
     this.enableNotifications = true,
     this.createSenderFolders = false,
     this.rememberBatchExpandState = false,
-    this.enableEncryption = false,
+    this.encryptionType = EncryptionType.none,
   });
 
   // Helper getters for UI display
   double get maxReceiveFileSizeInMB => maxReceiveFileSize / (1024 * 1024);
   double get maxTotalReceiveSizeInGB =>
       maxTotalReceiveSize / (1024 * 1024 * 1024);
+
+  // Backward compatibility getter
+  bool get enableEncryption => encryptionType != EncryptionType.none;
 
   P2PDataTransferSettings copyWith({
     String? downloadPath,
@@ -750,7 +728,7 @@ class P2PDataTransferSettings {
     bool? enableNotifications,
     bool? createSenderFolders,
     bool? rememberBatchExpandState,
-    bool? enableEncryption,
+    EncryptionType? encryptionType,
   }) {
     return P2PDataTransferSettings(
       downloadPath: downloadPath ?? this.downloadPath,
@@ -766,7 +744,7 @@ class P2PDataTransferSettings {
       createSenderFolders: createSenderFolders ?? this.createSenderFolders,
       rememberBatchExpandState:
           rememberBatchExpandState ?? this.rememberBatchExpandState,
-      enableEncryption: enableEncryption ?? this.enableEncryption,
+      encryptionType: encryptionType ?? this.encryptionType,
     );
   }
 
@@ -784,7 +762,7 @@ class P2PDataTransferSettings {
       'uiRefreshRateSeconds': uiRefreshRateSeconds,
       'enableNotifications': enableNotifications,
       'rememberBatchExpandState': rememberBatchExpandState,
-      'enableEncryption': enableEncryption,
+      'encryptionType': encryptionType.name,
     };
   }
 
@@ -802,7 +780,14 @@ class P2PDataTransferSettings {
       enableNotifications: json['enableNotifications'] ?? true,
       createSenderFolders: json['createSenderFolders'] ?? false,
       rememberBatchExpandState: json['rememberBatchExpandState'] ?? false,
-      enableEncryption: json['enableEncryption'] ?? false,
+      encryptionType: json['encryptionType'] != null
+          ? EncryptionType.values.firstWhere(
+              (e) => e.name == json['encryptionType'],
+              orElse: () => EncryptionType.none,
+            )
+          : (json['enableEncryption'] == true
+              ? EncryptionType.aesGcm
+              : EncryptionType.none),
     );
   }
 }

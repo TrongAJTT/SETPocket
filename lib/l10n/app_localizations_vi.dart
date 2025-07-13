@@ -12,10 +12,91 @@ class AppLocalizationsVi extends AppLocalizations {
   String get title => 'SETPocket';
 
   @override
+  String get version => 'Phiên bản';
+
+  @override
+  String get versionInfo => 'Thông tin phiên bản';
+
+  @override
+  String get versionNumber => 'Số phiên bản';
+
+  @override
+  String get appVersion => 'Phiên bản ứng dụng';
+
+  @override
+  String get versionType => 'Loại phiên bản';
+
+  @override
+  String get versionTypeDev => 'Dev';
+
+  @override
+  String get versionTypeBeta => 'Beta';
+
+  @override
+  String get versionTypeRelease => 'Release';
+
+  @override
+  String get versionTypeDevDisplay => 'Phiên bản phát triển';
+
+  @override
+  String get versionTypeBetaDisplay => 'Phiên bản thử nghiệm';
+
+  @override
+  String get versionTypeReleaseDisplay => 'Phiên bản chính thức';
+
+  @override
+  String get githubRepo => 'Kho lưu trữ GitHub';
+
+  @override
+  String get githubRepoDesc => 'Xem mã nguồn của ứng dụng trên GitHub.';
+
+  @override
+  String get creditAck => 'Ghi công và Lời cảm ơn';
+
+  @override
+  String get creditAckDesc => 'Danh sách các thư viện, công cụ và nguồn tài nguyên đã sử dụng trong ứng dụng này.';
+
+  @override
+  String get support => 'Hỗ trợ';
+
+  @override
+  String get supportDesc => 'SETPocket được tạo ra nhằm giúp đỡ mọi người thực hiện các tác vụ hằng ngày một cách dễ dàng hơn. Nếu bạn thấy ứng dụng hữu ích, hãy cân nhắc hỗ trợ mình để giúp mình duy trì và phát triển ứng dụng này. Cảm ơn bạn rất nhiều!';
+
+  @override
+  String get supportOnGitHub => 'Hỗ trợ trên GitHub';
+
+  @override
+  String get buyMeCoffee => 'Ủng hộ mình một ly cà phê';
+
+  @override
+  String get donate => 'Ủng hộ';
+
+  @override
+  String get donateDesc => 'Hỗ trợ mình nếu bạn thấy ứng dụng hữu ích.';
+
+  @override
+  String get oneTimeDonation => 'Ủng hộ một lần';
+
+  @override
+  String get platform => 'Platform';
+
+  @override
   String get settings => 'Cài đặt';
 
   @override
+  String get view => 'Xem';
+
+  @override
+  String get viewMode => 'Chế độ xem';
+
+  @override
   String get theme => 'Chủ đề';
+
+  @override
+  String get single => 'Đơn';
+
+  @override
+  String get all => 'Tất cả';
 
   @override
   String get language => 'Ngôn ngữ';

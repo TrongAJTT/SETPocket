@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:setpocket/utils/function_type_utils.dart';
 import 'package:setpocket/widgets/generic/generic_settings_helper.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/screens/about_layout.dart';
 import 'package:setpocket/screens/p2lan_transfer/p2lan_transfer_settings_layout.dart';
 import 'package:setpocket/screens/random_tools/random_tools_settings_layout.dart';
 import 'package:setpocket/screens/converter_tools/converter_tools_settings_layout.dart';
@@ -609,5 +610,33 @@ class GenericSettingsUtils {
         );
       }
     }
+  }
+
+  /// Navigate to About screen using platform-adaptive behavior.
+  ///
+  /// **Behavior:**
+  /// - Desktop: Opens dialog window with padding
+  /// - Mobile/Tablet: Full-screen navigation
+  ///
+  /// **Use Cases:**
+  /// - About information access from app bars or main menus
+  /// - Displaying app version, credits, and external links
+  /// - When you want automatic platform-appropriate presentation
+  ///
+  /// **Parameters:**
+  /// - [context]: Build context for navigation
+  static void navigateAbout(BuildContext context) {
+    final config = GenericSettingsConfig<dynamic>(
+      title: 'About',
+      settingsLayout: const AboutLayout(),
+      currentSettings: null,
+      onSettingsChanged: (_) {}, // No settings to change for About
+      showActions: false, // No save/cancel buttons needed
+      isCompact: false,
+      barrierDismissible: true,
+      padding: const EdgeInsets.all(16), // Add padding for desktop dialog
+    );
+
+    GenericSettingsHelper.showSettings(context, config);
   }
 }

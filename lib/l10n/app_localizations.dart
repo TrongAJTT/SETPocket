@@ -101,17 +101,179 @@ abstract class AppLocalizations {
   /// **'SETPocket'**
   String get title;
 
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @versionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Version Information'**
+  String get versionInfo;
+
+  /// No description provided for @versionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Version Number'**
+  String get versionNumber;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'App Version'**
+  String get appVersion;
+
+  /// No description provided for @versionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Version Type'**
+  String get versionType;
+
+  /// No description provided for @versionTypeDev.
+  ///
+  /// In en, this message translates to:
+  /// **'Development'**
+  String get versionTypeDev;
+
+  /// No description provided for @versionTypeBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get versionTypeBeta;
+
+  /// No description provided for @versionTypeRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Release'**
+  String get versionTypeRelease;
+
+  /// No description provided for @versionTypeDevDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Development Version'**
+  String get versionTypeDevDisplay;
+
+  /// No description provided for @versionTypeBetaDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta Version'**
+  String get versionTypeBetaDisplay;
+
+  /// No description provided for @versionTypeReleaseDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Release Version'**
+  String get versionTypeReleaseDisplay;
+
+  /// No description provided for @githubRepo.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub Repository'**
+  String get githubRepo;
+
+  /// No description provided for @githubRepoDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'View source code of the application on GitHub'**
+  String get githubRepoDesc;
+
+  /// No description provided for @creditAck.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits & Acknowledgements'**
+  String get creditAck;
+
+  /// No description provided for @creditAckDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Libraries and resources used in this app'**
+  String get creditAckDesc;
+
+  /// No description provided for @support.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// No description provided for @supportDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'SETPocket helps you with daily tasks. If you find it useful, consider supporting me to maintain and improve it. Thank you very much!'**
+  String get supportDesc;
+
+  /// No description provided for @supportOnGitHub.
+  ///
+  /// In en, this message translates to:
+  /// **'Support on GitHub'**
+  String get supportOnGitHub;
+
+  /// No description provided for @buyMeCoffee.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Me a Coffee'**
+  String get buyMeCoffee;
+
+  /// No description provided for @donate.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate'**
+  String get donate;
+
+  /// No description provided for @donateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support me if you find this app useful'**
+  String get donateDesc;
+
+  /// No description provided for @oneTimeDonation.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time Donation'**
+  String get oneTimeDonation;
+
+  /// No description provided for @platform.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform'**
+  String get platform;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @view.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get view;
+
+  /// No description provided for @viewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'View Mode'**
+  String get viewMode;
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:
   /// **'Theme'**
   String get theme;
+
+  /// No description provided for @single.
+  ///
+  /// In en, this message translates to:
+  /// **'Single'**
+  String get single;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
 
   /// No description provided for @language.
   ///

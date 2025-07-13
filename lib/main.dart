@@ -15,6 +15,7 @@ import 'package:setpocket/services/settings_models_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
 import 'package:setpocket/services/app_installation_service.dart';
+import 'package:setpocket/utils/generic_settings_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/text_template/text_template_list_screen.dart';
@@ -50,19 +51,19 @@ void callbackDispatcher() {
 
       // Only log the execution - no notifications unless explicitly requested
       if (!silentMode || showNotification) {
-        print('📱 Background KeepAlive: $taskInfo at $now');
+        logInfo('📱 Background KeepAlive: $taskInfo at $now');
       }
 
       // Perform minimal work - just prove the app is alive
       // No network calls, no heavy processing, just a simple heartbeat
 
       if (!silentMode) {
-        print('✅ Background KeepAlive completed successfully');
+        logInfo('✅ Background KeepAlive completed successfully');
       }
       return Future.value(true);
     } catch (e) {
       // Always log errors regardless of silent mode
-      print('❌ Background KeepAlive failed: $e');
+      logInfo('❌ Background KeepAlive failed: $e');
       return Future.value(false);
     }
   });
@@ -481,8 +482,18 @@ class MobileLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.title)),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => _showAbout(context),
+            tooltip: l10n.about,
+          ),
+        ],
+      ),
       body: const ToolSelectionScreen(),
     );
   }
@@ -738,6 +749,7 @@ class _DesktopLayoutState extends State<DesktopLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -758,6 +770,16 @@ class _DesktopLayoutState extends State<DesktopLayout> {
                     : 'Back to main menu',
               )
             : null,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: const Icon(Icons.info_outline),
+              onPressed: () => _showAbout(context),
+              tooltip: l10n.about,
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -1189,8 +1211,9 @@ class _ToolSelectionScreenState extends State<ToolSelectionScreen> {
       final tool = MainSettingsScreen(
         isEmbedded: widget.isDesktop,
         onToolVisibilityChanged: widget.onToolVisibilityChanged,
-        // Go directly to the detailed view
+        // Go directly to the detailed view with full layout
         initialSectionId: 'user_interface',
+        forceFullLayout: true, // Force full scrolling layout even on mobile
       );
       if (widget.isDesktop) {
         widget.onToolSelected?.call(
@@ -1525,4 +1548,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 Future<void> _clearAllDrafts() async {
   // Clearing drafts is no longer necessary as they are part of the main text template data
   // with a 'draft' status. This can be handled by the TemplateService if needed.
+}
+
+void _showAbout(BuildContext context) {
+  GenericSettingsUtils.navigateAbout(context);
 }

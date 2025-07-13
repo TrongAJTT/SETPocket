@@ -31,6 +31,9 @@ class GenericSettingsConfig<T> {
   /// Whether dialog is dismissible
   final bool barrierDismissible;
 
+  /// Padding for the content container
+  final EdgeInsets? padding;
+
   const GenericSettingsConfig({
     required this.title,
     required this.settingsLayout,
@@ -41,6 +44,7 @@ class GenericSettingsConfig<T> {
     this.isCompact = false,
     this.preferredSize,
     this.barrierDismissible = false,
+    this.padding,
   });
 }
 
@@ -108,6 +112,7 @@ class GenericSettingsHelper {
         title: config.title,
         preferredSize: config.preferredSize,
         settingsLayout: config.settingsLayout,
+        padding: config.padding,
       ),
     );
   }
@@ -163,6 +168,7 @@ class GenericSettingsHelper {
           title: 'Quick ${config.title}',
           preferredSize: quickSize ?? const Size(600, 500),
           settingsLayout: config.settingsLayout,
+          padding: config.padding,
         ),
       );
     } else {

@@ -1,7 +1,7 @@
 name: setpocket
 description: SETPocket - A comprehensive toolkit for everyday utilities
 publish_to: 'none'
-version: 0.5.0+1 # internal beta
+version: 0.5.0+1 # Beta Insider
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -28,6 +28,8 @@ dependencies:
   # hive_flutter: ^1.1.0  # Commented out - migrated to Isar
   window_manager: ^0.5.0
   flutter_colorpicker: ^1.1.0
+  package_info_plus: ^7.0.0
+  url_launcher: ^6.2.4
   # P2P Data Transfer dependencies
   connectivity_plus: ^6.0.5
   network_info_plus: ^5.0.3

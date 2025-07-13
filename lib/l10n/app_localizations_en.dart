@@ -12,10 +12,91 @@ class AppLocalizationsEn extends AppLocalizations {
   String get title => 'SETPocket';
 
   @override
+  String get version => 'Version';
+
+  @override
+  String get versionInfo => 'Version Information';
+
+  @override
+  String get versionNumber => 'Version Number';
+
+  @override
+  String get appVersion => 'App Version';
+
+  @override
+  String get versionType => 'Version Type';
+
+  @override
+  String get versionTypeDev => 'Development';
+
+  @override
+  String get versionTypeBeta => 'Beta';
+
+  @override
+  String get versionTypeRelease => 'Release';
+
+  @override
+  String get versionTypeDevDisplay => 'Development Version';
+
+  @override
+  String get versionTypeBetaDisplay => 'Beta Version';
+
+  @override
+  String get versionTypeReleaseDisplay => 'Release Version';
+
+  @override
+  String get githubRepo => 'GitHub Repository';
+
+  @override
+  String get githubRepoDesc => 'View source code of the application on GitHub';
+
+  @override
+  String get creditAck => 'Credits & Acknowledgements';
+
+  @override
+  String get creditAckDesc => 'Libraries and resources used in this app';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get supportDesc => 'SETPocket helps you with daily tasks. If you find it useful, consider supporting me to maintain and improve it. Thank you very much!';
+
+  @override
+  String get supportOnGitHub => 'Support on GitHub';
+
+  @override
+  String get buyMeCoffee => 'Buy Me a Coffee';
+
+  @override
+  String get donate => 'Donate';
+
+  @override
+  String get donateDesc => 'Support me if you find this app useful';
+
+  @override
+  String get oneTimeDonation => 'One-time Donation';
+
+  @override
+  String get platform => 'Platform';
+
+  @override
   String get settings => 'Settings';
 
   @override
+  String get view => 'View';
+
+  @override
+  String get viewMode => 'View Mode';
+
+  @override
   String get theme => 'Theme';
+
+  @override
+  String get single => 'Single';
+
+  @override
+  String get all => 'All';
 
   @override
   String get language => 'Language';

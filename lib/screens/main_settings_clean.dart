@@ -132,10 +132,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       title: widget.isEmbedded ? null : loc.settings,
       isEmbedded: widget.isEmbedded,
       sections: _buildSections(loc),
-      showViewToggle: true,
-      onSectionChanged: (sectionId) {
-        // Handle section selection if needed
-      },
     );
   }
 
@@ -145,9 +141,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       SectionItem(
         id: 'interface',
         title: loc.userInterface,
-        subtitle: 'Theme, language & display preferences',
-        icon: Icons.palette_outlined,
-        iconColor: Colors.blue.shade600,
+        icon: Icons.palette,
         content: UserInterfaceSettings(
           initialThemeMode: _themeMode,
           initialLanguage: _language,
@@ -160,9 +154,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       SectionItem(
         id: 'tools',
         title: loc.toolsShortcuts,
-        subtitle: 'Configure tools visibility & quick actions',
-        icon: Icons.build_outlined,
-        iconColor: Colors.orange.shade600,
+        icon: Icons.build,
         content: ToolsManagementSettings(
           onToolVisibilityChanged: widget.onToolVisibilityChanged,
         ),
@@ -172,9 +164,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       SectionItem(
         id: 'data',
         title: loc.dataAndStorage,
-        subtitle: 'Cache, logs & data retention settings',
-        icon: Icons.storage_outlined,
-        iconColor: Colors.green.shade600,
+        icon: Icons.storage,
         content: DataManagementSettings(
           initialLogRetentionDays:
               7, // Default value, will be loaded in the widget
@@ -185,9 +175,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
       SectionItem(
         id: 'about',
         title: loc.about,
-        subtitle: 'App version & information',
-        icon: Icons.info_outline,
-        iconColor: Colors.grey.shade600,
+        icon: Icons.info,
         content: const AboutSettings(),
       ),
     ];

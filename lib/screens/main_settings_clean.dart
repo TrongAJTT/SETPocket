@@ -165,7 +165,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         id: 'data',
         title: loc.dataAndStorage,
         icon: Icons.storage,
-        content: DataManagementSettings(
+        content: const DataManagementSettings(
           initialLogRetentionDays:
               7, // Default value, will be loaded in the widget
         ),

@@ -3,6 +3,7 @@ import 'package:setpocket/controllers/converter_controller.dart';
 import 'package:setpocket/models/converter_models/converter_base.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/focus_mode_service.dart';
+import 'package:setpocket/layouts/single_panel_layout.dart';
 import 'generic_unit_custom_dialog.dart';
 import 'converter_card_widget.dart';
 import 'converter_table_widget.dart';
@@ -50,114 +51,116 @@ class _GenericConverterViewState extends State<GenericConverterView> {
     super.dispose();
   }
 
+  /// Build actions for the unified AppBar (excluding info button which is handled by layout)
+  List<Widget> _buildActions(
+      BuildContext context, ConverterController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    final actions = <Widget>[];
+
+    // Mobile: Show customize units button and context menu for other actions
+    if (isMobile) {
+      actions.addAll([
+        IconButton(
+          icon: const Icon(Icons.info),
+          onPressed: widget.onShowInfo ?? () {},
+          tooltip: l10n.info,
+        ),
+        IconButton(
+          icon: const Icon(Icons.tune),
+          onPressed: () => _showGlobalUnitsCustomization(context, controller),
+          tooltip: l10n.customizeUnits,
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
+          tooltip: l10n.moreActions,
+          onSelected: (value) {
+            switch (value) {
+              case 'focus_mode':
+                _toggleFocusMode(context, controller);
+                break;
+              case 'reset_layout':
+                _showResetLayoutConfirmation(context, controller);
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem<String>(
+              value: 'focus_mode',
+              child: Row(
+                children: [
+                  Icon(
+                    controller.isFocusMode
+                        ? Icons.center_focus_weak
+                        : Icons.center_focus_strong,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    controller.isFocusMode
+                        ? l10n.disableFocusMode
+                        : l10n.enableFocusMode,
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<String>(
+              value: 'reset_layout',
+              child: Row(
+                children: [
+                  const Icon(Icons.restart_alt),
+                  const SizedBox(width: 12),
+                  Text(l10n.resetLayout),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ]);
+    }
+    // Desktop/Tablet: Show individual buttons
+    else {
+      actions.addAll([
+        IconButton(
+          icon: Icon(
+            controller.isFocusMode
+                ? Icons.center_focus_weak
+                : Icons.center_focus_strong,
+          ),
+          onPressed: () => _toggleFocusMode(context, controller),
+          tooltip: controller.isFocusMode
+              ? l10n.disableFocusMode
+              : l10n.enableFocusMode,
+        ),
+        IconButton(
+          icon: const Icon(Icons.restart_alt),
+          onPressed: () => _showResetLayoutConfirmation(context, controller),
+          tooltip: l10n.resetLayout,
+        ),
+        IconButton(
+          icon: const Icon(Icons.tune),
+          onPressed: () => _showGlobalUnitsCustomization(context, controller),
+          tooltip: l10n.customizeUnits,
+        ),
+      ]);
+    }
+
+    return actions;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.isEmbedded) {
       return _buildConverterContent(context, widget.controller);
     }
 
-    final l10n = AppLocalizations.of(context)!;
     final displayTitle =
         widget.title ?? widget.controller.converterService.displayName;
-    final isMobile = MediaQuery.of(context).size.width < 600;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text(
-          displayTitle,
-          overflow: TextOverflow.ellipsis,
-        ),
-        actions: [
-          if (widget.onShowInfo != null)
-            IconButton(
-              icon: const Icon(Icons.info_outline),
-              onPressed: widget.onShowInfo,
-              tooltip: '$displayTitle Info',
-            ),
-
-          // Mobile: Show customize units button and context menu for other actions
-          if (isMobile) ...[
-            IconButton(
-              icon: const Icon(Icons.tune),
-              onPressed: () =>
-                  _showGlobalUnitsCustomization(context, widget.controller),
-              tooltip: l10n.customizeUnits,
-            ),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              tooltip: l10n.moreActions,
-              onSelected: (value) {
-                switch (value) {
-                  case 'focus_mode':
-                    _toggleFocusMode(context, widget.controller);
-                    break;
-                  case 'reset_layout':
-                    _showResetLayoutConfirmation(context, widget.controller);
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem<String>(
-                  value: 'focus_mode',
-                  child: Row(
-                    children: [
-                      Icon(
-                        widget.controller.isFocusMode
-                            ? Icons.center_focus_weak
-                            : Icons.center_focus_strong,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        widget.controller.isFocusMode
-                            ? l10n.disableFocusMode
-                            : l10n.enableFocusMode,
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'reset_layout',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.restart_alt),
-                      const SizedBox(width: 12),
-                      Text(l10n.resetLayout),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ]
-          // Desktop/Tablet: Show individual buttons
-          else ...[
-            IconButton(
-              icon: Icon(
-                widget.controller.isFocusMode
-                    ? Icons.center_focus_weak
-                    : Icons.center_focus_strong,
-              ),
-              onPressed: () => _toggleFocusMode(context, widget.controller),
-              tooltip: widget.controller.isFocusMode
-                  ? l10n.disableFocusMode
-                  : l10n.enableFocusMode,
-            ),
-            IconButton(
-              icon: const Icon(Icons.restart_alt),
-              onPressed: () =>
-                  _showResetLayoutConfirmation(context, widget.controller),
-              tooltip: l10n.resetLayout,
-            ),
-            IconButton(
-              icon: const Icon(Icons.tune),
-              onPressed: () =>
-                  _showGlobalUnitsCustomization(context, widget.controller),
-              tooltip: l10n.customizeUnits,
-            ),
-          ],
-        ],
-      ),
-      body: _buildConverterContent(context, widget.controller),
+    // Use SinglePanelLayout with unified actions
+    return SinglePanelLayout(
+      title: displayTitle,
+      actions: _buildActions(context, widget.controller),
+      child: _buildConverterContent(context, widget.controller),
     );
   }
 

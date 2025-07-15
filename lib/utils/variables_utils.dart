@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/variables.dart';
 
@@ -23,4 +24,17 @@ extension VersionTypeExtension on VersionType {
         return l10n.versionTypeDev;
     }
   }
+}
+
+String getScreenTitle(String? title) {
+  return title ?? appName;
+}
+
+bool isMobileLayoutContext(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  return isMobileLayout(screenWidth);
+}
+
+bool isMobileLayout(double screenWidth) {
+  return screenWidth < tabletScreenWidthThreshold;
 }

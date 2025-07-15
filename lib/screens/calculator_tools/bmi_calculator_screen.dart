@@ -34,6 +34,29 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  /// Build actions cho main panel (clear history button)
+  List<Widget> _buildMainPanelActions() {
+    final actions = <Widget>[];
+
+    // Chỉ add clear history action nếu có history
+    if (_historyCount > 1) {
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.delete_sweep_outlined),
+          tooltip: 'Xóa tất cả lịch sử',
+          onPressed: () => _showClearAllConfirmation(context),
+        ),
+      );
+    }
+
+    return actions;
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Reload history when returning to this screen (e.g., from settings)
@@ -66,15 +89,8 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
           : null,
       mainPanelTitle: l10n.bmiCalculator,
       rightPanelTitle: l10n.bookmark,
-      rightPanelActions: [
-        if (_historyCount > 1)
-          IconButton(
-            icon: const Icon(Icons.delete_sweep_outlined),
-            tooltip: l10n.clearAll, // Using hardcoded text
-            onPressed: () => _showClearAllConfirmation(context),
-          )
-      ],
-      onShowInfo: () => _showBmiInfo(context),
+      mainPanelActions: _buildMainPanelActions(), // Unified actions!
+      // onShowInfo: () => _showBmiInfo(context),
     );
   }
 

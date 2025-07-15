@@ -239,6 +239,12 @@ abstract class AppLocalizations {
   /// **'Platform'**
   String get platform;
 
+  /// No description provided for @routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine'**
+  String get routine;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:

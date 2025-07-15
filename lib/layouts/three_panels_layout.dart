@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/layouts/base_responsive_layout.dart';
+import 'package:setpocket/utils/variables_utils.dart';
 
 class ThreePanelLayout extends StatefulWidget {
   final Widget mainPanel;
@@ -43,8 +45,31 @@ class ThreePanelLayout extends StatefulWidget {
 }
 
 class _ThreePanelLayoutState extends State<ThreePanelLayout>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, BaseResponsiveLayout {
   late TabController _tabController;
+
+  @override
+  bool hasInitialized = false;
+
+  @override
+  void syncMobileAppBar() {
+    if (isMobileLayoutContext(context)) {
+      // Collect all actions from both panels
+      List<Widget> allActions = [];
+
+      if (widget.mainPanelActions != null && _tabController.index == 0) {
+        allActions.addAll(widget.mainPanelActions!);
+      }
+      if (widget.topRightPanelActions != null && _tabController.index == 1) {
+        allActions.addAll(widget.topRightPanelActions!);
+      }
+      if (widget.bottomRightPanelActions != null && _tabController.index == 2) {
+        allActions.addAll(widget.bottomRightPanelActions!);
+      }
+    } else {
+      print('📵 ThreePanelsLayout: Not syncing (desktop)');
+    }
+  }
 
   @override
   void initState() {
@@ -515,19 +540,25 @@ class _ThreePanelLayoutState extends State<ThreePanelLayout>
           child: TabBarView(
             controller: _tabController,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: widget.mainPanel,
+              AutomaticKeepAlive(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: widget.mainPanel,
+                ),
               ),
               if (hasTopRightPanel)
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: widget.topRightPanel,
+                AutomaticKeepAlive(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: widget.topRightPanel,
+                  ),
                 ),
               if (hasBottomRightPanel)
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: widget.bottomRightPanel!,
+                AutomaticKeepAlive(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: widget.bottomRightPanel!,
+                  ),
                 ),
             ],
           ),

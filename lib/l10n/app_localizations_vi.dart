@@ -78,7 +78,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get oneTimeDonation => 'Ủng hộ một lần';
 
   @override
-  String get platform => 'Platform';
+  String get platform => 'Nền tảng';
+
+  @override
+  String get routine => 'Thường nhật';
 
   @override
   String get settings => 'Cài đặt';

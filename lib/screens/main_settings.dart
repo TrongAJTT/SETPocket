@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/controllers/mobile_appbar_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:setpocket/main.dart';
@@ -83,6 +84,15 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     }
   }
 
+  void _handleMobileAppbar() {
+    final loc = AppLocalizations.of(context)!;
+    final controller = MobileAppBarController();
+    controller.setAppBar(
+      title: loc.settings,
+      showBackButton: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -103,6 +113,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         !widget.isEmbedded &&
         widget.initialSectionId == null &&
         !widget.forceFullLayout) {
+      // _handleMobileAppbar();
       return MobileSectionSelectionScreen(
         title: loc.settings,
         sections: _buildSections(loc),
@@ -121,6 +132,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
     // For single section display (mobile navigation)
     if (widget.initialSectionId != null) {
+      _handleMobileAppbar();
       return SingleSectionDisplayScreen(
         sectionId: widget.initialSectionId!,
         sections: _buildSections(loc),
@@ -175,7 +187,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
         subtitle: 'Cache, logs & data retention settings',
         icon: Icons.storage_outlined,
         iconColor: Colors.green.shade600,
-        content: DataManagementSettings(
+        content: const DataManagementSettings(
           initialLogRetentionDays:
               7, // Default value, will be loaded in the widget
         ),

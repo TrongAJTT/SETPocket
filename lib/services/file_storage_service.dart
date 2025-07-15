@@ -3,6 +3,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:setpocket/services/app_logger.dart';
+import 'package:setpocket/variables.dart';
 
 class FileStorageService {
   static FileStorageService? _instance;
@@ -41,22 +42,22 @@ class FileStorageService {
   /// Get default public downloads directory
   String getPublicDownloadsDirectory() {
     if (Platform.isAndroid) {
-      return '/storage/emulated/0/Download/SetPocket';
+      return '/storage/emulated/0/Download/$appName';
     } else if (Platform.isWindows) {
-      return '${Platform.environment['USERPROFILE']}\\Downloads\\SetPocket';
+      return '${Platform.environment['USERPROFILE']}\\Downloads\\$appName';
     } else if (Platform.isMacOS) {
-      return '${Platform.environment['HOME']}/Downloads/SetPocket';
+      return '${Platform.environment['HOME']}/Downloads/$appName';
     } else if (Platform.isLinux) {
-      return '${Platform.environment['HOME']}/Downloads/SetPocket';
+      return '${Platform.environment['HOME']}/Downloads/$appName';
     }
-    return '/Downloads/SetPocket';
+    return '/Downloads/$appName';
   }
 
   String _getFallbackDirectory() {
     if (Platform.isWindows) {
-      return '${Platform.environment['USERPROFILE']}\\Downloads\\SetPocket';
+      return '${Platform.environment['USERPROFILE']}\\Downloads\\$appName';
     } else {
-      return '${Platform.environment['HOME'] ?? '/tmp'}/Downloads/SetPocket';
+      return '${Platform.environment['HOME'] ?? '/tmp'}/Downloads/$appName';
     }
   }
 

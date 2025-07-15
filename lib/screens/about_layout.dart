@@ -137,7 +137,7 @@ class _AboutLayoutState extends State<AboutLayout> {
         ),
         const SizedBox(height: 12),
         Text(
-          'SETPocket',
+          appName,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -155,11 +155,11 @@ class _AboutLayoutState extends State<AboutLayout> {
   String _getVersionString() {
     final l10n = AppLocalizations.of(context)!;
     final versionType = currentVersionType.getDisplayName(l10n);
-    
+
     if (isLoading || packageInfo == null) {
       return 'Loading... ($versionType)';
     }
-    
+
     return '${packageInfo!.version}+${packageInfo!.buildNumber} ($versionType)';
   }
 
@@ -283,7 +283,8 @@ class _AboutLayoutState extends State<AboutLayout> {
           title: Text(lib['name'] ?? ''),
           subtitle: Text('${lib['author'] ?? ''} • ${lib['license'] ?? ''}'),
           trailing: const Icon(Icons.open_in_new),
-          onTap: () => _openUrl('https://pub.dev/packages/${lib['name'] ?? ''}'),
+          onTap: () =>
+              _openUrl('https://pub.dev/packages/${lib['name'] ?? ''}'),
         );
       },
     );
@@ -524,10 +525,7 @@ class _AboutLayoutState extends State<AboutLayout> {
             leading: const Icon(Icons.tag),
             title: Text(l10n.appVersion),
             subtitle: Text(
-              isLoading 
-                ? 'Loading...' 
-                : (packageInfo?.version ?? 'Unknown')
-            ),
+                isLoading ? 'Loading...' : (packageInfo?.version ?? 'Unknown')),
           ),
           // ListTile(
           //   leading: const Icon(Icons.build),

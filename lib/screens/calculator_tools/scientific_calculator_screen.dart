@@ -804,8 +804,6 @@ class _ScientificCalculatorScreenState
       rightPanelTitle: _historyEnabled ? l10n.calculationHistory : null,
       isEmbedded: widget.isEmbedded,
       useCompactTabLayout: true,
-      onShowInfo: _showScientificCalculatorInfo,
-      showInfoInRightPanelHeader: false,
       mainPanelActions: [
         IconButton(
           onPressed: _showScientificCalculatorInfo,

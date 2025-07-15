@@ -20,17 +20,25 @@ class MobileSectionSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title ?? 'Settings'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-      ),
       body: SafeArea(
         child: SectionListView(
           sections: sections,
           onSectionSelected: onSectionSelected,
           padding: const EdgeInsets.symmetric(vertical: 8),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: loc.showAll,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context) =>
+                    SectionSidebarScrollingLayout(sections: sections)),
+          );
+        },
+        child: const Icon(Icons.list),
       ),
     );
   }
@@ -363,6 +371,7 @@ class _SectionSidebarScrollingLayoutState
   }
 
   Widget _buildMobileLayout() {
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     return Scaffold(
       key: _scaffoldKey,
       appBar: widget.isEmbedded
@@ -383,6 +392,16 @@ class _SectionSidebarScrollingLayoutState
           child: _buildAllSections(),
         ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.of(context).push(
+      //       MaterialPageRoute(
+      //           builder: (context) =>
+      //               SectionSidebarScrollingLayout(sections: widget.sections)),
+      //     );
+      //   },
+      //   child: const Icon(Icons.list),
+      // ),
     );
   }
 

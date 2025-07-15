@@ -81,6 +81,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platform => 'Platform';
 
   @override
+  String get routine => 'Routine';
+
+  @override
   String get settings => 'Settings';
 
   @override

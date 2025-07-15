@@ -21,6 +21,8 @@ import 'package:setpocket/widgets/import_status_dialog.dart';
 import 'package:setpocket/widgets/generic/enter_text_dialog.dart';
 import 'package:setpocket/widgets/generic/icon_button_list.dart';
 import 'package:archive/archive_io.dart';
+import 'package:setpocket/controllers/mobile_appbar_controller.dart';
+import 'package:setpocket/widgets/mobile_appbar.dart';
 
 class TemplateListScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -49,10 +51,46 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   final Set<String> _selectedTemplateIds = {};
   bool _viewingDrafts = false; // Re-introduce view toggle state
 
+  bool _hasInitialized = false;
+
   @override
   void initState() {
     super.initState();
-    _loadAllData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasInitialized) {
+      _hasInitialized = true;
+      _loadAllData();
+      // Defer AppBar sync để tránh setState during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _syncMobileAppBar();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Clear mobile AppBar khi dispose - đơn giản và an toàn
+    MobileAppBarController().clear();
+    super.dispose();
+  }
+
+  void _syncMobileAppBar() {
+    // CHỈ sync trên mobile thôi!
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 600 && !widget.isEmbedded) {
+      final l10n = AppLocalizations.of(context)!;
+      final title = l10n.textTemplatesTitle;
+      final actions = _buildAppBarActions(l10n, true);
+
+      MobileAppBarController().setAppBar(
+        title: title,
+        actions: actions,
+      );
+    }
   }
 
   Future<void> _loadAllData() async {
@@ -67,6 +105,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
           _drafts = drafts;
           _isLoading = false;
         });
+        // Re-sync AppBar khi data thay đổi
+        _syncMobileAppBar();
       }
     } catch (e) {
       if (mounted) {
@@ -77,22 +117,19 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     }
   }
 
-  void _toggleView() {
-    setState(() {
-      _viewingDrafts = !_viewingDrafts;
-      _exitSelectionMode();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final templatesToShow = _viewingDrafts ? _drafts : _completedTemplates;
-    final title = _viewingDrafts ? "Drafts" : l10n.textTemplatesTitle;
+    final title = l10n.textTemplatesTitle; // Always "Mẫu văn bản"
 
     Widget mainContent = _isLoading
         ? const Center(child: CircularProgressIndicator())
         : _buildTemplateList(templatesToShow, l10n);
+
+    // Check if mobile
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     if (widget.isEmbedded) {
       return Column(
@@ -103,13 +140,30 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       );
     }
 
+    // Mobile: dùng MobileAppBar
+    if (isMobile) {
+      return Scaffold(
+        appBar: const MobileAppBar(),
+        body: mainContent,
+        floatingActionButton: !_isSelectionMode
+            ? FloatingActionButton(
+                onPressed: _showAddTemplateDialog,
+                child: const Icon(Icons.add),
+              )
+            : null,
+        bottomNavigationBar:
+            _isSelectionMode ? _buildBottomActionBar(l10n) : null,
+      );
+    }
+
+    // Desktop: AppBar bình thường
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
         actions: _buildAppBarActions(l10n, templatesToShow.isNotEmpty),
       ),
       body: mainContent,
-      floatingActionButton: !_isSelectionMode && templatesToShow.isNotEmpty
+      floatingActionButton: !_isSelectionMode
           ? FloatingActionButton(
               onPressed: _showAddTemplateDialog,
               child: const Icon(Icons.add),
@@ -134,20 +188,18 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       ];
     }
     return [
-      if (hasTemplates) ...[
-        IconButton(
-          icon:
-              Icon(_viewingDrafts ? Icons.description : Icons.drafts_outlined),
-          tooltip:
-              _viewingDrafts ? l10n.textTemplatesTitle : l10n.draftsDialogTitle,
-          onPressed: () => _showTemplateStatusDialog('draft'),
-        ),
-        IconButton(
-          icon: const Icon(Icons.delete_outline),
-          tooltip: l10n.trashDialogTitle,
-          onPressed: () => _showTemplateStatusDialog('deleted'),
-        ),
-      ],
+      // Draft action - always show
+      IconButton(
+        icon: const Icon(Icons.drafts_outlined),
+        tooltip: l10n.draftsDialogTitle,
+        onPressed: () => _showTemplateStatusDialog('draft'),
+      ),
+      // Trash action - always show
+      IconButton(
+        icon: const Icon(Icons.delete_outline),
+        tooltip: l10n.trashDialogTitle,
+        onPressed: () => _showTemplateStatusDialog('deleted'),
+      ),
     ];
   }
 
@@ -216,6 +268,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
                   _isSelectionMode = true;
                   _selectedTemplateIds.add(template.id);
                 });
+                // Re-sync AppBar khi vào selection mode
+                _syncMobileAppBar();
               }
             },
             trailing: _isSelectionMode
@@ -479,7 +533,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   }
 
   Widget _buildBottomActionBar(AppLocalizations l10n) {
-    final isBatch = _selectedTemplateIds.length > 1;
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -512,6 +565,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         _selectedTemplateIds.add(templateId);
       }
     });
+    // Re-sync AppBar khi selection thay đổi
+    _syncMobileAppBar();
   }
 
   void _selectAll() {
@@ -523,6 +578,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         _selectedTemplateIds.addAll(templatesToShow.map((t) => t.id).toList());
       }
     });
+    // Re-sync AppBar
+    _syncMobileAppBar();
   }
 
   void _exitSelectionMode() {
@@ -530,32 +587,8 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       _isSelectionMode = false;
       _selectedTemplateIds.clear();
     });
-  }
-
-  void _deleteSelectedTemplates() async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Confirm Deletion"),
-        content: Text(
-            "Are you sure you want to delete ${_selectedTemplateIds.length} templates?"),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel)),
-          FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.delete)),
-        ],
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      await TemplateService.batchMoveToTrash(_selectedTemplateIds.toList());
-      _exitSelectionMode();
-      await _loadAllData(); // Refresh list
-    }
+    // Re-sync AppBar
+    _syncMobileAppBar();
   }
 
   void _navigateToUseTemplate(TextTemplatesData template) async {
@@ -566,11 +599,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     );
 
     if (widget.isEmbedded && widget.onToolSelected != null) {
-      // Desktop mode: callback to display in the main widget
+      // Embedded mode (mobile/desktop): use callback
       widget.onToolSelected!(useScreen, 'Generate Document: ${template.title}',
           parentCategory: 'TemplateListScreen', icon: Icons.description);
     } else {
-      // Mobile mode: normal navigation
+      // Standalone mode: normal navigation
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -585,22 +618,24 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       String? initialTitle,
       String? initialContent}) {
     if (widget.isEmbedded && widget.onToolSelected != null) {
-      // Desktop embedded view
+      // Embedded mode: use callback
+      final editScreen = TemplateEditScreen(
+        template: template,
+        initialTitle: initialTitle,
+        initialContent: initialContent,
+        isEmbedded: true,
+      );
+
       widget.onToolSelected!(
-        TemplateEditScreen(
-          template: template,
-          initialTitle: initialTitle,
-          initialContent: initialContent,
-          isEmbedded: true,
-        ),
+        editScreen,
         template != null ? 'Edit Template' : 'Create Template',
         parentCategory: 'TemplateListScreen',
         icon: Icons.edit,
       );
     } else {
-      // Mobile view
-      if (widget.onTemplateSelected != null) {
-        widget.onTemplateSelected!(template!);
+      // Standalone mode: handle different navigation options
+      if (widget.onTemplateSelected != null && template != null) {
+        widget.onTemplateSelected!(template);
       } else {
         // Default navigation
         Navigator.of(context).push(
@@ -613,10 +648,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         );
       }
     }
-  }
-
-  void _showHelpDialog() {
-    // This can be reimplemented if needed.
   }
 
   Future<void> _importTemplatesFromJson(List<PlatformFile> files) async {
@@ -732,14 +763,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     );
   }
 
-  Future<void> _importFromClipboard(AppLocalizations l10n) async {
-    // Logic to import from clipboard
-  }
-
-  Future<void> _showImportOptions(AppLocalizations l10n) async {
-    // Logic to show import options
-  }
-
   Future<void> _showAddTemplateDialog() async {
     final l10n = AppLocalizations.of(context)!;
     await showDialog(
@@ -753,7 +776,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
               OptionCard(
                 option: OptionItem<String>(
                   value: 'manual',
-                  label: l10n.createManually ?? 'Create Manually',
+                  label: l10n.createManually,
                   icon: GenericIcon.icon(Icons.edit_note),
                 ),
                 onTap: () {
@@ -765,7 +788,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
               OptionCard(
                 option: OptionItem<String>(
                   value: 'import',
-                  label: l10n.importFromFile ?? 'Import from File',
+                  label: l10n.importFromFile,
                   icon: GenericIcon.icon(Icons.file_open),
                 ),
                 onTap: () {

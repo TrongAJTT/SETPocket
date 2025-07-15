@@ -77,7 +77,6 @@ class _ProfileDesktopLayoutState extends State<ProfileDesktopLayout>
           if (!ProfileTabService.instance.isInitialized) {
             return const Center(child: CircularProgressIndicator());
           }
-
           return _buildDesktopLayout();
         },
       ),

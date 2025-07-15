@@ -156,7 +156,7 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
     final fillDataPanel = _buildFillDataPanel(l10n);
     final previewPanel = _buildPreviewPanel(l10n);
 
-    final layoutContent = TwoPanelsLayout(
+    return TwoPanelsLayout(
       mainPanel: fillDataPanel,
       rightPanel: previewPanel,
       title: '${l10n.generateDocument}: ${widget.template.title}',
@@ -172,14 +172,6 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
         ),
       ],
     );
-
-    // Nếu embedded trong desktop, return layout trực tiếp
-    if (widget.isEmbedded) {
-      return layoutContent;
-    }
-
-    // Mobile: TwoPanelsLayout đã tự tạo Scaffold với MobileAppBar rồi
-    return layoutContent;
   }
 
   Widget _buildFillDataPanel(AppLocalizations l10n) {

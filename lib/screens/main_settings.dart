@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/controllers/mobile_appbar_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:setpocket/main.dart';
@@ -86,11 +85,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
   void _handleMobileAppbar() {
     final loc = AppLocalizations.of(context)!;
-    final controller = MobileAppBarController();
-    controller.setAppBar(
-      title: loc.settings,
-      showBackButton: false,
-    );
+    // Removed unified MobileAppBarController logic
   }
 
   @override
@@ -132,22 +127,37 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
 
     // For single section display (mobile navigation)
     if (widget.initialSectionId != null) {
-      _handleMobileAppbar();
-      return SingleSectionDisplayScreen(
-        sectionId: widget.initialSectionId!,
-        sections: _buildSections(loc),
+      // Hiển thị AppBar trên mobile khi vào từng section
+      return Scaffold(
+        appBar: AppBar(title: Text(loc.settings)),
+        body: SingleSectionDisplayScreen(
+          sectionId: widget.initialSectionId!,
+          sections: _buildSections(loc),
+        ),
       );
     }
 
-    // Full layout for desktop or embedded
+    // Full layout for desktop hoặc embedded
+    if (!isDesktop && !widget.isEmbedded) {
+      // Mobile: bọc layout bằng Scaffold để có AppBar
+      return Scaffold(
+        appBar: AppBar(title: Text(loc.settings)),
+        body: SectionSidebarScrollingLayout(
+          title: null,
+          isEmbedded: false,
+          sections: _buildSections(loc),
+          showViewToggle: true,
+          onSectionChanged: (sectionId) {},
+        ),
+      );
+    }
+    // Desktop hoặc embedded: giữ nguyên
     return SectionSidebarScrollingLayout(
       title: widget.isEmbedded ? null : loc.settings,
       isEmbedded: widget.isEmbedded,
       sections: _buildSections(loc),
       showViewToggle: true,
-      onSectionChanged: (sectionId) {
-        // Handle section selection if needed
-      },
+      onSectionChanged: (sectionId) {},
     );
   }
 

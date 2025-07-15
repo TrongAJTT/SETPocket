@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/controllers/mobile_appbar_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/layouts/base_responsive_layout.dart';
 import 'package:setpocket/models/tool_config.dart';
 import 'package:setpocket/services/tool_visibility_service.dart';
 import 'package:setpocket/services/profile_tab_service.dart';
 import 'package:setpocket/services/profile_breadcrumb_service.dart';
 import 'package:setpocket/utils/generic_settings_utils.dart';
-import 'package:setpocket/utils/variables_utils.dart';
 import 'package:setpocket/variables.dart';
 import 'package:setpocket/widgets/tool_card.dart';
 import 'package:setpocket/screens/text_template/text_template_list_screen.dart';
@@ -22,12 +19,14 @@ class ProfileToolSelectionScreen extends StatefulWidget {
   final Function(Widget, String, {String? parentCategory, IconData? icon})?
       onToolSelected;
   final int? forTabIndex; // Chỉ định tab nào đang sử dụng screen này
+  final void Function(Widget)? onPushToTabStack;
 
   const ProfileToolSelectionScreen({
     super.key,
     this.isEmbedded = false,
     this.onToolSelected,
     this.forTabIndex,
+    this.onPushToTabStack,
   });
 
   @override
@@ -36,7 +35,7 @@ class ProfileToolSelectionScreen extends StatefulWidget {
 }
 
 class _ProfileToolSelectionScreenState extends State<ProfileToolSelectionScreen>
-    with SingleTickerProviderStateMixin, BaseResponsiveLayout {
+    with SingleTickerProviderStateMixin {
   List<ToolConfig> _visibleTools = [];
   bool _loading = true;
 
@@ -44,26 +43,6 @@ class _ProfileToolSelectionScreenState extends State<ProfileToolSelectionScreen>
   void initState() {
     super.initState();
     _loadVisibleTools();
-  }
-
-  @override
-  void syncMobileAppBar() {
-    final loc = AppLocalizations.of(context)!;
-
-    if (isMobileLayoutContext(context)) {
-      final controller = MobileAppBarController();
-      controller.setAppBar(
-        title: appName,
-        showBackButton: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () => GenericSettingsUtils.navigateAbout(context),
-            tooltip: loc.about,
-          ),
-        ],
-      );
-    }
   }
 
   @override
@@ -80,11 +59,6 @@ class _ProfileToolSelectionScreenState extends State<ProfileToolSelectionScreen>
       _visibleTools = tools;
       _loading = false;
     });
-
-    if (mounted && !hasInitialized) {
-      hasInitialized = true;
-      syncMobileAppBar();
-    }
   }
 
   @override
@@ -161,7 +135,14 @@ class _ProfileToolSelectionScreenState extends State<ProfileToolSelectionScreen>
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(loc.selectTool),
+          title: const Text(appName),
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.info_outline),
+                tooltip: loc.about,
+                onPressed: () => GenericSettingsUtils.navigateAbout(context)),
+            const SizedBox(width: 8), // Add spacing
+          ],
         ),
         body: content,
       );
@@ -176,6 +157,11 @@ class _ProfileToolSelectionScreenState extends State<ProfileToolSelectionScreen>
 
     // Cập nhật tab profile nếu có chỉ định tab
     if (widget.forTabIndex != null) {
+      // Nếu là tool Text Template và có callback push stack thì push vào TabAwarePageViewStack
+      if (config.id == 'textTemplate' && widget.onPushToTabStack != null) {
+        widget.onPushToTabStack!(tool);
+        return;
+      }
       ProfileTabService.instance.updateTabTool(
         tabIndex: widget.forTabIndex!,
         toolId: config.id,

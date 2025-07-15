@@ -5,6 +5,7 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/hive_service.dart';
 import 'package:setpocket/services/isar_service.dart';
 import 'package:setpocket/services/converter_services/converter_tools_data_service.dart';
+import 'package:setpocket/services/profile_tab_service.dart';
 import 'package:setpocket/services/settings_models_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
@@ -159,6 +160,9 @@ Future<void> main() async {
 
   // Initialize other services in background after UI starts
   _initializeServicesInBackground();
+
+  // Đảm bảo khởi tạo tabs trước khi build UI
+  await ProfileTabService.instance.initialize();
 
   runApp(const MainApp());
 }

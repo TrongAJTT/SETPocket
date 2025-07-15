@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/layouts/base_responsive_layout.dart';
-import 'package:setpocket/controllers/mobile_appbar_controller.dart';
-import 'package:setpocket/utils/variables_utils.dart';
-import 'package:setpocket/widgets/mobile_appbar.dart';
-import 'package:setpocket/services/tab_navigation_state_manager.dart';
 
 /// A responsive layout that shows two panels side-by-side on larger screens
 /// and as tabs on smaller screens.
@@ -44,77 +39,14 @@ class TwoPanelsLayout extends StatefulWidget {
 }
 
 class _TwoPanelsLayoutState extends State<TwoPanelsLayout>
-    with SingleTickerProviderStateMixin, BaseResponsiveLayout {
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  @override
-  void syncMobileAppBar() {
-    if (isMobileLayoutContext(context)) {
-      // Collect all actions from both panels
-      List<Widget> allActions = [];
-
-      if (widget.mainPanelActions != null && _tabController.index == 0) {
-        allActions.addAll(widget.mainPanelActions!);
-      }
-
-      if (widget.rightPanelActions != null && _tabController.index == 1) {
-        allActions.addAll(widget.rightPanelActions!);
-      }
-
-      // AppBar controller will automatically use current tab context
-      final controller = MobileAppBarController();
-      controller.setAppBar(
-        title: getScreenTitle(widget.title),
-        actions: allActions,
-      );
-
-      // Save AppBar state to current tab
-      final stateManager = TabNavigationStateManager.instance;
-      final currentTabState = stateManager.currentTabState;
-      currentTabState.updateAppBar(
-        title: getScreenTitle(widget.title),
-        actions: allActions
-            .map((action) => {
-                  'type': action.runtimeType.toString(),
-                  'tooltip': action is IconButton ? action.tooltip : null,
-                })
-            .toList(),
-      );
-      stateManager.saveState();
-    } else {
-      print('📵 TwoPanelsLayout: Not syncing (desktop)');
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     final tabCount = widget.rightPanel != null ? 2 : 1;
     _tabController = TabController(length: tabCount, vsync: this);
-    _tabController.addListener(() {
-      // Sync AppBar when tab changes
-      if (isMobileLayoutContext(context)) {
-        refreshMobileAppBar();
-      }
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    refreshMobileAppBarIfNotInitialized();
-  }
-
-  @override
-  void didUpdateWidget(TwoPanelsLayout oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Re-sync AppBar khi có thay đổi actions hoặc title
-    if (oldWidget.title != widget.title ||
-        oldWidget.mainPanelActions != widget.mainPanelActions ||
-        oldWidget.rightPanelActions != widget.rightPanelActions) {
-      refreshMobileAppBar();
-    }
   }
 
   @override
@@ -297,7 +229,7 @@ class _TwoPanelsLayoutState extends State<TwoPanelsLayout>
   /// Builds the layout with its own Scaffold and AppBar (not embedded).
   Widget _buildStandaloneLayout(BuildContext context, bool isMobile) {
     if (isMobile) {
-      // Standalone mobile: Scaffold với MobileAppBar và TabBar
+      // Standalone mobile: Scaffold with standard AppBar and TabBar
       final hasTabs = widget.rightPanel != null;
       Widget tabbedContent = hasTabs
           ? TabBarView(
@@ -319,38 +251,33 @@ class _TwoPanelsLayoutState extends State<TwoPanelsLayout>
             );
 
       return Scaffold(
-        appBar: hasTabs
-            ? PreferredSize(
-                preferredSize: const Size.fromHeight(
-                    kToolbarHeight + 48.0), // 48.0 is default tab height
-                child: Column(
-                  children: [
-                    const Flexible(child: MobileAppBar()),
-                    TabBar(
-                      controller: _tabController,
-                      tabs: [
-                        Tab(
-                          icon: widget.useCompactTabLayout
-                              ? null
-                              : Icon(widget.mainPanelIcon ?? Icons.calculate),
-                          text: widget.mainPanelTitle ??
-                              AppLocalizations.of(context)!.calculatorTools,
-                        ),
-                        if (widget.rightPanel != null)
-                          Tab(
-                            icon: widget.useCompactTabLayout
-                                ? null
-                                : const Icon(Icons.history),
-                            text: widget.rightPanelTitle ??
-                                AppLocalizations.of(context)!
-                                    .calculationHistory,
-                          ),
-                      ],
+        appBar: AppBar(
+          title: Text(widget.title ?? widget.mainPanelTitle ?? ''),
+          elevation: 0,
+          bottom: hasTabs
+              ? TabBar(
+                  controller: _tabController,
+                  tabs: [
+                    Tab(
+                      icon: widget.useCompactTabLayout
+                          ? null
+                          : Icon(widget.mainPanelIcon ?? Icons.calculate),
+                      text: widget.mainPanelTitle ??
+                          AppLocalizations.of(context)!.calculatorTools,
                     ),
+                    if (widget.rightPanel != null)
+                      Tab(
+                        icon: widget.useCompactTabLayout
+                            ? null
+                            : const Icon(Icons.history),
+                        text: widget.rightPanelTitle ??
+                            AppLocalizations.of(context)!.calculationHistory,
+                      ),
                   ],
-                ),
-              )
-            : const MobileAppBar(),
+                )
+              : null,
+          actions: widget.mainPanelActions,
+        ),
         body: tabbedContent,
       );
     } else {

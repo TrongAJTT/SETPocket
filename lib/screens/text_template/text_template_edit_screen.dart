@@ -241,6 +241,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDesktop = MediaQuery.of(context).size.width > 1000;
 
     final mainContent = PopScope(
       canPop: !_hasUnsavedChanges,
@@ -309,7 +310,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       onPressed: _isLoading ? null : _saveAsCompleteTemplate,
     );
 
-    final layoutContent = TwoPanelsLayout(
+    return TwoPanelsLayout(
       mainPanel: mainContent,
       rightPanel: structurePanel,
       title: _currentTemplate.status == TemplateStatus.draft
@@ -323,14 +324,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       mainPanelIcon: Icons.edit,
       isEmbedded: _isEmbeddedInDesktop,
     );
-
-    // Nếu embedded trong desktop, return layout trực tiếp
-    if (_isEmbeddedInDesktop) {
-      return layoutContent;
-    }
-
-    // Mobile: TwoPanelsLayout đã tự tạo Scaffold với MobileAppBar rồi
-    return layoutContent;
   }
 
   Widget _buildStructurePanel(AppLocalizations l10n) {
@@ -757,6 +750,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   }
 
   void _showAddElementDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => _AddElementDialog(

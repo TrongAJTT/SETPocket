@@ -33,6 +33,7 @@ class ProfileWidgetFactory {
     Function(Widget, String, {String? parentCategory, IconData? icon})?
         onToolSelected,
     int? forTabIndex,
+    void Function(Widget)? onPushToTabStack,
   }) {
     switch (toolId) {
       case 'tool_selection':
@@ -40,6 +41,7 @@ class ProfileWidgetFactory {
           isEmbedded: isEmbedded,
           onToolSelected: onToolSelected,
           forTabIndex: forTabIndex,
+          onPushToTabStack: onPushToTabStack,
         );
 
       // Converter Tools
@@ -84,6 +86,7 @@ class ProfileWidgetFactory {
           isEmbedded: isEmbedded,
           onToolSelected: onToolSelected,
           forTabIndex: forTabIndex,
+          onPushToTabStack: onPushToTabStack,
         );
     }
   }

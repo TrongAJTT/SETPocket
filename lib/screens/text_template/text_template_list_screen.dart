@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template/text_templates_data.dart';
 import 'package:setpocket/services/text_template_services/text_template_service.dart';
+import 'package:setpocket/utils/generic_dialog_utils.dart';
 import 'package:setpocket/utils/size_utils.dart';
 import 'text_template_use_screen.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
@@ -47,7 +48,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   bool _isLoading = true;
   bool _isSelectionMode = false;
   final Set<String> _selectedTemplateIds = {};
-  bool _viewingDrafts = false; // Re-introduce view toggle state
+  final bool _viewingDrafts = false; // Re-introduce view toggle state
 
   @override
   void initState() {
@@ -75,13 +76,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
             context, 'Error loading templates: $e', SnackBarType.error);
       }
     }
-  }
-
-  void _toggleView() {
-    setState(() {
-      _viewingDrafts = !_viewingDrafts;
-      _exitSelectionMode();
-    });
   }
 
   @override
@@ -317,12 +311,16 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     final l10n = AppLocalizations.of(context)!;
     try {
       await TemplateService.deleteTemplate(id, permanent: permanent);
-      SnackbarUtils.showTyped(
-          context, l10n.templateDeletedSuccess, SnackBarType.success);
-      _loadAllData(); // Refresh the list
+      if (mounted) {
+        SnackbarUtils.showTyped(
+            context, l10n.templateDeletedSuccess, SnackBarType.success);
+        _loadAllData(); // Refresh the list
+      }
     } catch (e) {
-      SnackbarUtils.showTyped(
-          context, l10n.templateDeleteError(e.toString()), SnackBarType.error);
+      if (mounted) {
+        SnackbarUtils.showTyped(context, l10n.templateDeleteError(e.toString()),
+            SnackBarType.error);
+      }
     }
   }
 
@@ -404,12 +402,16 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       if (outputPath != null) {
         final file = File(outputPath);
         await file.writeAsString(jsonString);
-        SnackbarUtils.showTyped(context,
-            l10n.templateExportedSuccess(outputPath), SnackBarType.success);
+        if (mounted) {
+          SnackbarUtils.showTyped(context,
+              l10n.templateExportedSuccess(outputPath), SnackBarType.success);
+        }
       }
     } catch (e) {
-      SnackbarUtils.showTyped(
-          context, l10n.templateExportError(e.toString()), SnackBarType.error);
+      if (mounted) {
+        SnackbarUtils.showTyped(context, l10n.templateExportError(e.toString()),
+            SnackBarType.error);
+      }
     }
   }
 
@@ -425,8 +427,10 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       await Share.shareXFiles([XFile(filePath)],
           text: 'Template: ${template.title}');
     } catch (e) {
-      SnackbarUtils.showTyped(
-          context, l10n.shareTemplateError(e.toString()), SnackBarType.error);
+      if (mounted) {
+        SnackbarUtils.showTyped(
+            context, l10n.shareTemplateError(e.toString()), SnackBarType.error);
+      }
     }
   }
 
@@ -442,13 +446,11 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
             Icon(
               _viewingDrafts ? Icons.drafts_outlined : Icons.note_add_outlined,
               size: 80,
-              color: theme.colorScheme.secondary.withOpacity(0.7),
+              color: theme.colorScheme.secondary.withValues(alpha: .7),
             ),
             const SizedBox(height: 24),
             Text(
-              _viewingDrafts
-                  ? "You have no drafts"
-                  : "No templates created yet",
+              _viewingDrafts ? l10n.noDrafts : l10n.noTemplatesYet,
               style: theme.textTheme.headlineSmall
                   ?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
@@ -466,7 +468,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
             ElevatedButton.icon(
               onPressed: _showAddTemplateDialog,
               icon: const Icon(Icons.add),
-              label: Text("Create a New Template"),
+              label: Text(l10n.createNewTemplate),
               style: ElevatedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -479,7 +481,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
   }
 
   Widget _buildBottomActionBar(AppLocalizations l10n) {
-    final isBatch = _selectedTemplateIds.length > 1;
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -530,32 +531,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       _isSelectionMode = false;
       _selectedTemplateIds.clear();
     });
-  }
-
-  void _deleteSelectedTemplates() async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Confirm Deletion"),
-        content: Text(
-            "Are you sure you want to delete ${_selectedTemplateIds.length} templates?"),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel)),
-          FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.delete)),
-        ],
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      await TemplateService.batchMoveToTrash(_selectedTemplateIds.toList());
-      _exitSelectionMode();
-      await _loadAllData(); // Refresh list
-    }
   }
 
   void _navigateToUseTemplate(TextTemplatesData template) async {
@@ -613,10 +588,6 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         );
       }
     }
-  }
-
-  void _showHelpDialog() {
-    // This can be reimplemented if needed.
   }
 
   Future<void> _importTemplatesFromJson(List<PlatformFile> files) async {
@@ -753,7 +724,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
               OptionCard(
                 option: OptionItem<String>(
                   value: 'manual',
-                  label: l10n.createManually ?? 'Create Manually',
+                  label: l10n.createManually,
                   icon: GenericIcon.icon(Icons.edit_note),
                 ),
                 onTap: () {
@@ -765,7 +736,7 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
               OptionCard(
                 option: OptionItem<String>(
                   value: 'import',
-                  label: l10n.importFromFile ?? 'Import from File',
+                  label: l10n.importFromFile,
                   icon: GenericIcon.icon(Icons.file_open),
                 ),
                 onTap: () {
@@ -810,93 +781,125 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     }
   }
 
+  IconButtonList _buildTextTempalteOptions(
+      TextTemplatesData template,
+      String status,
+      String restoreString,
+      String editString,
+      String permanentlyDeleteString,
+      int maxVisibleCount) {
+    List<IconButtonListItem> options = [
+      if (status == 'deleted')
+        IconButtonListItem(
+          icon: Icons.restore,
+          label: restoreString,
+          onPressed: () => _restoreTemplate(template),
+        ),
+      if (status == 'draft')
+        IconButtonListItem(
+          icon: Icons.edit,
+          label: editString,
+          onPressed: () => _navigateToEditScreen(template: template),
+        ),
+      IconButtonListItem(
+          icon: Icons.delete_forever,
+          label: permanentlyDeleteString,
+          onPressed: () async {
+            if (await _permanentlyDeleteTemplate(template) && mounted) {
+              // ignore: use_build_context_synchronously
+              Navigator.of(context).pop();
+            }
+          }),
+    ];
+    return IconButtonList(
+      buttons: options,
+      visibleCount: maxVisibleCount,
+      spacing: 4,
+    );
+  }
+
   void _showTemplateStatusDialog(String status) async {
     final l10n = AppLocalizations.of(context)!;
+    final screenSize = MediaQuery.of(context).size;
+    String restoreString = l10n.restore;
+    String editString = l10n.edit;
+    String permanentlyDeleteString = l10n.permanentlyDelete;
     List<TextTemplatesData> templates = [];
+
+    int visibleCount = screenSize.width > 350 ? 2 : 0;
+
     if (status == 'draft') {
       templates = await TemplateService.getDraftTemplates();
     } else if (status == 'deleted') {
       templates = await TemplateService.getDeletedTemplates();
     }
-    showDialog(
-      context: context,
-      builder: (context) {
-        return GenericDialog(
-          header: GenericDialogHeader(
-            title: status == 'draft'
-                ? l10n.draftsDialogTitle
-                : l10n.trashDialogTitle,
-          ),
-          body: SizedBox(
-            width: 400,
-            child: templates.isEmpty
-                ? Center(child: Text(l10n.noTemplatesYet))
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: templates.length,
-                    itemBuilder: (context, index) {
-                      final template = templates[index];
-                      final now = DateTime.now();
-                      final baseTime = template.updatedAt;
-                      final expireDays = status == 'draft' ? 7 : 30;
-                      final daysLeft =
-                          expireDays - now.difference(baseTime).inDays;
-                      final parser = TemplateParser.findElementsInContent(
-                          template.content);
-                      final fieldCount = parser.map((e) => e.id).toSet().length;
-                      final loopCount = TemplateParser.findDataLoopsInContent(
-                              template.content)
-                          .length;
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        child: ListTile(
-                          title: Text(template.title),
-                          subtitle: Text(
-                            '${template.content.length} chars • $fieldCount fields • $loopCount loops\n${l10n.daysLeft(daysLeft)}',
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (status == 'deleted')
-                                IconButton(
-                                  icon: const Icon(Icons.restore),
-                                  tooltip: l10n.restore,
-                                  onPressed: () => _restoreTemplate(template),
-                                ),
-                              if (status == 'draft')
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  tooltip: l10n.edit,
-                                  onPressed: () =>
-                                      _navigateToEditScreen(template: template),
-                                ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_forever),
-                                tooltip: l10n.permanentlyDelete,
-                                onPressed: () =>
-                                    _permanentlyDeleteTemplate(template),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          footer: GenericDialogFooter(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child: Text(l10n.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return GenericDialog(
+            header: GenericDialogHeader(
+              title: status == 'draft'
+                  ? l10n.draftsDialogTitle
+                  : l10n.trashDialogTitle,
             ),
-          ),
-        );
-      },
-    );
+            body: SizedBox(
+              height:
+                  screenSize.height * 0.8 > 800 ? 800 : screenSize.width * 0.8,
+              child: templates.isEmpty
+                  ? Center(child: Text(l10n.noTemplatesYet))
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: templates.length,
+                      itemBuilder: (context, index) {
+                        final template = templates[index];
+                        final now = DateTime.now();
+                        final baseTime = template.updatedAt;
+                        final expireDays = status == 'draft' ? 7 : 30;
+                        final daysLeft =
+                            expireDays - now.difference(baseTime).inDays;
+                        final parser = TemplateParser.findElementsInContent(
+                            template.content);
+                        final fieldCount =
+                            parser.map((e) => e.id).toSet().length;
+                        final loopCount = TemplateParser.findDataLoopsInContent(
+                                template.content)
+                            .length;
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          child: ListTile(
+                            title: Text(template.title),
+                            subtitle: Text(
+                              '${template.content.length} chars • $fieldCount fields • $loopCount loops\n${l10n.daysLeft(daysLeft)}',
+                            ),
+                            trailing: _buildTextTempalteOptions(
+                                template,
+                                status,
+                                restoreString,
+                                editString,
+                                permanentlyDeleteString,
+                                visibleCount),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            footer: GenericDialogFooter(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text(l10n.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   Future<void> _restoreTemplate(TextTemplatesData template) async {
@@ -905,10 +908,18 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
     _loadAllData();
   }
 
-  Future<void> _permanentlyDeleteTemplate(TextTemplatesData template) async {
-    await TemplateService.deleteTemplatePermanently(template.id);
-    Navigator.of(context).pop();
-    _loadAllData();
+  Future<bool> _permanentlyDeleteTemplate(TextTemplatesData template) async {
+    final l10n = AppLocalizations.of(context)!;
+    bool? result = await GenericDialogUtils.showSimpleGenericClearDialog(
+      context: context,
+      title: l10n.deleteTemplateTitle,
+      description: l10n.confirmDeleteTemplateMsg(template.title),
+      onConfirm: () async {
+        await TemplateService.deleteTemplatePermanently(template.id);
+      },
+    );
+    result ??= false; // Ensure result is not null
+    return result;
   }
 
   void _showDuplicateDialog(TextTemplatesData template, AppLocalizations l10n) {
@@ -987,13 +998,17 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       for (final id in ids) {
         await TemplateService.deleteTemplate(id, permanent: permanent);
       }
-      SnackbarUtils.showTyped(
-          context, l10n.templateDeletedSuccess, SnackBarType.success);
+      if (mounted) {
+        SnackbarUtils.showTyped(
+            context, l10n.templateDeletedSuccess, SnackBarType.success);
+      }
       _exitSelectionMode();
       _loadAllData();
     } catch (e) {
-      SnackbarUtils.showTyped(
-          context, l10n.templateDeleteError(e.toString()), SnackBarType.error);
+      if (mounted) {
+        SnackbarUtils.showTyped(context, l10n.templateDeleteError(e.toString()),
+            SnackBarType.error);
+      }
     }
   }
 
@@ -1070,12 +1085,16 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
         await file.writeAsString(jsonString);
         successCount++;
       }
-      SnackbarUtils.showTyped(context, l10n.batchExportCompleted(successCount),
-          SnackBarType.success);
+      if (mounted) {
+        SnackbarUtils.showTyped(context,
+            l10n.batchExportCompleted(successCount), SnackBarType.success);
+      }
       _exitSelectionMode();
     } catch (e) {
-      SnackbarUtils.showTyped(context,
-          l10n.errorDuringBatchExport(e.toString()), SnackBarType.error);
+      if (mounted) {
+        SnackbarUtils.showTyped(context,
+            l10n.errorDuringBatchExport(e.toString()), SnackBarType.error);
+      }
     }
   }
 
@@ -1105,8 +1124,10 @@ class _TemplateListScreenState extends State<TemplateListScreen> {
       encoder.close();
       await Share.shareXFiles([XFile(zipPath)], text: 'Exported templates');
     } catch (e) {
-      SnackbarUtils.showTyped(context,
-          l10n.errorDuringBatchExport(e.toString()), SnackBarType.error);
+      if (mounted) {
+        SnackbarUtils.showTyped(context,
+            l10n.errorDuringBatchExport(e.toString()), SnackBarType.error);
+      }
     }
   }
 }

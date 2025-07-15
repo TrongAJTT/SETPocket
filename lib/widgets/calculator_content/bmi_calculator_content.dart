@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/calculator_models/bmi_models.dart';
 import 'package:setpocket/services/calculator_services/bmi_service.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';
-import 'package:setpocket/widgets/generic/number_stepper.dart';
 
 /// BMI Calculator content widget - separated from main screen for better organization
 class BmiCalculatorContent extends StatefulWidget {
@@ -25,6 +25,9 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
   // Form controllers
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
+
+  // Focus nodes
+  final FocusNode _weightFocusNode = FocusNode();
 
   // Age group instead of exact age
   AgeGroup _ageGroup = AgeGroup.adult18Plus;
@@ -143,6 +146,20 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
 
     if (heightText.isEmpty || weightText.isEmpty) {
       if (!mounted) return;
+      if (heightText.isEmpty) {
+        SnackbarUtils.showTyped(
+            context,
+            AppLocalizations.of(context)!.pleaseEnterHeight,
+            SnackBarType.warning);
+        return;
+      }
+      if (weightText.isEmpty) {
+        SnackbarUtils.showTyped(
+            context,
+            AppLocalizations.of(context)!.pleaseEnterWeight,
+            SnackBarType.warning);
+        return;
+      }
       setState(() {
         _currentCalculation = null;
       });
@@ -178,7 +195,24 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
     final height = double.tryParse(heightText);
     final weight = double.tryParse(weightText);
 
-    if (height == null || weight == null) return;
+    if (height == null) {
+      if (mounted) {
+        SnackbarUtils.showTyped(
+            context,
+            AppLocalizations.of(context)!.pleaseEnterHeight,
+            SnackBarType.warning);
+      }
+      return;
+    }
+    if (weight == null) {
+      if (mounted) {
+        SnackbarUtils.showTyped(
+            context,
+            AppLocalizations.of(context)!.pleaseEnterWeight,
+            SnackBarType.warning);
+      }
+      return;
+    }
 
     final bmiData = BmiData.create(
       height: height,
@@ -356,18 +390,13 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: WidgetLayoutRenderHelper.twoEqualWidthInRow(
-                // Left side - Units label
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
+                  // Left side - Units label
+                  Text(
                     l10n.units,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                ),
-                // Right side - SegmentedButton spanning full width
-                SizedBox(
-                  width: double.infinity,
-                  child: SegmentedButton<UnitSystem>(
+                  // Right side - SegmentedButton spanning full width
+                  SegmentedButton<UnitSystem>(
                     segments: [
                       ButtonSegment(
                         value: UnitSystem.metric,
@@ -383,9 +412,7 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                       _toggleUnitSystem();
                     },
                   ),
-                ),
-                minWidth: 300,
-              ),
+                  minWidth: 500),
             ),
           ),
 
@@ -518,6 +545,12 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                             suffixText:
                                 _unitSystem == UnitSystem.metric ? 'cm' : 'in',
                           ),
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) {
+                            // Move focus to weight field when height is submitted
+                            FocusScope.of(context)
+                                .requestFocus(_weightFocusNode);
+                          },
                         ),
                       ],
                     ),
@@ -534,6 +567,7 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _weightController,
+                          focusNode: _weightFocusNode,
                           keyboardType: const TextInputType.numberWithOptions(
                               decimal: true),
                           inputFormatters: [
@@ -560,8 +594,9 @@ class _BmiCalculatorContentState extends State<BmiCalculatorContent> {
           const SizedBox(height: 16),
 
           // Calculate button
-          SizedBox(
+          Container(
             height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ElevatedButton(
               onPressed: _onCalculatePressed,
               style: ElevatedButton.styleFrom(

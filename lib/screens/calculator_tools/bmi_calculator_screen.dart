@@ -23,7 +23,7 @@ class BmiCalculatorScreen extends StatefulWidget {
 
 class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
   bool _historyEnabled = false;
-  int _historyCount = 0;
+  int _bookmarkCount = 0;
   final GlobalKey<_BmiHistoryWidgetState> _historyWidgetKey =
       GlobalKey<_BmiHistoryWidgetState>();
 
@@ -42,12 +42,12 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
   List<Widget> _buildMainPanelActions() {
     final actions = <Widget>[];
 
-    // Chỉ add clear history action nếu có history
-    if (_historyCount > 1) {
+    // Chỉ add clear history action nếu có bookmark
+    if (_bookmarkCount > 1) {
       actions.add(
         IconButton(
           icon: const Icon(Icons.delete_sweep_outlined),
-          tooltip: 'Xóa tất cả lịch sử',
+          tooltip: AppLocalizations.of(context)!.clearAllBookmarks,
           onPressed: () => _showClearAllConfirmation(context),
         ),
       );
@@ -70,7 +70,7 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
     if (mounted) {
       setState(() {
         _historyEnabled = settings.rememberHistory;
-        _historyCount = history.length;
+        _bookmarkCount = history.length;
       });
     }
   }
@@ -102,13 +102,14 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
         await BmiService.clearHistory();
         _historyWidgetKey.currentState?.refreshHistory();
         setState(() {
-          _historyCount = 0;
+          _bookmarkCount = 0;
         });
       },
     );
 
     if (confirmed == true && mounted) {
       SnackbarUtils.showTyped(
+        // ignore: use_build_context_synchronously
         context,
         l10n.clearAllBookmarksSuccess,
         SnackBarType.success,
@@ -139,11 +140,12 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
           // Update history data flag
           _loadHistorySettings();
           setState(() {
-            _historyCount++;
+            _bookmarkCount++;
           });
 
           if (context.mounted) {
             SnackbarUtils.showTyped(
+              // ignore: use_build_context_synchronously
               context,
               l10n.saved,
               SnackBarType.success,
@@ -152,6 +154,7 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
         } catch (e) {
           if (context.mounted) {
             SnackbarUtils.showTyped(
+              // ignore: use_build_context_synchronously
               context,
               'Error: $e',
               SnackBarType.error,
@@ -532,6 +535,7 @@ class _BmiHistoryWidgetState extends State<_BmiHistoryWidget> {
                         await _loadHistory();
                         if (context.mounted) {
                           SnackbarUtils.showTyped(
+                            // ignore: use_build_context_synchronously
                             context,
                             l10n.historyItemDeleted,
                             SnackBarType.success,
@@ -540,6 +544,7 @@ class _BmiHistoryWidgetState extends State<_BmiHistoryWidget> {
                       } catch (e) {
                         if (context.mounted) {
                           SnackbarUtils.showTyped(
+                            // ignore: use_build_context_synchronously
                             context,
                             'Error: $e',
                             SnackBarType.error,

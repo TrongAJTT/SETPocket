@@ -32,6 +32,7 @@ class GenericTableBuilder {
     VoidCallback? onSave,
     String? saveTooltip,
     TableStyle style = TableStyle.simple,
+    Widget? footer,
   }) {
     final theme = Theme.of(context);
 
@@ -72,6 +73,9 @@ class GenericTableBuilder {
             style == TableStyle.bordered
                 ? _buildBorderedTable(context, rows)
                 : _buildTable(context, rows),
+            if (footer != null) ...[
+              footer,
+            ],
           ],
         ),
       ),

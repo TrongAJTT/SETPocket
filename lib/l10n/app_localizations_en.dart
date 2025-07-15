@@ -381,6 +381,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addDataLoop => 'Add Data Loop';
 
   @override
+  String get fieldType => 'Field type';
+
+  @override
   String get fieldTypeText => 'Text';
 
   @override
@@ -420,7 +423,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loopTitleLabel => 'Loop title *';
 
   @override
-  String get loopTitleHint => 'E.g. Product list';
+  String get contentInALoop => 'Content in a Loop';
 
   @override
   String get pleaseFixDuplicateIds => 'Please fix inconsistent duplicate IDs before saving';
@@ -905,6 +908,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showCalculatorInfo => 'Show calculator information';
 
   @override
+  String get startCalculatingCreateBookmarkHint => 'Start calculating and save results to create bookmarks';
+
+  @override
   String get startDate => 'Start Date';
 
   @override
@@ -974,6 +980,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weeks => 'Weeks';
 
   @override
+  String get setToNextWeek => 'Set to next week';
+
+  @override
   String get addSubtractValues => 'Add/Subtract Values';
 
   @override
@@ -983,7 +992,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ageCalculatorResultsTitle => 'Age Calculation Results';
 
   @override
-  String get age => 'Your Current Age';
+  String get age => 'Age';
+
+  @override
+  String get yourCurrentAge => 'Your Current Age';
 
   @override
   String get daysLived => 'Total Days Lived';
@@ -2450,6 +2462,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weightPounds => 'Weight (pounds)';
+
+  @override
+  String get pleaseEnterHeight => 'Please enter your height';
+
+  @override
+  String get pleaseEnterWeight => 'Please enter your weight';
 
   @override
   String get yourBMI => 'Your BMI';
@@ -4813,6 +4831,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectedDate => 'Selected Date';
 
   @override
+  String get seeInfoForThisDate => 'See information for this date';
+
+  @override
   String get weekdayName => 'Day of Week';
 
   @override
@@ -6596,4 +6617,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storagePermissionRequired => 'Storage permission is required to select custom folder';
+
+  @override
+  String exceedLimitCharacters(int limit) {
+    return 'Exceeds limit of $limit characters';
+  }
+
+  @override
+  String get backAgainToCloseApp => 'Back again to close the app';
 }

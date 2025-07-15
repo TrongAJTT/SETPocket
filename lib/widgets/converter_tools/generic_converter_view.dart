@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/controllers/converter_controller.dart';
-import 'package:setpocket/models/converter_models/converter_base.dart';
+import 'package:setpocket/controllers/converter_controller.dart'
+    show ConverterController;
+import 'package:setpocket/layouts/single_panel_layout.dart'
+    show SinglePanelLayout;
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/services/focus_mode_service.dart';
-import 'package:setpocket/layouts/single_panel_layout.dart';
-import 'generic_unit_custom_dialog.dart';
+import 'package:setpocket/models/converter_models/converter_base.dart'
+    show ConverterViewMode;
+import 'package:setpocket/services/focus_mode_service.dart'
+    show FocusModeService;
+import 'package:setpocket/widgets/converter_tools/generic_unit_custom_dialog.dart'
+    show GenericUnitItem, EnhancedGenericUnitCustomizationDialog;
+import 'package:setpocket/widgets/generic/icon_button_list.dart'
+    show IconButtonList, IconButtonListItem;
 import 'converter_card_widget.dart';
 import 'converter_table_widget.dart';
 import 'converter_status_widget.dart';
@@ -52,99 +59,42 @@ class _GenericConverterViewState extends State<GenericConverterView> {
   }
 
   /// Build actions for the unified AppBar (excluding info button which is handled by layout)
-  List<Widget> _buildActions(
+  IconButtonList _buildActions(
       BuildContext context, ConverterController controller) {
     final l10n = AppLocalizations.of(context)!;
-    final isMobile = MediaQuery.of(context).size.width < 600;
-    final actions = <Widget>[];
+    final screenSize = MediaQuery.of(context).size;
 
-    // Mobile: Show customize units button and context menu for other actions
-    if (isMobile) {
-      actions.addAll([
-        IconButton(
-          icon: const Icon(Icons.info),
-          onPressed: widget.onShowInfo ?? () {},
-          tooltip: l10n.info,
-        ),
-        IconButton(
-          icon: const Icon(Icons.tune),
-          onPressed: () => _showGlobalUnitsCustomization(context, controller),
-          tooltip: l10n.customizeUnits,
-        ),
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
-          tooltip: l10n.moreActions,
-          onSelected: (value) {
-            switch (value) {
-              case 'focus_mode':
-                _toggleFocusMode(context, controller);
-                break;
-              case 'reset_layout':
-                _showResetLayoutConfirmation(context, controller);
-                break;
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem<String>(
-              value: 'focus_mode',
-              child: Row(
-                children: [
-                  Icon(
-                    controller.isFocusMode
-                        ? Icons.center_focus_weak
-                        : Icons.center_focus_strong,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    controller.isFocusMode
-                        ? l10n.disableFocusMode
-                        : l10n.enableFocusMode,
-                  ),
-                ],
-              ),
-            ),
-            PopupMenuItem<String>(
-              value: 'reset_layout',
-              child: Row(
-                children: [
-                  const Icon(Icons.restart_alt),
-                  const SizedBox(width: 12),
-                  Text(l10n.resetLayout),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ]);
-    }
-    // Desktop/Tablet: Show individual buttons
-    else {
-      actions.addAll([
-        IconButton(
-          icon: Icon(
-            controller.isFocusMode
-                ? Icons.center_focus_weak
-                : Icons.center_focus_strong,
-          ),
-          onPressed: () => _toggleFocusMode(context, controller),
-          tooltip: controller.isFocusMode
-              ? l10n.disableFocusMode
-              : l10n.enableFocusMode,
-        ),
-        IconButton(
-          icon: const Icon(Icons.restart_alt),
-          onPressed: () => _showResetLayoutConfirmation(context, controller),
-          tooltip: l10n.resetLayout,
-        ),
-        IconButton(
-          icon: const Icon(Icons.tune),
-          onPressed: () => _showGlobalUnitsCustomization(context, controller),
-          tooltip: l10n.customizeUnits,
-        ),
-      ]);
-    }
+    int visibleCount = ((screenSize.width - 340) ~/ 40).clamp(0, 4);
 
-    return actions;
+    List<IconButtonListItem> actionItems = [
+      IconButtonListItem(
+        icon: controller.isFocusMode
+            ? Icons.center_focus_weak
+            : Icons.center_focus_strong,
+        label: controller.isFocusMode
+            ? l10n.disableFocusMode
+            : l10n.enableFocusMode,
+        onPressed: () => _toggleFocusMode(context, controller),
+      ),
+      IconButtonListItem(
+        icon: Icons.tune,
+        label: l10n.customizeUnits,
+        onPressed: () => _showGlobalUnitsCustomization(context, controller),
+      ),
+      IconButtonListItem(
+        icon: Icons.restart_alt,
+        label: l10n.resetLayout,
+        onPressed: () => _showResetLayoutConfirmation(context, controller),
+      ),
+      IconButtonListItem(
+        icon: Icons.info,
+        label: l10n.info,
+        onPressed: widget.onShowInfo ?? () {},
+      ),
+    ];
+
+    return IconButtonList(
+        buttons: actionItems, visibleCount: visibleCount, spacing: 4.0);
   }
 
   @override
@@ -159,7 +109,7 @@ class _GenericConverterViewState extends State<GenericConverterView> {
     // Use SinglePanelLayout with unified actions
     return SinglePanelLayout(
       title: displayTitle,
-      actions: _buildActions(context, widget.controller),
+      actions: [_buildActions(context, widget.controller)],
       child: _buildConverterContent(context, widget.controller),
     );
   }

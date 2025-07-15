@@ -674,15 +674,25 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_isInitialized) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                l10n.fetchingRates,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
         ),
       );
     }
-
-    final l10n = AppLocalizations.of(context)!;
 
     return ListenableBuilder(
       listenable: _controller,

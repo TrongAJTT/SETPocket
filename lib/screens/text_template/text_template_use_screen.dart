@@ -228,8 +228,18 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(element.title,
-              style: const TextStyle(fontWeight: FontWeight.w500)),
+          Row(
+            children: [
+              Icon(
+                _getIconForType(element.type),
+                size: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(element.title,
+                  style: const TextStyle(fontWeight: FontWeight.w500)),
+            ],
+          ),
           const SizedBox(height: 8),
           _buildInputForElement(element, l10n, (value) {
             setState(() {
@@ -320,6 +330,25 @@ class _TemplateUseScreenState extends State<TemplateUseScreen>
         ),
       ),
     );
+  }
+
+  IconData _getIconForType(String type) {
+    switch (type) {
+      case 'text':
+        return Icons.text_fields;
+      case 'largetext':
+        return Icons.text_format;
+      case 'number':
+        return Icons.numbers;
+      case 'date':
+        return Icons.date_range;
+      case 'time':
+        return Icons.access_time;
+      case 'datetime':
+        return Icons.hourglass_bottom;
+      default:
+        return Icons.help_outline;
+    }
   }
 
   Widget _buildInputForElement(TemplateElement element, AppLocalizations l10n,

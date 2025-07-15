@@ -112,8 +112,10 @@
     "templateTitleLabel": "Tiêu đề mẫu *",
     "templateTitleHint": "Nhập tiêu đề cho mẫu này",
     "pleaseEnterTitle": "Vui lòng nhập tiêu đề",
+    "dataFields": "Trường dữ liệu",
     "addDataField": "Thêm trường dữ liệu",
     "addDataLoop": "Thêm vòng lặp dữ liệu",
+    "fieldType": "Loại trường",
     "fieldTypeText": "Văn bản",
     "fieldTypeLargeText": "Văn bản nhiều dòng",
     "fieldTypeNumber": "Số",
@@ -127,7 +129,7 @@
     "insertAtCursor": "Chèn tại vị trí con trỏ",
     "appendToEnd": "Thêm vào cuối",
     "loopTitleLabel": "Tiêu đề vòng lặp *",
-    "loopTitleHint": "VD: Danh sách sản phẩm",
+    "contentInALoop": "Nội dung trong vòng lặp",
     "pleaseFixDuplicateIds": "Vui lòng sửa các ID trùng lặp không nhất quán trước khi lưu",
     "errorSavingTemplate": "Lỗi khi lưu mẫu: {error}",
     "templateContentLabel": "Nội dung mẫu *",
@@ -663,7 +665,10 @@
     "enterMeasurements": "Nhập số đo của bạn",
     "heightCm": "Chiều cao (cm)",
     "heightInches": "Chiều cao (inches)",
-    "weightKg": "Cân nặng (kg)",    "weightPounds": "Cân nặng (pounds)",
+    "weightKg": "Cân nặng (kg)",    
+    "weightPounds": "Cân nặng (pounds)",
+    "pleaseEnterHeight": "Vui lòng nhập chiều cao",
+    "pleaseEnterWeight": "Vui lòng nhập cân nặng",
     "yourBMI": "BMI của bạn",
     "bmiScale": "Thang đo BMI",
     "underweight": "Thiếu cân",
@@ -854,6 +859,7 @@
     "bmiKeyFeatures": "Tính năng chính",
 
     "selectedDate": "Ngày được chọn",
+    "seeInfoForThisDate": "Xem thông tin cho ngày này",
     "weekdayName": "Thứ trong tuần",
     "dayInMonth": "Ngày trong tháng",
     "dayInYear": "Ngày trong năm",
@@ -966,6 +972,7 @@
     "dateCalculatorMainFeatures": "Tính năng chính",
     "dateCalculatorUsage": "Cách sử dụng",
     "showCalculatorInfo": "Xem thông tin máy tính",
+    "startCalculatingCreateBookmarkHint": "Bắt đầu thực hiện các phép tính để tạo dấu trang và lưu trữ kết quả.",
 
     "dateCalculatorDetailedInfo": "Thông tin Máy tính Ngày",
     "dateCalculatorOverview": "Công cụ toàn diện cho mọi phép tính về ngày tháng, thời gian và tuổi với nhiều tính năng hữu ích",
@@ -2223,6 +2230,7 @@
     "totalWeeks": "Tổng số tuần",
     "totalMonths": "Tổng số tháng",
     "weeks": "tuần",
+    "setToNextWeek": "Đặt sang tuần tiếp theo",
     "totalDays": "Tổng số ngày",
     "totalHours": "Tổng số giờ",
     "totalMinutes": "Tổng số phút",
@@ -2231,7 +2239,8 @@
     "ageCalculatorDesc": "Tính tuổi dựa trên ngày sinh và xem chi tiết về sinh nhật tiếp theo.",
     "ageCalculatorResultsTitle": "Kết quả tính tuổi",
     "birthDate": "Ngày sinh",
-    "daysLived": "Tổng số ngày đã sống",
+    "yourCurrentAge": "Tuổi hiện tại",
+    "daysLived": "Số ngày đã sống",
     "daysUntilBirthday": "Số ngày đến sinh nhật",
     "nextBirthday": "Sinh nhật tiếp theo",
     "dateCalculator": "Máy tính ngày",
@@ -2854,6 +2863,7 @@
     "duplicate": "Nhân bản",
     "enterNewTemplateName": "Nhập tên mới cho mẫu nhân bản.",
     "apply": "Áp dụng",
+    "createManually": "Tạo thủ công",
     "importFromFile": "Nhập từ file",
     "areYouSureToDeleteNTemplates": "Bạn có chắc muốn xóa {count} mẫu?",
     "youAreAboutToExportNTemplates": "Bạn sẽ xuất {count} mẫu.",
@@ -2904,5 +2914,14 @@
     "p2lanOptionEncryptionNoneAbout": "Dữ liệu được truyền không được mã hóa, cung cấp tốc độ truyền nhanh nhất nhưng không cung cấp bảo mật. Chỉ sử dụng trên mạng đáng tin cậy.",
     "p2lanOptionEncryptionAesGcmAbout": "AES-256-GCM là tiêu chuẩn mã hóa phổ biến cung cấp bảo mật mạnh. Phù hợp nhất cho thiết bị cao cấp với phần cứng tăng tốc, nhưng có thể chậm hơn trên thiết bị Android cũ hoặc thấp cấp.",
     "p2lanOptionEncryptionChaCha20About": "ChaCha20-Poly1305 là một thuật toán mã hóa hiện đại, được thiết kế để đảm bảo cả tính bảo mật cao và tốc độ xử lý nhanh, đặc biệt hiệu quả trên các thiết bị di động.\nKhuyến nghị sử dụng cho hầu hết các thiết bị Android vì khả năng hoạt động hiệu quả ngay cả khi thiết bị không hỗ trợ tăng tốc phần cứng (tức không cần chip chuyên dụng để xử lý mã hóa). Việc này giúp cung cấp khả năng bảo vệ dữ liệu mạnh mẽ với hiệu suất tốt hơn so với thuật toán AES trên nhiều dòng điện thoại.",
-    "storagePermissionRequired": "Cần quyền lưu trữ để chọn thư mục tùy chỉnh"
+    "storagePermissionRequired": "Cần quyền lưu trữ để chọn thư mục tùy chỉnh",
+    "exceedLimitCharacters": "Vượt quá giới hạn {limit} ký tự",
+    "@exceedLimitCharacters": {
+        "placeholders": {
+            "limit": {
+                "type": "int"
+            }
+        }
+    },
+    "backAgainToCloseApp": "Trở lại lần nữa để xác nhận đóng ứng dụng"
 }

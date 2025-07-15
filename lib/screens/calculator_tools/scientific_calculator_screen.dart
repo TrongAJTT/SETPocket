@@ -804,6 +804,7 @@ class _ScientificCalculatorScreenState
       rightPanelTitle: _historyEnabled ? l10n.calculationHistory : null,
       isEmbedded: widget.isEmbedded,
       useCompactTabLayout: true,
+      showInfoInRightPanelHeader: false,
       mainPanelActions: [
         IconButton(
           onPressed: _showScientificCalculatorInfo,
@@ -1243,7 +1244,7 @@ class _ScientificCalculatorHistoryWidgetState
                     onPressed: () =>
                         widget.onRestoreExpression(item.title ?? '', context),
                     icon: const Icon(Icons.input, size: 18),
-                    tooltip: 'Restore Expression',
+                    tooltip: l10n.restoreExpression,
                     constraints:
                         const BoxConstraints(minWidth: 32, minHeight: 32),
                   ),
@@ -1261,7 +1262,7 @@ class _ScientificCalculatorHistoryWidgetState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    item.value ?? '',
+                    item.value,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.secondary,
@@ -1271,7 +1272,7 @@ class _ScientificCalculatorHistoryWidgetState
                 IconButton(
                   onPressed: () => widget.onRestoreFromHistory(item, context),
                   icon: const Icon(Icons.restore, size: 18),
-                  tooltip: 'Restore Result',
+                  tooltip: l10n.restoreResult,
                   constraints:
                       const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
@@ -1345,7 +1346,7 @@ class _ScientificCalculatorHistoryWidgetState
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No calculation history',
+                        l10n.noCalculationHistory,
                         style:
                             Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Theme.of(context)
@@ -1357,7 +1358,7 @@ class _ScientificCalculatorHistoryWidgetState
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Text(
-                          'Perform calculations to see them here',
+                          l10n.performCalculation,
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context)

@@ -815,6 +815,12 @@ abstract class AppLocalizations {
   /// **'Add Data Loop'**
   String get addDataLoop;
 
+  /// No description provided for @fieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Field type'**
+  String get fieldType;
+
   /// No description provided for @fieldTypeText.
   ///
   /// In en, this message translates to:
@@ -893,11 +899,11 @@ abstract class AppLocalizations {
   /// **'Loop title *'**
   String get loopTitleLabel;
 
-  /// No description provided for @loopTitleHint.
+  /// No description provided for @contentInALoop.
   ///
   /// In en, this message translates to:
-  /// **'E.g. Product list'**
-  String get loopTitleHint;
+  /// **'Content in a Loop'**
+  String get contentInALoop;
 
   /// No description provided for @pleaseFixDuplicateIds.
   ///
@@ -1733,6 +1739,12 @@ abstract class AppLocalizations {
   /// **'Show calculator information'**
   String get showCalculatorInfo;
 
+  /// No description provided for @startCalculatingCreateBookmarkHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start calculating and save results to create bookmarks'**
+  String get startCalculatingCreateBookmarkHint;
+
   /// No description provided for @startDate.
   ///
   /// In en, this message translates to:
@@ -1871,6 +1883,12 @@ abstract class AppLocalizations {
   /// **'Weeks'**
   String get weeks;
 
+  /// No description provided for @setToNextWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Set to next week'**
+  String get setToNextWeek;
+
   /// No description provided for @addSubtractValues.
   ///
   /// In en, this message translates to:
@@ -1889,11 +1907,17 @@ abstract class AppLocalizations {
   /// **'Age Calculation Results'**
   String get ageCalculatorResultsTitle;
 
-  /// Label for age in age calculator
+  /// No description provided for @age.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get age;
+
+  /// No description provided for @yourCurrentAge.
   ///
   /// In en, this message translates to:
   /// **'Your Current Age'**
-  String get age;
+  String get yourCurrentAge;
 
   /// Label for total days lived in age calculator
   ///
@@ -4762,6 +4786,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weight (pounds)'**
   String get weightPounds;
+
+  /// No description provided for @pleaseEnterHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your height'**
+  String get pleaseEnterHeight;
+
+  /// No description provided for @pleaseEnterWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your weight'**
+  String get pleaseEnterWeight;
 
   /// No description provided for @yourBMI.
   ///
@@ -9305,6 +9341,12 @@ abstract class AppLocalizations {
   /// **'Selected Date'**
   String get selectedDate;
 
+  /// No description provided for @seeInfoForThisDate.
+  ///
+  /// In en, this message translates to:
+  /// **'See information for this date'**
+  String get seeInfoForThisDate;
+
   /// No description provided for @weekdayName.
   ///
   /// In en, this message translates to:
@@ -12730,6 +12772,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Storage permission is required to select custom folder'**
   String get storagePermissionRequired;
+
+  /// No description provided for @exceedLimitCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Exceeds limit of {limit} characters'**
+  String exceedLimitCharacters(int limit);
+
+  /// No description provided for @backAgainToCloseApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Back again to close the app'**
+  String get backAgainToCloseApp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

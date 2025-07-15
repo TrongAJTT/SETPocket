@@ -30,22 +30,35 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
     'originalPrice': TextEditingController(),
     'discountPercent': TextEditingController(),
   };
-
   final Map<String, TextEditingController> _tipControllers = {
     'billAmount': TextEditingController(),
     'tipPercent': TextEditingController(),
     'numberOfPeople': TextEditingController(),
   };
-
   final Map<String, TextEditingController> _taxControllers = {
     'priceBeforeTax': TextEditingController(),
     'taxRate': TextEditingController(),
   };
-
   final Map<String, TextEditingController> _markupControllers = {
     'costPrice': TextEditingController(),
     'markupPercent': TextEditingController(),
   };
+
+  // Focus node to manage focus
+  final Map<String, FocusNode> _discountFocusNodes = {
+    'discountPercent': FocusNode(),
+  };
+  final Map<String, FocusNode> _tipFocusNodes = {
+    'tipPercent': FocusNode(),
+    'numberOfPeople': FocusNode(),
+  };
+  final Map<String, FocusNode> _taxFocusNodes = {
+    'taxRate': FocusNode(),
+  };
+  final Map<String, FocusNode> _markupFocusNodes = {
+    'markupPercent': FocusNode(),
+  };
+
   @override
   void initState() {
     super.initState();
@@ -371,6 +384,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.originalPrice,
             hint: l10n.enterOriginalPrice,
             controller: _discountControllers['originalPrice']!,
+            nextFocusNode: _discountFocusNodes['discountPercent'],
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),
@@ -378,6 +392,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.discountPercent,
             hint: l10n.enterDiscountPercent,
             controller: _discountControllers['discountPercent']!,
+            focusNode: _discountFocusNodes['discountPercent'],
             keyboardType: TextInputType.number,
             isPercentage: true,
           ),
@@ -420,6 +435,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.billAmount,
             hint: l10n.enterBillAmount,
             controller: _tipControllers['billAmount']!,
+            nextFocusNode: _tipFocusNodes['tipPercent']!,
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),
@@ -427,6 +443,8 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.tipPercent,
             hint: l10n.enterTipPercent,
             controller: _tipControllers['tipPercent']!,
+            focusNode: _tipFocusNodes['tipPercent'],
+            nextFocusNode: _tipFocusNodes['numberOfPeople'],
             keyboardType: TextInputType.number,
             isPercentage: true,
           ),
@@ -435,6 +453,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.numberOfPeople,
             hint: l10n.enterNumberOfPeople,
             controller: _tipControllers['numberOfPeople']!,
+            focusNode: _tipFocusNodes['numberOfPeople'],
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 24),
@@ -476,6 +495,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.priceBeforeTax,
             hint: l10n.enterPriceBeforeTax,
             controller: _taxControllers['priceBeforeTax']!,
+            nextFocusNode: _taxFocusNodes['taxRate'],
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),
@@ -483,6 +503,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.taxRate,
             hint: l10n.enterTaxRate,
             controller: _taxControllers['taxRate']!,
+            focusNode: _taxFocusNodes['taxRate'],
             keyboardType: TextInputType.number,
             isPercentage: true,
           ),
@@ -524,6 +545,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.costPrice,
             hint: l10n.enterCostPrice,
             controller: _markupControllers['costPrice']!,
+            nextFocusNode: _markupFocusNodes['markupPercent'],
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),
@@ -531,6 +553,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             label: l10n.markupPercent,
             hint: l10n.enterMarkupPercent,
             controller: _markupControllers['markupPercent']!,
+            focusNode: _markupFocusNodes['markupPercent'],
             keyboardType: TextInputType.number,
             isPercentage: true,
           ),
@@ -562,6 +585,8 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
     required TextEditingController controller,
     required TextInputType keyboardType,
     bool isPercentage = false,
+    FocusNode? focusNode,
+    FocusNode? nextFocusNode,
   }) {
     return TextFormField(
       controller: controller,
@@ -576,6 +601,16 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
         border: const OutlineInputBorder(),
         suffixText: isPercentage ? '%' : null,
       ),
+      focusNode: focusNode,
+      textInputAction:
+          nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+      onFieldSubmitted: (value) {
+        if (nextFocusNode != null) {
+          FocusScope.of(context).requestFocus(nextFocusNode);
+        } else {
+          FocusScope.of(context).unfocus();
+        }
+      },
     );
   }
 
@@ -891,7 +926,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
-                'Start calculating and save results to create bookmarks',
+                l10n.startCalculatingCreateBookmarkHint,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),

@@ -430,14 +430,14 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
   ) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final useColumnLayout = constraints.maxWidth < 500;
+        final useColumnLayout = constraints.maxWidth < 300;
 
         if (useColumnLayout) {
           return Column(
             children: [
-              _buildAmountField(context, l10n, card, cardControllers),
-              const SizedBox(height: 12),
               _buildBaseUnitDropdown(context, l10n, card),
+              const SizedBox(height: 8),
+              _buildAmountField(context, l10n, card, cardControllers),
             ],
           );
         } else {
@@ -445,12 +445,12 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
             children: [
               Expanded(
                 flex: 2,
-                child: _buildAmountField(context, l10n, card, cardControllers),
+                child: _buildBaseUnitDropdown(context, l10n, card),
               ),
               const SizedBox(width: 12),
               Expanded(
                 flex: 3,
-                child: _buildBaseUnitDropdown(context, l10n, card),
+                child: _buildAmountField(context, l10n, card, cardControllers),
               ),
             ],
           );
@@ -547,42 +547,59 @@ class _ConverterCardWidgetState extends State<ConverterCardWidget> {
         ? card.baseUnitId
         : (validVisibleUnits.isNotEmpty ? validVisibleUnits.first : null);
 
-    return DropdownButtonFormField<String>(
-      value: dropdownValue,
-      decoration: InputDecoration(
-        labelText: l10n.from,
-        border: const OutlineInputBorder(),
-        isDense: true,
-      ),
-      style: TextStyle(
-        fontSize: 13,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
-      items: validVisibleUnits
-          .map((unitId) {
-            final unit = controller.converterService.getUnit(unitId);
-            if (unit == null) return null;
-
-            return DropdownMenuItem<String>(
-              value: unitId,
-              child: Text(
-                '${unit.symbol} - ${unit.name}',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            );
-          })
-          .where((item) => item != null)
-          .cast<DropdownMenuItem<String>>()
-          .toList(),
-      onChanged: (newUnitId) {
-        if (newUnitId != null) {
-          final currentValue = card.baseValue;
-          _debouncedOnChanged(cardIndex, newUnitId, currentValue.toString());
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate max text length based on width (approximate, 7px per char)
+        final maxTextLen = (constraints.maxWidth / 7).floor() - 4;
+        String truncateText(String text, int maxLen) {
+          if (text.length <= maxLen) return text;
+          return '${text.substring(0, maxLen > 3 ? maxLen - 3 : 0)}...';
         }
+
+        return DropdownButtonFormField<String>(
+          value: dropdownValue,
+          decoration: InputDecoration(
+            labelText: l10n.from,
+            border: const OutlineInputBorder(),
+            isDense: true,
+          ),
+          style: TextStyle(
+            fontSize: 13,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          isExpanded: true,
+          items: validVisibleUnits
+              .map((unitId) {
+                final unit = controller.converterService.getUnit(unitId);
+                if (unit == null) return null;
+                final displayText = '${unit.symbol} - ${unit.name}';
+                return DropdownMenuItem<String>(
+                  value: unitId,
+                  child: Container(
+                    constraints:
+                        BoxConstraints(maxWidth: constraints.maxWidth - 32),
+                    child: Text(
+                      truncateText(displayText, maxTextLen),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                );
+              })
+              .where((item) => item != null)
+              .cast<DropdownMenuItem<String>>()
+              .toList(),
+          onChanged: (newUnitId) {
+            if (newUnitId != null) {
+              final currentValue = card.baseValue;
+              _debouncedOnChanged(
+                  cardIndex, newUnitId, currentValue.toString());
+            }
+          },
+        );
       },
     );
   }

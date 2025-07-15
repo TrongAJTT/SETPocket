@@ -47,6 +47,24 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
     'frequency': TextEditingController(),
   };
 
+  // Form focus nodes for each tab
+  final Map<String, FocusNode> _loanFocusNodes = {
+    'rate': FocusNode(),
+    'term': FocusNode(),
+  };
+
+  final Map<String, FocusNode> _investmentFocusNodes = {
+    'monthly': FocusNode(),
+    'rate': FocusNode(),
+    'term': FocusNode(),
+  };
+
+  final Map<String, FocusNode> _compoundFocusNodes = {
+    'rate': FocusNode(),
+    'time': FocusNode(),
+    'frequency': FocusNode(),
+  };
+
   // Results
   LoanCalculationResult? _loanResult;
   InvestmentCalculationResult? _investmentResult;
@@ -443,6 +461,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 20),
           _buildInputField(
             controller: _loanControllers['amount']!,
+            nextFocusNode: _loanFocusNodes['rate'],
             label: l10n.loanAmount,
             hint: l10n.loanAmountHint,
             icon: Icons.attach_money,
@@ -450,6 +469,8 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _loanControllers['rate']!,
+            focusNode: _loanFocusNodes['rate']!,
+            nextFocusNode: _loanFocusNodes['term'],
             label: l10n.annualInterestRate,
             hint: l10n.annualInterestRateHint,
             icon: Icons.percent,
@@ -457,6 +478,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _loanControllers['term']!,
+            focusNode: _loanFocusNodes['term']!,
             label: l10n.loanTerm,
             hint: l10n.loanTermHint,
             icon: Icons.calendar_today,
@@ -507,6 +529,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 20),
           _buildInputField(
             controller: _investmentControllers['initial']!,
+            nextFocusNode: _investmentFocusNodes['monthly'],
             label: l10n.initialInvestment,
             hint: l10n.initialInvestmentHint,
             icon: Icons.savings,
@@ -514,6 +537,8 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _investmentControllers['monthly']!,
+            focusNode: _investmentFocusNodes['monthly']!,
+            nextFocusNode: _investmentFocusNodes['rate'],
             label: l10n.monthlyContribution,
             hint: l10n.monthlyContributionHint,
             icon: Icons.calendar_month,
@@ -521,6 +546,8 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _investmentControllers['rate']!,
+            focusNode: _investmentFocusNodes['rate']!,
+            nextFocusNode: _investmentFocusNodes['term'],
             label: l10n.annualReturn,
             hint: l10n.annualReturnHint,
             icon: Icons.trending_up,
@@ -528,6 +555,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _investmentControllers['term']!,
+            focusNode: _investmentFocusNodes['term']!,
             label: l10n.investmentPeriod,
             hint: l10n.investmentPeriodHint,
             icon: Icons.timeline,
@@ -578,6 +606,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 20),
           _buildInputField(
             controller: _compoundControllers['principal']!,
+            nextFocusNode: _compoundFocusNodes['rate'],
             label: l10n.principalAmount,
             hint: l10n.principalAmountHint,
             icon: Icons.account_balance,
@@ -585,6 +614,8 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _compoundControllers['rate']!,
+            focusNode: _compoundFocusNodes['rate']!,
+            nextFocusNode: _compoundFocusNodes['time'],
             label: l10n.annualInterestRate,
             hint: l10n.annualInterestRateHint,
             icon: Icons.percent,
@@ -592,6 +623,8 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _compoundControllers['time']!,
+            focusNode: _compoundFocusNodes['time']!,
+            nextFocusNode: _compoundFocusNodes['frequency'],
             label: l10n.timePeriod,
             hint: l10n.timePeriodHint,
             icon: Icons.schedule,
@@ -599,6 +632,7 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           const SizedBox(height: 16),
           _buildInputField(
             controller: _compoundControllers['frequency']!,
+            focusNode: _compoundFocusNodes['frequency']!,
             label: l10n.compoundingFrequency,
             hint: l10n.compoundingFrequencyHint,
             icon: Icons.repeat,
@@ -639,12 +673,15 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
     required String label,
     required String hint,
     required IconData icon,
+    FocusNode? focusNode,
+    FocusNode? nextFocusNode,
   }) {
     // Check if this is a percentage field
     final isPercentageField = label.contains('(%)') || hint.contains('%');
 
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
         if (isPercentageField)
@@ -673,6 +710,15 @@ class _FinancialCalculatorScreenState extends State<FinancialCalculatorScreen> {
           ),
         ),
       ),
+      textInputAction:
+          nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          FocusScope.of(context).requestFocus(nextFocusNode);
+        } else {
+          FocusScope.of(context).unfocus();
+        }
+      },
     );
   }
 

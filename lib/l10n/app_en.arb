@@ -145,6 +145,7 @@
     "pleaseEnterTitle": "Please enter a title",
     "addDataField": "Add Data Field",
     "addDataLoop": "Add Data Loop",
+    "fieldType": "Field type",
     "fieldTypeText": "Text",
     "fieldTypeLargeText": "Large Text",
     "fieldTypeNumber": "Number",
@@ -158,7 +159,7 @@
     "insertAtCursor": "Insert at Cursor",
     "appendToEnd": "Append to End",
     "loopTitleLabel": "Loop title *",
-    "loopTitleHint": "E.g. Product list",
+    "contentInALoop": "Content in a Loop",
     "pleaseFixDuplicateIds": "Please fix inconsistent duplicate IDs before saving",
     "errorSavingTemplate": "Error saving template: {error}",
     "templateContentLabel": "Template Content *",
@@ -319,6 +320,7 @@
     "clearTabData": "Clear Data",
     "tabDataCleared": "Data cleared for current tab",
     "showCalculatorInfo": "Calculator Information",
+    "startCalculatingCreateBookmarkHint": "Start calculating and save results to create bookmarks",
     
     "startDate": "Start Date",
     "endDate": "End Date",
@@ -344,6 +346,7 @@
     "minutes": "Minutes",
     "seconds": "Seconds",
     "weeks": "Weeks",
+    "setToNextWeek": "Set to next week",
     
     "addSubtractValues": "Add/Subtract Values",
     "addSubtractResultsTitle": "Result",
@@ -352,22 +355,11 @@
     "@ageCalculatorResultsTitle": {
         "description": "Title for the age calculator results card"
     },
-    "age": "Your Current Age",
-    "@age": {
-        "description": "Label for age in age calculator"
-    },
+    "age": "Age",
+    "yourCurrentAge": "Your Current Age",
     "daysLived": "Total Days Lived",
-    "@daysLived": {
-        "description": "Label for total days lived in age calculator"
-    },
     "nextBirthday": "Next Birthday On",
-    "@nextBirthday": {
-        "description": "Label for the date of the next birthday"
-    },
     "daysUntilBirthday": "Days Until Next Birthday",
-    "@daysUntilBirthday": {
-        "description": "Label for days until next birthday in age calculator"
-    },
     
     "workingDaysCount": "Working Days",
     "excludeWeekends": "Exclude Weekends",
@@ -990,7 +982,10 @@
     "enterMeasurements": "Enter your measurements",
     "heightCm": "Height (cm)",
     "heightInches": "Height (inches)",
-    "weightKg": "Weight (kg)",    "weightPounds": "Weight (pounds)",
+    "weightKg": "Weight (kg)",    
+    "weightPounds": "Weight (pounds)",
+    "pleaseEnterHeight": "Please enter your height",
+    "pleaseEnterWeight": "Please enter your weight",
     "yourBMI": "Your BMI",
     "bmiScale": "BMI Scale",
     "underweight": "Underweight",
@@ -2201,6 +2196,7 @@
     "financialTip5": "Higher compounding frequency increases returns",
 
     "selectedDate": "Selected Date",
+    "seeInfoForThisDate": "See information for this date",
     "weekdayName": "Day of Week",
     "dayInMonth": "Day in Month",
     "dayInYear": "Day in Year",
@@ -2263,10 +2259,6 @@
     "nextBirthday": "Next Birthday On",
     "@nextBirthday": {
         "description": "Label for the date of the next birthday"
-    },
-    "age": "Your Current Age",
-    "@age": {
-        "description": "Label for age in age calculator"
     },
     "dateCalculatorInfoHeaderTitle": "Date Calculator Information",
     "dateCalculatorInfoHeaderSubtitle": "A powerful tool for all your date and time calculations.",
@@ -3744,5 +3736,14 @@
     "p2lanOptionEncryptionNoneAbout": "Data is transferred without encryption. This provides the fastest transfer speeds but offers no security protection. Only use this on trusted networks.",
     "p2lanOptionEncryptionAesGcmAbout": "AES-256-GCM is a widely used encryption standard that provides strong security. It is best suited for high-end devices with hardware acceleration, but may be slower on older or low-end Android devices.",
     "p2lanOptionEncryptionChaCha20About": "ChaCha20-Poly1305 is a modern encryption algorithm designed for both security and speed, especially on mobile devices.\nIt is recommended for most Android devices because it works efficiently even without hardware acceleration, providing strong protection with better performance than AES on many phones.",
-    "storagePermissionRequired": "Storage permission is required to select custom folder"
+    "storagePermissionRequired": "Storage permission is required to select custom folder",
+    "exceedLimitCharacters": "Exceeds limit of {limit} characters",
+    "@exceedLimitCharacters": {
+        "placeholders": {
+            "limit": {
+                "type": "int"
+            }
+        }
+    },
+    "backAgainToCloseApp": "Back again to close the app"
   }

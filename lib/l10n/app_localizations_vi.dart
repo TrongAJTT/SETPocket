@@ -381,6 +381,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get addDataLoop => 'Thêm vòng lặp dữ liệu';
 
   @override
+  String get fieldType => 'Loại trường';
+
+  @override
   String get fieldTypeText => 'Văn bản';
 
   @override
@@ -420,7 +423,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loopTitleLabel => 'Tiêu đề vòng lặp *';
 
   @override
-  String get loopTitleHint => 'VD: Danh sách sản phẩm';
+  String get contentInALoop => 'Nội dung trong vòng lặp';
 
   @override
   String get pleaseFixDuplicateIds => 'Vui lòng sửa các ID trùng lặp không nhất quán trước khi lưu';
@@ -898,6 +901,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get showCalculatorInfo => 'Xem thông tin máy tính';
 
   @override
+  String get startCalculatingCreateBookmarkHint => 'Bắt đầu thực hiện các phép tính để tạo dấu trang và lưu trữ kết quả.';
+
+  @override
   String get startDate => 'Ngày bắt đầu';
 
   @override
@@ -967,6 +973,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weeks => 'tuần';
 
   @override
+  String get setToNextWeek => 'Đặt sang tuần tiếp theo';
+
+  @override
   String get addSubtractValues => 'Thêm/bớt giá trị';
 
   @override
@@ -979,7 +988,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get age => 'Tuổi';
 
   @override
-  String get daysLived => 'Tổng số ngày đã sống';
+  String get yourCurrentAge => 'Tuổi hiện tại';
+
+  @override
+  String get daysLived => 'Số ngày đã sống';
 
   @override
   String get nextBirthday => 'Sinh nhật tiếp theo';
@@ -2443,6 +2455,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get weightPounds => 'Cân nặng (pounds)';
+
+  @override
+  String get pleaseEnterHeight => 'Vui lòng nhập chiều cao';
+
+  @override
+  String get pleaseEnterWeight => 'Vui lòng nhập cân nặng';
 
   @override
   String get yourBMI => 'BMI của bạn';
@@ -4806,6 +4824,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get selectedDate => 'Ngày được chọn';
 
   @override
+  String get seeInfoForThisDate => 'Xem thông tin cho ngày này';
+
+  @override
   String get weekdayName => 'Thứ trong tuần';
 
   @override
@@ -6387,7 +6408,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get addElement => 'Add Element';
 
   @override
-  String get dataFields => 'Data Fields';
+  String get dataFields => 'Trường dữ liệu';
 
   @override
   String get templatesTabTitle => 'Mẫu';
@@ -6482,7 +6503,7 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get createManually => 'Create Manually';
+  String get createManually => 'Tạo thủ công';
 
   @override
   String get importFromFile => 'Nhập từ file';
@@ -6589,4 +6610,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get storagePermissionRequired => 'Cần quyền lưu trữ để chọn thư mục tùy chỉnh';
+
+  @override
+  String exceedLimitCharacters(int limit) {
+    return 'Vượt quá giới hạn $limit ký tự';
+  }
+
+  @override
+  String get backAgainToCloseApp => 'Trở lại lần nữa để xác nhận đóng ứng dụng';
 }

@@ -6,8 +6,6 @@ import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_services/date_calculator_service.dart';
 import 'package:setpocket/utils/localization_utils.dart';
-import 'package:setpocket/utils/size_utils.dart';
-import 'package:setpocket/utils/widget_layout_render_helper.dart';
 import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/widgets/numeric_stepper_widget.dart';
 import 'package:setpocket/models/unified_history_data.dart';
@@ -173,7 +171,7 @@ class DateCalculatorScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateSelector(context,
-              label: 'Base Date',
+              label: l10n.baseDate,
               date: c.startDate.value,
               onChanged: (picked) => c.startDate.value = picked),
           const SizedBox(height: 16),
@@ -183,7 +181,7 @@ class DateCalculatorScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Add/Subtract Values",
+                  Text(l10n.value,
                       style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 16),
                   NumericStepper(
@@ -231,14 +229,36 @@ class DateCalculatorScreen extends StatelessWidget {
           Obx(() => c.addSubtractResultDate.value.isNotEmpty
               ? table.GenericTableBuilder.buildResultCard(
                   context,
-                  title: "Result",
+                  title: l10n.results,
                   onSave: () => _saveToBookmark(c, l10n, context),
                   rows: [
                     table.GenericTableBuilder.createRow(
-                        "Result Date", c.addSubtractResultDate.value),
+                        l10n.resultDate, c.addSubtractResultDate.value),
                     table.GenericTableBuilder.createRow(
-                        "Day of the week", c.addSubtractResultDayOfWeek.value),
+                        l10n.dayOfWeek, c.addSubtractResultDayOfWeek.value),
                   ],
+                  footer: Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        c.onTabChanged(DateCalculationType.dateInfo);
+                        c.selectedDate.value =
+                            c.addSubtractResultDate.value.isNotEmpty
+                                ? DateTime.parse(c.addSubtractResultDate.value)
+                                : DateTime.now();
+                      },
+                      icon: const Icon(Icons.share),
+                      label: Text(l10n.seeInfoForThisDate),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 )
               : const SizedBox.shrink()),
         ],
@@ -262,7 +282,7 @@ class DateCalculatorScreen extends StatelessWidget {
           _buildDateSelector(context,
               label: 'End Date',
               date: c.toDate.value,
-              quickButtonLabel: 'Set to 1 week from now',
+              quickButtonLabel: l10n.setToNextWeek,
               quickButtonDate: DateTime.now().add(const Duration(days: 7)),
               onChanged: (picked) {
             c.toDate.value = picked;
@@ -271,8 +291,8 @@ class DateCalculatorScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Obx(() {
             if (c.isDateConflict.value) {
-              return _buildWarningCard(context,
-                  'Start date cannot be greater than or equal to end date.');
+              return _buildWarningCard(
+                  context, l10n.startDateConflixWithEndDateAlarm);
             }
             return const SizedBox.shrink();
           }),
@@ -308,7 +328,7 @@ class DateCalculatorScreen extends StatelessWidget {
           Obx(() => c.diffTotalDays.value != 0
               ? table.GenericTableBuilder.buildResultCard(
                   context,
-                  title: 'Duration',
+                  title: l10n.duration,
                   onSave: () => _saveToBookmark(c, l10n, context),
                   rows: [
                     table.GenericTableBuilder.createSectionHeader(
@@ -341,7 +361,7 @@ class DateCalculatorScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateSelector(context,
-              label: 'Birth Date',
+              label: l10n.birthDate,
               date: c.birthDate.value, onChanged: (picked) {
             c.birthDate.value = picked;
             c.calculate();
@@ -350,17 +370,17 @@ class DateCalculatorScreen extends StatelessWidget {
           Obx(() => c.currentAge.value.isNotEmpty
               ? table.GenericTableBuilder.buildResultCard(
                   context,
-                  title: "Age Calculation Results",
+                  title: l10n.ageCalculatorResultsTitle,
                   onSave: () => _saveToBookmark(c, l10n, context),
                   rows: [
                     table.GenericTableBuilder.createRow(
-                        "Your Current Age", c.currentAge.value),
+                        l10n.yourCurrentAge, c.currentAge.value),
                     table.GenericTableBuilder.createRow(
-                        "Total Days Lived", '${c.totalDaysLived.value} Days'),
+                        l10n.daysLived, '${c.totalDaysLived.value} Days'),
+                    table.GenericTableBuilder.createRow(l10n.daysUntilBirthday,
+                        '${c.daysUntilBirthday.value} Days'),
                     table.GenericTableBuilder.createRow(
-                        "Days Until Next", '${c.daysUntilBirthday.value} Days'),
-                    table.GenericTableBuilder.createRow(
-                        "Next Birthday On", c.nextBirthday.value),
+                        l10n.nextBirthday, c.nextBirthday.value),
                   ],
                 )
               : const SizedBox.shrink()),
@@ -377,7 +397,7 @@ class DateCalculatorScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateSelector(context,
-              label: 'Selected Date',
+              label: l10n.selectedDate,
               date: c.selectedDate.value, onChanged: (picked) {
             c.selectedDate.value = picked;
             c.calculate();
@@ -386,31 +406,31 @@ class DateCalculatorScreen extends StatelessWidget {
           Obx(() => c.dayOfWeek.value.isNotEmpty
               ? table.GenericTableBuilder.buildResultCard(
                   context,
-                  title: "Date Information Results",
+                  title: l10n.dateInfoResults,
                   onSave: () => _saveToBookmark(c, l10n, context),
                   rows: [
                     table.GenericTableBuilder.createRow(
-                        "Day of Week", c.dayOfWeek.value),
+                        l10n.dayOfWeek, c.dayOfWeek.value),
                     table.GenericTableBuilder.createRow(
-                        "Day in Month", '${c.dayInMonth.value}'),
+                        l10n.dayInMonth, '${c.dayInMonth.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Day in Year", '${c.dayInYear.value}'),
+                        l10n.dayInYear, '${c.dayInYear.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Week in Month", '${c.weekInMonth.value}'),
+                        l10n.weekInMonth, '${c.weekInMonth.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Week in Year", '${c.weekInYear.value}'),
+                        l10n.weekInYear, '${c.weekInYear.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Month Of Year", c.monthOfYear.value),
+                        l10n.monthOfYear, c.monthOfYear.value),
                     table.GenericTableBuilder.createRow(
-                        "Year", '${c.yearValue.value}'),
+                        l10n.year, '${c.yearValue.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Quarter Of Year", 'Q${c.quarterOfYear.value}'),
+                        l10n.quarterOfYear, 'Q${c.quarterOfYear.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Leap Year", c.isLeapYear.value ? "Yes" : "No"),
+                        l10n.isLeapYear, c.isLeapYear.value ? "Yes" : "No"),
                     table.GenericTableBuilder.createRow(
-                        "Days in Month", '${c.daysInMonth.value}'),
+                        l10n.daysInMonth, '${c.daysInMonth.value}'),
                     table.GenericTableBuilder.createRow(
-                        "Days in Year", '${c.daysInYear.value}'),
+                        l10n.daysInYear, '${c.daysInYear.value}'),
                   ],
                 )
               : const SizedBox.shrink()),
@@ -477,7 +497,7 @@ class DateCalculatorScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Text(
-                    'Start calculating and save results to create bookmarks',
+                    l10n.startCalculatingCreateBookmarkHint,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),

@@ -3,6 +3,7 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/models/text_template/text_templates_data.dart';
 import 'package:setpocket/models/text_template/text_template_components.dart';
 import 'package:setpocket/services/text_template_services/text_template_service.dart';
+import 'package:setpocket/utils/size_utils.dart';
 import 'package:setpocket/utils/template_parser.dart';
 import 'dart:async';
 import 'package:setpocket/utils/snackbar_utils.dart';
@@ -162,8 +163,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   }
 
   void _autoSaveDraftSync() {
-    if (!_hasUnsavedChanges || _currentTemplate.status != TemplateStatus.draft)
+    if (!_hasUnsavedChanges ||
+        _currentTemplate.status != TemplateStatus.draft) {
       return;
+    }
 
     try {
       // Update the existing _currentTemplate object and save it
@@ -241,7 +244,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isDesktop = MediaQuery.of(context).size.width > 1000;
 
     final mainContent = PopScope(
       canPop: !_hasUnsavedChanges,
@@ -262,9 +264,13 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                 labelText: l10n.templateTitleLabel,
                 border: const OutlineInputBorder(),
               ),
+              maxLength: 30,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return l10n.pleaseEnterTitle;
+                }
+                if (value.length > 30) {
+                  return l10n.exceedLimitCharacters(30);
                 }
                 return null;
               },
@@ -286,8 +292,8 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
                     textAlignVertical: TextAlignVertical.top,
                   ),
                   Positioned(
-                    bottom: 16,
-                    right: 16,
+                    bottom: 12,
+                    right: 12,
                     child: FloatingActionButton(
                       onPressed: () => _showAddElementDialog(context),
                       tooltip: l10n.addElement,
@@ -323,6 +329,7 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
       rightPanelTitle: l10n.templateStructure,
       mainPanelIcon: Icons.edit,
       isEmbedded: _isEmbeddedInDesktop,
+      useCompactTabLayout: true,
     );
   }
 
@@ -750,7 +757,6 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
   }
 
   void _showAddElementDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => _AddElementDialog(
@@ -1120,7 +1126,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
           TextButton(
             onPressed: () async {
               await _saveAsDraft();
-              Navigator.of(context).pop('save_draft');
+              if (mounted) {
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop('save_draft');
+              }
             },
             child: Text(l10n.saveDraft),
           ),
@@ -1174,7 +1183,10 @@ class _TemplateEditScreenState extends State<TemplateEditScreen>
           TextButton(
             onPressed: () async {
               await _saveAsDraft();
-              if (mounted) Navigator.of(context).pop('save_draft');
+              if (mounted) {
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop('save_draft');
+              }
             },
             child: Text(l10n.saveDraft),
           ),
@@ -1237,72 +1249,81 @@ class _AddElementDialogState extends State<_AddElementDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final screenSize = MediaQuery.of(context).size;
     return GenericDialog(
       header: GenericDialogHeader(
         title: l10n.addElement,
         icon: GenericIcon.icon(Icons.add),
         displayExitButton: true,
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SegmentedButton<int>(
-            segments: const [
-              ButtonSegment(
-                value: 0,
-                label: Text('Data Field'),
-                icon: Icon(Icons.text_fields),
+      body: SizedBox(
+        height: screenSize.height * 0.8 > 500 ? 500 : screenSize.height * 0.8,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SegmentedButton<int>(
+                segments: [
+                  ButtonSegment(
+                    value: 0,
+                    label: Text(l10n.dataFields),
+                    icon: const Icon(Icons.text_fields),
+                  ),
+                  ButtonSegment(
+                    value: 1,
+                    label: Text(l10n.dataLoops),
+                    icon: const Icon(Icons.repeat),
+                  ),
+                ],
+                selected: {_selectedTab},
+                onSelectionChanged: (s) {
+                  setState(() => _selectedTab = s.first);
+                },
               ),
-              ButtonSegment(
-                value: 1,
-                label: Text('Data Loop'),
-                icon: Icon(Icons.repeat),
-              ),
+              const SizedBox(height: 20),
+              if (_selectedTab == 0) ...[
+                // Add Data Field form
+                TextField(
+                  controller: _fieldTitleController,
+                  decoration: InputDecoration(
+                    labelText: l10n.fieldTitleLabel,
+                    hintText: l10n.fieldTitleHint,
+                    border: const OutlineInputBorder(),
+                  ),
+                  autofocus: true,
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('${l10n.fieldType}:'),
+                ),
+                const SizedBox(height: 8),
+                _buildRadioOption(
+                    'text', l10n.fieldTypeText, Icons.text_fields),
+                _buildRadioOption(
+                    'largetext', l10n.fieldTypeLargeText, Icons.text_snippet),
+                _buildRadioOption(
+                    'number', l10n.fieldTypeNumber, Icons.numbers),
+                _buildRadioOption(
+                    'date', l10n.fieldTypeDate, Icons.calendar_today),
+                _buildRadioOption(
+                    'time', l10n.fieldTypeTime, Icons.access_time),
+                _buildRadioOption(
+                    'datetime', l10n.fieldTypeDateTime, Icons.calendar_month),
+              ] else ...[
+                // Add Data Loop form
+                TextField(
+                  controller: _loopTitleController,
+                  decoration: InputDecoration(
+                    labelText: l10n.loopTitleLabel,
+                    border: const OutlineInputBorder(),
+                  ),
+                  autofocus: true,
+                ),
+              ],
             ],
-            selected: {_selectedTab},
-            onSelectionChanged: (s) {
-              setState(() => _selectedTab = s.first);
-            },
           ),
-          const SizedBox(height: 20),
-          if (_selectedTab == 0) ...[
-            // Add Data Field form
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Field type:'),
-            ),
-            const SizedBox(height: 8),
-            _buildRadioOption('text', l10n.fieldTypeText, Icons.text_fields),
-            _buildRadioOption(
-                'largetext', l10n.fieldTypeLargeText, Icons.text_snippet),
-            _buildRadioOption('number', l10n.fieldTypeNumber, Icons.numbers),
-            _buildRadioOption('date', l10n.fieldTypeDate, Icons.calendar_today),
-            _buildRadioOption('time', l10n.fieldTypeTime, Icons.access_time),
-            _buildRadioOption(
-                'datetime', l10n.fieldTypeDateTime, Icons.calendar_month),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _fieldTitleController,
-              decoration: InputDecoration(
-                labelText: l10n.fieldTitleLabel,
-                hintText: l10n.fieldTitleHint,
-                border: const OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ] else ...[
-            // Add Data Loop form
-            TextField(
-              controller: _loopTitleController,
-              decoration: InputDecoration(
-                labelText: l10n.loopTitleLabel,
-                hintText: l10n.loopTitleHint,
-                border: const OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ],
-        ],
+        ),
       ),
       footer: GenericDialogFooter(
         child: Row(
@@ -1353,6 +1374,8 @@ class _AddElementDialogState extends State<_AddElementDialog> {
           ],
         ),
       ),
+      decorator: GenericDialogDecorator(
+          width: DynamicDimension.flexibilityMax(94, 700)),
     );
   }
 

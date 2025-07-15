@@ -11,6 +11,7 @@ import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/number_format_service.dart';
 import 'package:setpocket/services/app_installation_service.dart';
 import 'package:setpocket/services/quick_actions_service.dart';
+import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:setpocket/variables.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -353,6 +354,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WindowListener {
+  DateTime? _lastBackPressed;
   @override
   void initState() {
     super.initState();
@@ -425,17 +427,47 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // If width is less than 600, we consider it mobile layout
-        final isMobile = constraints.maxWidth < 600;
+    return PopScope(
+      canPop: false, // Prevent default pop behavior
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return; // If already popped, don't do anything
 
-        if (isMobile) {
-          return const ProfileMobileLayout();
-        } else {
-          return const ProfileDesktopLayout();
+        // Check if there is no screen left in stack (at HomePage)
+        final now = DateTime.now();
+        if (_lastBackPressed == null ||
+            now.difference(_lastBackPressed!) > const Duration(seconds: 3)) {
+          _lastBackPressed = now;
+          SnackbarUtils.showTyped(
+            context,
+            AppLocalizations.of(context)!.backAgainToCloseApp,
+            SnackBarType.info,
+          );
+          return; // Don't pop
+        }
+
+        // Back again within 3 seconds to exit
+        if (context.mounted) {
+          // Close the app on Android/Windows
+          if (Platform.isAndroid) {
+            SystemNavigator.pop();
+          } else if (Platform.isWindows) {
+            await windowManager.destroy();
+          }
+          // Other platforms will implement their own exit logic on the future
         }
       },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // If width is less than 600, we consider it mobile layout
+          final isMobile = constraints.maxWidth < 600;
+
+          if (isMobile) {
+            return const ProfileMobileLayout();
+          } else {
+            return const ProfileDesktopLayout();
+          }
+        },
+      ),
     );
   }
 }

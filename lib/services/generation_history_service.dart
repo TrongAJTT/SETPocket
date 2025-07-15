@@ -1,16 +1,9 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:isar/isar.dart';
 import 'package:setpocket/services/generation_history_service_isar.dart';
 import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/services/isar_service.dart';
 
 class GenerationHistoryService {
-  static const String _historyEnabledKey = 'generation_history_enabled';
-  static const String _historyKey = 'generation_history';
-  static const String _encryptionKey =
-      'my_multi_tools_history_encryption_key_2024';
-
   // Maximum number of items to keep in history
   static const int maxHistoryItems = 100;
   static bool _migrationCompleted = false;
@@ -21,39 +14,6 @@ class GenerationHistoryService {
     // Since this is a one-time migration, we assume it has been completed
     // and the old Hive data is no longer relevant.
     _migrationCompleted = true;
-  }
-
-  /// Simple encryption using base64 and key rotation
-  static String _encrypt(String plainText) {
-    final bytes = utf8.encode(plainText);
-    final keyBytes = utf8.encode(_encryptionKey);
-
-    // Simple XOR encryption with key rotation
-    final encrypted = Uint8List(bytes.length);
-    for (int i = 0; i < bytes.length; i++) {
-      encrypted[i] = bytes[i] ^ keyBytes[i % keyBytes.length];
-    }
-
-    return base64.encode(encrypted);
-  }
-
-  /// Simple decryption
-  static String _decrypt(String encryptedText) {
-    try {
-      final encrypted = base64.decode(encryptedText);
-      final keyBytes = utf8.encode(_encryptionKey);
-
-      // Simple XOR decryption with key rotation
-      final decrypted = Uint8List(encrypted.length);
-      for (int i = 0; i < encrypted.length; i++) {
-        decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
-      }
-
-      return utf8.decode(decrypted);
-    } catch (e) {
-      // If decryption fails, return empty string
-      return '';
-    }
   }
 
   /// Check if history saving is enabled

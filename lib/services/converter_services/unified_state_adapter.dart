@@ -20,8 +20,6 @@ class UnifiedStateAdapter implements ConverterStateService {
       if (savedStates != null && savedStates['states'] != null) {
         final stateList = savedStates['states'] as List;
         if (stateList.isNotEmpty) {
-          final stateData = stateList.first as Map<String, dynamic>;
-
           // Convert saved state to ConverterState
           final cards = (savedStates['states'] as List)
               .map((cardData) => ConverterCardState(

@@ -135,22 +135,12 @@ class _RandomToolsSettingsLayoutState extends BaseSettingsLayoutState<
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Generation History Settings
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildHistorySettings(loc),
-            ),
-          ),
+          _buildHistorySettings(loc),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
           // State Saving Settings
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildSaveRandomToolsStateSettings(loc),
-            ),
-          ),
+          _buildSaveRandomToolsStateSettings(loc),
         ],
       ),
     );

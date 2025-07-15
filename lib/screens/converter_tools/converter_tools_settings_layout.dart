@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/services/settings_models_service.dart';
-import 'package:setpocket/services/app_logger.dart';
-import 'package:setpocket/widgets/generic/option_switch.dart';
-import 'package:setpocket/widgets/generic/option_list_picker.dart';
-import 'package:setpocket/widgets/generic/option_slider.dart';
-import 'package:setpocket/widgets/generic/option_item.dart';
+import 'package:setpocket/models/converter_models/currency_fetch_mode.dart'
+    show CurrencyFetchMode, CurrencyFetchModeExtension;
+import 'package:setpocket/services/app_logger.dart' show logError;
+import 'package:setpocket/services/settings_models_service.dart'
+    show ExtensibleSettingsService;
 import 'package:setpocket/widgets/generic/base_settings_layout.dart';
-import 'package:setpocket/models/converter_models/currency_fetch_mode.dart';
-import 'package:setpocket/utils/widget_layout_decor_utils.dart';
+import 'package:setpocket/widgets/generic/option_item.dart' show OptionItem;
+import 'package:setpocket/widgets/generic/option_list_picker.dart'
+    show OptionListPicker;
+import 'package:setpocket/widgets/generic/option_slider.dart'
+    show SliderOption, OptionSlider, OptionSliderLayout;
+import 'package:setpocket/widgets/generic/option_switch.dart'
+    show OptionSwitchDecorator, OptionSwitch;
 
 /// Layout for Converter Tools settings using the generic settings system
 class ConverterToolsSettingsLayout
@@ -155,23 +159,27 @@ class _ConverterToolsSettingsLayoutState extends BaseSettingsLayoutState<
   @override
   Widget buildSettingsContent(BuildContext context, AppLocalizations loc) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Currency Settings
-          Text(
-            loc.currencyFetchMode,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            loc.currencyFetchModeDesc,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+          ListTile(
+            leading: Icon(Icons.currency_exchange,
+                size: 20, color: Theme.of(context).colorScheme.primary),
+            title: Text(
+              loc.currencyFetchMode,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+            subtitle: Text(
+              loc.currencyFetchModeDesc,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 16),
           OptionListPicker<CurrencyFetchMode>(
@@ -189,7 +197,7 @@ class _ConverterToolsSettingsLayoutState extends BaseSettingsLayoutState<
             showSelectionControl: false,
           ),
 
-          VerticalSpacingDivider.both(6),
+          const SizedBox(height: 8),
 
           // Fetch Timeout
           OptionSlider<int>(
@@ -208,8 +216,6 @@ class _ConverterToolsSettingsLayoutState extends BaseSettingsLayoutState<
             layout: OptionSliderLayout.none,
           ),
 
-          VerticalSpacingDivider.both(6),
-
           // Fetch Retry Times
           OptionSlider<int>(
             label: loc.fetchRetryIncomplete,
@@ -227,7 +233,7 @@ class _ConverterToolsSettingsLayoutState extends BaseSettingsLayoutState<
             layout: OptionSliderLayout.none,
           ),
 
-          VerticalSpacingDivider.both(16),
+          const SizedBox(height: 8),
 
           // State Saving
           OptionSwitch(

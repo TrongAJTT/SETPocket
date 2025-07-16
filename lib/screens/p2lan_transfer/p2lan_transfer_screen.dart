@@ -5,6 +5,7 @@ import 'package:setpocket/controllers/p2p_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/utils/network_debug_utils.dart';
 import 'package:setpocket/widgets/p2p/network_security_warning_dialog.dart';
 import 'package:setpocket/widgets/p2p/pairing_request_dialog.dart';
@@ -273,6 +274,14 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         icon: Icons.info,
         content: _buildStatusPanel(),
       ),
+      secondaryPanelActions: [
+        IconButton(
+          icon: const Icon(Icons.info),
+          onPressed: () =>
+              FunctionInfo.show(context, FunctionInfoKeys.p2lanDataTransfer),
+          tooltip: l10n.info,
+        ),
+      ],
     );
   }
 

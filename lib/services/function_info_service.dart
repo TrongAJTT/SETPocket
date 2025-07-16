@@ -55,6 +55,8 @@ class FunctionInfo {
 }
 
 class FunctionInfoKeys {
+  static const String p2lanDataTransfer = 'p2lanDataTransfer';
+
   static const String currencyConverter = 'converter_tools/currencyConverter';
   static const String lengthConverter = 'converter_tools/lengthConverter';
   static const String weightConverter = 'converter_tools/weightConverter';

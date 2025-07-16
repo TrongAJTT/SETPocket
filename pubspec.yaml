@@ -69,5 +69,4 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/func_info/calculator_tools/
-    - assets/func_info/converter_tools/
+    - assets/func_info/

@@ -5,8 +5,8 @@ import 'package:setpocket/controllers/date_calculator_controller.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/services/calculator_services/date_calculator_service.dart';
+import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/utils/localization_utils.dart';
-import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/widgets/numeric_stepper_widget.dart';
 import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
@@ -684,16 +684,7 @@ class DateCalculatorScreen extends StatelessWidget {
   }
 
   void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (context) => const GenericInfoDialog(
-        title: "Date Calculator",
-        headerIcon: Icons.calendar_today,
-        overview:
-            "A comprehensive tool for date calculations including add/subtract operations, date differences, age calculations, and detailed date information.",
-        sections: [],
-      ),
-    );
+    FunctionInfo.show(context, FunctionInfoKeys.dateCalculator);
   }
 
   void _showClearDataDialog(

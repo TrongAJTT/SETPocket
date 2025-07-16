@@ -864,93 +864,6 @@
     "memoryOperations": "Memory Operations",
     "memoryOperationsDesc": "Store and recall values with memory management functions",
     
-    "scientificHowToUse": "How to Use",
-    "step1Scientific": "Step 1: Enter Expression",
-    "step1ScientificDesc": "Type numbers and use function buttons to build mathematical expressions",
-    "step2Scientific": "Step 2: Use Functions",
-    "step2ScientificDesc": "Access trigonometric, logarithmic, and algebraic functions from the keypad",
-    "step3Scientific": "Step 3: Toggle Modes",
-    "step3ScientificDesc": "Switch between radians/degrees and primary/secondary functions as needed",
-    "step4Scientific": "Step 4: Use History - View and reuse previous calculations",
-    "@step4Scientific": {
-        "description": "Step 4 for using scientific calculator"
-    },
-    "step4ScientificDesc": "Press = to calculate or see real-time preview while typing",
-    
-    "scientificTips": "Pro Tips",
-    "tip1Scientific": "Use parentheses to ensure correct order of operations: (2+3)×4 = 20",
-    "@tip1Scientific": {
-        "description": "Tip 1 for scientific calculator"
-    },
-    "tip2Scientific": "Switch to DEG mode for degree calculations, RAD for radians",
-    "@tip2Scientific": {
-        "description": "Tip 2 for scientific calculator"
-    },
-    "tip3Scientific": "Use the 2nd button to access inverse functions: sin⁻¹, cos⁻¹, log⁻¹",
-    "@tip3Scientific": {
-        "description": "Tip 3 for scientific calculator"
-    },
-    "tip4Scientific": "Use memory functions (MS, MR, M+, M-) to store intermediate results",
-    "@tip4Scientific": {
-        "description": "Tip 4 for scientific calculator"
-    },
-    "tip5Scientific": "Double-tap numbers to select and copy results",
-    "@tip5Scientific": {
-        "description": "Tip 5 for scientific calculator"
-    },
-    "tip6Scientific": "Use EXP for scientific notation: 1.23E+5 = 123,000",
-    "@tip6Scientific": {
-        "description": "Tip 6 for scientific calculator"
-    },
-    "tip7Scientific": "Clear individual entries with C, or clear all with AC",
-    "@tip7Scientific": {
-        "description": "Tip 7 for scientific calculator"
-    },
-    "basicArithmetic": "Basic Arithmetic",
-    "@basicArithmetic": {
-        "description": "Basic arithmetic operations section"
-    },
-    "trigonometricFunctionsScientific": "Trigonometric Functions",
-    "@trigonometricFunctionsScientific": {
-        "description": "Trigonometric functions section for scientific calculator"
-    },
-    "logarithmicFunctionsScientific": "Logarithmic Functions",
-    "@logarithmicFunctionsScientific": {
-        "description": "Logarithmic functions section for scientific calculator"
-    },
-    "algebraicFunctions": "Algebraic Functions",
-    "@algebraicFunctions": {
-        "description": "Algebraic functions section"
-    },
-    "scientificFunctionCategories": "Function Categories",
-    "basicArithmeticDesc": "Addition (+), Subtraction (-), Multiplication (*), Division (/)",
-    "trigonometricFunctionsScientificDesc": "sin, cos, tan and their inverse functions (asin, acos, atan)",
-    "logarithmicFunctionsScientificDesc": "Natural log (ln), common log (log), exponential (exp, eˣ, 10ˣ)",
-    "algebraicFunctionsDesc": "Powers (x², x³, xʸ), roots (√, ∛), factorial (n!), absolute value (|x|)",
-    "angleMode": "Angle Mode (DEG/RAD)",
-    "@angleMode": {
-        "description": "Angle mode control"
-    },
-    "functionToggle": "Function Toggle (2nd)",
-    "@functionToggle": {
-        "description": "Function toggle control"
-    },
-    "memoryFunctions": "Memory Functions",
-    "@memoryFunctions": {
-        "description": "Memory functions control"
-    },
-    "historyAccess": "History Access",
-    "@historyAccess": {
-        "description": "History access control"
-    },
-    "scientificCalculatorPracticalApplications": "Practical Applications",
-    "@scientificCalculatorPracticalApplications": {
-        "description": "Practical applications section for scientific calculator"
-    },
-    "scientificCalculatorPracticalApplicationsDesc": "Helpful for students in mathematics and science courses, basic engineering calculations, and everyday problem-solving involving complex mathematical operations.",
-    "@scientificCalculatorPracticalApplicationsDesc": {
-        "description": "Practical applications description for scientific calculator"
-    },
     "cacheWithLogSize": "Cache: {cacheSize} (+{logSize} log)",
     "@cacheWithLogSize": {
         "description": "Cache info with log size",
@@ -1045,41 +958,6 @@
     "bmiNormalDesc": "Associated with lowest risk of weight-related health problems",
     "bmiOverweightDesc": "Increased risk of cardiovascular disease, diabetes, and other health issues",
     "bmiObeseDesc": "Significantly increased risk of serious health complications",
-    
-    "bmiKeyFeatures": "Key Features",
-    "comprehensiveBmiCalc": "Comprehensive BMI Calculation",
-    "comprehensiveBmiCalcDesc": "Calculate BMI using height, weight, age, and gender for accurate results",
-    "multipleUnitSystems": "Multiple Unit Systems",
-    "multipleUnitSystemsDesc": "Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements",
-    "healthInsights": "Health Insights",
-    "healthInsightsDesc": "Get personalized recommendations based on your BMI category",
-    "calculationHistory": "Calculation History",
-    "calculationHistoryDesc": "Track your BMI calculations over time with detailed history",
-    "ageGenderConsideration": "Age & Gender Consideration",
-    "ageGenderConsiderationDesc": "BMI interpretation adjusted for age and gender factors",
-    
-    "bmiHowToUse": "How to Use",
-    "step1Bmi": "Step 1: Select Unit System",
-    "step1BmiDesc": "Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements",
-    "step2Bmi": "Step 2: Enter Your Information",
-    "step2BmiDesc": "Input your height, weight, age, and gender for accurate calculation",
-    "step3Bmi": "Step 3: View Results",
-    "step3BmiDesc": "See your BMI value, category, and personalized health recommendations",
-    "step4Bmi": "Step 4: Track Progress",
-    "step4BmiDesc": "Save calculations to history and monitor changes over time",
-    
-    "bmiTips": "Health Tips",
-    "tip1Bmi": "BMI is a screening tool - consult healthcare providers for complete health assessment",
-    "tip2Bmi": "Regular monitoring helps track progress toward health goals",
-    "tip3Bmi": "BMI may not accurately reflect body composition for athletes or elderly",
-    "tip4Bmi": "Focus on healthy lifestyle changes rather than just the number",
-    "tip5Bmi": "Combine BMI with other health indicators for better understanding",
-    
-    "bmiLimitations": "Understanding BMI Limitations",
-    "bmiLimitationsDesc": "BMI is a useful screening tool but has limitations. It doesn't distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.",
-    
-    "bmiPracticalApplications": "Practical Applications",
-    "bmiPracticalApplicationsDesc": "Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.",
     
     "noHistoryMessage": "Your BMI calculation history will appear here",
     "clearBmiHistory": "Clear BMI History",
@@ -2049,12 +1927,6 @@
     "bmiFemaleRec": "Women of reproductive age should ensure adequate nutrition, especially iron and calcium intake.",
     "bmiConsultationRec": "Consider consulting with healthcare professionals for personalized health assessment and guidance.",
 
-    "bmiFormula": "BMI = Weight (kg) / [Height (m)]²",
-    "bmiLimitation1": "Does not reflect body composition (muscle vs. fat ratio)",
-    "bmiLimitation2": "May not be accurate for athletes, elderly, or certain ethnic groups",
-    "bmiLimitation3": "Does not assess other health factors like blood pressure, cholesterol, or blood sugar",
-    "bmiLimitation4": "Not suitable for pregnant women, children under 18, or individuals with certain medical conditions",
-
     "bmiConsult1": "Comprehensive health checkups and necessary tests",
     "bmiConsult2": "Professional medical consultation and guidance",
     "bmiConsult3": "Personalized care recommendations from healthcare specialists",
@@ -2072,8 +1944,6 @@
     "bmiPercentileOverweight": "85th to 95th percentile",
     "bmiPercentileObese": "Above 95th percentile",
 
-    "bmiPediatricInterpretation": "Your BMI percentile is {percentile} for your age and gender. This indicates {category}.",
-    "bmiPediatricNote": "For children and adolescents, BMI is compared to others of the same age and gender using percentile charts.",
     "bmiGrowthPattern": "Consult with pediatrician to evaluate growth patterns and overall health.",
 
     "age": "Age",
@@ -2180,20 +2050,6 @@
     },
 
     "saveToFinancialHistory": "Save to history",
-    "financialCalculationTypes": "Financial Calculation Types",
-    "loanCalculationDesc": "Calculate monthly payments, total cost, and interest for loans",
-    "investmentCalculationDesc": "Plan future value of investments with regular contributions",
-    "compoundInterestDesc": "Calculate compound interest growth over time",
-
-    "practicalFinancialApplications": "Practical Applications",
-    "financialApplicationsDesc": "Mortgage planning, auto loans, retirement savings, education funding, business investments, and general financial planning.",
-
-    "financialTips": "Financial Tips",
-    "financialTip1": "Compare different loan terms to find the best option",
-    "financialTip2": "Start investing early to maximize compound interest",
-    "financialTip3": "Consider additional payments to reduce loan interest",
-    "financialTip4": "Regular contributions can significantly boost investment growth",
-    "financialTip5": "Higher compounding frequency increases returns",
 
     "selectedDate": "Selected Date",
     "seeInfoForThisDate": "See information for this date",
@@ -2364,96 +2220,6 @@
     "taxCalculatorResults": "Tax Calculation Results", 
     "markupCalculatorResults": "Markup Calculation Results",
 
-    "discountCalculatorDetailedInfo": "Discount Calculator Information",
-    "discountCalculatorOverview": "Comprehensive tool for discount, tip, tax, and markup calculations with many useful features",
-    "discountKeyFeatures": "Key Features",
-    "comprehensiveDiscountCalc": "Comprehensive Calculations",
-    "comprehensiveDiscountCalcDesc": "Full support for discount, tip, tax, and markup calculations",
-    "multipleDiscountModes": "Multiple Calculation Modes",
-    "multipleDiscountModesDesc": "4 different modes: discount, tip, tax, markup",
-    "realTimeDiscountResults": "Real-time Results",
-    "realTimeDiscountResultsDesc": "Get detailed results instantly as you input data",
-    "discountHistorySaving": "History Saving",
-    "discountHistorySavingDesc": "Save and review previous calculations for reference",
-
-    "discountHowToUse": "How to Use",
-    "step1Discount": "Step 1: Select calculation type",
-    "step1DiscountDesc": "Choose appropriate tab: Discount, Tip, Tax, or Markup",
-    "step2Discount": "Step 2: Enter information",
-    "step2DiscountDesc": "Fill in required information like price, percentage, quantity",
-    "step3Discount": "Step 3: View results",
-    "step3DiscountDesc": "Results will be displayed immediately with detailed information",
-    "step4Discount": "Step 4: Save to history",
-    "step4DiscountDesc": "Results are automatically saved to history for future reference",
-
-    "discountCalculationModes": "Calculation Modes",
-    "discountMode": "Discount Calculator",
-    "discountModeDesc": "Calculate final price after discount and savings amount",
-    "tipMode": "Tip Calculator",
-    "tipModeDesc": "Calculate tip and split bill among multiple people",
-    "taxMode": "Tax Calculator",
-    "taxModeDesc": "Calculate tax amount and final price after tax",
-    "markupMode": "Markup Calculator",
-    "markupModeDesc": "Calculate selling price and profit margin from cost price",
-
-    "discountTips": "Usage Tips",
-    "discountTip1": "Use discount calculator when shopping to know real prices",
-    "discountTip2": "Calculate appropriate tip based on service quality",
-    "discountTip3": "Check tax to know actual total cost",
-    "discountTip4": "Use markup calculator for business pricing",
-    "discountTip5": "Save calculations for comparison and reference",
-
-    "discountLimitations": "Important Notes",
-    "discountLimitationsDesc": "Some important points to consider when using the discount calculator:",
-    "discountLimitation1": "Results are for reference only",
-    "discountLimitation2": "Tax rates may vary by location",
-    "discountLimitation3": "Tip amounts may vary by culture",
-    "discountLimitation4": "Markup may be affected by other costs",
-    "discountLimitation5": "Should verify with actual receipts",
-
-    "discountDisclaimer": "This tool is for calculation assistance only and does not replace professional financial advice. Results may differ from reality due to other factors.",
-
-    "financialKeyFeatures": "Key Features",
-    "comprehensiveFinancialCalc": "Comprehensive Calculations",
-    "comprehensiveFinancialCalcDesc": "Versatile financial calculator for loans, investments, and compound interest",
-    "multipleCalculationTypes": "Multiple Calculation Types",
-    "multipleCalculationTypesDesc": "Support for loan, investment, and compound interest calculations in one app",
-    "realTimeResults": "Real-time Results",
-    "realTimeResultsDesc": "Get detailed results instantly as you input data",
-    "historySaving": "History Saving",
-    "historySavingDesc": "Save and review previous calculations for reference",
-
-    "financialHowToUse": "How to Use",
-    "step1Financial": "Step 1: Select calculation type",
-    "step1FinancialDesc": "Choose Loan, Investment, or Compound Interest tab based on your needs",
-    "step2Financial": "Step 2: Enter information",
-    "step2FinancialDesc": "Fill in required information like amount, interest rate, time period",
-    "step3Financial": "Step 3: Calculate",
-    "step3FinancialDesc": "Press the calculate button to view detailed results",
-    "step4Financial": "Step 4: Save results",
-    "step4FinancialDesc": "Save results to history for future reference",
-
-    "financialFormulas": "Financial Formulas",
-    "loanFormula": "Loan Formula",
-    "loanFormulaText": "M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]",
-    "loanFormulaDesc": "M: Monthly payment, P: Loan amount, r: Monthly interest rate, n: Number of months",
-    "investmentFormula": "Investment Formula",
-    "investmentFormulaText": "FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]",
-    "investmentFormulaDesc": "FV: Future value, PV: Initial investment, PMT: Monthly contribution, r: Interest rate, n: Number of periods",
-    "compoundInterestFormula": "Compound Interest Formula",
-    "compoundInterestFormulaText": "A = P(1 + r/n)^(nt)",
-    "compoundInterestFormulaDesc": "A: Final amount, P: Principal, r: Interest rate, n: Compounding frequency, t: Time",
-
-    "financialLimitations": "Important Notes",
-    "financialLimitationsDesc": "The calculation results are for reference only and may not accurately reflect real-world situations:",
-    "financialLimitation1": "Does not account for inflation and market volatility",
-    "financialLimitation2": "Interest rates may change over time",
-    "financialLimitation3": "Does not include fees and additional costs",
-    "financialLimitation4": "Results may differ based on actual terms and conditions",
-    "financialLimitation5": "Should consult financial professionals for advice",
-
-    "financialDisclaimer": "This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.",
-
     "discountResultSavedToHistory": "Discount result saved to history",
     "tipResultSavedToHistory": "Tip result saved to history",
     "taxResultSavedToHistory": "Tax result saved to history",
@@ -2461,8 +2227,8 @@
     "startCalculatingToSeeHistory": "Start calculating to see history",
     "noHistoryAvailable": "No history available",
 
-      "p2pDataTransfer": "P2P File Transfer",
-  "p2pDataTransferDesc": "Transfer files between devices on the same local network.",
+    "p2pDataTransfer": "P2P File Transfer",
+    "p2pDataTransferDesc": "Transfer files between devices on the same local network.",
     "networkSecurityWarning": "Network Security Warning",
     "unsecureNetworkDetected": "Unsecure network detected",
     "currentNetwork": "Current Network",

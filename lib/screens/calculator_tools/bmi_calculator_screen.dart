@@ -5,9 +5,9 @@ import 'package:setpocket/layouts/two_panels_layout.dart';
 import 'package:setpocket/models/calculator_models/bmi_models.dart';
 import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/services/calculator_services/bmi_service.dart';
+import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/services/settings_models_service.dart';
 import 'package:setpocket/widgets/calculator_content/bmi_calculator_content.dart';
-import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:setpocket/utils/generic_dialog_utils.dart';
 import 'dart:convert'; // Added for jsonDecode
@@ -39,7 +39,7 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
   }
 
   /// Build actions cho main panel (clear history button)
-  List<Widget> _buildMainPanelActions() {
+  List<Widget> _buildRightPanelActions() {
     final actions = <Widget>[];
 
     // Chỉ add clear history action nếu có bookmark
@@ -89,7 +89,8 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
           : null,
       mainPanelTitle: l10n.bmiCalculator,
       rightPanelTitle: l10n.bookmark,
-      mainPanelActions: _buildMainPanelActions(), // Unified actions!
+      mainPanelActions: _buildMainPanelActions(),
+      rightPanelActions: _buildRightPanelActions(), // Unified actions!
       // onShowInfo: () => _showBmiInfo(context),
     );
   }
@@ -165,212 +166,21 @@ class _BmiCalculatorScreenState extends State<BmiCalculatorScreen> {
     );
   }
 
+  List<Widget> _buildMainPanelActions() {
+    return [
+      IconButton(
+        icon: const Icon(Icons.info),
+        tooltip: AppLocalizations.of(context)!.info,
+        onPressed: () {
+          // Show BMI info dialog
+          _showBmiInfo(context);
+        },
+      ),
+    ];
+  }
+
   void _showBmiInfo(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    GenericInfoDialog.show(
-      context: context,
-      title: l10n.bmiDetailedInfo,
-      overview: l10n.bmiOverview,
-      headerIcon: Icons.monitor_weight,
-      sections: [
-        // BMI Formula
-        InfoSection(
-          title: l10n.bmiFormula,
-          icon: Icons.calculate,
-          color: Colors.indigo,
-          children: [
-            GenericInfoDialog.buildBmiFormula(
-                theme, 'BMI = Weight (kg) / [Height (m)]²'),
-          ],
-        ),
-
-        // Key Features
-        InfoSection(
-          title: l10n.bmiKeyFeatures,
-          icon: Icons.star_outline,
-          color: Colors.orange,
-          children: [
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.comprehensiveBmiCalc,
-                description: l10n.comprehensiveBmiCalcDesc,
-                icon: Icons.calculate,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.multipleUnitSystems,
-                description: l10n.multipleUnitSystemsDesc,
-                icon: Icons.straighten,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.healthInsights,
-                description: l10n.healthInsightsDesc,
-                icon: Icons.insights,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.calculationHistory,
-                description: l10n.calculationHistoryDesc,
-                icon: Icons.history,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.ageGenderConsideration,
-                description: l10n.ageGenderConsiderationDesc,
-                icon: Icons.people,
-              ),
-            ),
-          ],
-        ),
-
-        // How to Use
-        InfoSection(
-          title: l10n.bmiHowToUse,
-          icon: Icons.help_outline,
-          color: Colors.blue,
-          children: [
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(step: l10n.step1Bmi, description: l10n.step1BmiDesc),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(step: l10n.step2Bmi, description: l10n.step2BmiDesc),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(step: l10n.step3Bmi, description: l10n.step3BmiDesc),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(step: l10n.step4Bmi, description: l10n.step4BmiDesc),
-            ),
-          ],
-        ),
-
-        // BMI Scale
-        InfoSection(
-          title: l10n.bmiScale,
-          icon: Icons.category,
-          color: Colors.purple,
-          children: [
-            // Adult BMI Scale
-            GenericInfoDialog.buildBmiScaleHeader(theme, l10n.bmiAdultTitle),
-            ...BmiService.getBmiRangesForAgeGroup(l10n, AgeGroup.adult18Plus)
-                .map((range) => GenericInfoDialog.buildBmiRangeItem(
-                      theme: theme,
-                      category: range['category'],
-                      range: range['range'],
-                      color: range['color'],
-                      description: range['description'],
-                    ))
-                .toList(),
-
-            const SizedBox(height: 16),
-
-            // Pediatric BMI Scale
-            GenericInfoDialog.buildBmiScaleHeader(
-                theme, l10n.bmiPediatricTitle),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Text(
-                l10n.bmiPercentileNote,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-            ...BmiService.getBmiRangesForAgeGroup(l10n, AgeGroup.under18)
-                .map((range) => GenericInfoDialog.buildBmiRangeItem(
-                      theme: theme,
-                      category: range['category'],
-                      range: range['range'],
-                      color: range['color'],
-                      description: range['description'],
-                    ))
-                .toList(),
-
-            GenericInfoDialog.buildAgeConsiderations(
-              theme: theme,
-              elderlyNote: l10n.bmiElderlyNote,
-              youthNote: l10n.bmiYouthNote,
-            ),
-          ],
-        ),
-
-        // Health Tips
-        InfoSection(
-          title: l10n.bmiTips,
-          icon: Icons.lightbulb_outline,
-          color: Colors.green,
-          children: [
-            GenericInfoDialog.buildTipItem(theme, l10n.tip1Bmi),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip2Bmi),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip3Bmi),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip4Bmi),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip5Bmi),
-          ],
-        ),
-
-        // Limitations
-        InfoSection(
-          title: l10n.bmiLimitations,
-          icon: Icons.warning_outlined,
-          color: Colors.amber,
-          children: [
-            GenericInfoDialog.buildBulletList(
-              theme: theme,
-              description: l10n.bmiLimitationsDesc,
-              items: BmiService.getBmiDetailedInfo(l10n)['limitations']
-                  .map<String>((limitation) => limitation.toString())
-                  .toList(),
-            ),
-          ],
-        ),
-
-        // When to Consult Healthcare Professionals
-        InfoSection(
-          title: l10n.bmiPracticalApplications,
-          icon: Icons.medical_services,
-          color: Colors.teal,
-          children: [
-            GenericInfoDialog.buildBulletList(
-              theme: theme,
-              description: l10n.bmiPracticalApplicationsDesc,
-              items: BmiService.getBmiDetailedInfo(l10n)['whenToConsult']
-                  .map<String>((consultation) => consultation.toString())
-                  .toList(),
-            ),
-          ],
-        ),
-
-        // Disclaimer
-        InfoSection(
-          title: 'Important Notice',
-          icon: Icons.info_outline,
-          color: Colors.red,
-          children: [
-            GenericInfoDialog.buildDisclaimer(
-              theme: theme,
-              text: l10n.bmiLimitationReminder,
-            ),
-          ],
-        ),
-      ],
-    );
+    FunctionInfo.show(context, FunctionInfoKeys.bmiCalculator);
   }
 }
 

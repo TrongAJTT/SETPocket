@@ -2314,126 +2314,42 @@ class AppLocalizationsVi extends AppLocalizations {
   String get memoryOperationsDesc => 'Lưu trữ và gọi lại giá trị với các hàm quản lý bộ nhớ';
 
   @override
-  String get scientificHowToUse => 'Cách sử dụng';
-
-  @override
-  String get step1Scientific => 'Bước 1: Nhập biểu thức';
-
-  @override
-  String get step1ScientificDesc => 'Gõ số và sử dụng các nút hàm để xây dựng biểu thức toán học';
-
-  @override
-  String get step2Scientific => 'Bước 2: Sử dụng hàm';
-
-  @override
-  String get step2ScientificDesc => 'Truy cập các hàm lượng giác, logarit và đại số từ bàn phím';
-
-  @override
-  String get step3Scientific => 'Bước 3: Chuyển đổi chế độ';
-
-  @override
-  String get step3ScientificDesc => 'Chuyển đổi giữa radian/độ và hàm chính/phụ khi cần';
-
-  @override
-  String get step4Scientific => 'Bước 4: Xem kết quả';
-
-  @override
-  String get step4ScientificDesc => 'Nhấn = để tính toán hoặc xem xem trước thời gian thực khi nhập';
-
-  @override
-  String get scientificTips => 'Mẹo chuyên nghiệp';
-
-  @override
-  String get tip1Scientific => 'Dùng dấu ngoặc để kiểm soát thứ tự tính toán: sin(π/2) thay vì sin π/2';
-
-  @override
-  String get tip2Scientific => 'Nhấn 2nd để truy cập hàm phụ như asin, acos, atan';
-
-  @override
-  String get tip3Scientific => 'Chuyển chế độ Rad/Deg cho hàm lượng giác (mặc định là radian)';
-
-  @override
-  String get tip4Scientific => 'Dùng hàm bộ nhớ để lưu kết quả trung gian';
-
-  @override
-  String get tip5Scientific => 'Xem lịch sử tính toán để xem lại và tái sử dụng biểu thức trước đó';
-
-  @override
-  String get tip6Scientific => 'Xem trước thời gian thực hiển thị kết quả trước khi nhấn bằng';
-
-  @override
-  String get tip7Scientific => 'Dùng hằng số π và e cho tính toán toán học chính xác';
-
-  @override
-  String get basicArithmetic => 'Số học cơ bản';
-
-  @override
-  String get trigonometricFunctionsScientific => 'Hàm lượng giác';
-
-  @override
-  String get logarithmicFunctionsScientific => 'Hàm logarit';
-
-  @override
-  String get algebraicFunctions => 'Hàm đại số';
-
-  @override
-  String get scientificFunctionCategories => 'Danh mục hàm';
-
-  @override
-  String get basicArithmeticDesc => 'Cộng (+), Trừ (-), Nhân (*), Chia (/)';
-
-  @override
-  String get trigonometricFunctionsScientificDesc => 'sin, cos, tan và các hàm nghịch đảo (asin, acos, atan)';
-
-  @override
-  String get logarithmicFunctionsScientificDesc => 'Logarit tự nhiên (ln), logarit thường (log), mũ (exp, eˣ, 10ˣ)';
-
-  @override
-  String get algebraicFunctionsDesc => 'Lũy thừa (x², x³, xʸ), căn (√, ∛), giai thừa (n!), giá trị tuyệt đối (|x|)';
-
-  @override
-  String get angleMode => 'Chế độ góc';
-
-  @override
-  String get functionToggle => 'Chuyển đổi hàm';
-
-  @override
-  String get memoryFunctions => 'Hàm bộ nhớ';
-
-  @override
-  String get historyAccess => 'Truy cập lịch sử';
-
-  @override
-  String get scientificCalculatorPracticalApplications => 'Ứng dụng thực tế';
-
-  @override
-  String get scientificCalculatorPracticalApplicationsDesc => 'Hữu ích cho học sinh trong các khóa học toán và khoa học, tính toán kỹ thuật cơ bản và giải quyết vấn đề hàng ngày liên quan đến các phép toán phức tạp.';
-
-  @override
   String cacheWithLogSize(String cacheSize, String logSize) {
     return 'Bộ nhớ đệm: $cacheSize (+$logSize nhật ký)';
   }
 
   @override
-  String get scientificModeControls => 'Điều khiển chế độ';
+  String get scientificModeControls => 'Mode Controls';
 
   @override
-  String get angleModeDesc => 'Chuyển đổi giữa Radian và Độ cho tính toán lượng giác';
+  String get angleMode => 'Angle Mode';
 
   @override
-  String get functionToggleDesc => 'Nhấn 2nd để chuyển đổi giữa bộ hàm chính và phụ';
+  String get angleModeDesc => 'Toggle between Radians and Degrees for trigonometric calculations';
 
   @override
-  String get memoryFunctionsDesc => 'Lưu trữ, gọi lại và quản lý giá trị trong bộ nhớ máy tính';
+  String get functionToggle => 'Function Toggle';
 
   @override
-  String get historyAccessDesc => 'Duyệt các phép tính trước đó và tái sử dụng biểu thức';
+  String get functionToggleDesc => 'Press 2nd to switch between primary and secondary function sets';
 
   @override
-  String get scientificPracticalApplications => 'Ứng dụng thực tế';
+  String get memoryFunctions => 'Memory Functions';
 
   @override
-  String get scientificPracticalApplicationsDesc => 'Hữu ích cho học sinh trong các môn toán và khoa học, thực hiện phép tính cần các hàm lượng giác, logarit và đại số.';
+  String get memoryFunctionsDesc => 'Store, recall, and manage values in calculator memory';
+
+  @override
+  String get historyAccess => 'History Access';
+
+  @override
+  String get historyAccessDesc => 'Browse previous calculations and reuse expressions';
+
+  @override
+  String get scientificPracticalApplications => 'Practical Applications';
+
+  @override
+  String get scientificPracticalApplicationsDesc => 'Helpful for students in mathematics and science courses, performing calculations that require trigonometric, logarithmic, and algebraic functions.';
 
   @override
   String get metric => 'Hệ mét';
@@ -2569,90 +2485,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bmiObeseDesc => 'Significantly increased risk of serious health complications';
-
-  @override
-  String get bmiKeyFeatures => 'Tính năng chính';
-
-  @override
-  String get comprehensiveBmiCalc => 'Comprehensive BMI Calculation';
-
-  @override
-  String get comprehensiveBmiCalcDesc => 'Calculate BMI using height, weight, age, and gender for accurate results';
-
-  @override
-  String get multipleUnitSystems => 'Multiple Unit Systems';
-
-  @override
-  String get multipleUnitSystemsDesc => 'Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements';
-
-  @override
-  String get healthInsights => 'Health Insights';
-
-  @override
-  String get healthInsightsDesc => 'Get personalized recommendations based on your BMI category';
-
-  @override
-  String get ageGenderConsideration => 'Age & Gender Consideration';
-
-  @override
-  String get ageGenderConsiderationDesc => 'BMI interpretation adjusted for age and gender factors';
-
-  @override
-  String get bmiHowToUse => 'How to Use';
-
-  @override
-  String get step1Bmi => 'Step 1: Select Unit System';
-
-  @override
-  String get step1BmiDesc => 'Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements';
-
-  @override
-  String get step2Bmi => 'Step 2: Enter Your Information';
-
-  @override
-  String get step2BmiDesc => 'Input your height, weight, age, and gender for accurate calculation';
-
-  @override
-  String get step3Bmi => 'Step 3: View Results';
-
-  @override
-  String get step3BmiDesc => 'See your BMI value, category, and personalized health recommendations';
-
-  @override
-  String get step4Bmi => 'Step 4: Track Progress';
-
-  @override
-  String get step4BmiDesc => 'Save calculations to history and monitor changes over time';
-
-  @override
-  String get bmiTips => 'Health Tips';
-
-  @override
-  String get tip1Bmi => 'BMI is a screening tool - consult healthcare providers for complete health assessment';
-
-  @override
-  String get tip2Bmi => 'Regular monitoring helps track progress toward health goals';
-
-  @override
-  String get tip3Bmi => 'BMI may not accurately reflect body composition for athletes or elderly';
-
-  @override
-  String get tip4Bmi => 'Focus on healthy lifestyle changes rather than just the number';
-
-  @override
-  String get tip5Bmi => 'Combine BMI with other health indicators for better understanding';
-
-  @override
-  String get bmiLimitations => 'Understanding BMI Limitations';
-
-  @override
-  String get bmiLimitationsDesc => 'BMI is a useful screening tool but has limitations. It doesn\'t distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.';
-
-  @override
-  String get bmiPracticalApplications => 'Practical Applications';
-
-  @override
-  String get bmiPracticalApplicationsDesc => 'Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.';
 
   @override
   String get clearBmiHistory => 'Clear BMI History';
@@ -4521,21 +4353,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bmiConsultationRec => 'Cân nhắc tham khảo ý kiến chuyên gia y tế để được đánh giá sức khỏe và hướng dẫn cá nhân hóa.';
 
   @override
-  String get bmiFormula => 'BMI = Cân nặng (kg) / [Chiều cao (m)]²';
-
-  @override
-  String get bmiLimitation1 => 'Không phản ánh thành phần cơ thể (tỷ lệ cơ bắp/mỡ)';
-
-  @override
-  String get bmiLimitation2 => 'Có thể không chính xác cho vận động viên, người già, hoặc một số nhóm dân tộc';
-
-  @override
-  String get bmiLimitation3 => 'Không đánh giá các yếu tố sức khỏe khác như huyết áp, cholesterol, đường huyết';
-
-  @override
-  String get bmiLimitation4 => 'Không phù hợp cho phụ nữ mang thai, trẻ em dưới 18 tuổi, hoặc người có bệnh lý nhất định';
-
-  @override
   String get bmiConsult1 => 'Khám sức khỏe toàn diện và làm các xét nghiệm cần thiết';
 
   @override
@@ -4558,14 +4375,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bmiPercentileNormal => 'Từ phân vị thứ 5 đến 85';
-
-  @override
-  String bmiPediatricInterpretation(Object category, Object percentile) {
-    return 'Phân vị BMI của bạn là $percentile cho tuổi và giới tính của bạn. Điều này cho thấy $category.';
-  }
-
-  @override
-  String get bmiPediatricNote => 'Đối với trẻ em và thanh thiếu niên, BMI được so sánh với những người cùng tuổi và giới tính bằng biểu đồ phân vị.';
 
   @override
   String get bmiGrowthPattern => 'Tham khảo ý kiến bác sĩ nhi khoa để đánh giá mô hình tăng trưởng và sức khỏe tổng thể.';
@@ -4783,42 +4592,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get saveToFinancialHistory => 'Lưu vào lịch sử';
-
-  @override
-  String get financialCalculationTypes => 'Loại Tính toán Tài chính';
-
-  @override
-  String get loanCalculationDesc => 'Tính toán thanh toán hàng tháng, tổng chi phí và lãi cho các khoản vay';
-
-  @override
-  String get investmentCalculationDesc => 'Lập kế hoạch giá trị tương lai của đầu tư với đóng góp thường xuyên';
-
-  @override
-  String get compoundInterestDesc => 'Tính toán tăng trưởng lãi kép theo thời gian';
-
-  @override
-  String get practicalFinancialApplications => 'Ứng dụng Thực tế';
-
-  @override
-  String get financialApplicationsDesc => 'Kế hoạch thế chấp, vay mua xe, tiết kiệm hưu trí, quỹ giáo dục, đầu tư kinh doanh và lập kế hoạch tài chính tổng thể.';
-
-  @override
-  String get financialTips => 'Mẹo Tài chính';
-
-  @override
-  String get financialTip1 => 'So sánh các thời hạn vay khác nhau để tìm lựa chọn tốt nhất';
-
-  @override
-  String get financialTip2 => 'Bắt đầu đầu tư sớm để tối đa hóa lãi kép';
-
-  @override
-  String get financialTip3 => 'Cân nhắc thanh toán thêm để giảm lãi vay';
-
-  @override
-  String get financialTip4 => 'Đóng góp thường xuyên có thể tăng đáng kể tăng trưởng đầu tư';
-
-  @override
-  String get financialTip5 => 'Tần suất tính lãi cao hơn sẽ tăng lợi nhuận';
 
   @override
   String get selectedDate => 'Ngày được chọn';
@@ -5276,117 +5049,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get discountLimitation5 => 'Nên kiểm tra lại với hóa đơn thực tế';
-
-  @override
-  String get discountDisclaimer => 'Công cụ này chỉ hỗ trợ tính toán và không thay thế tư vấn tài chính chuyên nghiệp. Kết quả có thể khác thực tế do các yếu tố khác.';
-
-  @override
-  String get financialKeyFeatures => 'Tính năng chính';
-
-  @override
-  String get comprehensiveFinancialCalc => 'Tính toán toàn diện';
-
-  @override
-  String get comprehensiveFinancialCalcDesc => 'Máy tính tài chính đa năng cho vay, đầu tư và lãi kép';
-
-  @override
-  String get multipleCalculationTypes => 'Nhiều loại tính toán';
-
-  @override
-  String get multipleCalculationTypesDesc => 'Hỗ trợ tính toán vay, đầu tư và lãi kép trong một ứng dụng';
-
-  @override
-  String get realTimeResults => 'Kết quả thời gian thực';
-
-  @override
-  String get realTimeResultsDesc => 'Nhận kết quả chi tiết ngay lập tức khi bạn nhập dữ liệu';
-
-  @override
-  String get historySaving => 'Lưu lịch sử';
-
-  @override
-  String get historySavingDesc => 'Lưu và xem lại các phép tính trước đó để tham khảo';
-
-  @override
-  String get financialHowToUse => 'Cách sử dụng';
-
-  @override
-  String get step1Financial => 'Bước 1: Chọn loại tính toán';
-
-  @override
-  String get step1FinancialDesc => 'Chọn tab Vay, Đầu tư hoặc Lãi kép theo nhu cầu của bạn';
-
-  @override
-  String get step2Financial => 'Bước 2: Nhập thông tin';
-
-  @override
-  String get step2FinancialDesc => 'Điền các thông tin cần thiết như số tiền, lãi suất, thời gian';
-
-  @override
-  String get step3Financial => 'Bước 3: Tính toán';
-
-  @override
-  String get step3FinancialDesc => 'Nhấn nút tính toán để xem kết quả chi tiết';
-
-  @override
-  String get step4Financial => 'Bước 4: Lưu kết quả';
-
-  @override
-  String get step4FinancialDesc => 'Lưu kết quả vào lịch sử để tham khảo sau';
-
-  @override
-  String get financialFormulas => 'Công thức tài chính';
-
-  @override
-  String get loanFormula => 'Công thức vay';
-
-  @override
-  String get loanFormulaText => 'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]';
-
-  @override
-  String get loanFormulaDesc => 'M: Thanh toán hàng tháng, P: Số tiền vay, r: Lãi suất hàng tháng, n: Số tháng';
-
-  @override
-  String get investmentFormula => 'Công thức đầu tư';
-
-  @override
-  String get investmentFormulaText => 'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]';
-
-  @override
-  String get investmentFormulaDesc => 'FV: Giá trị tương lai, PV: Đầu tư ban đầu, PMT: Đóng góp hàng tháng, r: Lãi suất, n: Số kỳ';
-
-  @override
-  String get compoundInterestFormula => 'Công thức lãi kép';
-
-  @override
-  String get compoundInterestFormulaText => 'A = P(1 + r/n)^(nt)';
-
-  @override
-  String get compoundInterestFormulaDesc => 'A: Số tiền cuối cùng, P: Số tiền gốc, r: Lãi suất, n: Số lần ghép lãi/năm, t: Thời gian';
-
-  @override
-  String get financialLimitations => 'Lưu ý quan trọng';
-
-  @override
-  String get financialLimitationsDesc => 'Kết quả tính toán chỉ mang tính chất tham khảo và có thể không phản ánh chính xác thực tế:';
-
-  @override
-  String get financialLimitation1 => 'Không tính đến lạm phát và biến động thị trường';
-
-  @override
-  String get financialLimitation2 => 'Lãi suất có thể thay đổi theo thời gian';
-
-  @override
-  String get financialLimitation3 => 'Không bao gồm phí và các chi phí bổ sung';
-
-  @override
-  String get financialLimitation4 => 'Kết quả có thể khác tùy theo điều khoản thực tế';
-
-  @override
-  String get financialLimitation5 => 'Nên tham khảo ý kiến chuyên gia tài chính';
-
-  @override
-  String get financialDisclaimer => 'Công cụ này chỉ hỗ trợ tính toán và không thay thế tư vấn tài chính chuyên nghiệp. Vui lòng tham khảo chuyên gia trước khi đưa ra quyết định tài chính quan trọng.';
 
   @override
   String get discountResultSavedToHistory => 'Kết quả tính giảm giá đã lưu vào lịch sử';

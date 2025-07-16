@@ -4490,7 +4490,7 @@ abstract class AppLocalizations {
   /// No description provided for @calculationHistoryDesc.
   ///
   /// In en, this message translates to:
-  /// **'Track your BMI calculations over time with detailed history'**
+  /// **'Automatic saving and browsing of previous calculations'**
   String get calculationHistoryDesc;
 
   /// No description provided for @memoryOperations.
@@ -4505,198 +4505,6 @@ abstract class AppLocalizations {
   /// **'Store and recall values with memory management functions'**
   String get memoryOperationsDesc;
 
-  /// No description provided for @scientificHowToUse.
-  ///
-  /// In en, this message translates to:
-  /// **'How to Use'**
-  String get scientificHowToUse;
-
-  /// No description provided for @step1Scientific.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 1: Enter Expression'**
-  String get step1Scientific;
-
-  /// No description provided for @step1ScientificDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Type numbers and use function buttons to build mathematical expressions'**
-  String get step1ScientificDesc;
-
-  /// No description provided for @step2Scientific.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 2: Use Functions'**
-  String get step2Scientific;
-
-  /// No description provided for @step2ScientificDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Access trigonometric, logarithmic, and algebraic functions from the keypad'**
-  String get step2ScientificDesc;
-
-  /// No description provided for @step3Scientific.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 3: Toggle Modes'**
-  String get step3Scientific;
-
-  /// No description provided for @step3ScientificDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch between radians/degrees and primary/secondary functions as needed'**
-  String get step3ScientificDesc;
-
-  /// Step 4 for using scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Step 4: Use History - View and reuse previous calculations'**
-  String get step4Scientific;
-
-  /// No description provided for @step4ScientificDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Press = to calculate or see real-time preview while typing'**
-  String get step4ScientificDesc;
-
-  /// No description provided for @scientificTips.
-  ///
-  /// In en, this message translates to:
-  /// **'Pro Tips'**
-  String get scientificTips;
-
-  /// Tip 1 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Use parentheses to ensure correct order of operations: (2+3)×4 = 20'**
-  String get tip1Scientific;
-
-  /// Tip 2 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to DEG mode for degree calculations, RAD for radians'**
-  String get tip2Scientific;
-
-  /// Tip 3 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Use the 2nd button to access inverse functions: sin⁻¹, cos⁻¹, log⁻¹'**
-  String get tip3Scientific;
-
-  /// Tip 4 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Use memory functions (MS, MR, M+, M-) to store intermediate results'**
-  String get tip4Scientific;
-
-  /// Tip 5 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Double-tap numbers to select and copy results'**
-  String get tip5Scientific;
-
-  /// Tip 6 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Use EXP for scientific notation: 1.23E+5 = 123,000'**
-  String get tip6Scientific;
-
-  /// Tip 7 for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Clear individual entries with C, or clear all with AC'**
-  String get tip7Scientific;
-
-  /// Basic arithmetic operations section
-  ///
-  /// In en, this message translates to:
-  /// **'Basic Arithmetic'**
-  String get basicArithmetic;
-
-  /// Trigonometric functions section for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Trigonometric Functions'**
-  String get trigonometricFunctionsScientific;
-
-  /// Logarithmic functions section for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Logarithmic Functions'**
-  String get logarithmicFunctionsScientific;
-
-  /// Algebraic functions section
-  ///
-  /// In en, this message translates to:
-  /// **'Algebraic Functions'**
-  String get algebraicFunctions;
-
-  /// No description provided for @scientificFunctionCategories.
-  ///
-  /// In en, this message translates to:
-  /// **'Function Categories'**
-  String get scientificFunctionCategories;
-
-  /// No description provided for @basicArithmeticDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Addition (+), Subtraction (-), Multiplication (*), Division (/)'**
-  String get basicArithmeticDesc;
-
-  /// No description provided for @trigonometricFunctionsScientificDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'sin, cos, tan and their inverse functions (asin, acos, atan)'**
-  String get trigonometricFunctionsScientificDesc;
-
-  /// No description provided for @logarithmicFunctionsScientificDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Natural log (ln), common log (log), exponential (exp, eˣ, 10ˣ)'**
-  String get logarithmicFunctionsScientificDesc;
-
-  /// No description provided for @algebraicFunctionsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Powers (x², x³, xʸ), roots (√, ∛), factorial (n!), absolute value (|x|)'**
-  String get algebraicFunctionsDesc;
-
-  /// Angle mode control
-  ///
-  /// In en, this message translates to:
-  /// **'Angle Mode'**
-  String get angleMode;
-
-  /// Function toggle control
-  ///
-  /// In en, this message translates to:
-  /// **'Function Toggle'**
-  String get functionToggle;
-
-  /// Memory functions control
-  ///
-  /// In en, this message translates to:
-  /// **'Memory Functions'**
-  String get memoryFunctions;
-
-  /// History access control
-  ///
-  /// In en, this message translates to:
-  /// **'History Access'**
-  String get historyAccess;
-
-  /// Practical applications section for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Practical Applications'**
-  String get scientificCalculatorPracticalApplications;
-
-  /// Practical applications description for scientific calculator
-  ///
-  /// In en, this message translates to:
-  /// **'Helpful for students in mathematics and science courses, basic engineering calculations, and everyday problem-solving involving complex mathematical operations.'**
-  String get scientificCalculatorPracticalApplicationsDesc;
-
   /// Cache info with log size
   ///
   /// In en, this message translates to:
@@ -4709,11 +4517,23 @@ abstract class AppLocalizations {
   /// **'Mode Controls'**
   String get scientificModeControls;
 
+  /// No description provided for @angleMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Angle Mode'**
+  String get angleMode;
+
   /// No description provided for @angleModeDesc.
   ///
   /// In en, this message translates to:
   /// **'Toggle between Radians and Degrees for trigonometric calculations'**
   String get angleModeDesc;
+
+  /// No description provided for @functionToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Function Toggle'**
+  String get functionToggle;
 
   /// No description provided for @functionToggleDesc.
   ///
@@ -4721,11 +4541,23 @@ abstract class AppLocalizations {
   /// **'Press 2nd to switch between primary and secondary function sets'**
   String get functionToggleDesc;
 
+  /// No description provided for @memoryFunctions.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Functions'**
+  String get memoryFunctions;
+
   /// No description provided for @memoryFunctionsDesc.
   ///
   /// In en, this message translates to:
   /// **'Store, recall, and manage values in calculator memory'**
   String get memoryFunctionsDesc;
+
+  /// No description provided for @historyAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'History Access'**
+  String get historyAccess;
 
   /// No description provided for @historyAccessDesc.
   ///
@@ -5002,174 +4834,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Significantly increased risk of serious health complications'**
   String get bmiObeseDesc;
-
-  /// No description provided for @bmiKeyFeatures.
-  ///
-  /// In en, this message translates to:
-  /// **'Key Features'**
-  String get bmiKeyFeatures;
-
-  /// No description provided for @comprehensiveBmiCalc.
-  ///
-  /// In en, this message translates to:
-  /// **'Comprehensive BMI Calculation'**
-  String get comprehensiveBmiCalc;
-
-  /// No description provided for @comprehensiveBmiCalcDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculate BMI using height, weight, age, and gender for accurate results'**
-  String get comprehensiveBmiCalcDesc;
-
-  /// No description provided for @multipleUnitSystems.
-  ///
-  /// In en, this message translates to:
-  /// **'Multiple Unit Systems'**
-  String get multipleUnitSystems;
-
-  /// No description provided for @multipleUnitSystemsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements'**
-  String get multipleUnitSystemsDesc;
-
-  /// No description provided for @healthInsights.
-  ///
-  /// In en, this message translates to:
-  /// **'Health Insights'**
-  String get healthInsights;
-
-  /// No description provided for @healthInsightsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Get personalized recommendations based on your BMI category'**
-  String get healthInsightsDesc;
-
-  /// No description provided for @ageGenderConsideration.
-  ///
-  /// In en, this message translates to:
-  /// **'Age & Gender Consideration'**
-  String get ageGenderConsideration;
-
-  /// No description provided for @ageGenderConsiderationDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI interpretation adjusted for age and gender factors'**
-  String get ageGenderConsiderationDesc;
-
-  /// No description provided for @bmiHowToUse.
-  ///
-  /// In en, this message translates to:
-  /// **'How to Use'**
-  String get bmiHowToUse;
-
-  /// No description provided for @step1Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 1: Select Unit System'**
-  String get step1Bmi;
-
-  /// No description provided for @step1BmiDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements'**
-  String get step1BmiDesc;
-
-  /// No description provided for @step2Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 2: Enter Your Information'**
-  String get step2Bmi;
-
-  /// No description provided for @step2BmiDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Input your height, weight, age, and gender for accurate calculation'**
-  String get step2BmiDesc;
-
-  /// No description provided for @step3Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 3: View Results'**
-  String get step3Bmi;
-
-  /// No description provided for @step3BmiDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'See your BMI value, category, and personalized health recommendations'**
-  String get step3BmiDesc;
-
-  /// No description provided for @step4Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 4: Track Progress'**
-  String get step4Bmi;
-
-  /// No description provided for @step4BmiDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Save calculations to history and monitor changes over time'**
-  String get step4BmiDesc;
-
-  /// No description provided for @bmiTips.
-  ///
-  /// In en, this message translates to:
-  /// **'Health Tips'**
-  String get bmiTips;
-
-  /// No description provided for @tip1Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI is a screening tool - consult healthcare providers for complete health assessment'**
-  String get tip1Bmi;
-
-  /// No description provided for @tip2Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Regular monitoring helps track progress toward health goals'**
-  String get tip2Bmi;
-
-  /// No description provided for @tip3Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI may not accurately reflect body composition for athletes or elderly'**
-  String get tip3Bmi;
-
-  /// No description provided for @tip4Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Focus on healthy lifestyle changes rather than just the number'**
-  String get tip4Bmi;
-
-  /// No description provided for @tip5Bmi.
-  ///
-  /// In en, this message translates to:
-  /// **'Combine BMI with other health indicators for better understanding'**
-  String get tip5Bmi;
-
-  /// No description provided for @bmiLimitations.
-  ///
-  /// In en, this message translates to:
-  /// **'Understanding BMI Limitations'**
-  String get bmiLimitations;
-
-  /// No description provided for @bmiLimitationsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI is a useful screening tool but has limitations. It doesn\'t distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.'**
-  String get bmiLimitationsDesc;
-
-  /// No description provided for @bmiPracticalApplications.
-  ///
-  /// In en, this message translates to:
-  /// **'Practical Applications'**
-  String get bmiPracticalApplications;
-
-  /// No description provided for @bmiPracticalApplicationsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.'**
-  String get bmiPracticalApplicationsDesc;
 
   /// No description provided for @clearBmiHistory.
   ///
@@ -8747,36 +8411,6 @@ abstract class AppLocalizations {
   /// **'Consider consulting with healthcare professionals for personalized health assessment and guidance.'**
   String get bmiConsultationRec;
 
-  /// No description provided for @bmiFormula.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI = Weight (kg) / [Height (m)]²'**
-  String get bmiFormula;
-
-  /// No description provided for @bmiLimitation1.
-  ///
-  /// In en, this message translates to:
-  /// **'Does not reflect body composition (muscle vs. fat ratio)'**
-  String get bmiLimitation1;
-
-  /// No description provided for @bmiLimitation2.
-  ///
-  /// In en, this message translates to:
-  /// **'May not be accurate for athletes, elderly, or certain ethnic groups'**
-  String get bmiLimitation2;
-
-  /// No description provided for @bmiLimitation3.
-  ///
-  /// In en, this message translates to:
-  /// **'Does not assess other health factors like blood pressure, cholesterol, or blood sugar'**
-  String get bmiLimitation3;
-
-  /// No description provided for @bmiLimitation4.
-  ///
-  /// In en, this message translates to:
-  /// **'Not suitable for pregnant women, children under 18, or individuals with certain medical conditions'**
-  String get bmiLimitation4;
-
   /// No description provided for @bmiConsult1.
   ///
   /// In en, this message translates to:
@@ -8824,18 +8458,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'5th to 85th percentile'**
   String get bmiPercentileNormal;
-
-  /// No description provided for @bmiPediatricInterpretation.
-  ///
-  /// In en, this message translates to:
-  /// **'Your BMI percentile is {percentile} for your age and gender. This indicates {category}.'**
-  String bmiPediatricInterpretation(Object category, Object percentile);
-
-  /// No description provided for @bmiPediatricNote.
-  ///
-  /// In en, this message translates to:
-  /// **'For children and adolescents, BMI is compared to others of the same age and gender using percentile charts.'**
-  String get bmiPediatricNote;
 
   /// No description provided for @bmiGrowthPattern.
   ///
@@ -9262,78 +8884,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save to history'**
   String get saveToFinancialHistory;
-
-  /// No description provided for @financialCalculationTypes.
-  ///
-  /// In en, this message translates to:
-  /// **'Financial Calculation Types'**
-  String get financialCalculationTypes;
-
-  /// No description provided for @loanCalculationDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculate monthly payments, total cost, and interest for loans'**
-  String get loanCalculationDesc;
-
-  /// No description provided for @investmentCalculationDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Plan future value of investments with regular contributions'**
-  String get investmentCalculationDesc;
-
-  /// No description provided for @compoundInterestDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculate compound interest growth over time'**
-  String get compoundInterestDesc;
-
-  /// No description provided for @practicalFinancialApplications.
-  ///
-  /// In en, this message translates to:
-  /// **'Practical Applications'**
-  String get practicalFinancialApplications;
-
-  /// No description provided for @financialApplicationsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Mortgage planning, auto loans, retirement savings, education funding, business investments, and general financial planning.'**
-  String get financialApplicationsDesc;
-
-  /// No description provided for @financialTips.
-  ///
-  /// In en, this message translates to:
-  /// **'Financial Tips'**
-  String get financialTips;
-
-  /// No description provided for @financialTip1.
-  ///
-  /// In en, this message translates to:
-  /// **'Compare different loan terms to find the best option'**
-  String get financialTip1;
-
-  /// No description provided for @financialTip2.
-  ///
-  /// In en, this message translates to:
-  /// **'Start investing early to maximize compound interest'**
-  String get financialTip2;
-
-  /// No description provided for @financialTip3.
-  ///
-  /// In en, this message translates to:
-  /// **'Consider additional payments to reduce loan interest'**
-  String get financialTip3;
-
-  /// No description provided for @financialTip4.
-  ///
-  /// In en, this message translates to:
-  /// **'Regular contributions can significantly boost investment growth'**
-  String get financialTip4;
-
-  /// No description provided for @financialTip5.
-  ///
-  /// In en, this message translates to:
-  /// **'Higher compounding frequency increases returns'**
-  String get financialTip5;
 
   /// No description provided for @selectedDate.
   ///
@@ -10240,228 +9790,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Should verify with actual receipts'**
   String get discountLimitation5;
-
-  /// No description provided for @discountDisclaimer.
-  ///
-  /// In en, this message translates to:
-  /// **'This tool is for calculation assistance only and does not replace professional financial advice. Results may differ from reality due to other factors.'**
-  String get discountDisclaimer;
-
-  /// No description provided for @financialKeyFeatures.
-  ///
-  /// In en, this message translates to:
-  /// **'Key Features'**
-  String get financialKeyFeatures;
-
-  /// No description provided for @comprehensiveFinancialCalc.
-  ///
-  /// In en, this message translates to:
-  /// **'Comprehensive Calculations'**
-  String get comprehensiveFinancialCalc;
-
-  /// No description provided for @comprehensiveFinancialCalcDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Versatile financial calculator for loans, investments, and compound interest'**
-  String get comprehensiveFinancialCalcDesc;
-
-  /// No description provided for @multipleCalculationTypes.
-  ///
-  /// In en, this message translates to:
-  /// **'Multiple Calculation Types'**
-  String get multipleCalculationTypes;
-
-  /// No description provided for @multipleCalculationTypesDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Support for loan, investment, and compound interest calculations in one app'**
-  String get multipleCalculationTypesDesc;
-
-  /// No description provided for @realTimeResults.
-  ///
-  /// In en, this message translates to:
-  /// **'Real-time Results'**
-  String get realTimeResults;
-
-  /// No description provided for @realTimeResultsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Get detailed results instantly as you input data'**
-  String get realTimeResultsDesc;
-
-  /// No description provided for @historySaving.
-  ///
-  /// In en, this message translates to:
-  /// **'History Saving'**
-  String get historySaving;
-
-  /// No description provided for @historySavingDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Save and review previous calculations for reference'**
-  String get historySavingDesc;
-
-  /// No description provided for @financialHowToUse.
-  ///
-  /// In en, this message translates to:
-  /// **'How to Use'**
-  String get financialHowToUse;
-
-  /// No description provided for @step1Financial.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 1: Select calculation type'**
-  String get step1Financial;
-
-  /// No description provided for @step1FinancialDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose Loan, Investment, or Compound Interest tab based on your needs'**
-  String get step1FinancialDesc;
-
-  /// No description provided for @step2Financial.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 2: Enter information'**
-  String get step2Financial;
-
-  /// No description provided for @step2FinancialDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Fill in required information like amount, interest rate, time period'**
-  String get step2FinancialDesc;
-
-  /// No description provided for @step3Financial.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 3: Calculate'**
-  String get step3Financial;
-
-  /// No description provided for @step3FinancialDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Press the calculate button to view detailed results'**
-  String get step3FinancialDesc;
-
-  /// No description provided for @step4Financial.
-  ///
-  /// In en, this message translates to:
-  /// **'Step 4: Save results'**
-  String get step4Financial;
-
-  /// No description provided for @step4FinancialDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Save results to history for future reference'**
-  String get step4FinancialDesc;
-
-  /// No description provided for @financialFormulas.
-  ///
-  /// In en, this message translates to:
-  /// **'Financial Formulas'**
-  String get financialFormulas;
-
-  /// No description provided for @loanFormula.
-  ///
-  /// In en, this message translates to:
-  /// **'Loan Formula'**
-  String get loanFormula;
-
-  /// No description provided for @loanFormulaText.
-  ///
-  /// In en, this message translates to:
-  /// **'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]'**
-  String get loanFormulaText;
-
-  /// No description provided for @loanFormulaDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'M: Monthly payment, P: Loan amount, r: Monthly interest rate, n: Number of months'**
-  String get loanFormulaDesc;
-
-  /// No description provided for @investmentFormula.
-  ///
-  /// In en, this message translates to:
-  /// **'Investment Formula'**
-  String get investmentFormula;
-
-  /// No description provided for @investmentFormulaText.
-  ///
-  /// In en, this message translates to:
-  /// **'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]'**
-  String get investmentFormulaText;
-
-  /// No description provided for @investmentFormulaDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'FV: Future value, PV: Initial investment, PMT: Monthly contribution, r: Interest rate, n: Number of periods'**
-  String get investmentFormulaDesc;
-
-  /// No description provided for @compoundInterestFormula.
-  ///
-  /// In en, this message translates to:
-  /// **'Compound Interest Formula'**
-  String get compoundInterestFormula;
-
-  /// No description provided for @compoundInterestFormulaText.
-  ///
-  /// In en, this message translates to:
-  /// **'A = P(1 + r/n)^(nt)'**
-  String get compoundInterestFormulaText;
-
-  /// No description provided for @compoundInterestFormulaDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'A: Final amount, P: Principal, r: Interest rate, n: Compounding frequency, t: Time'**
-  String get compoundInterestFormulaDesc;
-
-  /// No description provided for @financialLimitations.
-  ///
-  /// In en, this message translates to:
-  /// **'Important Notes'**
-  String get financialLimitations;
-
-  /// No description provided for @financialLimitationsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'The calculation results are for reference only and may not accurately reflect real-world situations:'**
-  String get financialLimitationsDesc;
-
-  /// No description provided for @financialLimitation1.
-  ///
-  /// In en, this message translates to:
-  /// **'Does not account for inflation and market volatility'**
-  String get financialLimitation1;
-
-  /// No description provided for @financialLimitation2.
-  ///
-  /// In en, this message translates to:
-  /// **'Interest rates may change over time'**
-  String get financialLimitation2;
-
-  /// No description provided for @financialLimitation3.
-  ///
-  /// In en, this message translates to:
-  /// **'Does not include fees and additional costs'**
-  String get financialLimitation3;
-
-  /// No description provided for @financialLimitation4.
-  ///
-  /// In en, this message translates to:
-  /// **'Results may differ based on actual terms and conditions'**
-  String get financialLimitation4;
-
-  /// No description provided for @financialLimitation5.
-  ///
-  /// In en, this message translates to:
-  /// **'Should consult financial professionals for advice'**
-  String get financialLimitation5;
-
-  /// No description provided for @financialDisclaimer.
-  ///
-  /// In en, this message translates to:
-  /// **'This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.'**
-  String get financialDisclaimer;
 
   /// No description provided for @discountResultSavedToHistory.
   ///

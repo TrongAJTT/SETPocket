@@ -2312,109 +2312,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secondaryFunctionsDesc => 'Access extended functions with the 2nd button toggle';
 
   @override
-  String get calculationHistoryDesc => 'Track your BMI calculations over time with detailed history';
+  String get calculationHistoryDesc => 'Automatic saving and browsing of previous calculations';
 
   @override
   String get memoryOperations => 'Memory Operations';
 
   @override
   String get memoryOperationsDesc => 'Store and recall values with memory management functions';
-
-  @override
-  String get scientificHowToUse => 'How to Use';
-
-  @override
-  String get step1Scientific => 'Step 1: Enter Expression';
-
-  @override
-  String get step1ScientificDesc => 'Type numbers and use function buttons to build mathematical expressions';
-
-  @override
-  String get step2Scientific => 'Step 2: Use Functions';
-
-  @override
-  String get step2ScientificDesc => 'Access trigonometric, logarithmic, and algebraic functions from the keypad';
-
-  @override
-  String get step3Scientific => 'Step 3: Toggle Modes';
-
-  @override
-  String get step3ScientificDesc => 'Switch between radians/degrees and primary/secondary functions as needed';
-
-  @override
-  String get step4Scientific => 'Step 4: Use History - View and reuse previous calculations';
-
-  @override
-  String get step4ScientificDesc => 'Press = to calculate or see real-time preview while typing';
-
-  @override
-  String get scientificTips => 'Pro Tips';
-
-  @override
-  String get tip1Scientific => 'Use parentheses to ensure correct order of operations: (2+3)×4 = 20';
-
-  @override
-  String get tip2Scientific => 'Switch to DEG mode for degree calculations, RAD for radians';
-
-  @override
-  String get tip3Scientific => 'Use the 2nd button to access inverse functions: sin⁻¹, cos⁻¹, log⁻¹';
-
-  @override
-  String get tip4Scientific => 'Use memory functions (MS, MR, M+, M-) to store intermediate results';
-
-  @override
-  String get tip5Scientific => 'Double-tap numbers to select and copy results';
-
-  @override
-  String get tip6Scientific => 'Use EXP for scientific notation: 1.23E+5 = 123,000';
-
-  @override
-  String get tip7Scientific => 'Clear individual entries with C, or clear all with AC';
-
-  @override
-  String get basicArithmetic => 'Basic Arithmetic';
-
-  @override
-  String get trigonometricFunctionsScientific => 'Trigonometric Functions';
-
-  @override
-  String get logarithmicFunctionsScientific => 'Logarithmic Functions';
-
-  @override
-  String get algebraicFunctions => 'Algebraic Functions';
-
-  @override
-  String get scientificFunctionCategories => 'Function Categories';
-
-  @override
-  String get basicArithmeticDesc => 'Addition (+), Subtraction (-), Multiplication (*), Division (/)';
-
-  @override
-  String get trigonometricFunctionsScientificDesc => 'sin, cos, tan and their inverse functions (asin, acos, atan)';
-
-  @override
-  String get logarithmicFunctionsScientificDesc => 'Natural log (ln), common log (log), exponential (exp, eˣ, 10ˣ)';
-
-  @override
-  String get algebraicFunctionsDesc => 'Powers (x², x³, xʸ), roots (√, ∛), factorial (n!), absolute value (|x|)';
-
-  @override
-  String get angleMode => 'Angle Mode';
-
-  @override
-  String get functionToggle => 'Function Toggle';
-
-  @override
-  String get memoryFunctions => 'Memory Functions';
-
-  @override
-  String get historyAccess => 'History Access';
-
-  @override
-  String get scientificCalculatorPracticalApplications => 'Practical Applications';
-
-  @override
-  String get scientificCalculatorPracticalApplicationsDesc => 'Helpful for students in mathematics and science courses, basic engineering calculations, and everyday problem-solving involving complex mathematical operations.';
 
   @override
   String cacheWithLogSize(String cacheSize, String logSize) {
@@ -2425,13 +2329,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scientificModeControls => 'Mode Controls';
 
   @override
+  String get angleMode => 'Angle Mode';
+
+  @override
   String get angleModeDesc => 'Toggle between Radians and Degrees for trigonometric calculations';
+
+  @override
+  String get functionToggle => 'Function Toggle';
 
   @override
   String get functionToggleDesc => 'Press 2nd to switch between primary and secondary function sets';
 
   @override
+  String get memoryFunctions => 'Memory Functions';
+
+  @override
   String get memoryFunctionsDesc => 'Store, recall, and manage values in calculator memory';
+
+  @override
+  String get historyAccess => 'History Access';
 
   @override
   String get historyAccessDesc => 'Browse previous calculations and reuse expressions';
@@ -2576,90 +2492,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bmiObeseDesc => 'Significantly increased risk of serious health complications';
-
-  @override
-  String get bmiKeyFeatures => 'Key Features';
-
-  @override
-  String get comprehensiveBmiCalc => 'Comprehensive BMI Calculation';
-
-  @override
-  String get comprehensiveBmiCalcDesc => 'Calculate BMI using height, weight, age, and gender for accurate results';
-
-  @override
-  String get multipleUnitSystems => 'Multiple Unit Systems';
-
-  @override
-  String get multipleUnitSystemsDesc => 'Support for both metric (cm/kg) and imperial (ft-in/lbs) measurements';
-
-  @override
-  String get healthInsights => 'Health Insights';
-
-  @override
-  String get healthInsightsDesc => 'Get personalized recommendations based on your BMI category';
-
-  @override
-  String get ageGenderConsideration => 'Age & Gender Consideration';
-
-  @override
-  String get ageGenderConsiderationDesc => 'BMI interpretation adjusted for age and gender factors';
-
-  @override
-  String get bmiHowToUse => 'How to Use';
-
-  @override
-  String get step1Bmi => 'Step 1: Select Unit System';
-
-  @override
-  String get step1BmiDesc => 'Choose between metric (cm/kg) or imperial (ft-in/lbs) measurements';
-
-  @override
-  String get step2Bmi => 'Step 2: Enter Your Information';
-
-  @override
-  String get step2BmiDesc => 'Input your height, weight, age, and gender for accurate calculation';
-
-  @override
-  String get step3Bmi => 'Step 3: View Results';
-
-  @override
-  String get step3BmiDesc => 'See your BMI value, category, and personalized health recommendations';
-
-  @override
-  String get step4Bmi => 'Step 4: Track Progress';
-
-  @override
-  String get step4BmiDesc => 'Save calculations to history and monitor changes over time';
-
-  @override
-  String get bmiTips => 'Health Tips';
-
-  @override
-  String get tip1Bmi => 'BMI is a screening tool - consult healthcare providers for complete health assessment';
-
-  @override
-  String get tip2Bmi => 'Regular monitoring helps track progress toward health goals';
-
-  @override
-  String get tip3Bmi => 'BMI may not accurately reflect body composition for athletes or elderly';
-
-  @override
-  String get tip4Bmi => 'Focus on healthy lifestyle changes rather than just the number';
-
-  @override
-  String get tip5Bmi => 'Combine BMI with other health indicators for better understanding';
-
-  @override
-  String get bmiLimitations => 'Understanding BMI Limitations';
-
-  @override
-  String get bmiLimitationsDesc => 'BMI is a useful screening tool but has limitations. It doesn\'t distinguish between muscle and fat mass, and may not be accurate for athletes, elderly, or certain ethnic groups. Always consult healthcare professionals for comprehensive health assessment.';
-
-  @override
-  String get bmiPracticalApplications => 'Practical Applications';
-
-  @override
-  String get bmiPracticalApplicationsDesc => 'Useful for health screening, weight management planning, fitness goal setting, and tracking health progress over time.';
 
   @override
   String get clearBmiHistory => 'Clear BMI History';
@@ -4528,21 +4360,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bmiConsultationRec => 'Consider consulting with healthcare professionals for personalized health assessment and guidance.';
 
   @override
-  String get bmiFormula => 'BMI = Weight (kg) / [Height (m)]²';
-
-  @override
-  String get bmiLimitation1 => 'Does not reflect body composition (muscle vs. fat ratio)';
-
-  @override
-  String get bmiLimitation2 => 'May not be accurate for athletes, elderly, or certain ethnic groups';
-
-  @override
-  String get bmiLimitation3 => 'Does not assess other health factors like blood pressure, cholesterol, or blood sugar';
-
-  @override
-  String get bmiLimitation4 => 'Not suitable for pregnant women, children under 18, or individuals with certain medical conditions';
-
-  @override
   String get bmiConsult1 => 'Comprehensive health checkups and necessary tests';
 
   @override
@@ -4565,14 +4382,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bmiPercentileNormal => '5th to 85th percentile';
-
-  @override
-  String bmiPediatricInterpretation(Object category, Object percentile) {
-    return 'Your BMI percentile is $percentile for your age and gender. This indicates $category.';
-  }
-
-  @override
-  String get bmiPediatricNote => 'For children and adolescents, BMI is compared to others of the same age and gender using percentile charts.';
 
   @override
   String get bmiGrowthPattern => 'Consult with pediatrician to evaluate growth patterns and overall health.';
@@ -4790,42 +4599,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveToFinancialHistory => 'Save to history';
-
-  @override
-  String get financialCalculationTypes => 'Financial Calculation Types';
-
-  @override
-  String get loanCalculationDesc => 'Calculate monthly payments, total cost, and interest for loans';
-
-  @override
-  String get investmentCalculationDesc => 'Plan future value of investments with regular contributions';
-
-  @override
-  String get compoundInterestDesc => 'Calculate compound interest growth over time';
-
-  @override
-  String get practicalFinancialApplications => 'Practical Applications';
-
-  @override
-  String get financialApplicationsDesc => 'Mortgage planning, auto loans, retirement savings, education funding, business investments, and general financial planning.';
-
-  @override
-  String get financialTips => 'Financial Tips';
-
-  @override
-  String get financialTip1 => 'Compare different loan terms to find the best option';
-
-  @override
-  String get financialTip2 => 'Start investing early to maximize compound interest';
-
-  @override
-  String get financialTip3 => 'Consider additional payments to reduce loan interest';
-
-  @override
-  String get financialTip4 => 'Regular contributions can significantly boost investment growth';
-
-  @override
-  String get financialTip5 => 'Higher compounding frequency increases returns';
 
   @override
   String get selectedDate => 'Selected Date';
@@ -5283,117 +5056,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discountLimitation5 => 'Should verify with actual receipts';
-
-  @override
-  String get discountDisclaimer => 'This tool is for calculation assistance only and does not replace professional financial advice. Results may differ from reality due to other factors.';
-
-  @override
-  String get financialKeyFeatures => 'Key Features';
-
-  @override
-  String get comprehensiveFinancialCalc => 'Comprehensive Calculations';
-
-  @override
-  String get comprehensiveFinancialCalcDesc => 'Versatile financial calculator for loans, investments, and compound interest';
-
-  @override
-  String get multipleCalculationTypes => 'Multiple Calculation Types';
-
-  @override
-  String get multipleCalculationTypesDesc => 'Support for loan, investment, and compound interest calculations in one app';
-
-  @override
-  String get realTimeResults => 'Real-time Results';
-
-  @override
-  String get realTimeResultsDesc => 'Get detailed results instantly as you input data';
-
-  @override
-  String get historySaving => 'History Saving';
-
-  @override
-  String get historySavingDesc => 'Save and review previous calculations for reference';
-
-  @override
-  String get financialHowToUse => 'How to Use';
-
-  @override
-  String get step1Financial => 'Step 1: Select calculation type';
-
-  @override
-  String get step1FinancialDesc => 'Choose Loan, Investment, or Compound Interest tab based on your needs';
-
-  @override
-  String get step2Financial => 'Step 2: Enter information';
-
-  @override
-  String get step2FinancialDesc => 'Fill in required information like amount, interest rate, time period';
-
-  @override
-  String get step3Financial => 'Step 3: Calculate';
-
-  @override
-  String get step3FinancialDesc => 'Press the calculate button to view detailed results';
-
-  @override
-  String get step4Financial => 'Step 4: Save results';
-
-  @override
-  String get step4FinancialDesc => 'Save results to history for future reference';
-
-  @override
-  String get financialFormulas => 'Financial Formulas';
-
-  @override
-  String get loanFormula => 'Loan Formula';
-
-  @override
-  String get loanFormulaText => 'M = P × [r(1+r)ⁿ] / [(1+r)ⁿ-1]';
-
-  @override
-  String get loanFormulaDesc => 'M: Monthly payment, P: Loan amount, r: Monthly interest rate, n: Number of months';
-
-  @override
-  String get investmentFormula => 'Investment Formula';
-
-  @override
-  String get investmentFormulaText => 'FV = PV(1+r)ⁿ + PMT × [((1+r)ⁿ-1)/r]';
-
-  @override
-  String get investmentFormulaDesc => 'FV: Future value, PV: Initial investment, PMT: Monthly contribution, r: Interest rate, n: Number of periods';
-
-  @override
-  String get compoundInterestFormula => 'Compound Interest Formula';
-
-  @override
-  String get compoundInterestFormulaText => 'A = P(1 + r/n)^(nt)';
-
-  @override
-  String get compoundInterestFormulaDesc => 'A: Final amount, P: Principal, r: Interest rate, n: Compounding frequency, t: Time';
-
-  @override
-  String get financialLimitations => 'Important Notes';
-
-  @override
-  String get financialLimitationsDesc => 'The calculation results are for reference only and may not accurately reflect real-world situations:';
-
-  @override
-  String get financialLimitation1 => 'Does not account for inflation and market volatility';
-
-  @override
-  String get financialLimitation2 => 'Interest rates may change over time';
-
-  @override
-  String get financialLimitation3 => 'Does not include fees and additional costs';
-
-  @override
-  String get financialLimitation4 => 'Results may differ based on actual terms and conditions';
-
-  @override
-  String get financialLimitation5 => 'Should consult financial professionals for advice';
-
-  @override
-  String get financialDisclaimer => 'This tool is for calculation assistance only and does not replace professional financial advice. Please consult experts before making important financial decisions.';
 
   @override
   String get discountResultSavedToHistory => 'Discount result saved to history';

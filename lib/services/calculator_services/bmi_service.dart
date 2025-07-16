@@ -12,8 +12,6 @@ import 'package:setpocket/models/calculator_models/calculator_tools_data.dart';
 import 'package:setpocket/services/settings_models_service.dart';
 
 class BmiService {
-  static const String _historyKey = 'bmi_history';
-  static const String _preferencesKey = 'bmi_preferences';
   static const String _toolId = CalculatorToolCodes.bmi;
 
   // BMI calculation based on WHO standards with age and gender considerations
@@ -26,7 +24,7 @@ class BmiService {
     AppLocalizations l10n,
   ) {
     // Convert AgeGroup to age for internal calculations
-    int age = ageGroup == AgeGroup.under18 ? 16 : 25; // Representative ages
+    // Representative ages
 
     // Convert to metric if needed
     double heightInCm = height;
@@ -93,81 +91,6 @@ class BmiService {
     );
   }
 
-  static double _calculateBmiPercentile(double bmi, int age, Gender gender) {
-    // Simplified approximation of BMI percentiles based on CDC data
-    // This is a basic approximation - real implementation would use CDC lookup tables
-
-    // Age-adjusted BMI thresholds (approximated)
-    Map<int, Map<Gender, List<double>>> ageThresholds = {
-      // Format: age: {gender: [5th, 50th, 85th, 95th percentiles]}
-      5: {
-        Gender.male: [13.3, 15.4, 17.4, 19.3],
-        Gender.female: [13.2, 15.2, 17.1, 19.2],
-        Gender.other: [13.3, 15.3, 17.3, 19.3], // Use average
-      },
-      10: {
-        Gender.male: [14.2, 16.7, 20.0, 23.0],
-        Gender.female: [14.0, 16.9, 20.3, 23.2],
-        Gender.other: [14.1, 16.8, 20.2, 23.1],
-      },
-      15: {
-        Gender.male: [17.2, 20.2, 23.6, 26.8],
-        Gender.female: [17.0, 20.7, 24.0, 27.1],
-        Gender.other: [17.1, 20.5, 23.8, 27.0],
-      },
-      17: {
-        Gender.male: [18.2, 21.6, 25.0, 28.3],
-        Gender.female: [17.9, 21.8, 25.3, 28.8],
-        Gender.other: [18.1, 21.7, 25.2, 28.6],
-      }
-    };
-
-    // Find closest age group
-    int closestAge = 17;
-    for (int ageKey in ageThresholds.keys) {
-      if (age <= ageKey) {
-        closestAge = ageKey;
-        break;
-      }
-    }
-
-    List<double> thresholds = ageThresholds[closestAge]![gender] ??
-        ageThresholds[closestAge]![Gender.other]!;
-
-    // Calculate approximate percentile
-    if (bmi < thresholds[0]) {
-      return 2.5; // Below 5th percentile
-    } else if (bmi < thresholds[1]) {
-      return 25.0; // 5th to 50th percentile
-    } else if (bmi < thresholds[2]) {
-      return 70.0; // 50th to 85th percentile
-    } else if (bmi < thresholds[3]) {
-      return 90.0; // 85th to 95th percentile
-    } else {
-      return 97.5; // Above 95th percentile
-    }
-  }
-
-  static BmiCategory _getPediatricBmiCategory(double percentile) {
-    if (percentile < 5) return BmiCategory.underweight;
-    if (percentile < 85) return BmiCategory.normalWeight;
-    if (percentile < 95) return BmiCategory.overweightI;
-    return BmiCategory.obeseI;
-  }
-
-  static String _getPediatricInterpretation(double percentile,
-      BmiCategory category, int age, Gender gender, AppLocalizations l10n) {
-    String categoryName = _getPediatricCategoryName(category, l10n);
-    String baseInterpretation = l10n.bmiPediatricInterpretation(
-        percentile.toStringAsFixed(0), categoryName);
-
-    // Add pediatric-specific context
-    String pediatricNote = ' ${l10n.bmiPediatricNote}';
-    String growthPattern = ' ${l10n.bmiGrowthPattern}';
-
-    return baseInterpretation + pediatricNote + growthPattern;
-  }
-
   static String _getPediatricCategoryName(
       BmiCategory category, AppLocalizations l10n) {
     switch (category) {
@@ -183,48 +106,6 @@ class BmiService {
       case BmiCategory.obeseIII:
         return l10n.bmiPercentileObeseI.toLowerCase();
     }
-  }
-
-  static List<String> _getPediatricRecommendations(
-      BmiCategory category, int age, AppLocalizations l10n) {
-    List<String> recommendations = [];
-
-    // Age-appropriate recommendations
-    switch (category) {
-      case BmiCategory.underweight:
-        recommendations.addAll([
-          l10n.bmiUnderweightRec1,
-          l10n.bmiUnderweightRec2,
-          l10n.bmiUnderweightRec3,
-        ]);
-        break;
-      case BmiCategory.normalWeight:
-        recommendations.addAll([
-          l10n.bmiNormalRec1,
-          l10n.bmiNormalRec2,
-          l10n.bmiNormalRec3,
-        ]);
-        break;
-      case BmiCategory.overweightI:
-      case BmiCategory.overweightII:
-        recommendations.addAll([
-          l10n.bmiOverweightRec1,
-          l10n.bmiOverweightRec2,
-          l10n.bmiOverweightRec3,
-        ]);
-        break;
-      case BmiCategory.obeseI:
-      case BmiCategory.obeseII:
-      case BmiCategory.obeseIII:
-        recommendations.addAll([
-          l10n.bmiObeseRec1,
-          l10n.bmiObeseRec2,
-          l10n.bmiObeseRec3,
-        ]);
-        break;
-    }
-
-    return recommendations;
   }
 
   // Simplified pediatric BMI category determination since we don't have exact age
@@ -371,15 +252,6 @@ class BmiService {
     }
 
     return baseInterpretation;
-  }
-
-  static double _calculatePediatricBmiPercentile(double bmi, int age) {
-    // Simplified approximation for pediatric BMI percentiles
-    // In real implementation, this would use CDC growth charts
-    if (bmi < 16.0) return 5.0; // Underweight
-    if (bmi < 18.5) return 50.0; // Normal
-    if (bmi < 22.0) return 90.0; // 85th-95th percentile
-    return 97.0; // Above 95th percentile
   }
 
   static String _getDetailedCategoryName(
@@ -814,26 +686,5 @@ class BmiService {
     return ageGroup == AgeGroup.under18
         ? l10n.bmiPercentileNote
         : 'Tiêu chuẩn WHO cho người trưởng thành (18+ tuổi)';
-  }
-
-  // Add detailed BMI information for different age groups
-  static Map<String, dynamic> getBmiDetailedInfo(AppLocalizations l10n) {
-    return {
-      'formula': l10n.bmiFormula,
-      'adultRanges': getBmiRanges(l10n),
-      'elderlyNote': l10n.bmiElderlyNote,
-      'youthNote': l10n.bmiYouthNote,
-      'limitations': [
-        l10n.bmiLimitation1,
-        l10n.bmiLimitation2,
-        l10n.bmiLimitation3,
-        l10n.bmiLimitation4,
-      ],
-      'whenToConsult': [
-        l10n.bmiConsult1,
-        l10n.bmiConsult2,
-        l10n.bmiConsult3,
-      ],
-    };
   }
 }

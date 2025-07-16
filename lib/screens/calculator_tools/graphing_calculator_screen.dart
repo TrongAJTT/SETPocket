@@ -3,10 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/three_panels_layout.dart';
+import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/widgets/graph_calculator/graph_panel.dart';
 import 'package:setpocket/widgets/graph_calculator/functions_panel.dart';
 import 'package:setpocket/widgets/graph_calculator/bookmarks_panel.dart';
-import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/models/calculator_models/graphing_function.dart';
 import 'package:setpocket/models/unified_history_data.dart';
 import 'package:setpocket/services/generation_history_service.dart';
@@ -397,7 +397,7 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
         color = _functionColors[index % _functionColors.length];
       }
 
-      final id = DateTime.now().millisecondsSinceEpoch.toString() + '_$index';
+      final id = '${DateTime.now().millisecondsSinceEpoch}_$index';
       return GraphingFunction(
         id: id,
         expression: expression,
@@ -910,202 +910,202 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
   }
 
   void _showGraphingCalculatorInfo() {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
+    FunctionInfo.show(context, FunctionInfoKeys.graphingCalculator);
+    // final l10n = AppLocalizations.of(context)!;
+    // final theme = Theme.of(context);
 
-    GenericInfoDialog.show(
-      context: context,
-      title: l10n.graphingCalculatorDetailedInfo,
-      overview: l10n.graphingCalculatorOverview,
-      headerIcon: Icons.auto_graph,
-      sections: [
-        // Key Features
-        InfoSection(
-          title: l10n.graphingKeyFeatures,
-          icon: Icons.star_outline,
-          color: Colors.orange,
-          children: [
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.realTimePlotting,
-                description: l10n.realTimePlottingDesc,
-                icon: Icons.speed,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.multipleFunction,
-                description: l10n.multipleFunctionDesc,
-                icon: Icons.functions,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.interactiveControls,
-                description: l10n.interactiveControlsDesc,
-                icon: Icons.touch_app,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.aspectRatioControl,
-                description: l10n.aspectRatioControlDesc,
-                icon: Icons.aspect_ratio,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.functionHistory,
-                description: l10n.functionHistoryDesc,
-                icon: Icons.history,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.mathExpressionSupport,
-                description: l10n.mathExpressionSupportDesc,
-                icon: Icons.calculate,
-              ),
-            ),
-          ],
-        ),
+    // GenericInfoDialog.show(
+    //   context: context,
+    //   title: l10n.graphingCalculatorDetailedInfo,
+    //   overview: l10n.graphingCalculatorOverview,
+    //   headerIcon: Icons.auto_graph,
+    //   sections: [
+    //     // Key Features
+    //     InfoSection(
+    //       title: l10n.graphingKeyFeatures,
+    //       icon: Icons.star_outline,
+    //       color: Colors.orange,
+    //       children: [
+    //         GenericInfoDialog.buildFeatureItem(
+    //           theme,
+    //           FeatureItem(
+    //             title: l10n.realTimePlotting,
+    //             description: l10n.realTimePlottingDesc,
+    //             icon: Icons.speed,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildFeatureItem(
+    //           theme,
+    //           FeatureItem(
+    //             title: l10n.multipleFunction,
+    //             description: l10n.multipleFunctionDesc,
+    //             icon: Icons.functions,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildFeatureItem(
+    //           theme,
+    //           FeatureItem(
+    //             title: l10n.interactiveControls,
+    //             description: l10n.interactiveControlsDesc,
+    //             icon: Icons.touch_app,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildFeatureItem(
+    //           theme,
+    //           FeatureItem(
+    //             title: l10n.aspectRatioControl,
+    //             description: l10n.aspectRatioControlDesc,
+    //             icon: Icons.aspect_ratio,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildFeatureItem(
+    //           theme,
+    //           FeatureItem(
+    //             title: l10n.functionHistory,
+    //             description: l10n.functionHistoryDesc,
+    //             icon: Icons.history,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildFeatureItem(
+    //           theme,
+    //           FeatureItem(
+    //             title: l10n.mathExpressionSupport,
+    //             description: l10n.mathExpressionSupportDesc,
+    //             icon: Icons.calculate,
+    //           ),
+    //         ),
+    //       ],
+    //     ),
 
-        // How to Use
-        InfoSection(
-          title: l10n.graphingHowToUse,
-          icon: Icons.help_outline,
-          color: Colors.blue,
-          children: [
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                step: l10n.step1Graph,
-                description: l10n.step1GraphDesc,
-              ),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                step: l10n.step2Graph,
-                description: l10n.step2GraphDesc,
-              ),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                step: l10n.step3Graph,
-                description: l10n.step3GraphDesc,
-              ),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                step: l10n.step4Graph,
-                description: l10n.step4GraphDesc,
-              ),
-            ),
-          ],
-        ),
+    //     // How to Use
+    //     InfoSection(
+    //       title: l10n.graphingHowToUse,
+    //       icon: Icons.help_outline,
+    //       color: Colors.blue,
+    //       children: [
+    //         GenericInfoDialog.buildStepItem(
+    //           theme,
+    //           StepItem(
+    //             step: l10n.step1Graph,
+    //             description: l10n.step1GraphDesc,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildStepItem(
+    //           theme,
+    //           StepItem(
+    //             step: l10n.step2Graph,
+    //             description: l10n.step2GraphDesc,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildStepItem(
+    //           theme,
+    //           StepItem(
+    //             step: l10n.step3Graph,
+    //             description: l10n.step3GraphDesc,
+    //           ),
+    //         ),
+    //         GenericInfoDialog.buildStepItem(
+    //           theme,
+    //           StepItem(
+    //             step: l10n.step4Graph,
+    //             description: l10n.step4GraphDesc,
+    //           ),
+    //         ),
+    //       ],
+    //     ),
 
-        // Tips
-        InfoSection(
-          title: l10n.graphingTips,
-          icon: Icons.lightbulb_outline,
-          color: Colors.green,
-          children: [
-            GenericInfoDialog.buildTipItem(theme, l10n.tip1Graph),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip2Graph),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip3Graph),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip4Graph),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip5Graph),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip6Graph),
-            GenericInfoDialog.buildTipItem(theme, l10n.tip7Graph),
-          ],
-        ),
+    //     // Tips
+    //     InfoSection(
+    //       title: l10n.graphingTips,
+    //       icon: Icons.lightbulb_outline,
+    //       color: Colors.green,
+    //       children: [
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip1Graph),
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip2Graph),
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip3Graph),
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip4Graph),
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip5Graph),
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip6Graph),
+    //         GenericInfoDialog.buildTipItem(theme, l10n.tip7Graph),
+    //       ],
+    //     ),
 
-        // Supported Functions
-        InfoSection(
-          title: l10n.supportedFunctions,
-          icon: Icons.category,
-          color: Colors.purple,
-          children: [
-            GenericInfoDialog.buildMultiSubSection(
-              theme: theme,
-              subsections: [
-                {
-                  'title': l10n.basicOperations,
-                  'description': l10n.basicOperationsDesc,
-                },
-                {
-                  'title': l10n.trigonometricFunctions,
-                  'description': l10n.trigonometricFunctionsDesc,
-                },
-                {
-                  'title': l10n.logarithmicFunctions,
-                  'description': l10n.logarithmicFunctionsDesc,
-                },
-                {
-                  'title': l10n.otherFunctions,
-                  'description': l10n.otherFunctionsDesc,
-                },
-              ],
-            ),
-          ],
-        ),
+    //     // Supported Functions
+    //     InfoSection(
+    //       title: l10n.supportedFunctions,
+    //       icon: Icons.category,
+    //       color: Colors.purple,
+    //       children: [
+    //         GenericInfoDialog.buildMultiSubSection(
+    //           theme: theme,
+    //           subsections: [
+    //             {
+    //               'title': l10n.basicOperations,
+    //               'description': l10n.basicOperationsDesc,
+    //             },
+    //             {
+    //               'title': l10n.trigonometricFunctions,
+    //               'description': l10n.trigonometricFunctionsDesc,
+    //             },
+    //             {
+    //               'title': l10n.logarithmicFunctions,
+    //               'description': l10n.logarithmicFunctionsDesc,
+    //             },
+    //             {
+    //               'title': l10n.otherFunctions,
+    //               'description': l10n.otherFunctionsDesc,
+    //             },
+    //           ],
+    //         ),
+    //       ],
+    //     ),
 
-        // Navigation Controls
-        InfoSection(
-          title: l10n.navigationControls,
-          icon: Icons.navigation,
-          color: Colors.indigo,
-          children: [
-            GenericInfoDialog.buildMultiSubSection(
-              theme: theme,
-              subsections: [
-                {
-                  'title': l10n.zoomControls,
-                  'description': l10n.zoomControlsDesc,
-                },
-                {
-                  'title': l10n.panControls,
-                  'description': l10n.panControlsDesc,
-                },
-                {
-                  'title': l10n.resetControls,
-                  'description': l10n.resetControlsDesc,
-                },
-                {
-                  'title': l10n.aspectRatioDialog,
-                  'description': l10n.aspectRatioDialogDesc,
-                },
-              ],
-            ),
-          ],
-        ),
+    //     // Navigation Controls
+    //     InfoSection(
+    //       title: l10n.navigationControls,
+    //       icon: Icons.navigation,
+    //       color: Colors.indigo,
+    //       children: [
+    //         GenericInfoDialog.buildMultiSubSection(
+    //           theme: theme,
+    //           subsections: [
+    //             {
+    //               'title': l10n.zoomControls,
+    //               'description': l10n.zoomControlsDesc,
+    //             },
+    //             {
+    //               'title': l10n.panControls,
+    //               'description': l10n.panControlsDesc,
+    //             },
+    //             {
+    //               'title': l10n.resetControls,
+    //               'description': l10n.resetControlsDesc,
+    //             },
+    //             {
+    //               'title': l10n.aspectRatioDialog,
+    //               'description': l10n.aspectRatioDialogDesc,
+    //             },
+    //           ],
+    //         ),
+    //       ],
+    //     ),
 
-        // Practical Applications
-        InfoSection(
-          title: l10n.graphingPracticalApplications,
-          icon: Icons.build,
-          color: Colors.teal,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text(
-                l10n.graphingPracticalApplicationsDesc,
-                style: theme.textTheme.bodyMedium,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+    //     // Practical Applications
+    //     InfoSection(
+    //       title: l10n.graphingPracticalApplications,
+    //       icon: Icons.build,
+    //       color: Colors.teal,
+    //       children: [
+    //         Padding(
+    //           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    //           child: Text(
+    //             l10n.graphingPracticalApplicationsDesc,
+    //             style: theme.textTheme.bodyMedium,
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ],
   }
 
   @override

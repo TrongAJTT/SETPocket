@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
+import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/utils/percentage_input_utils.dart';
@@ -314,7 +315,7 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
         ),
         IconButton(
           icon: const Icon(Icons.info_outline),
-          onPressed: () => _showInfoDialog(l10n),
+          onPressed: _showInfoDialog,
           tooltip: l10n.showCalculatorInfo,
           iconSize: 20,
         ),
@@ -713,176 +714,8 @@ class _DiscountCalculatorScreenState extends State<DiscountCalculatorScreen> {
     }
   }
 
-  void _showInfoDialog(AppLocalizations l10n) {
-    final theme = Theme.of(context);
-
-    GenericInfoDialog.show(
-      context: context,
-      title: l10n.discountCalculatorDetailedInfo,
-      overview: l10n.discountCalculatorOverview,
-      headerIcon: Icons.local_offer,
-      sections: [
-        // Key Features
-        InfoSection(
-          title: l10n.discountKeyFeatures,
-          icon: Icons.star_outline,
-          color: Colors.blue,
-          children: [
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.comprehensiveDiscountCalc,
-                description: l10n.comprehensiveDiscountCalcDesc,
-                icon: Icons.calculate,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.multipleDiscountModes,
-                description: l10n.multipleDiscountModesDesc,
-                icon: Icons.tab,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.realTimeDiscountResults,
-                description: l10n.realTimeDiscountResultsDesc,
-                icon: Icons.flash_on,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.discountHistorySaving,
-                description: l10n.discountHistorySavingDesc,
-                icon: Icons.history,
-              ),
-            ),
-          ],
-        ),
-
-        // How to Use
-        InfoSection(
-          title: l10n.discountHowToUse,
-          icon: Icons.help_outline,
-          color: Colors.green,
-          children: [
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                  step: l10n.step1Discount,
-                  description: l10n.step1DiscountDesc),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                  step: l10n.step2Discount,
-                  description: l10n.step2DiscountDesc),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                  step: l10n.step3Discount,
-                  description: l10n.step3DiscountDesc),
-            ),
-            GenericInfoDialog.buildStepItem(
-              theme,
-              StepItem(
-                  step: l10n.step4Discount,
-                  description: l10n.step4DiscountDesc),
-            ),
-          ],
-        ),
-
-        // Calculation Modes
-        InfoSection(
-          title: l10n.discountCalculationModes,
-          icon: Icons.category,
-          color: Colors.orange,
-          children: [
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.discountMode,
-                description: l10n.discountModeDesc,
-                icon: Icons.local_offer,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.tipMode,
-                description: l10n.tipModeDesc,
-                icon: Icons.restaurant,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.taxMode,
-                description: l10n.taxModeDesc,
-                icon: Icons.receipt,
-              ),
-            ),
-            GenericInfoDialog.buildFeatureItem(
-              theme,
-              FeatureItem(
-                title: l10n.markupMode,
-                description: l10n.markupModeDesc,
-                icon: Icons.trending_up,
-              ),
-            ),
-          ],
-        ),
-
-        // Usage Tips
-        InfoSection(
-          title: l10n.discountTips,
-          icon: Icons.lightbulb_outline,
-          color: Colors.indigo,
-          children: [
-            GenericInfoDialog.buildTipItem(theme, l10n.discountTip1),
-            GenericInfoDialog.buildTipItem(theme, l10n.discountTip2),
-            GenericInfoDialog.buildTipItem(theme, l10n.discountTip3),
-            GenericInfoDialog.buildTipItem(theme, l10n.discountTip4),
-            GenericInfoDialog.buildTipItem(theme, l10n.discountTip5),
-          ],
-        ),
-
-        // Important Notes
-        InfoSection(
-          title: l10n.discountLimitations,
-          icon: Icons.warning_outlined,
-          color: Colors.amber,
-          children: [
-            GenericInfoDialog.buildBulletList(
-              theme: theme,
-              description: l10n.discountLimitationsDesc,
-              items: [
-                l10n.discountLimitation1,
-                l10n.discountLimitation2,
-                l10n.discountLimitation3,
-                l10n.discountLimitation4,
-                l10n.discountLimitation5,
-              ],
-            ),
-          ],
-        ), // Disclaimer
-        InfoSection(
-          title: l10n.discountLimitations,
-          icon: Icons.info_outline,
-          color: Colors.red,
-          children: [
-            GenericInfoDialog.buildDisclaimer(
-              theme: theme,
-              text: l10n.discountDisclaimer,
-            ),
-          ],
-        ),
-      ],
-    );
+  void _showInfoDialog() {
+    FunctionInfo.show(context, FunctionInfoKeys.discountCalculator);
   }
 
   void _showErrorDialog(String message) {

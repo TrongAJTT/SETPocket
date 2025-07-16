@@ -58,6 +58,13 @@ class SubSectionTitleInfoItem extends InfoItem {
   SubSectionTitleInfoItem({required this.title, required this.color});
 }
 
+// Item dạng nút liên kết
+class LinkButtonInfoItem extends InfoItem {
+  final String text;
+  final String url; // URL để mở khi nhấn nút
+  LinkButtonInfoItem({required this.text, required this.url});
+}
+
 // Item dạng danh sách
 class UnorderListItem extends InfoItem {
   final String content;

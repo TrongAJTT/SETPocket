@@ -120,6 +120,18 @@ class MarkdownInfoParser {
         continue;
       }
 
+      // Phân tích LinkButtonInfoItem: "([url]text)"
+      if (line.startsWith('([') && line.contains(']') && line.contains(')')) {
+        final linkMatch = RegExp(r'\(\[([^\]]+)\](.+)\)').firstMatch(line);
+        if (linkMatch != null) {
+          items.add(LinkButtonInfoItem(
+            url: linkMatch.group(1)!.trim(),
+            text: linkMatch.group(2)!.trim(),
+          ));
+          continue;
+        }
+      }
+
       // Phân tích Colored Shape Item: "- [shape:circle/square,ColorName] Title: Desc"
       featureMatch =
           RegExp(r'-\s*\[shape:(circle|square),([a-zA-Z]+)\]\s*([^:]+):\s*(.+)')

@@ -13,6 +13,7 @@ Format list:
 - [shape:circle/square,#HexColor] Title: Desc       -> ColoredShapeInfoItem
 - [shape:circle/square,ColorName] Title: Desc       -> ColoredShapeInfoItem
 [blank] or [blank:N]                                -> Empty line
+([link]text)                                        -> Link button
 1. Title: description                               -> StepInfoItem
 - content                                           -> UnorderListItem
 $expression                                         -> Math Expression

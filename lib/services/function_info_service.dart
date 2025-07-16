@@ -4,7 +4,7 @@ import 'package:setpocket/parsers/markdown_info_parser.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:setpocket/widgets/generic/generic_settings_helper.dart';
-import 'package:setpocket/widgets/generic_info_screen.dart';
+import 'package:setpocket/widgets/generic_function_info_screen.dart';
 
 class FunctionInfo {
   static Future<void> show(BuildContext context, String featureName) async {
@@ -55,6 +55,25 @@ class FunctionInfo {
 }
 
 class FunctionInfoKeys {
+  static const String currencyConverter = 'converter_tools/currencyConverter';
+  static const String lengthConverter = 'converter_tools/lengthConverter';
+  static const String weightConverter = 'converter_tools/weightConverter';
+  static const String temperatureConverter =
+      'converter_tools/temperatureConverter';
+  static const String massConverter = 'converter_tools/massConverter';
+  static const String speedConverter = 'converter_tools/speedConverter';
+  static const String areaConverter = 'converter_tools/areaConverter';
+  static const String volumeConverter = 'converter_tools/volumeConverter';
+  static const String timeConverter = 'converter_tools/timeConverter';
+  static const String powerConverter = 'converter_tools/powerConverter';
+  static const String energyConverter = 'converter_tools/energyConverter';
+  static const String pressureConverter = 'converter_tools/pressureConverter';
+  static const String dataConverter = 'converter_tools/dataConverter';
+  static const String angleConverter = 'converter_tools/angleConverter';
+  static const String frequencyConverter = 'converter_tools/frequencyConverter';
+  static const String numberSystemConverter =
+      'converter_tools/numberSystemConverter';
+
   static const String scientificCalculator =
       'calculator_tools/scientificCalculator';
   static const String graphingCalculator =

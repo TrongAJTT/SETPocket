@@ -4,7 +4,6 @@ import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
-import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/utils/percentage_input_utils.dart';
 import 'package:setpocket/controllers/discount_calculator_controller.dart';
 import 'package:setpocket/models/calculator_models/discount_calculator_models.dart';

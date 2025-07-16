@@ -45,6 +45,44 @@ class IconMapper {
     'savings': Icons.savings,
     'business_center': Icons.business_center,
     'attach_money': Icons.attach_money,
+    'tab': Icons.tab,
+    'apps': Icons.apps,
+    'flash_on': Icons.flash_on,
+    'alarm': Icons.alarm,
+    'local_offer': Icons.local_offer,
+    'local_activity': Icons.local_activity,
+    'local_library': Icons.local_library,
+    'local_hospital': Icons.local_hospital,
+    'restaurant': Icons.restaurant,
+    'receipt': Icons.receipt,
+    'compare_arrows': Icons.compare_arrows,
+    'cake': Icons.cake,
+    'info': Icons.info,
+    'touch_app': Icons.touch_app,
+    'aspect_ratio': Icons.aspect_ratio,
+    'navigation': Icons.navigation,
+    'map': Icons.map,
+    'credit_card': Icons.credit_card,
+    'tune': Icons.tune,
+    'drag_handle': Icons.drag_handle,
+    'filter_list': Icons.filter_list,
+    'sort': Icons.sort,
+    'view_agenda': Icons.view_agenda,
+    'save': Icons.save,
+    'update': Icons.update,
+    'delete': Icons.delete,
+    'center_focus_strong': Icons.center_focus_strong,
+    'center_focus_weak': Icons.center_focus_weak,
+    'precision_manufacturing': Icons.precision_manufacturing,
+    'thermostat': Icons.thermostat,
+    'science': Icons.science,
+    'access_time': Icons.access_time,
+    'storage': Icons.storage,
+    'cloud_upload': Icons.cloud_upload,
+    'rotate_90_degrees_ccw': Icons.rotate_90_degrees_ccw,
+    'crop_free': Icons.crop_free,
+    'fitness_center': Icons.fitness_center,
+    'code': Icons.code,
   };
 
   static const Map<String, Color> _colorMap = {
@@ -64,6 +102,6 @@ class IconMapper {
   }
 
   static Color getColor(String name) {
-    return _colorMap[name] ?? Colors.grey; // Màu mặc định
+    return _colorMap[name] ?? Colors.black; // Màu mặc định
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/models/info_models.dart';
+import 'package:setpocket/utils/url_utils.dart';
 
 class GenericInfoScreen extends StatelessWidget {
   final InfoPage page;
@@ -77,6 +78,9 @@ class GenericInfoScreen extends StatelessWidget {
     if (item is SubSectionTitleInfoItem) {
       return _buildSubSectionTitleInfoItem(theme, item);
     }
+    if (item is LinkButtonInfoItem) {
+      return _buildLinkButtonItem(theme, item);
+    }
     if (item is StepInfoItem) {
       return _buildStepInfoItem(theme, item);
     }
@@ -96,6 +100,33 @@ class GenericInfoScreen extends StatelessWidget {
       return _buildBlankLineItem(theme, item);
     }
     return const SizedBox.shrink();
+  }
+
+  Widget _buildLinkButtonItem(ThemeData theme, LinkButtonInfoItem item) {
+    return Builder(
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: TextButton(
+          onPressed: () => UrlUtils.launchInBrowser(item.url, context),
+          style: OutlinedButton.styleFrom(
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: .1),
+            side: BorderSide(
+              color: theme.colorScheme.primary.withValues(alpha: .3),
+            ),
+          ),
+          child: Text(
+            item.text,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: theme.colorScheme.primary),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildColoredShapeItem(ThemeData theme, ColoredShapeInfoItem item) {

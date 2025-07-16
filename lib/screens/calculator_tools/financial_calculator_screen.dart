@@ -11,7 +11,6 @@ import 'package:setpocket/services/calculator_services/graphing_calculator_servi
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
 import 'package:setpocket/services/function_info_service.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
-import 'package:setpocket/widgets/generic_info_dialog.dart';
 import 'package:setpocket/utils/percentage_input_utils.dart';
 import 'package:setpocket/utils/generic_dialog_utils.dart';
 import 'package:setpocket/utils/localization_utils.dart';

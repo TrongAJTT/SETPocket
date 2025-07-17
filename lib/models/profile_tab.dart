@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/utils/icon_data_utils.dart';
 
 /// Model để lưu trữ thông tin của một tab profile
 class ProfileTab {
@@ -78,16 +79,17 @@ class ProfileTab {
 
   /// Create from Map
   factory ProfileTab.fromJson(Map<String, dynamic> json) {
+    // Tạo IconData constant trước
+    final int codePoint = json['iconCodePoint'] ?? Icons.apps.codePoint;
+
     return ProfileTab(
       index: json['index'] ?? 0,
       toolId: json['toolId'] ?? 'tool_selection',
       toolTitle: json['toolTitle'] ?? 'Select Tool',
-      icon: IconData(
-        json['iconCodePoint'] ?? Icons.apps.codePoint,
-        fontFamily: json['iconFontFamily'],
-      ),
+      icon: IconDataHelper.getConstantIconData(
+          codePoint), // Sử dụng constant IconData
       iconColor: Color(json['iconColorValue'] ?? Colors.grey.value),
-      toolWidget: Container(), // Widget sẽ được tái tạo khi load
+      toolWidget: Container(),
       parentCategory: json['parentCategory'],
       breadcrumbData: json['breadcrumbData'] != null
           ? List<Map<String, dynamic>>.from(json['breadcrumbData'])
@@ -96,10 +98,5 @@ class ProfileTab {
         json['lastAccessed'] ?? DateTime.now().millisecondsSinceEpoch,
       ),
     );
-  }
-
-  @override
-  String toString() {
-    return 'ProfileTab(index: $index, toolId: $toolId, toolTitle: $toolTitle)';
   }
 }

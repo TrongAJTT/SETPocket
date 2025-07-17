@@ -868,7 +868,6 @@ class _GraphingCalculatorScreenState extends State<GraphingCalculatorScreen>
   }
 
   Future<void> _removeGroupFromHistory(Map<String, dynamic> group) async {
-    final l10n = AppLocalizations.of(context)!;
     final int? historyId = group['id'];
 
     if (historyId == null) {

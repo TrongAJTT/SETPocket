@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
+import 'package:setpocket/utils/url_utils.dart';
 import 'package:setpocket/utils/variables_utils.dart';
 import 'package:setpocket/widgets/generic/generic_settings_helper.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -69,7 +70,7 @@ class _AboutLayoutState extends State<AboutLayout> {
             title: Text(l10n.githubRepo),
             subtitle: Text(l10n.githubRepoDesc),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => _openUrl(githubRepoUrl),
+            onTap: () => UrlUtils.launchInBrowser(githubRepoUrl, context),
           ),
 
           // Donate section
@@ -163,33 +164,6 @@ class _AboutLayoutState extends State<AboutLayout> {
     return '${packageInfo!.version}+${packageInfo!.buildNumber} ($versionType)';
   }
 
-  Future<void> _openUrl(String url) async {
-    try {
-      final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        // Fallback: show snackbar with error
-        if (mounted) {
-          SnackbarUtils.showTyped(
-            context,
-            'Could not open URL: $url',
-            SnackBarType.error,
-          );
-        }
-      }
-    } catch (e) {
-      // Handle error silently or show user-friendly message
-      if (mounted) {
-        SnackbarUtils.showTyped(
-          context,
-          'Error opening URL: $e',
-          SnackBarType.error,
-        );
-      }
-    }
-  }
-
   void _showDonateDialog() {
     final l10n = AppLocalizations.of(context)!;
     final config = GenericSettingsConfig<dynamic>(
@@ -233,21 +207,21 @@ class _AboutLayoutState extends State<AboutLayout> {
             title: const Text('GitHub Sponsors'),
             subtitle: Text(l10n.supportOnGitHub),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => _openUrl(githubSponsorUrl),
+            onTap: () => UrlUtils.launchInBrowser(githubSponsorUrl, context),
           ),
           ListTile(
             leading: const Icon(Icons.coffee),
             title: const Text('Ko-fi'),
             subtitle: Text(l10n.buyMeCoffee),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => _openUrl(donateKofiUrl),
+            onTap: () => UrlUtils.launchInBrowser(donateKofiUrl, context),
           ),
           ListTile(
             leading: const Icon(Icons.payment),
             title: const Text('PayPal'),
             subtitle: Text(l10n.oneTimeDonation),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => _openUrl(paypalDonateUrl),
+            onTap: () => UrlUtils.launchInBrowser(paypalDonateUrl, context),
           ),
         ],
       ),
@@ -280,12 +254,11 @@ class _AboutLayoutState extends State<AboutLayout> {
       itemBuilder: (context, index) {
         final lib = libraries[index];
         return ListTile(
-          title: Text(lib['name'] ?? ''),
-          subtitle: Text('${lib['author'] ?? ''} • ${lib['license'] ?? ''}'),
-          trailing: const Icon(Icons.open_in_new),
-          onTap: () =>
-              _openUrl('https://pub.dev/packages/${lib['name'] ?? ''}'),
-        );
+            title: Text(lib['name'] ?? ''),
+            subtitle: Text('${lib['author'] ?? ''} • ${lib['license'] ?? ''}'),
+            trailing: const Icon(Icons.open_in_new),
+            onTap: () => UrlUtils.launchInBrowser(
+                'https://pub.dev/packages/${lib['name'] ?? ''}', context));
       },
     );
   }

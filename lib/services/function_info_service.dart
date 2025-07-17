@@ -8,13 +8,14 @@ import 'package:setpocket/widgets/generic_function_info_screen.dart';
 
 class FunctionInfo {
   static Future<void> show(BuildContext context, String featureName) async {
+    late String path;
     try {
       // Get the locale to determine the language
       final locale = Localizations.localeOf(context);
       final langCode = locale.languageCode; // 'vi' or 'en'
 
       // Load the markdown file based on featureName and language
-      final path = 'assets/func_info/${featureName}_$langCode.md';
+      path = 'assets/func_info/${featureName}_$langCode.md';
       final content = await rootBundle.loadString(path);
 
       // Parse the markdown content
@@ -46,7 +47,7 @@ class FunctionInfo {
       if (context.mounted) {
         SnackbarUtils.showTyped(
           context,
-          'Could not load information for $featureName.',
+          'Could not load information for $path.',
           SnackBarType.error,
         );
       }

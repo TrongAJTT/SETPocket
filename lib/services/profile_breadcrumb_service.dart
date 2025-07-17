@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/services/profile_tab_service.dart';
+import 'package:setpocket/utils/icon_data_utils.dart';
 
 /// Data model cho breadcrumb item
 class ProfileBreadcrumbItem {
@@ -331,20 +332,20 @@ class ProfileBreadcrumbService extends ChangeNotifier {
       return;
     }
 
-    _breadcrumbStacks[tabIndex] = breadcrumbData
-        .map((data) => ProfileBreadcrumbItem(
-              title: data['title'] ?? '',
-              toolId: data['toolId'] ?? '',
-              icon: data['iconCodePoint'] != null
-                  ? IconData(
-                      data['iconCodePoint'],
-                      fontFamily: data['iconFontFamily'],
-                    )
-                  : null,
-              // toolWidget sẽ được tái tạo khi cần thông qua updateTabTool
-              toolWidget: null,
-            ))
-        .toList();
+    _breadcrumbStacks[tabIndex] = breadcrumbData.map((data) {
+      // Tạo constant IconData
+      final int? codePoint = data['iconCodePoint'];
+
+      return ProfileBreadcrumbItem(
+        title: data['title'] ?? '',
+        toolId: data['toolId'] ?? '',
+        icon: codePoint != null
+            ? IconDataHelper.getConstantIconData(codePoint)
+            : null,
+        // Sử dụng constant IconData hoặc null
+        toolWidget: null,
+      );
+    }).toList();
   }
 
   /// Lưu breadcrumb state của tab hiện tại vào ProfileTab

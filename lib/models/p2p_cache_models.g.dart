@@ -7,13 +7,13 @@ part of 'p2p_cache_models.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetP2PDataCacheCollection on Isar {
   IsarCollection<P2PDataCache> get p2PDataCaches => this.collection();
 }
 
-const P2PDataCacheSchema = CollectionSchema(
+final P2PDataCacheSchema = CollectionSchema(
   name: r'P2PDataCache',
   id: 5868483008450424708,
   properties: {
@@ -197,7 +197,7 @@ const P2PDataCacheSchema = CollectionSchema(
   getId: _p2PDataCacheGetId,
   getLinks: _p2PDataCacheGetLinks,
   attach: _p2PDataCacheAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _p2PDataCacheEstimateSize(

@@ -7,13 +7,13 @@ part of 'p2p_models.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetP2PUserCollection on Isar {
   IsarCollection<P2PUser> get p2PUsers => this.collection();
 }
 
-const P2PUserSchema = CollectionSchema(
+final P2PUserSchema = CollectionSchema(
   name: r'P2PUser',
   id: 566369171815177019,
   properties: {
@@ -121,7 +121,7 @@ const P2PUserSchema = CollectionSchema(
   getId: _p2PUserGetId,
   getLinks: _p2PUserGetLinks,
   attach: _p2PUserAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _p2PUserEstimateSize(
@@ -2015,13 +2015,13 @@ extension P2PUserQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetPairingRequestCollection on Isar {
   IsarCollection<PairingRequest> get pairingRequests => this.collection();
 }
 
-const PairingRequestSchema = CollectionSchema(
+final PairingRequestSchema = CollectionSchema(
   name: r'PairingRequest',
   id: 1782595776270177333,
   properties: {
@@ -2096,7 +2096,7 @@ const PairingRequestSchema = CollectionSchema(
   getId: _pairingRequestGetId,
   getLinks: _pairingRequestGetLinks,
   attach: _pairingRequestAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _pairingRequestEstimateSize(
@@ -3647,13 +3647,13 @@ extension PairingRequestQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetDataTransferTaskCollection on Isar {
   IsarCollection<DataTransferTask> get dataTransferTasks => this.collection();
 }
 
-const DataTransferTaskSchema = CollectionSchema(
+final DataTransferTaskSchema = CollectionSchema(
   name: r'DataTransferTask',
   id: 3546441473027873409,
   properties: {
@@ -3785,7 +3785,7 @@ const DataTransferTaskSchema = CollectionSchema(
   getId: _dataTransferTaskGetId,
   getLinks: _dataTransferTaskGetLinks,
   attach: _dataTransferTaskAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _dataTransferTaskEstimateSize(
@@ -6483,14 +6483,14 @@ extension DataTransferTaskQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetFileTransferRequestCollection on Isar {
   IsarCollection<FileTransferRequest> get fileTransferRequests =>
       this.collection();
 }
 
-const FileTransferRequestSchema = CollectionSchema(
+final FileTransferRequestSchema = CollectionSchema(
   name: r'FileTransferRequest',
   id: 6889281268088159415,
   properties: {
@@ -6549,6 +6549,11 @@ const FileTransferRequestSchema = CollectionSchema(
       id: 10,
       name: r'totalSize',
       type: IsarType.long,
+    ),
+    r'useEncryption': PropertySchema(
+      id: 11,
+      name: r'useEncryption',
+      type: IsarType.bool,
     )
   },
   estimateSize: _fileTransferRequestEstimateSize,
@@ -6589,7 +6594,7 @@ const FileTransferRequestSchema = CollectionSchema(
   getId: _fileTransferRequestGetId,
   getLinks: _fileTransferRequestGetLinks,
   attach: _fileTransferRequestAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _fileTransferRequestEstimateSize(
@@ -6637,6 +6642,7 @@ void _fileTransferRequestSerialize(
   writer.writeString(offsets[8], object.requestId);
   writer.writeDateTime(offsets[9], object.requestTime);
   writer.writeLong(offsets[10], object.totalSize);
+  writer.writeBool(offsets[11], object.useEncryption);
 }
 
 FileTransferRequest _fileTransferRequestDeserialize(
@@ -6663,6 +6669,7 @@ FileTransferRequest _fileTransferRequestDeserialize(
     requestId: reader.readString(offsets[8]),
     requestTime: reader.readDateTime(offsets[9]),
     totalSize: reader.readLong(offsets[10]),
+    useEncryption: reader.readBoolOrNull(offsets[11]) ?? false,
   );
   return object;
 }
@@ -6702,6 +6709,8 @@ P _fileTransferRequestDeserializeProp<P>(
       return (reader.readDateTime(offset)) as P;
     case 10:
       return (reader.readLong(offset)) as P;
+    case 11:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -8043,6 +8052,16 @@ extension FileTransferRequestQueryFilter on QueryBuilder<FileTransferRequest,
       ));
     });
   }
+
+  QueryBuilder<FileTransferRequest, FileTransferRequest, QAfterFilterCondition>
+      useEncryptionEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'useEncryption',
+        value: value,
+      ));
+    });
+  }
 }
 
 extension FileTransferRequestQueryObject on QueryBuilder<FileTransferRequest,
@@ -8197,6 +8216,20 @@ extension FileTransferRequestQuerySortBy
       sortByTotalSizeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'totalSize', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FileTransferRequest, FileTransferRequest, QAfterSortBy>
+      sortByUseEncryption() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useEncryption', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FileTransferRequest, FileTransferRequest, QAfterSortBy>
+      sortByUseEncryptionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useEncryption', Sort.desc);
     });
   }
 }
@@ -8356,6 +8389,20 @@ extension FileTransferRequestQuerySortThenBy
       return query.addSortBy(r'totalSize', Sort.desc);
     });
   }
+
+  QueryBuilder<FileTransferRequest, FileTransferRequest, QAfterSortBy>
+      thenByUseEncryption() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useEncryption', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FileTransferRequest, FileTransferRequest, QAfterSortBy>
+      thenByUseEncryptionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useEncryption', Sort.desc);
+    });
+  }
 }
 
 extension FileTransferRequestQueryWhereDistinct
@@ -8427,6 +8474,13 @@ extension FileTransferRequestQueryWhereDistinct
       distinctByTotalSize() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'totalSize');
+    });
+  }
+
+  QueryBuilder<FileTransferRequest, FileTransferRequest, QDistinct>
+      distinctByUseEncryption() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'useEncryption');
     });
   }
 }
@@ -8514,6 +8568,13 @@ extension FileTransferRequestQueryProperty
       return query.addPropertyName(r'totalSize');
     });
   }
+
+  QueryBuilder<FileTransferRequest, bool, QQueryOperations>
+      useEncryptionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'useEncryption');
+    });
+  }
 }
 
 // **************************************************************************
@@ -8521,7 +8582,7 @@ extension FileTransferRequestQueryProperty
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 const FileTransferInfoSchema = Schema(
   name: r'FileTransferInfo',

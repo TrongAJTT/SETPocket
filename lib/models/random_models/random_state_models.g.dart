@@ -7,14 +7,14 @@ part of 'random_state_models.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetNumberGeneratorStateCollection on Isar {
   IsarCollection<NumberGeneratorState> get numberGeneratorStates =>
       this.collection();
 }
 
-const NumberGeneratorStateSchema = CollectionSchema(
+final NumberGeneratorStateSchema = CollectionSchema(
   name: r'NumberGeneratorState',
   id: -6870471639702179438,
   properties: {
@@ -60,7 +60,7 @@ const NumberGeneratorStateSchema = CollectionSchema(
   getId: _numberGeneratorStateGetId,
   getLinks: _numberGeneratorStateGetLinks,
   attach: _numberGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _numberGeneratorStateEstimateSize(
@@ -853,14 +853,14 @@ extension NumberGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetPasswordGeneratorStateCollection on Isar {
   IsarCollection<PasswordGeneratorState> get passwordGeneratorStates =>
       this.collection();
 }
 
-const PasswordGeneratorStateSchema = CollectionSchema(
+final PasswordGeneratorStateSchema = CollectionSchema(
   name: r'PasswordGeneratorState',
   id: 3145882875069307163,
   properties: {
@@ -906,7 +906,7 @@ const PasswordGeneratorStateSchema = CollectionSchema(
   getId: _passwordGeneratorStateGetId,
   getLinks: _passwordGeneratorStateGetLinks,
   attach: _passwordGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _passwordGeneratorStateEstimateSize(
@@ -1588,14 +1588,14 @@ extension PasswordGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetDateGeneratorStateCollection on Isar {
   IsarCollection<DateGeneratorState> get dateGeneratorStates =>
       this.collection();
 }
 
-const DateGeneratorStateSchema = CollectionSchema(
+final DateGeneratorStateSchema = CollectionSchema(
   name: r'DateGeneratorState',
   id: 5674200133836957957,
   properties: {
@@ -1636,7 +1636,7 @@ const DateGeneratorStateSchema = CollectionSchema(
   getId: _dateGeneratorStateGetId,
   getLinks: _dateGeneratorStateGetLinks,
   attach: _dateGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _dateGeneratorStateEstimateSize(
@@ -2388,14 +2388,14 @@ extension DateGeneratorStateQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetColorGeneratorStateCollection on Isar {
   IsarCollection<ColorGeneratorState> get colorGeneratorStates =>
       this.collection();
 }
 
-const ColorGeneratorStateSchema = CollectionSchema(
+final ColorGeneratorStateSchema = CollectionSchema(
   name: r'ColorGeneratorState',
   id: -5728070979846270080,
   properties: {
@@ -2421,7 +2421,7 @@ const ColorGeneratorStateSchema = CollectionSchema(
   getId: _colorGeneratorStateGetId,
   getLinks: _colorGeneratorStateGetLinks,
   attach: _colorGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _colorGeneratorStateEstimateSize(
@@ -2832,14 +2832,14 @@ extension ColorGeneratorStateQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetDateTimeGeneratorStateCollection on Isar {
   IsarCollection<DateTimeGeneratorState> get dateTimeGeneratorStates =>
       this.collection();
 }
 
-const DateTimeGeneratorStateSchema = CollectionSchema(
+final DateTimeGeneratorStateSchema = CollectionSchema(
   name: r'DateTimeGeneratorState',
   id: -1052635046332609604,
   properties: {
@@ -2885,7 +2885,7 @@ const DateTimeGeneratorStateSchema = CollectionSchema(
   getId: _dateTimeGeneratorStateGetId,
   getLinks: _dateTimeGeneratorStateGetLinks,
   attach: _dateTimeGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _dateTimeGeneratorStateEstimateSize(
@@ -3695,14 +3695,14 @@ extension DateTimeGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetTimeGeneratorStateCollection on Isar {
   IsarCollection<TimeGeneratorState> get timeGeneratorStates =>
       this.collection();
 }
 
-const TimeGeneratorStateSchema = CollectionSchema(
+final TimeGeneratorStateSchema = CollectionSchema(
   name: r'TimeGeneratorState',
   id: -2685172112002548250,
   properties: {
@@ -3758,7 +3758,7 @@ const TimeGeneratorStateSchema = CollectionSchema(
   getId: _timeGeneratorStateGetId,
   getLinks: _timeGeneratorStateGetLinks,
   attach: _timeGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _timeGeneratorStateEstimateSize(
@@ -4731,14 +4731,14 @@ extension TimeGeneratorStateQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetSimpleGeneratorStateCollection on Isar {
   IsarCollection<SimpleGeneratorState> get simpleGeneratorStates =>
       this.collection();
 }
 
-const SimpleGeneratorStateSchema = CollectionSchema(
+final SimpleGeneratorStateSchema = CollectionSchema(
   name: r'SimpleGeneratorState',
   id: -2331032547444031588,
   properties: {
@@ -4764,7 +4764,7 @@ const SimpleGeneratorStateSchema = CollectionSchema(
   getId: _simpleGeneratorStateGetId,
   getLinks: _simpleGeneratorStateGetLinks,
   attach: _simpleGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _simpleGeneratorStateEstimateSize(
@@ -5176,14 +5176,14 @@ extension SimpleGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetUuidGeneratorStateCollection on Isar {
   IsarCollection<UuidGeneratorState> get uuidGeneratorStates =>
       this.collection();
 }
 
-const UuidGeneratorStateSchema = CollectionSchema(
+final UuidGeneratorStateSchema = CollectionSchema(
   name: r'UuidGeneratorState',
   id: 7898149454024905870,
   properties: {
@@ -5219,7 +5219,7 @@ const UuidGeneratorStateSchema = CollectionSchema(
   getId: _uuidGeneratorStateGetId,
   getLinks: _uuidGeneratorStateGetLinks,
   attach: _uuidGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _uuidGeneratorStateEstimateSize(
@@ -5786,14 +5786,14 @@ extension UuidGeneratorStateQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetStringGeneratorStateCollection on Isar {
   IsarCollection<StringGeneratorState> get stringGeneratorStates =>
       this.collection();
 }
 
-const StringGeneratorStateSchema = CollectionSchema(
+final StringGeneratorStateSchema = CollectionSchema(
   name: r'StringGeneratorState',
   id: -7106958830527332572,
   properties: {
@@ -5844,7 +5844,7 @@ const StringGeneratorStateSchema = CollectionSchema(
   getId: _stringGeneratorStateGetId,
   getLinks: _stringGeneratorStateGetLinks,
   attach: _stringGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _stringGeneratorStateEstimateSize(
@@ -6627,14 +6627,14 @@ extension StringGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetListGeneratorStateCollection on Isar {
   IsarCollection<ListGeneratorState> get listGeneratorStates =>
       this.collection();
 }
 
-const ListGeneratorStateSchema = CollectionSchema(
+final ListGeneratorStateSchema = CollectionSchema(
   name: r'ListGeneratorState',
   id: -3118342959546359802,
   properties: {
@@ -6675,7 +6675,7 @@ const ListGeneratorStateSchema = CollectionSchema(
   getId: _listGeneratorStateGetId,
   getLinks: _listGeneratorStateGetLinks,
   attach: _listGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _listGeneratorStateEstimateSize(
@@ -7425,14 +7425,14 @@ extension ListGeneratorStateQueryProperty
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetDiceRollGeneratorStateCollection on Isar {
   IsarCollection<DiceRollGeneratorState> get diceRollGeneratorStates =>
       this.collection();
 }
 
-const DiceRollGeneratorStateSchema = CollectionSchema(
+final DiceRollGeneratorStateSchema = CollectionSchema(
   name: r'DiceRollGeneratorState',
   id: 858777766865356202,
   properties: {
@@ -7468,7 +7468,7 @@ const DiceRollGeneratorStateSchema = CollectionSchema(
   getId: _diceRollGeneratorStateGetId,
   getLinks: _diceRollGeneratorStateGetLinks,
   attach: _diceRollGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _diceRollGeneratorStateEstimateSize(
@@ -8084,14 +8084,14 @@ extension DiceRollGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetLatinLetterGeneratorStateCollection on Isar {
   IsarCollection<LatinLetterGeneratorState> get latinLetterGeneratorStates =>
       this.collection();
 }
 
-const LatinLetterGeneratorStateSchema = CollectionSchema(
+final LatinLetterGeneratorStateSchema = CollectionSchema(
   name: r'LatinLetterGeneratorState',
   id: -112186655833231801,
   properties: {
@@ -8137,7 +8137,7 @@ const LatinLetterGeneratorStateSchema = CollectionSchema(
   getId: _latinLetterGeneratorStateGetId,
   getLinks: _latinLetterGeneratorStateGetLinks,
   attach: _latinLetterGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _latinLetterGeneratorStateEstimateSize(
@@ -8819,14 +8819,14 @@ extension LatinLetterGeneratorStateQueryProperty on QueryBuilder<
 }
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetPlayingCardGeneratorStateCollection on Isar {
   IsarCollection<PlayingCardGeneratorState> get playingCardGeneratorStates =>
       this.collection();
 }
 
-const PlayingCardGeneratorStateSchema = CollectionSchema(
+final PlayingCardGeneratorStateSchema = CollectionSchema(
   name: r'PlayingCardGeneratorState',
   id: -4041564923094062239,
   properties: {
@@ -8862,7 +8862,7 @@ const PlayingCardGeneratorStateSchema = CollectionSchema(
   getId: _playingCardGeneratorStateGetId,
   getLinks: _playingCardGeneratorStateGetLinks,
   attach: _playingCardGeneratorStateAttach,
-  version: '3.0.5',
+  version: '3.1.0+1',
 );
 
 int _playingCardGeneratorStateEstimateSize(

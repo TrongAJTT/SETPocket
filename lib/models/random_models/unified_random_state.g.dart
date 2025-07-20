@@ -14,7 +14,7 @@ extension GetUnifiedRandomStateCollection on Isar {
       this.collection();
 }
 
-final UnifiedRandomStateSchema = CollectionSchema(
+const UnifiedRandomStateSchema = CollectionSchema(
   name: r'UnifiedRandomState',
   id: 6948725424467877474,
   properties: {

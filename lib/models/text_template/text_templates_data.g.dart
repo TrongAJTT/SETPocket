@@ -13,7 +13,7 @@ extension GetTextTemplatesDataCollection on Isar {
   IsarCollection<TextTemplatesData> get textTemplatesDatas => this.collection();
 }
 
-final TextTemplatesDataSchema = CollectionSchema(
+const TextTemplatesDataSchema = CollectionSchema(
   name: r'TextTemplatesData',
   id: 922399691416816559,
   properties: {

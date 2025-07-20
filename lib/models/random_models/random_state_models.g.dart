@@ -14,7 +14,7 @@ extension GetNumberGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final NumberGeneratorStateSchema = CollectionSchema(
+const NumberGeneratorStateSchema = CollectionSchema(
   name: r'NumberGeneratorState',
   id: -6870471639702179438,
   properties: {
@@ -860,7 +860,7 @@ extension GetPasswordGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final PasswordGeneratorStateSchema = CollectionSchema(
+const PasswordGeneratorStateSchema = CollectionSchema(
   name: r'PasswordGeneratorState',
   id: 3145882875069307163,
   properties: {
@@ -1595,7 +1595,7 @@ extension GetDateGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final DateGeneratorStateSchema = CollectionSchema(
+const DateGeneratorStateSchema = CollectionSchema(
   name: r'DateGeneratorState',
   id: 5674200133836957957,
   properties: {
@@ -2395,7 +2395,7 @@ extension GetColorGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final ColorGeneratorStateSchema = CollectionSchema(
+const ColorGeneratorStateSchema = CollectionSchema(
   name: r'ColorGeneratorState',
   id: -5728070979846270080,
   properties: {
@@ -2839,7 +2839,7 @@ extension GetDateTimeGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final DateTimeGeneratorStateSchema = CollectionSchema(
+const DateTimeGeneratorStateSchema = CollectionSchema(
   name: r'DateTimeGeneratorState',
   id: -1052635046332609604,
   properties: {
@@ -3702,7 +3702,7 @@ extension GetTimeGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final TimeGeneratorStateSchema = CollectionSchema(
+const TimeGeneratorStateSchema = CollectionSchema(
   name: r'TimeGeneratorState',
   id: -2685172112002548250,
   properties: {
@@ -4738,7 +4738,7 @@ extension GetSimpleGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final SimpleGeneratorStateSchema = CollectionSchema(
+const SimpleGeneratorStateSchema = CollectionSchema(
   name: r'SimpleGeneratorState',
   id: -2331032547444031588,
   properties: {
@@ -5183,7 +5183,7 @@ extension GetUuidGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final UuidGeneratorStateSchema = CollectionSchema(
+const UuidGeneratorStateSchema = CollectionSchema(
   name: r'UuidGeneratorState',
   id: 7898149454024905870,
   properties: {
@@ -5793,7 +5793,7 @@ extension GetStringGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final StringGeneratorStateSchema = CollectionSchema(
+const StringGeneratorStateSchema = CollectionSchema(
   name: r'StringGeneratorState',
   id: -7106958830527332572,
   properties: {
@@ -6634,7 +6634,7 @@ extension GetListGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final ListGeneratorStateSchema = CollectionSchema(
+const ListGeneratorStateSchema = CollectionSchema(
   name: r'ListGeneratorState',
   id: -3118342959546359802,
   properties: {
@@ -7432,7 +7432,7 @@ extension GetDiceRollGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final DiceRollGeneratorStateSchema = CollectionSchema(
+const DiceRollGeneratorStateSchema = CollectionSchema(
   name: r'DiceRollGeneratorState',
   id: 858777766865356202,
   properties: {
@@ -8091,7 +8091,7 @@ extension GetLatinLetterGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final LatinLetterGeneratorStateSchema = CollectionSchema(
+const LatinLetterGeneratorStateSchema = CollectionSchema(
   name: r'LatinLetterGeneratorState',
   id: -112186655833231801,
   properties: {
@@ -8826,7 +8826,7 @@ extension GetPlayingCardGeneratorStateCollection on Isar {
       this.collection();
 }
 
-final PlayingCardGeneratorStateSchema = CollectionSchema(
+const PlayingCardGeneratorStateSchema = CollectionSchema(
   name: r'PlayingCardGeneratorState',
   id: -4041564923094062239,
   properties: {

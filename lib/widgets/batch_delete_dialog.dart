@@ -19,7 +19,7 @@ class BatchDeleteDialog extends StatelessWidget {
     return HoldToConfirmDialog(
       title: l10n.confirmBatchDelete,
       content: l10n.typeConfirmToDelete(templateCount),
-      actionText: l10n.batchDelete,
+      cancelText: l10n.batchDelete,
       holdText: l10n.holdToDelete,
       processingText: l10n.deleting,
       instructionText: l10n.holdToDeleteInstruction,

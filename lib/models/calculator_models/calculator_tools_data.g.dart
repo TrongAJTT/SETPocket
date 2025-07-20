@@ -14,7 +14,7 @@ extension GetCalculatorToolsDataCollection on Isar {
       this.collection();
 }
 
-final CalculatorToolsDataSchema = CollectionSchema(
+const CalculatorToolsDataSchema = CollectionSchema(
   name: r'CalculatorToolsData',
   id: -949341117906944116,
   properties: {

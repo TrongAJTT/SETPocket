@@ -189,7 +189,7 @@ class MyService {
 ### Khởi Tạo
 ```dart
 // Trong main.dart hoặc khởi tạo app
-await AppLogger.instance.initialize(loggerName: 'MyMultiTools');
+await AppLogger.instance.initialize(loggerName: 'SETPocket');
 ```
 
 ### Tích Hợp Quản Lý Log

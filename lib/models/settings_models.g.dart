@@ -14,7 +14,7 @@ extension GetExtensibleSettingsCollection on Isar {
       this.collection();
 }
 
-final ExtensibleSettingsSchema = CollectionSchema(
+const ExtensibleSettingsSchema = CollectionSchema(
   name: r'ExtensibleSettings',
   id: 5655895684797682385,
   properties: {

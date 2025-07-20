@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/services/file_storage_service.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:setpocket/services/p2p_services/p2p_notification_service.dart';

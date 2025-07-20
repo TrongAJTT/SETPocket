@@ -14,7 +14,7 @@ extension GetConverterToolsDataCollection on Isar {
       this.collection();
 }
 
-final ConverterToolsDataSchema = CollectionSchema(
+const ConverterToolsDataSchema = CollectionSchema(
   name: r'ConverterToolsData',
   id: -6662130265328579496,
   properties: {

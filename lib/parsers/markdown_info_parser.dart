@@ -36,6 +36,28 @@ class MarkdownInfoParser {
     return InfoPage(title: title, overview: overview, sections: sections);
   }
 
+  List<InfoSection> parseSections(String content) {
+    final lines = content.split('\n');
+    final sections = <InfoSection>[];
+    List<String> currentSectionLines = [];
+
+    for (final line in lines) {
+      if (line.startsWith('## ')) {
+        if (currentSectionLines.isNotEmpty) {
+          sections.add(_parseSection(currentSectionLines));
+          currentSectionLines.clear();
+        }
+      }
+      currentSectionLines.add(line);
+    }
+
+    if (currentSectionLines.isNotEmpty) {
+      sections.add(_parseSection(currentSectionLines));
+    }
+
+    return sections;
+  }
+
   InfoSection _parseSection(List<String> lines) {
     final headerLine = lines.first;
     // RegExp để lấy icon, color, title từ "## [icon, color] Title"

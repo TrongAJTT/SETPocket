@@ -267,6 +267,13 @@ class PairingRequest {
       );
 }
 
+/// Các key chuẩn cho metadata mở rộng của DataTransferTask
+enum DataTransferKey {
+  messageId,
+  syncFilePath,
+  fileSyncResponse,
+}
+
 @Collection()
 class DataTransferTask {
   Id get isarId => fastHash(id);
@@ -305,6 +312,10 @@ class DataTransferTask {
   @Index()
   String? batchId; // Links to file transfer request
 
+  /// Metadata mở rộng cho transfer (ví dụ: messageId, custom keys...)
+  @ignore
+  Map<String, dynamic>? data;
+
   DataTransferTask({
     required this.id,
     required this.fileName,
@@ -321,6 +332,7 @@ class DataTransferTask {
     required this.isOutgoing,
     this.savePath,
     this.batchId,
+    this.data,
   });
 
   factory DataTransferTask.create({
@@ -338,6 +350,7 @@ class DataTransferTask {
     required bool isOutgoing,
     String? savePath,
     String? batchId,
+    Map<String, dynamic>? data,
   }) =>
       DataTransferTask(
         id: const Uuid().v4(),
@@ -355,6 +368,7 @@ class DataTransferTask {
         isOutgoing: isOutgoing,
         savePath: savePath,
         batchId: batchId,
+        data: data,
       );
 
   @ignore
@@ -376,6 +390,7 @@ class DataTransferTask {
         'isOutgoing': isOutgoing,
         'savePath': savePath,
         'batchId': batchId,
+        'data': data,
       };
 
   factory DataTransferTask.fromJson(Map<String, dynamic> json) =>
@@ -399,6 +414,9 @@ class DataTransferTask {
         isOutgoing: json['isOutgoing'],
         savePath: json['savePath'],
         batchId: json['batchId'],
+        data: json['data'] != null
+            ? Map<String, dynamic>.from(json['data'])
+            : {"errorAsString": "No data provided"},
       );
 }
 
@@ -469,22 +487,26 @@ class P2PMessage {
 class FileTransferInfo {
   late String fileName;
   late int fileSize;
+  int? messageId; // Dùng để truyền metadata cho file message (nếu có)
 
   // Add a no-arg constructor for Isar
   FileTransferInfo({
     this.fileName = '',
     this.fileSize = 0,
+    this.messageId,
   });
 
   Map<String, dynamic> toJson() => {
         'fileName': fileName,
         'fileSize': fileSize,
+        if (messageId != null) 'messageId': messageId,
       };
 
   factory FileTransferInfo.fromJson(Map<String, dynamic> json) =>
       FileTransferInfo(
         fileName: json['fileName'] as String,
         fileSize: json['fileSize'] as int,
+        messageId: json['messageId'] as int?,
       );
 }
 
@@ -520,6 +542,9 @@ class FileTransferRequest {
 
   bool useEncryption; // Whether sender uses encryption for this transfer
 
+  @ignore
+  Map<String, dynamic>? metadata; // Additional metadata for transfer
+
   FileTransferRequest({
     required this.requestId,
     required this.batchId,
@@ -533,6 +558,7 @@ class FileTransferRequest {
     this.maxChunkSize,
     this.receivedTime,
     this.useEncryption = false,
+    this.metadata,
   });
 
   factory FileTransferRequest.create({
@@ -664,6 +690,12 @@ class P2PMessageTypes {
   // File transfer pre-request messages
   static const String fileTransferRequest = 'file_transfer_request';
   static const String fileTransferResponse = 'file_transfer_response';
+  // Chat messages
+  static const String sendChatMessage = 'send_chat_message';
+  static const String chatMessageAck = 'chat_message_ack';
+  static const String chatRequestFileBackward = 'chat_request_file_backward';
+  static const String chatRequestFileLost = 'chat_response_file_lost';
+  static const String chatFileTransferRequest = 'chat_file_transfer_request';
 }
 
 // Workmanager task constants

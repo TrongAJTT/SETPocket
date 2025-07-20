@@ -13,7 +13,7 @@ extension GetP2PUserCollection on Isar {
   IsarCollection<P2PUser> get p2PUsers => this.collection();
 }
 
-final P2PUserSchema = CollectionSchema(
+const P2PUserSchema = CollectionSchema(
   name: r'P2PUser',
   id: 566369171815177019,
   properties: {
@@ -2021,7 +2021,7 @@ extension GetPairingRequestCollection on Isar {
   IsarCollection<PairingRequest> get pairingRequests => this.collection();
 }
 
-final PairingRequestSchema = CollectionSchema(
+const PairingRequestSchema = CollectionSchema(
   name: r'PairingRequest',
   id: 1782595776270177333,
   properties: {
@@ -3653,7 +3653,7 @@ extension GetDataTransferTaskCollection on Isar {
   IsarCollection<DataTransferTask> get dataTransferTasks => this.collection();
 }
 
-final DataTransferTaskSchema = CollectionSchema(
+const DataTransferTaskSchema = CollectionSchema(
   name: r'DataTransferTask',
   id: 3546441473027873409,
   properties: {
@@ -6490,7 +6490,7 @@ extension GetFileTransferRequestCollection on Isar {
       this.collection();
 }
 
-final FileTransferRequestSchema = CollectionSchema(
+const FileTransferRequestSchema = CollectionSchema(
   name: r'FileTransferRequest',
   id: 6889281268088159415,
   properties: {
@@ -8597,6 +8597,11 @@ const FileTransferInfoSchema = Schema(
       id: 1,
       name: r'fileSize',
       type: IsarType.long,
+    ),
+    r'messageId': PropertySchema(
+      id: 2,
+      name: r'messageId',
+      type: IsarType.long,
     )
   },
   estimateSize: _fileTransferInfoEstimateSize,
@@ -8623,6 +8628,7 @@ void _fileTransferInfoSerialize(
 ) {
   writer.writeString(offsets[0], object.fileName);
   writer.writeLong(offsets[1], object.fileSize);
+  writer.writeLong(offsets[2], object.messageId);
 }
 
 FileTransferInfo _fileTransferInfoDeserialize(
@@ -8634,6 +8640,7 @@ FileTransferInfo _fileTransferInfoDeserialize(
   final object = FileTransferInfo(
     fileName: reader.readStringOrNull(offsets[0]) ?? '',
     fileSize: reader.readLongOrNull(offsets[1]) ?? 0,
+    messageId: reader.readLongOrNull(offsets[2]),
   );
   return object;
 }
@@ -8649,6 +8656,8 @@ P _fileTransferInfoDeserializeProp<P>(
       return (reader.readStringOrNull(offset) ?? '') as P;
     case 1:
       return (reader.readLongOrNull(offset) ?? 0) as P;
+    case 2:
+      return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -8840,6 +8849,80 @@ extension FileTransferInfoQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'fileSize',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<FileTransferInfo, FileTransferInfo, QAfterFilterCondition>
+      messageIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'messageId',
+      ));
+    });
+  }
+
+  QueryBuilder<FileTransferInfo, FileTransferInfo, QAfterFilterCondition>
+      messageIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'messageId',
+      ));
+    });
+  }
+
+  QueryBuilder<FileTransferInfo, FileTransferInfo, QAfterFilterCondition>
+      messageIdEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'messageId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FileTransferInfo, FileTransferInfo, QAfterFilterCondition>
+      messageIdGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'messageId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FileTransferInfo, FileTransferInfo, QAfterFilterCondition>
+      messageIdLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'messageId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FileTransferInfo, FileTransferInfo, QAfterFilterCondition>
+      messageIdBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'messageId',
         lower: lower,
         includeLower: includeLower,
         upper: upper,

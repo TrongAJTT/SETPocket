@@ -104,7 +104,7 @@ class AppLogger {
   static AppLogger get instance;
   
   // Initialization
-  Future<void> initialize({String loggerName = 'MyMultiTools'});
+  Future<void> initialize({String loggerName = 'SETPocket'});
   Future<void> dispose();
   
   // Logging Methods

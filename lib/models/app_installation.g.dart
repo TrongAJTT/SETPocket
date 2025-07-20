@@ -13,7 +13,7 @@ extension GetAppInstallationCollection on Isar {
   IsarCollection<AppInstallation> get appInstallations => this.collection();
 }
 
-final AppInstallationSchema = CollectionSchema(
+const AppInstallationSchema = CollectionSchema(
   name: r'AppInstallation',
   id: -8556603532728503639,
   properties: {

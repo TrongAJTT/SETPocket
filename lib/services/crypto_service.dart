@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:pointycastle/export.dart' as pointy;
 import 'package:cryptography/cryptography.dart' as crypto;
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 
 /// Comprehensive crypto service supporting multiple encryption algorithms

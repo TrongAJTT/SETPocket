@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/utils/function_type_utils.dart';
 import 'package:setpocket/widgets/generic/generic_settings_helper.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/screens/about_layout.dart';
 import 'package:setpocket/screens/p2lan_transfer/p2lan_transfer_settings_layout.dart';
 import 'package:setpocket/screens/random_tools/random_tools_settings_layout.dart';

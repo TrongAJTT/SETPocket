@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/widgets/p2p/data_transfer_progress_widget.dart';
 import 'package:setpocket/utils/generic_dialog_utils.dart';
 import 'package:setpocket/widgets/generic/radial_menu.dart';

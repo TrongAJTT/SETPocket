@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/models/settings_models.dart';
 import 'package:setpocket/services/settings_models_service.dart';
 import 'package:setpocket/services/app_logger.dart';

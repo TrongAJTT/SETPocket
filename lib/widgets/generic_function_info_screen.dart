@@ -25,14 +25,13 @@ class GenericInfoScreen extends StatelessWidget {
             ),
           ),
           // Sections
-          ...page.sections
-              .map((section) => _buildSectionWidget(theme, section)),
+          ...page.sections.map((section) => buildSectionWidget(theme, section)),
         ],
       ),
     );
   }
 
-  Widget _buildSectionWidget(ThemeData theme, InfoSection section) {
+  static Widget buildSectionWidget(ThemeData theme, InfoSection section) {
     return Card(
       margin: const EdgeInsets.only(bottom: 20),
       elevation: 2,
@@ -65,7 +64,7 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildItemWidget(ThemeData theme, InfoItem item) {
+  static Widget _buildItemWidget(ThemeData theme, InfoItem item) {
     if (item is FeatureInfoItem) {
       return _buildFeatureInfoItem(theme, item);
     }
@@ -102,12 +101,12 @@ class GenericInfoScreen extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-  Widget _buildLinkButtonItem(ThemeData theme, LinkButtonInfoItem item) {
+  static Widget _buildLinkButtonItem(ThemeData theme, LinkButtonInfoItem item) {
     return Builder(
       builder: (context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: TextButton(
-          onPressed: () => UrlUtils.launchInBrowser(item.url, context),
+          onPressed: () => UriUtils.launchInBrowser(item.url, context),
           style: OutlinedButton.styleFrom(
             padding:
                 const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
@@ -129,7 +128,8 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildColoredShapeItem(ThemeData theme, ColoredShapeInfoItem item) {
+  static Widget _buildColoredShapeItem(
+      ThemeData theme, ColoredShapeInfoItem item) {
     return ListTile(
       leading: Container(
         width: 24,
@@ -148,7 +148,7 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureInfoItem(ThemeData theme, FeatureInfoItem item) {
+  static Widget _buildFeatureInfoItem(ThemeData theme, FeatureInfoItem item) {
     return ListTile(
       leading:
           Icon(item.icon, color: theme.iconTheme.color?.withValues(alpha: .7)),
@@ -161,7 +161,7 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSubSectionTitleInfoItem(
+  static Widget _buildSubSectionTitleInfoItem(
       ThemeData theme, SubSectionTitleInfoItem item) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -175,7 +175,7 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStepInfoItem(ThemeData theme, StepInfoItem item) {
+  static Widget _buildStepInfoItem(ThemeData theme, StepInfoItem item) {
     return ListTile(
       leading: CircleAvatar(
         radius: 14,
@@ -190,7 +190,7 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlainSubSectionInfoItem(
+  static Widget _buildPlainSubSectionInfoItem(
       ThemeData theme, PlainSubSectionInfoItem item) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -207,7 +207,8 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMathExpressionItem(ThemeData theme, MathExpressionItem item) {
+  static Widget _buildMathExpressionItem(
+      ThemeData theme, MathExpressionItem item) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Center(
@@ -220,7 +221,7 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUnorderListItem(ThemeData theme, UnorderListItem item) {
+  static Widget _buildUnorderListItem(ThemeData theme, UnorderListItem item) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -234,13 +235,36 @@ class GenericInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildParagraphInfoItem(ThemeData theme, ParagraphInfoItem item) {
+  static Widget _buildParagraphInfoItem(
+      ThemeData theme, ParagraphInfoItem item) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Text(item.text, style: theme.textTheme.bodyMedium));
   }
 
-  Widget _buildBlankLineItem(ThemeData theme, BlankLineInfoItem item) {
+  static Widget _buildBlankLineItem(ThemeData theme, BlankLineInfoItem item) {
     return SizedBox(height: item.spaceCount * 8.0); // Adjust space as needed
+  }
+}
+
+class GenericInfoSectionList extends StatelessWidget {
+  final List<InfoSection> sections;
+
+  const GenericInfoSectionList({super.key, required this.sections});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: sections
+            .map((section) => GenericInfoScreen.buildSectionWidget(
+                  Theme.of(context),
+                  section,
+                ))
+            .toList(),
+      ),
+    );
   }
 }

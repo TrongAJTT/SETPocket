@@ -1859,6 +1859,12 @@ abstract class AppLocalizations {
   /// **'Days'**
   String get days;
 
+  /// No description provided for @numberOfDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String numberOfDays(int count);
+
   /// No description provided for @hours.
   ///
   /// In en, this message translates to:
@@ -9461,6 +9467,12 @@ abstract class AppLocalizations {
   /// **'Customize how your device appears to other users'**
   String get displayNameDescription;
 
+  /// No description provided for @enterDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter display name'**
+  String get enterDisplayName;
+
   /// No description provided for @deviceDisplayNameLabel.
   ///
   /// In en, this message translates to:
@@ -10174,6 +10186,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back again to close the app'**
   String get backAgainToCloseApp;
+
+  /// No description provided for @chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chat;
+
+  /// No description provided for @chatWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with {name}'**
+  String chatWith(String name);
+
+  /// No description provided for @deleteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Chat'**
+  String get deleteChat;
+
+  /// No description provided for @deleteChatWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chat with {name}?'**
+  String deleteChatWith(String name);
+
+  /// No description provided for @deleteChatDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the chat history with this user. This action cannot be undone.'**
+  String get deleteChatDesc;
+
+  /// No description provided for @noChatExists.
+  ///
+  /// In en, this message translates to:
+  /// **'No chat yet.'**
+  String get noChatExists;
+
+  /// No description provided for @noMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet. Start chatting!'**
+  String get noMessages;
+
+  /// No description provided for @fileLost.
+  ///
+  /// In en, this message translates to:
+  /// **'File is lost on the device'**
+  String get fileLost;
+
+  /// No description provided for @fileLostRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'File lost request'**
+  String get fileLostRequest;
+
+  /// No description provided for @fileLostRequestDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is lost or cannot be found. You can request the sender to resend it if they still keep their file on their device.'**
+  String get fileLostRequestDesc;
+
+  /// No description provided for @fileLostOnBothSides.
+  ///
+  /// In en, this message translates to:
+  /// **'File is lost on both sides'**
+  String get fileLostOnBothSides;
+
+  /// No description provided for @noPathToCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'No path to copy'**
+  String get noPathToCopy;
+
+  /// No description provided for @deleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message'**
+  String get deleteMessage;
+
+  /// No description provided for @deleteMessageDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this message?'**
+  String get deleteMessageDesc;
+
+  /// No description provided for @deleteMessageAndFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message and file'**
+  String get deleteMessageAndFile;
+
+  /// No description provided for @deleteMessageAndFileDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this message and the attached file?'**
+  String get deleteMessageAndFileDesc;
+
+  /// No description provided for @errorOpeningFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error opening file'**
+  String get errorOpeningFile;
+
+  /// No description provided for @errorOpeningFileDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while trying to open the file: {error}'**
+  String errorOpeningFileDetails(String error);
+
+  /// No description provided for @attachFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach files'**
+  String get attachFile;
+
+  /// No description provided for @attachMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach media'**
+  String get attachMedia;
+
+  /// No description provided for @chatCustomization.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat Customization'**
+  String get chatCustomization;
+
+  /// No description provided for @chatCustomizationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat customization saved successfully'**
+  String get chatCustomizationSaved;
+
+  /// No description provided for @sendMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Message'**
+  String get sendMessage;
+
+  /// No description provided for @sendAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send at {time}'**
+  String sendAt(String time);
+
+  /// No description provided for @scrollAgainToLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll again to load more messages'**
+  String get scrollAgainToLoadMore;
+
+  /// No description provided for @loadingOldMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading old messages...'**
+  String get loadingOldMessages;
+
+  /// No description provided for @messageRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Retention'**
+  String get messageRetention;
+
+  /// No description provided for @messageRetentionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set how long messages are kept in the chat before being automatically deleted.'**
+  String get messageRetentionDesc;
+
+  /// No description provided for @p2pChatAutoCopyIncomingMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Synchronize clipboard'**
+  String get p2pChatAutoCopyIncomingMessages;
+
+  /// No description provided for @p2pChatAutoCopyIncomingMessagesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, new messages, if they are images or text, will be automatically copied to the device\'s clipboard.'**
+  String get p2pChatAutoCopyIncomingMessagesDesc;
+
+  /// No description provided for @p2pChatDeleteAfterCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message after copying'**
+  String get p2pChatDeleteAfterCopy;
+
+  /// No description provided for @p2pChatDeleteAfterCopyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, messages will be deleted after being copied to the clipboard.'**
+  String get p2pChatDeleteAfterCopyDesc;
+
+  /// No description provided for @p2pChatClipboardSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard sharing'**
+  String get p2pChatClipboardSharing;
+
+  /// No description provided for @p2pChatClipboardSharingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, new content appearing in the clipboard, if it is text or images, will be automatically recognized and a message will be sent. This feature will register a process and consume resources, so it is recommended to enable it only when necessary.'**
+  String get p2pChatClipboardSharingDesc;
+
+  /// No description provided for @p2pChatDeleteAfterShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message after sharing'**
+  String get p2pChatDeleteAfterShare;
+
+  /// No description provided for @p2pChatDeleteAfterShareDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, messages will be deleted after being shared from the clipboard.'**
+  String get p2pChatDeleteAfterShareDesc;
+
+  /// No description provided for @p2pChatCustomizationAndroidCaution.
+  ///
+  /// In en, this message translates to:
+  /// **'## [warning, orange] Note for Android devices\n- Clipboard-related features may not work stably with images.\n- The clipboard sharing feature only works when the app is running in the foreground (meaning you must be actively using the app, or have it open in a floating window, mini window, or split-screen) and you must be in this chat conversation.\n- The clipboard sharing feature will register a monitoring task that may impact device performance, so enable it only when truly necessary and disable it when not in use.\n'**
+  String get p2pChatCustomizationAndroidCaution;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

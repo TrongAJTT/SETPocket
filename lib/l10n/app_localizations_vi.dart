@@ -961,6 +961,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get days => 'Ngày';
 
   @override
+  String numberOfDays(int count) {
+    return '$count ngày';
+  }
+
+  @override
   String get hours => 'Giờ';
 
   @override
@@ -2684,7 +2689,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get scrollToTop => 'Lên đầu trang';
 
   @override
-  String get scrollToBottom => 'Xuống cuối trang';
+  String get scrollToBottom => 'Cuộn xuống dưới cùng';
 
   @override
   String get logActions => 'Hành động log';
@@ -4932,6 +4937,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get displayNameDescription => 'Tùy chỉnh cách thiết bị của bạn xuất hiện với người dùng khác';
 
   @override
+  String get enterDisplayName => 'Nhập tên hiển thị';
+
+  @override
   String get deviceDisplayNameLabel => 'Tên hiển thị thiết bị';
 
   @override
@@ -5311,4 +5319,123 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get backAgainToCloseApp => 'Trở lại lần nữa để xác nhận đóng ứng dụng';
+
+  @override
+  String get chat => 'Trò chuyện';
+
+  @override
+  String chatWith(String name) {
+    return 'Trò chuyện với $name';
+  }
+
+  @override
+  String get deleteChat => 'Xóa trò chuyện';
+
+  @override
+  String deleteChatWith(String name) {
+    return 'Xóa trò chuyện với $name?';
+  }
+
+  @override
+  String get deleteChatDesc => 'Bạn có chắc chắn muốn xóa cuộc trò chuyện với người dùng này?\nHành động này sẽ xóa tất cả tin nhắn và không thể hoàn tác.';
+
+  @override
+  String get noChatExists => 'Không có cuộc trò chuyện nào';
+
+  @override
+  String get noMessages => 'Chưa có tin nhắn nào, hãy bắt đầu cuộc trò chuyện!';
+
+  @override
+  String get fileLost => 'Tập tin không còn tồn tại';
+
+  @override
+  String get fileLostRequest => 'Yêu cầu tập tin';
+
+  @override
+  String get fileLostRequestDesc => 'Tập tin này không còn tôn tại trên thiết bị của bạn!\nBạn có thể yêu cầu người gửi gửi lại tập tin này nếu họ còn giữ tập tin trên thiết bị của họ.';
+
+  @override
+  String get fileLostOnBothSides => 'Tập tin không còn tồn tại trên cả hai thiết bị!';
+
+  @override
+  String get noPathToCopy => 'Không có đường dẫn để sao chép';
+
+  @override
+  String get deleteMessage => 'Xóa tin nhắn';
+
+  @override
+  String get deleteMessageDesc => 'Bạn có chắc chắn muốn xóa tin nhắn này?';
+
+  @override
+  String get deleteMessageAndFile => 'Xóa tin nhắn cùng tập tin';
+
+  @override
+  String get deleteMessageAndFileDesc => 'Bạn có chắc chắn muốn xóa tin nhắn này và tập tin đính kèm?';
+
+  @override
+  String get errorOpeningFile => 'Lỗi khi mở tập tin';
+
+  @override
+  String errorOpeningFileDetails(String error) {
+    return 'Sự cố khi mở tập tin: $error.';
+  }
+
+  @override
+  String get attachFile => 'Attach files';
+
+  @override
+  String get attachMedia => 'Attach media';
+
+  @override
+  String get chatCustomization => 'Tùy chỉnh trò chuyện';
+
+  @override
+  String get chatCustomizationSaved => 'Tùy chỉnh trò chuyện đã được lưu';
+
+  @override
+  String get sendMessage => 'Gửi tin nhắn';
+
+  @override
+  String sendAt(String time) {
+    return 'Gửi lúc $time';
+  }
+
+  @override
+  String get scrollAgainToLoadMore => 'Cuộn lên lần nữa để tải thêm tin nhắn';
+
+  @override
+  String get loadingOldMessages => 'Đang tải tin nhắn cũ...';
+
+  @override
+  String get messageRetention => 'Thời gian giữ tin nhắn';
+
+  @override
+  String get messageRetentionDesc => 'Chọn thời gian giữ tin nhắn trong cuộc trò chuyện. Sau thời gian này, tin nhắn sẽ tự động bị xóa.';
+
+  @override
+  String get p2pChatAutoCopyIncomingMessages => 'Đồng bộ bộ nhớ tạm';
+
+  @override
+  String get p2pChatAutoCopyIncomingMessagesDesc => 'Khi bật, tin nhắn mới nếu là ảnh hoặc văn bản sẽ tự động được sao chép vào bộ nhớ tạm của thiết bị.';
+
+  @override
+  String get p2pChatDeleteAfterCopy => 'Xóa tin nhắn sau khi sao chép';
+
+  @override
+  String get p2pChatDeleteAfterCopyDesc => 'Khi bật, tin nhắn sẽ bị xóa sau khi sao chép vào bộ nhớ tạm.';
+
+  @override
+  String get p2pChatClipboardSharing => 'Chia sẻ bộ nhớ tạm';
+
+  @override
+  String get p2pChatClipboardSharingDesc => 'Khi bật, nội dung mới xuất hiện trong bộ nhớ tạm nếu là văn bản hoặc hình ảnh sẽ được tự động nhận diện và tạo tin nhắn gửi đi. Tính năng này sẽ đăng ký tiến trình nền và ngốn tài nguyên nên khuyến nghị chỉ bật khi cần thiết.';
+
+  @override
+  String get p2pChatDeleteAfterShare => 'Xóa tin nhắn sau khi chia sẻ';
+
+  @override
+  String get p2pChatDeleteAfterShareDesc => 'Khi bật, tin nhắn sẽ bị xóa sau khi được chia sẻ từ bộ nhớ tạm.';
+
+  @override
+  String get p2pChatCustomizationAndroidCaution => '## [warning, orange] Lưu ý đối với thiết bị Android\n- Tính năng liên quan đến bộ nhớ tạm có thể hoạt động không ổn định với ảnh.\n- Tính năng chia sẻ bộ nhớ tạm chỉ hoạt động khi ứng dụng đang chạy trên nền (tức là bạn phải đang sử dụng ứng dụng, hoặc mở nó trong cửa sổ nổi, cửa sổ mini hoặc chia màn hình) và bạn phải ở trong đoạn chat này.\n- Tính năng chia sẻ bộ nhớ tạm sẽ đăng ký tác vụ theo dõi gây tác động đến hiệu suất thiết bị, vì vậy hãy bật nó khi bạn thật sự cần thiết và tắt đi khi không còn sử dụng.\n';
 }

@@ -1,9 +1,36 @@
+import 'dart:io';
+
+import 'package:open_file/open_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:setpocket/utils/snackbar_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class UrlUtils {
+class UriUtils {
+  /// Opens a file with the OS using open_file package.
+  static Future<void> openFile(String filePath, {BuildContext? context}) async {
+    try {
+      final result = await OpenFile.open(filePath);
+      if (result.type != ResultType.done && context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không thể mở file: ${result.message}')),
+        );
+      }
+    } catch (e) {
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi mở file: $e')),
+        );
+      }
+    }
+  }
+
+  static String getFileName(String filePath) {
+    return filePath.contains('/')
+        ? filePath.split('/').last
+        : filePath.split('\\').last;
+  }
+
   /// Opens a URL in the default browser.
   static Future<void> launchInBrowser(String url, BuildContext context) async {
     try {
@@ -87,6 +114,52 @@ class UrlUtils {
           );
         },
       );
+    }
+  }
+
+  static void openInFileExplorer(String filePath) {
+    if (Platform.isWindows) {
+      try {
+        final file = File(filePath);
+        if (file.existsSync()) {
+          Process.run('explorer', [file.parent.path]);
+        } else {
+          throw Exception('File does not exist: $filePath');
+        }
+      } catch (e) {
+        print('Error opening file explorer: $e');
+      }
+    }
+  }
+
+  static Future<void> createImageFileFromUint8List({
+    required Uint8List data,
+    required String fileName,
+    String? directory,
+  }) async {
+    if (Platform.isWindows) {
+      final directoryPath = directory ?? Directory.systemTemp.path;
+      final filePath = '$directoryPath/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(data);
+    } else if (Platform.isAndroid) {
+      final directoryPath = directory ?? Directory.systemTemp.path;
+      final filePath = '$directoryPath/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(data);
+    } else {
+      throw UnsupportedError('Unsupported platform for creating image files');
+    }
+  }
+
+  static Future<void> deleteSystemTempFile({required String fileName}) async {
+    final tempDir = Directory.systemTemp;
+    final filePath = '${tempDir.path}/$fileName';
+    final file = File(filePath);
+    if (await file.exists()) {
+      await file.delete();
+    } else {
+      print('File does not exist: $filePath');
     }
   }
 }

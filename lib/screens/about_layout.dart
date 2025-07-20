@@ -70,7 +70,7 @@ class _AboutLayoutState extends State<AboutLayout> {
             title: Text(l10n.githubRepo),
             subtitle: Text(l10n.githubRepoDesc),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => UrlUtils.launchInBrowser(githubRepoUrl, context),
+            onTap: () => UriUtils.launchInBrowser(githubRepoUrl, context),
           ),
 
           // Donate section
@@ -207,21 +207,21 @@ class _AboutLayoutState extends State<AboutLayout> {
             title: const Text('GitHub Sponsors'),
             subtitle: Text(l10n.supportOnGitHub),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => UrlUtils.launchInBrowser(githubSponsorUrl, context),
+            onTap: () => UriUtils.launchInBrowser(githubSponsorUrl, context),
           ),
           ListTile(
             leading: const Icon(Icons.coffee),
             title: const Text('Ko-fi'),
             subtitle: Text(l10n.buyMeCoffee),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => UrlUtils.launchInBrowser(donateKofiUrl, context),
+            onTap: () => UriUtils.launchInBrowser(donateKofiUrl, context),
           ),
           ListTile(
             leading: const Icon(Icons.payment),
             title: const Text('PayPal'),
             subtitle: Text(l10n.oneTimeDonation),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => UrlUtils.launchInBrowser(paypalDonateUrl, context),
+            onTap: () => UriUtils.launchInBrowser(paypalDonateUrl, context),
           ),
         ],
       ),
@@ -257,7 +257,7 @@ class _AboutLayoutState extends State<AboutLayout> {
             title: Text(lib['name'] ?? ''),
             subtitle: Text('${lib['author'] ?? ''} • ${lib['license'] ?? ''}'),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => UrlUtils.launchInBrowser(
+            onTap: () => UriUtils.launchInBrowser(
                 'https://pub.dev/packages/${lib['name'] ?? ''}', context));
       },
     );
@@ -468,6 +468,11 @@ class _AboutLayoutState extends State<AboutLayout> {
       {
         'name': 'get',
         'author': 'Jonny Borges',
+        'license': 'MIT',
+      },
+      {
+        'name': 'desktop_drop',
+        'author': 'leanflutter',
         'license': 'MIT',
       },
     ];

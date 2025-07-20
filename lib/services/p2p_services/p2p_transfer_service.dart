@@ -7,13 +7,17 @@ import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_chat.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
+// Import enum DataTransferKey để dùng cho metadata
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/isar_service.dart';
+import 'package:setpocket/services/p2p_services/p2p_chat_service.dart';
 import 'package:setpocket/services/p2p_services/p2p_network_service.dart';
 import 'package:setpocket/services/p2p_services/p2p_notification_service.dart';
 import 'package:setpocket/services/p2p_settings_adapter.dart';
 import 'package:setpocket/utils/isar_utils.dart';
+import 'package:setpocket/utils/url_utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:setpocket/services/encryption_service.dart';
@@ -37,6 +41,7 @@ class _FileTransferValidationResult {
 /// Extracted from monolithic P2PService for better modularity
 class P2PTransferService extends ChangeNotifier {
   final P2PNetworkService _networkService;
+  late final P2PChatService _chatService = P2PChatService(IsarService.isar);
 
   // Transfer settings
   P2PDataTransferSettings? _transferSettings;
@@ -67,6 +72,8 @@ class P2PTransferService extends ChangeNotifier {
 
   // File receiving management
   final Map<String, List<Uint8List>> _incomingFileChunks = {};
+  // Map taskId -> messageId (P2PCMessage.id) for received files
+  final Map<String, int> _receivedFileMessageIds = {};
 
   // Task creation synchronization to prevent race conditions
   final Map<String, Completer<DataTransferTask?>> _taskCreationLocks = {};
@@ -112,7 +119,7 @@ class P2PTransferService extends ChangeNotifier {
       _activeTransfers.values.toList();
 
   P2PTransferService(this._networkService) {
-    // Set up message handlers
+    // Set up message handler for incoming TCP messages
     _networkService.setMessageHandler(_handleTcpMessage);
   }
 
@@ -131,7 +138,7 @@ class P2PTransferService extends ChangeNotifier {
 
   /// Send multiple files to paired user
   Future<bool> sendMultipleFiles(
-      List<String> filePaths, P2PUser targetUser) async {
+      List<String> filePaths, P2PUser targetUser, bool transferOnly) async {
     try {
       if (!targetUser.isPaired) {
         throw Exception('User is not paired');
@@ -178,17 +185,18 @@ class P2PTransferService extends ChangeNotifier {
         final fileInfo = files[i];
 
         final task = DataTransferTask.create(
-          fileName: fileInfo.fileName,
-          filePath: filePath,
-          fileSize: fileInfo.fileSize,
-          targetUserId: targetUser.id,
-          targetUserName: targetUser.displayName,
-          status: DataTransferStatus.waitingForApproval,
-          isOutgoing: true,
-          batchId: request.batchId,
-        );
-
+            fileName: fileInfo.fileName,
+            filePath: filePath,
+            fileSize: fileInfo.fileSize,
+            targetUserId: targetUser.id,
+            targetUserName: targetUser.displayName,
+            status: DataTransferStatus.waitingForApproval,
+            isOutgoing: true,
+            batchId: request.batchId,
+            data: {DataTransferKey.syncFilePath.name: 1});
         _activeTransfers[task.id] = task;
+        logDebug(
+            'P2PTransferService: Created task ${task.id} for file ${fileInfo.fileName} with data: ${task.data.toString()}');
       }
 
       // Send file transfer request
@@ -427,8 +435,6 @@ class P2PTransferService extends ChangeNotifier {
       final messageData = jsonDecode(jsonString);
       final message = P2PMessage.fromJson(messageData);
 
-      logInfo('P2PTransferService: Processing message: ${message.type}');
-
       // Associate socket with user ID
       if (!_networkService.connectedSockets.containsKey(message.fromUserId)) {
         _networkService.associateSocketWithUser(message.fromUserId, socket);
@@ -446,6 +452,15 @@ class P2PTransferService extends ChangeNotifier {
           break;
         case P2PMessageTypes.fileTransferResponse:
           _handleFileTransferResponse(message);
+          break;
+        case P2PMessageTypes.sendChatMessage:
+          _networkService.handleIncomingChatMessage(message.data);
+          break;
+        case P2PMessageTypes.chatRequestFileBackward:
+          _handleFileCheckAndTransferBackwardRequest(message);
+          break;
+        case P2PMessageTypes.chatRequestFileLost:
+          _handleChatResponseLost(message);
           break;
         default:
           // Forward other message types to discovery service via callback
@@ -650,7 +665,6 @@ class P2PTransferService extends ChangeNotifier {
         return;
       }
 
-      // Get or create task
       DataTransferTask? task = await _getOrCreateTask(taskId, message, data);
       if (task == null) {
         logError(
@@ -730,7 +744,8 @@ class P2PTransferService extends ChangeNotifier {
       if (isLast) {
         logInfo(
             'P2PTransferService: Last chunk received for task $taskId, assembling file...');
-        await _assembleReceivedFile(taskId);
+        await _assembleReceivedFile(
+            taskId: taskId, metaData: {"userId": message.fromUserId});
       }
     } catch (e) {
       logError(
@@ -768,12 +783,15 @@ class P2PTransferService extends ChangeNotifier {
     // Check if task already exists
     DataTransferTask? task = _activeTransfers[taskId];
     if (task != null) {
+      logDebug('Get or create task: Found existing task for taskId=$taskId');
       return task;
     }
 
     // Check if another thread is creating this task
     Completer<DataTransferTask?>? existingLock = _taskCreationLocks[taskId];
     if (existingLock != null) {
+      logDebug(
+          'Get or create task: Waiting for existing lock for taskId=$taskId');
       return await existingLock.future;
     }
 
@@ -785,6 +803,8 @@ class P2PTransferService extends ChangeNotifier {
       // Double-check pattern
       task = _activeTransfers[taskId];
       if (task != null) {
+        logDebug(
+            'Get or create task: Found existing task after double-check for taskId=$taskId');
         completer.complete(task);
         return task;
       }
@@ -794,6 +814,8 @@ class P2PTransferService extends ChangeNotifier {
       final fileSize = data['fileSize'] as int?;
 
       if (fileName != null && fileSize != null) {
+        logDebug(
+            'Get or create task: Creating new task for file $fileName, taskId=$taskId');
         // Get batchId for this incoming transfer
         final batchId = _activeBatchIdsByUser[message.fromUserId];
 
@@ -803,7 +825,6 @@ class P2PTransferService extends ChangeNotifier {
         if (fromUser != null && fromUser.displayName.isNotEmpty) {
           senderName = fromUser.displayName;
         } else {
-          // Try to get from current batch's FileTransferRequest
           for (final request in _pendingFileTransferRequests) {
             if (request.fromUserId == message.fromUserId &&
                 request.fromUserName.isNotEmpty) {
@@ -813,10 +834,36 @@ class P2PTransferService extends ChangeNotifier {
           }
         }
 
+        // Tự động lấy toàn bộ metadata từ payload chunk đầu tiên, trừ các trường mặc định
+        final excludeKeys = [
+          'fileName',
+          'fileSize',
+          'taskId',
+          'data',
+          'isLast',
+          'ct',
+          'iv',
+          'tag',
+          'nonce',
+          'enc'
+        ];
+        Map<String, dynamic> metadata = {};
+        data.forEach((key, value) {
+          if (!excludeKeys.contains(key)) {
+            metadata[key] = value;
+          }
+        });
+        // Nếu có messageId thì lưu lại cho _receivedFileMessageIds
+        if (metadata.containsKey('messageId')) {
+          _receivedFileMessageIds[taskId] = metadata['messageId'];
+        }
+        logDebug(
+            '[P2PTransferService] Received metadata from sender: $metadata for taskId=$taskId');
+
         task = DataTransferTask(
           id: taskId,
           fileName: fileName,
-          filePath: '',
+          filePath: fileName, // Set initial filePath to fileName
           fileSize: fileSize,
           targetUserId: message.fromUserId,
           targetUserName: senderName,
@@ -825,6 +872,7 @@ class P2PTransferService extends ChangeNotifier {
           createdAt: DateTime.now(),
           startedAt: DateTime.now(),
           batchId: batchId,
+          data: metadata.isNotEmpty ? metadata : null,
         );
 
         _activeTransfers[taskId] = task;
@@ -845,7 +893,7 @@ class P2PTransferService extends ChangeNotifier {
             }
 
             if (isLast) {
-              Future.microtask(() => _assembleReceivedFile(taskId));
+              Future.microtask(() => _assembleReceivedFile(taskId: taskId));
             }
           }
           notifyListeners();
@@ -866,7 +914,8 @@ class P2PTransferService extends ChangeNotifier {
     }
   }
 
-  Future<void> _assembleReceivedFile(String taskId) async {
+  Future<void> _assembleReceivedFile(
+      {required String taskId, Map<String, dynamic>? metaData}) async {
     try {
       final chunks = _incomingFileChunks[taskId];
       final task = _activeTransfers[taskId];
@@ -875,6 +924,9 @@ class P2PTransferService extends ChangeNotifier {
         logError('P2PTransferService: Missing chunks or task for $taskId');
         return;
       }
+
+      logInfo(
+          'P2PTransferService: Receive task ${task.id} with data: ${task.data.toString()}');
 
       final fileName = _sanitizeFileName(task.fileName);
       final expectedFileSize = task.fileSize;
@@ -942,6 +994,60 @@ class P2PTransferService extends ChangeNotifier {
       task.filePath = filePath;
       task.savePath = filePath;
       task.transferredBytes = fileData.length;
+
+      logDebug('Check data transfer task: ${task.data}');
+
+      // Chỉ cập nhật filePath trong Isar nếu có syncFilePath (tức là đồng bộ đường dẫn file)
+      if (task.data?.containsKey(DataTransferKey.syncFilePath.name) ?? false) {
+        try {
+          final isar = IsarService.isar;
+          final String userId = metaData!['userId'] as String;
+          final msg =
+              (await isar.p2PChats.filter().userBIdEqualTo(userId).findFirst())!
+                  .messages
+                  .lastOrNull;
+          if (msg != null) {
+            await isar.writeTxn(() async {
+              msg.filePath = filePath;
+              msg.status = P2PCMessageStatus.onDevice;
+              await isar.p2PCMessages.put(msg);
+            });
+          }
+        } catch (e) {
+          logError('P2PTransferService: Failed to update filePath in Isar: $e');
+        }
+      }
+
+      // Update isar if fileSyncResponse is present
+      if (task.data?.containsKey(DataTransferKey.fileSyncResponse.name) ??
+          false) {
+        logInfo(
+            'P2PTransferService: Updating message status in Isar for task $taskId');
+        try {
+          final isar = IsarService.isar;
+          final userId = task.data!['userId'] as String;
+          final syncId = task.data![DataTransferKey.fileSyncResponse.name];
+          final msg = await (await isar.p2PChats
+                  .filter()
+                  .userBIdEqualTo(userId)
+                  .findFirst())!
+              .messages
+              .filter()
+              .syncIdEqualTo(syncId as String)
+              .findFirst();
+          await isar.writeTxn(() async {
+            msg!.status = P2PCMessageStatus.onDevice;
+            msg.filePath = filePath;
+            await isar.p2PCMessages.put(msg);
+          });
+
+          logInfo(
+              'P2PTransferService: Updated message status in Isar for syncId: $syncId');
+        } catch (e) {
+          logError(
+              'P2PTransferService: Failed to update message status in Isar: $e');
+        }
+      }
 
       // Show completion notification
       await _safeNotificationCall(
@@ -1270,6 +1376,19 @@ class P2PTransferService extends ChangeNotifier {
           if (isFirstChunk) {
             dataPayload['fileName'] = task.fileName;
             dataPayload['fileSize'] = task.fileSize;
+            // Truyền messageId nếu có trong task.data
+            // final syncFilePath = task.data != null
+            //     ? task.data![DataTransferKey.syncFilePath.name]
+            //     : null;
+            // if (syncFilePath != null) {
+            //   dataPayload['messageId'] = syncFilePath;
+            // }
+            // Truyền toàn bộ metadata từ task.data vào chunk đầu tiên
+            if (task.data != null) {
+              task.data!.forEach((key, value) {
+                dataPayload[key] = value;
+              });
+            }
             isFirstChunk = false;
           }
 
@@ -1865,6 +1984,70 @@ class P2PTransferService extends ChangeNotifier {
         logError('P2PTransferService: Failed to initialize Android path: $e');
       }
     }
+  }
+
+  Future<void> _handleFileCheckAndTransferBackwardRequest(
+      P2PMessage msg) async {
+    logInfo(
+        'P2PTransferService: Handling file check and transfer backward request from ${msg.toJson()}');
+
+    final data = msg.data;
+    final peerUser = _getTargetUser(msg.fromUserId)!;
+    final syncId = data['syncId'];
+
+    if (syncId == null) {
+      logError(
+          'P2PTransferService: syncId is null in file check and transfer backward request');
+      return;
+    }
+
+    // Check the file on device
+    final filePath =
+        await _chatService.handleCheckMessageFileExist(msg.fromUserId, syncId);
+
+    logDebug(
+        'P2PTransferService: File check for syncId $syncId returned path: $filePath');
+
+    // If file not found, send response
+    if (filePath == null) {
+      logInfo('P2PTransferService: File not found for syncId $syncId');
+      final response = P2PMessage(
+          type: P2PMessageTypes.chatRequestFileLost,
+          fromUserId: msg.toUserId,
+          toUserId: msg.fromUserId,
+          data: {"syncId": syncId});
+      await _networkService.sendMessageToUser(peerUser, response.toJson());
+    } else {
+      // If file exists, create file transfer task
+      final file = File(filePath);
+      final task = DataTransferTask.create(
+        filePath: filePath,
+        fileName: UriUtils.getFileName(filePath),
+        fileSize: file.lengthSync(),
+        status: DataTransferStatus.pending,
+        isOutgoing: true,
+        targetUserId: msg.fromUserId,
+        batchId: syncId,
+        startedAt: DateTime.now(),
+        targetUserName: peerUser.displayName,
+        createdAt: DateTime.now(),
+        data: {
+          DataTransferKey.fileSyncResponse.name: syncId,
+          "userId": msg.toUserId
+        },
+      );
+      _activeTransfers[syncId] = task;
+      logInfo(
+          'P2PTransferService: Created file transfer task for syncId $syncId');
+      await _startNextAvailableTransfers();
+      notifyListeners();
+    }
+  }
+
+  Future<void> _handleChatResponseLost(P2PMessage msg) async {
+    final userId = msg.fromUserId;
+    final syncId = msg.data['syncId'] as String;
+    _chatService.handleFileRequestLost(userId, syncId);
   }
 
   @override

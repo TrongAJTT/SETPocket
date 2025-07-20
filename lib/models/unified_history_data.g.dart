@@ -14,7 +14,7 @@ extension GetUnifiedHistoryDataCollection on Isar {
       this.collection();
 }
 
-final UnifiedHistoryDataSchema = CollectionSchema(
+const UnifiedHistoryDataSchema = CollectionSchema(
   name: r'UnifiedHistoryData',
   id: -3106033285787504197,
   properties: {

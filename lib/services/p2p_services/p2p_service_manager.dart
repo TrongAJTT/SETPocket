@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/isar_service.dart';
 import 'package:setpocket/services/p2p_services/p2p_discovery_service.dart';
@@ -12,6 +12,8 @@ import 'package:setpocket/services/p2p_services/p2p_transfer_service.dart';
 /// P2P Service Manager - Facade pattern that coordinates all P2P services
 /// Provides a unified API that replaces the monolithic P2PService
 class P2PServiceManager extends ChangeNotifier {
+  // Public getter for network service
+  P2PNetworkService get networkService => _networkService;
   static P2PServiceManager? _instance;
 
   // Services
@@ -210,19 +212,24 @@ class P2PServiceManager extends ChangeNotifier {
 
   /// Send multiple files to user
   Future<bool> sendMultipleFiles(
-      List<String> filePaths, P2PUser targetUser) async {
-    return await _transferService.sendMultipleFiles(filePaths, targetUser);
+      {required List<String> filePaths,
+      required P2PUser targetUser,
+      bool transferOnly = true}) async {
+    return await _transferService.sendMultipleFiles(
+        filePaths, targetUser, transferOnly);
   }
 
   /// Send data to paired user (legacy method)
   Future<bool> sendData(String filePath, P2PUser targetUser) async {
-    return await sendMultipleFiles([filePath], targetUser);
+    return await sendMultipleFiles(
+        filePaths: [filePath], targetUser: targetUser);
   }
 
   /// Send multiple files to user (alias)
   Future<bool> sendMultipleFilesToUser(
-      List<String> filePaths, P2PUser targetUser) async {
-    return await sendMultipleFiles(filePaths, targetUser);
+      List<String> filePaths, P2PUser targetUser, bool transferOnly) async {
+    return await sendMultipleFiles(
+        filePaths: filePaths, targetUser: targetUser);
   }
 
   /// Cancel data transfer

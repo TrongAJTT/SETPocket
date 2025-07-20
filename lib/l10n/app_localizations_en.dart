@@ -968,6 +968,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get days => 'Days';
 
   @override
+  String numberOfDays(int count) {
+    return '$count days';
+  }
+
+  @override
   String get hours => 'Hours';
 
   @override
@@ -4939,6 +4944,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displayNameDescription => 'Customize how your device appears to other users';
 
   @override
+  String get enterDisplayName => 'Enter display name';
+
+  @override
   String get deviceDisplayNameLabel => 'Device Display Name';
 
   @override
@@ -5318,4 +5326,123 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backAgainToCloseApp => 'Back again to close the app';
+
+  @override
+  String get chat => 'Chat';
+
+  @override
+  String chatWith(String name) {
+    return 'Chat with $name';
+  }
+
+  @override
+  String get deleteChat => 'Delete Chat';
+
+  @override
+  String deleteChatWith(String name) {
+    return 'Delete chat with $name?';
+  }
+
+  @override
+  String get deleteChatDesc => 'This will permanently delete the chat history with this user. This action cannot be undone.';
+
+  @override
+  String get noChatExists => 'No chat yet.';
+
+  @override
+  String get noMessages => 'No messages yet. Start chatting!';
+
+  @override
+  String get fileLost => 'File is lost on the device';
+
+  @override
+  String get fileLostRequest => 'File lost request';
+
+  @override
+  String get fileLostRequestDesc => 'This file is lost or cannot be found. You can request the sender to resend it if they still keep their file on their device.';
+
+  @override
+  String get fileLostOnBothSides => 'File is lost on both sides';
+
+  @override
+  String get noPathToCopy => 'No path to copy';
+
+  @override
+  String get deleteMessage => 'Delete message';
+
+  @override
+  String get deleteMessageDesc => 'Are you sure you want to delete this message?';
+
+  @override
+  String get deleteMessageAndFile => 'Delete message and file';
+
+  @override
+  String get deleteMessageAndFileDesc => 'Are you sure you want to delete this message and the attached file?';
+
+  @override
+  String get errorOpeningFile => 'Error opening file';
+
+  @override
+  String errorOpeningFileDetails(String error) {
+    return 'An error occurred while trying to open the file: $error';
+  }
+
+  @override
+  String get attachFile => 'Attach files';
+
+  @override
+  String get attachMedia => 'Attach media';
+
+  @override
+  String get chatCustomization => 'Chat Customization';
+
+  @override
+  String get chatCustomizationSaved => 'Chat customization saved successfully';
+
+  @override
+  String get sendMessage => 'Send Message';
+
+  @override
+  String sendAt(String time) {
+    return 'Send at $time';
+  }
+
+  @override
+  String get scrollAgainToLoadMore => 'Scroll again to load more messages';
+
+  @override
+  String get loadingOldMessages => 'Loading old messages...';
+
+  @override
+  String get messageRetention => 'Message Retention';
+
+  @override
+  String get messageRetentionDesc => 'Set how long messages are kept in the chat before being automatically deleted.';
+
+  @override
+  String get p2pChatAutoCopyIncomingMessages => 'Synchronize clipboard';
+
+  @override
+  String get p2pChatAutoCopyIncomingMessagesDesc => 'When enabled, new messages, if they are images or text, will be automatically copied to the device\'s clipboard.';
+
+  @override
+  String get p2pChatDeleteAfterCopy => 'Delete message after copying';
+
+  @override
+  String get p2pChatDeleteAfterCopyDesc => 'When enabled, messages will be deleted after being copied to the clipboard.';
+
+  @override
+  String get p2pChatClipboardSharing => 'Clipboard sharing';
+
+  @override
+  String get p2pChatClipboardSharingDesc => 'When enabled, new content appearing in the clipboard, if it is text or images, will be automatically recognized and a message will be sent. This feature will register a process and consume resources, so it is recommended to enable it only when necessary.';
+
+  @override
+  String get p2pChatDeleteAfterShare => 'Delete message after sharing';
+
+  @override
+  String get p2pChatDeleteAfterShareDesc => 'When enabled, messages will be deleted after being shared from the clipboard.';
+
+  @override
+  String get p2pChatCustomizationAndroidCaution => '## [warning, orange] Note for Android devices\n- Clipboard-related features may not work stably with images.\n- The clipboard sharing feature only works when the app is running in the foreground (meaning you must be actively using the app, or have it open in a floating window, mini window, or split-screen) and you must be in this chat conversation.\n- The clipboard sharing feature will register a monitoring task that may impact device performance, so enable it only when truly necessary and disable it when not in use.\n';
 }

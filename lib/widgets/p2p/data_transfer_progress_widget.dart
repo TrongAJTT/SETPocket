@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/utils/size_utils.dart';
 import 'package:setpocket/utils/widget_layout_render_helper.dart';

@@ -13,7 +13,7 @@ extension GetBmiHistoryEntryCollection on Isar {
   IsarCollection<BmiHistoryEntry> get bmiHistoryEntrys => this.collection();
 }
 
-final BmiHistoryEntrySchema = CollectionSchema(
+const BmiHistoryEntrySchema = CollectionSchema(
   name: r'BmiHistoryEntry',
   id: 3590145505753095761,
   properties: {

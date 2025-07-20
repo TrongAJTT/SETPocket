@@ -597,6 +597,14 @@
     "minutes": "Phút",
     "hours": "Giờ",
     "days": "Ngày",
+    "numberOfDays": "{count} ngày",
+    "@numberOfDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "weeks": "Tuần",
     "months": "Tháng", 
     "years": "Năm",
@@ -2133,6 +2141,7 @@
     "deviceProfile": "Hồ sơ thiết bị",
     "displayName": "Tên hiển thị",
     "displayNameDescription": "Tùy chỉnh cách thiết bị của bạn xuất hiện với người dùng khác",
+    "enterDisplayName": "Nhập tên hiển thị",
     "deviceDisplayName": "Tên hiển thị thiết bị",
     "defaultDisplayName": "Mặc định: {name}",
     "deviceDisplayNameLabel": "Tên hiển thị thiết bị",
@@ -2458,5 +2467,72 @@
             }
         }
     },
-    "backAgainToCloseApp": "Trở lại lần nữa để xác nhận đóng ứng dụng"
+    "backAgainToCloseApp": "Trở lại lần nữa để xác nhận đóng ứng dụng",
+    "chat": "Trò chuyện",
+    "chatWith": "Trò chuyện với {name}",
+    "@chatWith": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+
+    "deleteChat": "Xóa trò chuyện",
+    "deleteChatWith": "Xóa trò chuyện với {name}?",
+    "@deleteChatWith": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "deleteChatDesc": "Bạn có chắc chắn muốn xóa cuộc trò chuyện với người dùng này?\nHành động này sẽ xóa tất cả tin nhắn và không thể hoàn tác.",
+    "noChatExists": "Không có cuộc trò chuyện nào",
+    "noMessages": "Chưa có tin nhắn nào, hãy bắt đầu cuộc trò chuyện!",
+    "fileLost": "Tập tin không còn tồn tại",
+    "fileLostRequest": "Yêu cầu tập tin",
+    "fileLostRequestDesc": "Tập tin này không còn tôn tại trên thiết bị của bạn!\nBạn có thể yêu cầu người gửi gửi lại tập tin này nếu họ còn giữ tập tin trên thiết bị của họ.",
+    "fileLostOnBothSides": "Tập tin không còn tồn tại trên cả hai thiết bị!",
+    "noPathToCopy": "Không có đường dẫn để sao chép",
+    "deleteMessage": "Xóa tin nhắn",
+    "deleteMessageDesc": "Bạn có chắc chắn muốn xóa tin nhắn này?",
+    "deleteMessageAndFile": "Xóa tin nhắn cùng tập tin",
+    "deleteMessageAndFileDesc": "Bạn có chắc chắn muốn xóa tin nhắn này và tập tin đính kèm?",
+    "errorOpeningFile": "Lỗi khi mở tập tin",
+    "errorOpeningFileDetails": "Sự cố khi mở tập tin: {error}.",
+    "@errorOpeningFileDetails": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "attatchFiles": "Đính kèm tập tin",
+    "attatchMedia": "Đính kèm phương tiện",
+    "chatCustomization": "Tùy chỉnh trò chuyện",
+    "chatCustomizationSaved": "Tùy chỉnh trò chuyện đã được lưu",
+    "sendMessage": "Gửi tin nhắn",
+    "scrollToBottom": "Cuộn xuống dưới cùng",
+    "sendAt": "Gửi lúc {time}",
+    "@sendAt": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "scrollAgainToLoadMore": "Cuộn lên lần nữa để tải thêm tin nhắn",
+    "loadingOldMessages": "Đang tải tin nhắn cũ...",
+    "messageRetention": "Thời gian giữ tin nhắn",
+    "messageRetentionDesc": "Chọn thời gian giữ tin nhắn trong cuộc trò chuyện. Sau thời gian này, tin nhắn sẽ tự động bị xóa.",
+    "p2pChatAutoCopyIncomingMessages": "Đồng bộ bộ nhớ tạm",
+    "p2pChatAutoCopyIncomingMessagesDesc": "Khi bật, tin nhắn mới nếu là ảnh hoặc văn bản sẽ tự động được sao chép vào bộ nhớ tạm của thiết bị.",
+    "p2pChatDeleteAfterCopy": "Xóa tin nhắn sau khi sao chép",
+    "p2pChatDeleteAfterCopyDesc": "Khi bật, tin nhắn sẽ bị xóa sau khi sao chép vào bộ nhớ tạm.",
+    "p2pChatClipboardSharing": "Chia sẻ bộ nhớ tạm",
+    "p2pChatClipboardSharingDesc": "Khi bật, nội dung mới xuất hiện trong bộ nhớ tạm nếu là văn bản hoặc hình ảnh sẽ được tự động nhận diện và tạo tin nhắn gửi đi. Tính năng này sẽ đăng ký tiến trình nền và ngốn tài nguyên nên khuyến nghị chỉ bật khi cần thiết.",
+    "p2pChatDeleteAfterShare": "Xóa tin nhắn sau khi chia sẻ",
+    "p2pChatDeleteAfterShareDesc": "Khi bật, tin nhắn sẽ bị xóa sau khi được chia sẻ từ bộ nhớ tạm.",
+    "p2pChatCustomizationAndroidCaution": "## [warning, orange] Lưu ý đối với thiết bị Android\n- Tính năng liên quan đến bộ nhớ tạm có thể hoạt động không ổn định với ảnh.\n- Tính năng chia sẻ bộ nhớ tạm chỉ hoạt động khi ứng dụng đang chạy trên nền (tức là bạn phải đang sử dụng ứng dụng, hoặc mở nó trong cửa sổ nổi, cửa sổ mini hoặc chia màn hình) và bạn phải ở trong đoạn chat này.\n- Tính năng chia sẻ bộ nhớ tạm sẽ đăng ký tác vụ theo dõi gây tác động đến hiệu suất thiết bị, vì vậy hãy bật nó khi bạn thật sự cần thiết và tắt đi khi không còn sử dụng.\n"
 }

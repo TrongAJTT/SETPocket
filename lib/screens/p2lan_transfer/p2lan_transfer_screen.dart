@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:setpocket/controllers/p2p_controller.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 import 'package:setpocket/layouts/two_panels_main_multi_tab_layout.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
+import 'package:setpocket/screens/p2lan_transfer/p2lan_chat_screen.dart';
 import 'package:setpocket/services/function_info_service.dart';
+import 'package:setpocket/utils/generic_dialog_utils.dart';
 import 'package:setpocket/utils/network_debug_utils.dart';
 import 'package:setpocket/widgets/p2p/network_security_warning_dialog.dart';
 import 'package:setpocket/widgets/p2p/pairing_request_dialog.dart';
@@ -39,6 +41,8 @@ class P2LanTransferScreen extends StatefulWidget {
 class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
   late P2PController _controller;
   int _currentTabIndex = 0;
+  final GlobalKey<NavigatorState> _chatNavigatorKey =
+      GlobalKey<NavigatorState>();
   bool _isControllerInitialized = false;
   final ScrollController _transfersScrollController = ScrollController();
 
@@ -215,21 +219,19 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         });
       },
       mainPanelActions: [
-        // Local files folder button
+        // ...existing code...
         if (Platform.isAndroid)
           IconButton(
             icon: const Icon(Icons.folder),
             onPressed: _openLocalFiles,
             tooltip: 'Local Files',
           ),
-        // Manual discovery button - show only when networking is enabled and not currently refreshing
         if (_controller.isEnabled && !_controller.isRefreshing)
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: _manualRefresh,
             tooltip: 'Manual Discovery',
           ),
-        // Loading indicator when refreshing
         if (_controller.isRefreshing)
           const Padding(
             padding: EdgeInsets.all(16.0),
@@ -248,7 +250,6 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
             onPressed: _showPairingRequests,
             tooltip: l10n.pairingRequests,
           ),
-        // File storage settings
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: _showTransferSettings,
@@ -265,6 +266,11 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           label: l10n.transfers,
           icon: Icons.swap_horiz,
           content: _buildTransfersTab(),
+        ),
+        TabData(
+          label: l10n.chat,
+          icon: Icons.chat,
+          content: _buildChatTab(),
         ),
       ],
       secondaryPanel: _buildStatusPanel(),
@@ -283,6 +289,11 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildChatTab() {
+    return ChatTabNavigator(
+        controller: _controller, navigatorKey: _chatNavigatorKey);
   }
 
   Widget _buildDevicesTab() {
@@ -450,6 +461,19 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
                 ],
               ),
             ),
+
+            // Add to chat list, only show when user is online
+            if (isOnline)
+              PopupMenuItem(
+                value: 'add_to_chat',
+                child: Row(
+                  children: [
+                    const Icon(Icons.chat),
+                    const SizedBox(width: 8),
+                    Text(l10n.chatWith(user.displayName)),
+                  ],
+                ),
+              ),
 
             // Basic actions
             if (!user.isPaired)
@@ -890,6 +914,9 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       case 'view_info':
         _showUserInfoDialog(user);
         break;
+      case 'add_to_chat':
+        _addUserToChatAndOpen(user);
+        break;
       case 'pair':
         _showPairingDialog(user);
         break;
@@ -903,6 +930,32 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
         _showUnpairDialog(user);
         break;
     }
+  }
+
+  /// Add user to chat and switch to Chat tab
+  void _addUserToChatAndOpen(P2PUser user) async {
+    final chatService = _controller.p2pChatService;
+    final currentUserId = _controller.currentUser?.id;
+    if (currentUserId == null) {
+      _showErrorSnackBar('Current user not available');
+      return;
+    }
+    // Find chat (API expects userId)
+    final chat = await chatService.findChatByUsers(user.id);
+    String chatId;
+    if (chat != null) {
+      chatId = chat.id.toString();
+    } else {
+      final newChat = await chatService.addChat(user.id);
+      chatId = newChat.id.toString();
+    }
+    setState(() {
+      _currentTabIndex = 2;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _chatNavigatorKey.currentState
+          ?.pushNamed('/chatDetail', arguments: chatId);
+    });
   }
 
   void _cancelTransfer(String taskId) {
@@ -1451,34 +1504,23 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
 
   void _removeTrust(P2PUser user) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
+    GenericDialogUtils.showSimpleGenericClearDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.removeTrust),
-        content: Text(l10n.removeTrustFrom(user.displayName)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final success = await _controller.removeTrust(user.id);
-              if (success && mounted) {
-                SnackbarUtils.showTyped(
-                  context,
-                  l10n.removeTrustFrom(user.displayName),
-                  SnackBarType.info,
-                );
-              } else if (_controller.errorMessage != null) {
-                _showErrorSnackBar(_controller.errorMessage!);
-              }
-            },
-            child: Text(l10n.remove),
-          ),
-        ],
-      ),
+      onConfirm: () async {
+        Navigator.of(context).pop();
+        final success = await _controller.removeTrust(user.id);
+        if (success && mounted) {
+          SnackbarUtils.showTyped(
+            context,
+            l10n.removeTrustFrom(user.displayName),
+            SnackBarType.info,
+          );
+        } else if (_controller.errorMessage != null) {
+          _showErrorSnackBar(_controller.errorMessage!);
+        }
+      },
+      title: l10n.removeTrust,
+      description: l10n.removeTrustFrom(user.displayName),
     );
   }
 
@@ -1490,7 +1532,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
       builder: (context) => HoldToConfirmDialog(
         title: l10n.unpairFrom(user.displayName),
         content: l10n.unpairDescription,
-        actionText: l10n.holdToUnpair,
+        cancelText: l10n.holdToUnpair,
         holdText: l10n.holdToUnpair,
         processingText: l10n.unpairing,
         instructionText: l10n.holdButtonToConfirmUnpair,
@@ -1501,7 +1543,7 @@ class _P2LanTransferScreenState extends State<P2LanTransferScreen> {
           Navigator.of(context).pop();
 
           final success = await _controller.unpairUser(user.id);
-          if (success && mounted) {
+          if (success && context.mounted) {
             SnackbarUtils.showTyped(
               context,
               l10n.unpairFrom(user.displayName),

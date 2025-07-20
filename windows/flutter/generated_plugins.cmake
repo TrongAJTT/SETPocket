@@ -4,8 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
+  desktop_drop
   isar_flutter_libs
   nsd_windows
+  pasteboard
   permission_handler_windows
   screen_retriever_windows
   share_plus

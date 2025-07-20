@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:setpocket/services/p2p_services/p2p_navigation_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:setpocket/services/app_logger.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 
 /// P2P notification types for different events
 enum P2PNotificationType {

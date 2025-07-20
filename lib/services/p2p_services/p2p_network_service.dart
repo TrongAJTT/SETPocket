@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:isar/isar.dart';
+import 'package:setpocket/models/app_installation.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_chat.dart';
+import 'package:setpocket/services/isar_service.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/network_security_service.dart';
 import 'package:workmanager/workmanager.dart';
@@ -33,6 +36,55 @@ class P2PNetworkService extends ChangeNotifier {
 
   // Message handling callback
   Function(Socket, Uint8List)? _onMessageReceived;
+
+  /// Constructor
+  P2PNetworkService() {
+    // Initialize network service
+    logInfo('P2PNetworkService: Initializing...');
+  }
+
+  // Chat message handler (for demo, should be moved to service)
+  Future<void> handleIncomingChatMessage(
+      Map<String, dynamic> messageData) async {
+    logDebug('>>>>>>>>>>>>>>>>>>>>>>>>>>');
+
+    final msg = P2PCMessage.fromJson(messageData);
+    final isar = IsarService.isar;
+
+    final myId =
+        (await isar.appInstallations.where().findFirst())!.installationId!;
+    P2PChat? chat =
+        await isar.p2PChats.filter().userBIdEqualTo(msg.senderId).findFirst();
+    final displayName =
+        (await isar.p2PUsers.filter().idEqualTo(msg.senderId).findFirst())
+                ?.displayName ??
+            'User ${msg.senderId}';
+
+    if (chat == null) {
+      final newChat = P2PChat()
+        ..userAId = myId
+        ..userBId = msg.senderId
+        ..displayName = displayName
+        ..createdAt = DateTime.now()
+        ..retention = MessageRetention.days30;
+      await isar.writeTxn(() async {
+        await isar.p2PChats.put(newChat);
+      });
+      chat = newChat;
+    }
+    // Add message
+    // Gọi đến hàm addMessage của Chat Service
+    try {
+      final chatService = IsarService.chatService;
+      msg.id = await chatService.addMessage(msg, chat);
+    } catch (e) {
+      logError('Failed to access IsarService.chatService: $e');
+      // Optionally, queue message for later or handle gracefully
+      return;
+    }
+    notifyListeners();
+  }
+
   Function(Uint8List, InternetAddress, int)? _onUdpMessageReceived;
 
   // Constants
@@ -157,6 +209,9 @@ class P2PNetworkService extends ChangeNotifier {
         targetUser.port,
         timeout: const Duration(seconds: 5),
       );
+
+      logInfo(
+          'P2PNetworkService: Send chat message to ${targetUser.displayName} with data: $messageData');
 
       final success = await sendMessageToSocket(socket, messageData);
 

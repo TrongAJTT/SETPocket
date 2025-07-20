@@ -13,7 +13,7 @@ extension GetUnitTemplateModelCollection on Isar {
   IsarCollection<UnitTemplateModel> get unitTemplateModels => this.collection();
 }
 
-final UnitTemplateModelSchema = CollectionSchema(
+const UnitTemplateModelSchema = CollectionSchema(
   name: r'UnitTemplateModel',
   id: -3164407944360440420,
   properties: {

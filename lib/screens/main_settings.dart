@@ -83,11 +83,6 @@ class _MainSettingsScreenState extends State<MainSettingsScreen> {
     }
   }
 
-  void _handleMobileAppbar() {
-    final loc = AppLocalizations.of(context)!;
-    // Removed unified MobileAppBarController logic
-  }
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;

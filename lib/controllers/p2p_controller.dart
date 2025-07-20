@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_chat.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
+import 'package:setpocket/services/isar_service.dart';
 import 'package:setpocket/services/network_security_service.dart';
+import 'package:setpocket/services/p2p_services/p2p_chat_service.dart';
 import 'package:setpocket/services/p2p_services/p2p_service_manager.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
 
 class P2PController with ChangeNotifier {
+  // Chat service
+  late final P2PChatService _p2pChatService = P2PChatService(IsarService.isar);
   final P2PServiceManager _p2pService = P2PServiceManager.instance;
 
   // UI State
@@ -58,6 +63,7 @@ class P2PController with ChangeNotifier {
   P2PUser? get currentUser => _p2pService.currentUser;
   List<P2PUser> get discoveredUsers => _p2pService.discoveredUsers;
   List<P2PUser> get pairedUsers => _p2pService.pairedUsers;
+  P2PChatService get p2pChatService => _p2pChatService;
 
   /// Saved devices (stored connections) - ensure no duplicates
   List<P2PUser> get connectedUsers {
@@ -75,6 +81,28 @@ class P2PController with ChangeNotifier {
   /// Online saved devices (green background)
   List<P2PUser> get onlineDevices {
     return discoveredUsers.where((user) => user.isOnlineSaved).toList();
+  }
+
+  P2PUser? getUserById(String userId) {
+    try {
+      return discoveredUsers.firstWhere((user) => user.id == userId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Offline saved devices (gray background)
+  bool isUserOnline(String userId) {
+    final user = discoveredUsers.firstWhere(
+      (user) => user.id == userId,
+      orElse: () => P2PUser.create(
+          displayName: '',
+          profileId: '',
+          ipAddress: '',
+          port: 0,
+          isOnline: false),
+    );
+    return user.isOnline;
   }
 
   /// New discovered devices (blue background)
@@ -465,8 +493,8 @@ class P2PController with ChangeNotifier {
       List<String> filePaths, P2PUser targetUser) async {
     try {
       _errorMessage = null;
-      final success =
-          await _p2pService.sendMultipleFilesToUser(filePaths, targetUser);
+      final success = await _p2pService.sendMultipleFilesToUser(
+          filePaths, targetUser, false);
       if (!success) {
         _errorMessage = 'Failed to send files';
       }
@@ -943,6 +971,17 @@ class P2PController with ChangeNotifier {
     } finally {
       _isRefreshing = false;
       notifyListeners();
+    }
+  }
+
+  /// SECTION: CHAT MANAGEMENT
+
+  Future<List<P2PChat>> loadAllChatsTitle() async {
+    try {
+      return await _p2pChatService.getAllChatsWithoutMessages();
+    } catch (e) {
+      logError('Failed to load all chats: $e');
+      rethrow;
     }
   }
 }

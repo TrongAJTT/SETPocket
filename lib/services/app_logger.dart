@@ -37,7 +37,7 @@ class AppLogger {
   static const Duration _productionFlushInterval = Duration(seconds: 5);
 
   /// Initialize the unified logger
-  Future<void> initialize({String loggerName = 'MyMultiTools'}) async {
+  Future<void> initialize({String loggerName = 'SETPocket'}) async {
     if (_isInitialized) return;
 
     try {

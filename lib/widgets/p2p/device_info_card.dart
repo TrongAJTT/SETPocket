@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 
 class DeviceInfoCard extends StatefulWidget {
   final P2PUser? user;

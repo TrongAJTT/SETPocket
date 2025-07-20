@@ -342,6 +342,14 @@
     "years": "Years",
     "months": "Months",
     "days": "Days",
+    "numberOfDays": "{count} days",
+    "@numberOfDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "hours": "Hours",
     "minutes": "Minutes",
     "seconds": "Seconds",
@@ -2987,6 +2995,7 @@
     "deviceProfile": "Device Profile",
     "displayName": "Display Name",
     "displayNameDescription": "Customize how your device appears to other users",
+    "enterDisplayName": "Enter display name",
     "deviceDisplayNameLabel": "Device Display Name",
     "deviceDisplayNameHint": "Enter custom display name...",
     "defaultDisplayName": "Default: {name}",
@@ -3210,5 +3219,73 @@
             }
         }
     },
-    "backAgainToCloseApp": "Back again to close the app"
+    "backAgainToCloseApp": "Back again to close the app",
+    "chat": "Chat",
+    "chatWith": "Chat with {name}",
+    "@chatWith": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+
+    "deleteChat": "Delete Chat",
+    "deleteChatWith": "Delete chat with {name}?",
+    "@deleteChatWith": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "deleteChatDesc": "This will permanently delete the chat history with this user. This action cannot be undone.",
+    "noChatExists": "No chat yet.",
+    "noMessages": "No messages yet. Start chatting!",
+    "fileLost": "File is lost on the device",
+    "fileLostRequest": "File lost request",
+    "fileLostRequestDesc": "This file is lost or cannot be found. You can request the sender to resend it if they still keep their file on their device.",
+    "fileLostOnBothSides": "File is lost on both sides",
+    "noPathToCopy": "No path to copy",
+    "deleteMessage": "Delete message",
+    "deleteMessageDesc": "Are you sure you want to delete this message?",
+    "deleteMessageAndFile": "Delete message and file",
+    "deleteMessageAndFileDesc": "Are you sure you want to delete this message and the attached file?",
+    "errorOpeningFile": "Error opening file",
+    "errorOpeningFileDetails": "An error occurred while trying to open the file: {error}",
+    "@errorOpeningFileDetails": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "attachFile": "Attach files",
+    "attachMedia": "Attach media",
+    "chatCustomization": "Chat Customization",
+    "chatCustomizationSaved": "Chat customization saved successfully",
+    "sendMessage": "Send Message",
+    "scrollToBottom": "Scroll to Bottom",
+    "sendAt": "Send at {time}",
+    "@sendAt": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "scrollAgainToLoadMore": "Scroll again to load more messages",
+    "loadingOldMessages": "Loading old messages...",
+    "messageRetention": "Message Retention",
+    "messageRetentionDesc": "Set how long messages are kept in the chat before being automatically deleted.",
+        "p2pChatAutoCopyIncomingMessages": "Synchronize clipboard",
+    "p2pChatAutoCopyIncomingMessagesDesc": "When enabled, new messages, if they are images or text, will be automatically copied to the device's clipboard.",
+    "p2pChatDeleteAfterCopy": "Delete message after copying",
+    "p2pChatDeleteAfterCopyDesc": "When enabled, messages will be deleted after being copied to the clipboard.",
+    "p2pChatClipboardSharing": "Clipboard sharing",
+    "p2pChatClipboardSharingDesc": "When enabled, new content appearing in the clipboard, if it is text or images, will be automatically recognized and a message will be sent. This feature will register a process and consume resources, so it is recommended to enable it only when necessary.",
+    "p2pChatDeleteAfterShare": "Delete message after sharing",
+    "p2pChatDeleteAfterShareDesc": "When enabled, messages will be deleted after being shared from the clipboard.",
+    "p2pChatCustomizationAndroidCaution": "## [warning, orange] Note for Android devices\n- Clipboard-related features may not work stably with images.\n- The clipboard sharing feature only works when the app is running in the foreground (meaning you must be actively using the app, or have it open in a floating window, mini window, or split-screen) and you must be in this chat conversation.\n- The clipboard sharing feature will register a monitoring task that may impact device performance, so enable it only when truly necessary and disable it when not in use.\n"
+
   }

@@ -3,7 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:network_info_plus/network_info_plus.dart' as network_info_plus;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/services/app_logger.dart';
 import 'package:setpocket/services/app_installation_service.dart';
 

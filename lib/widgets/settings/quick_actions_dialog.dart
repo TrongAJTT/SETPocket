@@ -178,68 +178,9 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                     )
                   : Column(
                       children: [
-                        // Info section
-                        Container(
-                          width: double.infinity,
-                          margin: EdgeInsets.all(
-                              isDesktop ? 16 : 12), // Smaller margin on mobile
-                          padding: EdgeInsets.all(
-                              isDesktop ? 16 : 12), // Smaller padding on mobile
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            border: Border.all(
-                              color: theme.colorScheme.outline
-                                  .withValues(alpha: 0.2),
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    size: isDesktop
-                                        ? 20
-                                        : 18, // Smaller icon on mobile
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    // Add Expanded to prevent overflow
-                                    child: Text(
-                                      l10n.quickActionsInfo,
-                                      style:
-                                          theme.textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: isDesktop
-                                            ? null
-                                            : 13, // Smaller text on mobile
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                l10n.selectUpTo4Tools,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.7),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                l10n.quickActionsEnableDesc,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ), // Selected count
+                        const SizedBox(
+                            height: 16), // Spacing between header and content
+                        // Selected count
                         Container(
                           margin: EdgeInsets.symmetric(
                               horizontal: isDesktop
@@ -248,7 +189,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                           child: Row(
                             children: [
                               Icon(
-                                Icons.flash_on,
+                                Icons.list_alt,
                                 size: isDesktop
                                     ? 16
                                     : 14, // Smaller icon on mobile

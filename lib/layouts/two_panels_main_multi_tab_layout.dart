@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:setpocket/widgets/generic/draggable_fab.dart';
 
 /// Decorator for customizing the switch tab buttons between main and secondary tabs
 class SwitchTabButtonDecorator {
@@ -131,7 +132,14 @@ class _TwoPanelsMainMultiTabLayoutState
   TabController? _mobileTabController;
 
   int _currentMainTabIndex = 0;
-  bool _isOnSecondaryTab = false; // For mobile floating button state
+  bool _isOnSecondaryTab = false;
+
+  // Floating button position management
+  Offset _fabOffset = const Offset(-1, -1); // -1 indicates uninitialized
+  Size? _screenSize;
+  bool _isDragging = false;
+  static const double _fabSize = 56.0;
+  static const double _fabPadding = 16.0;
 
   @override
   void initState() {
@@ -540,29 +548,22 @@ class _TwoPanelsMainMultiTabLayoutState
       ],
     );
 
-    if (widget.isEmbedded) {
-      return Stack(
-        children: [
-          tabContent,
-          if (hasSecondaryTab) _buildPositionedFloatingButton(),
-        ],
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: widget.title != null ? Text(widget.title!) : null,
-          actions: _getMobileAppBarActions(),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(0),
-            child: Container(), // Empty container to maintain spacing
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: widget.title != null ? Text(widget.title!) : null,
+            actions: _getMobileAppBarActions(),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(0),
+              child: Container(), // Empty container to maintain spacing
+            ),
           ),
+          body: tabContent,
         ),
-        body: tabContent,
-        floatingActionButton: hasSecondaryTab
-            ? _buildFloatingActionButton()
-            : widget.floatingActionButton,
-      );
-    }
+        if (hasSecondaryTab) _buildPositionedFloatingButton(),
+      ],
+    );
   }
 
   Widget _buildPositionedFloatingButton() {
@@ -570,32 +571,59 @@ class _TwoPanelsMainMultiTabLayoutState
         widget.secondaryEnabled && widget.secondaryTab != null;
     if (!hasSecondaryTab) return const SizedBox.shrink();
 
-    return Positioned(
-      bottom: 16,
-      right: 16,
-      child: _buildFloatingActionButton(),
+    return DraggableFloatingActionButton.recommended(
+      icon: _isOnSecondaryTab
+          ? Icons.calculate
+          : (widget.secondaryTab?.icon ?? Icons.more_horiz),
+      tooltip: _isOnSecondaryTab
+          ? 'Back to calculator'
+          : widget.secondaryTab?.label ?? '',
+      onPressed: _toggleMainSecondaryTab,
     );
   }
 
-  Widget _buildFloatingActionButton() {
-    final hasSecondaryTab =
-        widget.secondaryEnabled && widget.secondaryTab != null;
-    if (!hasSecondaryTab) return const SizedBox.shrink();
+  /// Calculate snap position for floating button
+  Offset _calculateSnapPosition(Offset dragEndOffset) {
+    if (_screenSize == null) return dragEndOffset;
 
-    return FloatingActionButton.small(
-      onPressed: _toggleMainSecondaryTab,
-      tooltip:
-          _isOnSecondaryTab ? 'Back to calculator' : widget.secondaryTab!.label,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: Icon(
-          _isOnSecondaryTab
-              ? Icons.calculate
-              : (widget.secondaryTab!.icon ?? Icons.more_horiz),
-          key: ValueKey(_isOnSecondaryTab),
-        ),
-      ),
-    );
+    final double screenWidth = _screenSize!.width;
+    final double screenHeight = _screenSize!.height;
+
+    // Calculate center position of the FAB
+    double centerX = dragEndOffset.dx + _fabSize / 2;
+    double centerY = dragEndOffset.dy + _fabSize / 2;
+
+    // Constrain to screen bounds with padding
+    const double minX = _fabPadding;
+    final double maxX = screenWidth - _fabSize - _fabPadding;
+    const double minY = _fabPadding + 80; // Account for app bar
+    final double maxY =
+        screenHeight - _fabSize - 100; // Account for bottom safe area
+
+    // Snap to edges if close enough
+    const double snapThreshold = 50.0;
+
+    double finalX = centerX - _fabSize / 2;
+    double finalY = centerY - _fabSize / 2;
+
+    // Snap to left or right edge
+    if (centerX < screenWidth / 3) {
+      finalX = minX; // Snap to left
+    } else if (centerX > screenWidth * 2 / 3) {
+      finalX = maxX; // Snap to right
+    }
+
+    // Ensure Y position is within bounds
+    finalY = finalY.clamp(minY, maxY);
+
+    // Snap to top or bottom if very close
+    if (finalY < minY + snapThreshold) {
+      finalY = minY;
+    } else if (finalY > maxY - snapThreshold) {
+      finalY = maxY;
+    }
+
+    return Offset(finalX, finalY);
   }
 
   List<Widget>? _getMobileAppBarActions() {

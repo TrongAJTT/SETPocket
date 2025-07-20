@@ -14,7 +14,7 @@ extension GetFinancialCalculationHistoryCollection on Isar {
       get financialCalculationHistorys => this.collection();
 }
 
-final FinancialCalculationHistorySchema = CollectionSchema(
+const FinancialCalculationHistorySchema = CollectionSchema(
   name: r'FinancialCalculationHistory',
   id: 1151823705567661945,
   properties: {
@@ -1147,7 +1147,7 @@ extension GetFinancialCalculatorStateCollection on Isar {
       this.collection();
 }
 
-final FinancialCalculatorStateSchema = CollectionSchema(
+const FinancialCalculatorStateSchema = CollectionSchema(
   name: r'FinancialCalculatorState',
   id: -6838229852067599508,
   properties: {

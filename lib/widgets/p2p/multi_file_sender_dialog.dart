@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:setpocket/l10n/app_localizations.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 import 'package:setpocket/widgets/p2p/file_type_radial_menu.dart';
 import 'package:setpocket/services/file_directory_service.dart';
 import 'package:setpocket/services/app_logger.dart';
@@ -26,6 +27,7 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
   final List<FileInfo> _selectedFiles = [];
   bool _isLoading = false;
   bool _filesSent = false;
+  bool _dragging = false;
 
   OverlayEntry? _radialMenuOverlay;
 
@@ -35,16 +37,16 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
   @override
   void dispose() {
     _hideRadialMenu();
-    // 🔥 FIX: Only cleanup if dialog was cancelled (not sent)
+    // FIX: Only cleanup if dialog was cancelled (not sent)
     if (!_filesSent) {
       _cleanupFilePickerCache();
     }
-    // 🔥 CLEANUP: Clear selected files list to free memory
+    // CLEANUP: Clear selected files list to free memory
     _selectedFiles.clear();
     super.dispose();
   }
 
-  /// 🔥 NEW: Cleanup file picker temporary files
+  /// Cleanup file picker temporary files
   Future<void> _cleanupFilePickerCache() async {
     try {
       // Clear file picker cache to free temporary files
@@ -76,31 +78,74 @@ class _MultiFileSenderDialogState extends State<MultiFileSenderDialog>
       content: SizedBox(
         width: 600,
         height: 500,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_selectedFiles.isNotEmpty)
-              Row(
-                children: [
-                  _buildEnhancedAddFilesButton(),
-                  const SizedBox(width: 8),
-                  TextButton.icon(
-                    onPressed: _clearAllFiles,
-                    icon: const Icon(Icons.clear_all),
-                    label: Text(l10n.clearAll),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.red,
+        child: DropTarget(
+          onDragDone: (detail) async {
+            try {
+              final List<FileInfo> newFiles = [];
+              for (final file in detail.files) {
+                if (file.path.isNotEmpty) {
+                  try {
+                    final fileInfo = await _createFileInfo(file.path!);
+                    final isAlreadySelected = _selectedFiles.any(
+                      (existing) => existing.path == fileInfo.path,
+                    );
+                    if (!isAlreadySelected) {
+                      newFiles.add(fileInfo);
+                    }
+                  } catch (e) {
+                    logError('Error processing file ${file.path}: $e');
+                  }
+                }
+              }
+              if (newFiles.isNotEmpty && mounted) {
+                setState(() {
+                  _selectedFiles.addAll(newFiles);
+                });
+              }
+            } catch (e) {
+              logError('Error in onDragDone: $e');
+            }
+          },
+          onDragEntered: (detail) {
+            if (mounted) {
+              setState(() {
+                _dragging = true;
+              });
+            }
+          },
+          onDragExited: (detail) {
+            if (mounted) {
+              setState(() {
+                _dragging = false;
+              });
+            }
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_selectedFiles.isNotEmpty)
+                Row(
+                  children: [
+                    _buildEnhancedAddFilesButton(),
+                    const SizedBox(width: 8),
+                    TextButton.icon(
+                      onPressed: _clearAllFiles,
+                      icon: const Icon(Icons.clear_all),
+                      label: Text(l10n.clearAll),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              if (_selectedFiles.isNotEmpty) const SizedBox(height: 16),
+              Expanded(
+                child: _selectedFiles.isEmpty
+                    ? _buildEmptyState()
+                    : _buildFilesList(),
               ),
-            if (_selectedFiles.isNotEmpty) const SizedBox(height: 16),
-            Expanded(
-              child: _selectedFiles.isEmpty
-                  ? _buildEmptyState()
-                  : _buildFilesList(),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [

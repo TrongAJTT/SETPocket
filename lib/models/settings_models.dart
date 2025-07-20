@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:isar/isar.dart';
 import 'converter_models/currency_fetch_mode.dart';
-import 'package:setpocket/models/p2p_models.dart';
+import 'package:setpocket/models/p2p/p2p_models.dart';
 
 part 'settings_models.g.dart';
 

@@ -13,7 +13,7 @@ extension GetP2PDataCacheCollection on Isar {
   IsarCollection<P2PDataCache> get p2PDataCaches => this.collection();
 }
 
-final P2PDataCacheSchema = CollectionSchema(
+const P2PDataCacheSchema = CollectionSchema(
   name: r'P2PDataCache',
   id: 5868483008450424708,
   properties: {

@@ -53,6 +53,22 @@ class FunctionInfo {
       }
     }
   }
+
+  static Widget buildSectionsFromText(String text) {
+    try {
+      final parser = MarkdownInfoParser();
+      final infoSections = parser.parseSections(text);
+      return GenericInfoSectionList(sections: infoSections);
+    } catch (e) {
+      logError('Error parsing function info text: $e');
+      return Center(
+        child: Text(
+          'Error loading information. Details: $e',
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
+    }
+  }
 }
 
 class FunctionInfoKeys {

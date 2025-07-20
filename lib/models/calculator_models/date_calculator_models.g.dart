@@ -14,7 +14,7 @@ extension GetDateCalculationHistoryCollection on Isar {
       this.collection();
 }
 
-final DateCalculationHistorySchema = CollectionSchema(
+const DateCalculationHistorySchema = CollectionSchema(
   name: r'DateCalculationHistory',
   id: 8297151515272173219,
   properties: {
@@ -1153,7 +1153,7 @@ extension GetDateCalculatorStateCollection on Isar {
       this.collection();
 }
 
-final DateCalculatorStateSchema = CollectionSchema(
+const DateCalculatorStateSchema = CollectionSchema(
   name: r'DateCalculatorState',
   id: -965660668008464411,
   properties: {

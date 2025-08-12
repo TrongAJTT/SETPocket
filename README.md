@@ -1,3 +1,6 @@
+> [!note]
+> I have discontinued the development of this project because even making a single change would be very demanding. Integrating multiple features into one app, especially after it has grown beyond six major functions, is overwhelming for a one-person team like myself, who is still new to the profession. Therefore, I decided to split it into completely separate applications, which currently include [P2Lan Transfer](https://github.com/TrongAJTT/p2lan-transfer) and [Random Please](https://github.com/TrongAJTT/random-please).
+
 # 🛠️ SETPocket - Set of Essential Tools in one Pocket.
 
 A cross-platform productivity suite providing essential everyday tools in one application. Built with Flutter to deliver consistent user experience across Windows, Android, and other platforms.
